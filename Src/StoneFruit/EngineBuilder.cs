@@ -13,7 +13,7 @@ namespace StoneFruit
     {
         private readonly CombinedCommandSource _commandSource;
         private IEnvironmentCollection _environments;
-        private IParser<char, IArgument> _argParser;
+        private IParser<char, IEnumerable<IArgument>> _argParser;
 
         public EngineBuilder()
         {
@@ -55,7 +55,7 @@ namespace StoneFruit
             return UseSingleEnvironment(null);
         }
 
-        public EngineBuilder UseArgumentParser(IParser<char, IArgument> argParser)
+        public EngineBuilder UseArgumentParser(IParser<char, IEnumerable<IArgument>> argParser)
         {
             _argParser = argParser;
             return this;

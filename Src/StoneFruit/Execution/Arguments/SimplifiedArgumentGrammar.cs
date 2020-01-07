@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using ParserObjects;
 using ParserObjects.Parsers;
 using static ParserObjects.Parsers.ParserMethods;
@@ -9,7 +10,7 @@ namespace StoneFruit.Execution.Arguments
 {
     public class SimplifiedArgumentGrammar
     {
-        public static IParser<char, IArgument> GetParser()
+        public static IParser<char, IEnumerable<IArgument>> GetParser()
         {
             var doubleQuotedString = StrippedDoubleQuotedStringWithEscapedQuotes();
             var singleQuotedString = StrippedSingleQuotedStringWithEscapedQuotes();
@@ -28,12 +29,12 @@ namespace StoneFruit.Execution.Arguments
                 Match("=", c => c),
                 value,
 
-                (n, e, v) => new NamedArgument(n, v)
+                (n, e, v) => new IArgument[] { new NamedArgument(n, v) }
             );
 
-            var args = First<char, IArgument>(
+            var args = First<char, IEnumerable<IArgument>>(
                 namedArg,
-                value.Transform(v => new PositionalArgument(v))
+                value.Transform(v => new [] { new PositionalArgument(v) })
             );
 
             var whitespace = Whitespace();

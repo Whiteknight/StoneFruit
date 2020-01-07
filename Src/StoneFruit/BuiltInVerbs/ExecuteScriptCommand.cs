@@ -21,6 +21,7 @@ namespace StoneFruit.BuiltInVerbs
         {
             var scriptName = _args.ShiftNextPositional().Require().Value;
             // TODO: Some kind of comment syntax? Maybe we can cover that in the command parser?
+            // TODO: Error-handling if we don't have the file?
             var contents = File.ReadAllLines(scriptName).Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
             foreach (var line in contents)
                 _state.AddCommand(line);

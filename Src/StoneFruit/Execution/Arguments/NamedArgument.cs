@@ -11,7 +11,7 @@
         public string Name { get; }
 
         public string Value { get; }
-
+        
         public bool Consumed { get; private set; }
 
         public IArgument MarkConsumed()

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ParserObjects;
 using ParserObjects.Sequences;
@@ -16,7 +17,7 @@ namespace StoneFruit.Execution
         private readonly ITerminalOutput _output;
         private readonly IParser<char, CompleteCommand> _parser;
 
-        public Engine(ICommandSource commands, IEnvironmentCollection environments, IParser<char, IArgument> argParser)
+        public Engine(ICommandSource commands, IEnvironmentCollection environments, IParser<char, IEnumerable<IArgument>> argParser)
         {
             // TODO: If we have 0 commands, we might want to just abort?
             _environments = environments ?? new InstanceEnvironmentCollection(null);

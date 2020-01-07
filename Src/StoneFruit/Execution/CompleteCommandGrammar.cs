@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using ParserObjects;
 using ParserObjects.Parsers;
 using StoneFruit.Execution.Arguments;
@@ -8,7 +9,7 @@ namespace StoneFruit.Execution
 {
     public static class CompleteCommandGrammar
     {
-        public static IParser<char, CompleteCommand> GetParser(IParser<char, IArgument> argParser = null)
+        public static IParser<char, CompleteCommand> GetParser(IParser<char, IEnumerable<IArgument>> argParser = null)
         {
             argParser ??= SimplifiedArgumentGrammar.GetParser();
 
@@ -22,7 +23,7 @@ namespace StoneFruit.Execution
 
             return Rule(
                 commandName,
-                argParser.List(a => new CommandArguments(a)),
+                argParser.List(a => new CommandArguments(a.SelectMany(x => x))),
 
                 (name, args) => new CompleteCommand(name, args)
             );

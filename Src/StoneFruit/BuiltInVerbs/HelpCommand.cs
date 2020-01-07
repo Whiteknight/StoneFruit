@@ -18,6 +18,9 @@ namespace StoneFruit.BuiltInVerbs
 
         public void Execute()
         {
+            // TODO: Mode where we take the name of a command and try to offer detailed information
+            // Will probably require some kind of extension to the command object to provide that info
+
             var commandsList = _commands.GetAll().ToList();
             int maxCommandLength = commandsList.Select(c => c.Name.Length).Max();
             int descStartColumn = maxCommandLength + 2;

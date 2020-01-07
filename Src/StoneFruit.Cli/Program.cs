@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using StoneFruit.BuiltInVerbs;
 using StoneFruit.StructureMap;
 
 namespace StoneFruit.Cli
@@ -14,7 +13,7 @@ namespace StoneFruit.Cli
                 //.UseCommands(typeof(HelpCommand), typeof(ExitCommand))
                 .UseEnvironmentFactory(new MyEnvironmentFactory())
                 .Build();
-            engine.Start(args);
+            engine.Run(args);
             Console.ReadKey();
         }
     }
