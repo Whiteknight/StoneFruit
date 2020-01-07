@@ -1,0 +1,31 @@
+﻿using System.Linq;
+using ParserObjects;
+using ParserObjects.Parsers;
+using StoneFruit.Execution.Arguments;
+using static ParserObjects.Parsers.ParserMethods;
+
+namespace StoneFruit.Execution
+{
+    public static class CompleteCommandGrammar
+    {
+        public static IParser<char, CompleteCommand> GetParser(IParser<char, IArgument> argParser = null)
+        {
+            argParser = argParser ?? SimplifiedArgumentGrammar.GetParser();
+
+            var firstChar = Match<char>(c => c == '_' || char.IsLetter(c));
+            var bodyChars = Match<char>(c => c == '_' || c == '-' || char.IsLetterOrDigit(c));
+            var commandName = Rule(
+                firstChar,
+                bodyChars.List(c => new string(c.ToArray())),
+                (first, rest) => (first + rest).ToLowerInvariant()
+            );
+
+            return Rule(
+                commandName,
+                argParser.List(a => new CommandArguments(a)),
+
+                (name, args) => new CompleteCommand(name, args)
+            );
+        }
+    }
+}

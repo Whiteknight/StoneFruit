@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="structuremap" Version="4.7.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\StoneFruit.StructureMap\StoneFruit.StructureMap.csproj" />
+    <ProjectReference Include="..\StoneFruit\StoneFruit.csproj" />
+  </ItemGroup>
+
+</Project>
