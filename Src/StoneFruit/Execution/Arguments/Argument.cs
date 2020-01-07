@@ -11,12 +11,15 @@ namespace StoneFruit.Execution.Arguments
 
     public static class ArgumentExtensions
     {
-        public static void Require(this IArgument argument)
+        public static IArgument Require(this IArgument argument)
         {
             if (argument == null)
                 throw new ArgumentNullException(nameof(argument));
             (argument as MissingArgument)?.Throw();
+            return argument;
         }
+
+        public static bool Exists(this IArgument argument) => argument != null && !(argument is MissingArgument);
 
         public static bool AsBool(this IArgument argument) => As(argument, bool.Parse);
 

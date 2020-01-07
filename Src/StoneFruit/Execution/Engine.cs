@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using ParserObjects;
 using ParserObjects.Sequences;
 using StoneFruit.BuiltInVerbs;
@@ -24,61 +25,40 @@ namespace StoneFruit.Execution
             _output = new ConsoleTerminalOutput();
         }
 
-        public void Start(string[] args = null)
+        public void Run(string[] args = null)
         {
-            //if (args == null || args.Length == 0)
-            //{
-                //ExecuteCommand(ChangeEnvironmentCommand.Name, CommandArguments.Empty);
+            if (args == null || args.Length == 0)
+            {
                 RunInteractively();
-            //}
-            //else if (args.Length == 1 && _environments.IsValid(args[0]))
-            //{
-            //    ExecuteCommand(ChangeEnvironmentCommand.Name, CommandArguments.Parse(args[0]));
-            //    RunInteractively();
-            //}
-            //else
-            //{
-            //    RunHeadless(args);
-            //}
+                return;
+            }
+
+            if (args.Length == 1 && _environments.IsValid(args[0]))
+            {
+                RunInteractively();
+                return;
+            }
+
+            if (args.Length == 1 && args[0] == "help")
+            {
+                // TODO: A HeadlessHelpCommand that includes more info about headless usage?
+                new HelpCommand(_output, _commandSource).Execute();
+                return;
+            }
+
+            RunHeadless(args);
         }
 
-        //private void RunHeadless(string[] arg)
-        //{
-        //    _state.Headless = true;
+        public void RunHeadless(string[] arg)
+        {
+            var state = new EngineState(true);
 
-        //    var sequence = new StringArraySequence(arg);
+            var env = arg[0];
+            new ChangeEnvironmentCommand(_output, CommandArguments.Single(env), state, _environments).Execute();
 
-        //    var env = sequence.GetNext();
-        //    if (env == "help")
-        //    {
-        //        env = _environments.GetName(0);
-        //        new HelpCommand().Execute(CreateContext(env));
-        //        System.Environment.ExitCode = 0;
-        //        return;
-        //    }
-
-        //    var context = CreateContext(env);
-        //    new ChangeEnvironmentCommand().Execute(context);
-
-        //    var args = CommandArguments.Parse(string.Join(" ", batch));
-        //    try
-        //    {
-        //        var command = args.Shift();
-        //        ReadLine.AddHistory(command);
-        //        ExecuteCommand(command, args, false);
-        //    }
-        //    catch (Exception)
-        //    {
-        //        System.Environment.ExitCode = 1;
-        //        break;
-        //    }
-
-        //    if (System.Diagnostics.Debugger.IsAttached)
-        //    {
-        //        _output.GreenLine("Reverting to interactive since you're debugging");
-        //        RunInteractively();
-        //    }
-        //}
+            state.AddCommand(string.Join(" ", arg.Skip(1)));
+            ExecuteCommandQueue(state);
+        }
 
         public void RunInteractively()
         {
@@ -87,29 +67,50 @@ namespace StoneFruit.Execution
             if (_environments.Current == null)
                 new ChangeEnvironmentCommand(_output, new CommandArguments(), state, _environments).Execute();
 
+            RunInteractivelyWithEnvironment(state);
+        }
+
+        public void RunInteractively(string environment)
+        {
+            var state = new EngineState(false);
+            new ChangeEnvironmentCommand(_output, CommandArguments.Single(environment), state, _environments).Execute();
+            RunInteractivelyWithEnvironment(state);
+        }
+
+        private void RunInteractivelyWithEnvironment(EngineState state)
+        {
             _output.Write("Enter command ");
             _output.Write(ConsoleColor.DarkGray, "('help' for help, 'exit' to quit)");
             _output.WriteLine(":");
 
             while (true)
             {
-                var s = ReadLine.Read($"{_environments.CurrentName}> ");
-                _output.WriteLine();
-                if (string.IsNullOrWhiteSpace(s))
+                var commandString = ReadLine.Read($"{_environments.CurrentName}> ");
+                if (string.IsNullOrWhiteSpace(commandString))
                     continue;
+                state.AddCommand(commandString);
 
+                ExecuteCommandQueue(state);
+                if (state.ShouldExit)
+                    return;
+            }
+        }
+
+        private void ExecuteCommandQueue(EngineState state)
+        {
+            while (true)
+            {
+                var commandString = state.GetNextCommand();
+                if (string.IsNullOrEmpty(commandString))
+                    return;
                 try
                 {
-                    var commands = s.Split('\n');
-                    for (var index = 0; index < s.Split('\n').Length; index++)
-                    {
-                        var ss = commands[index];
-                        var sequence = new StringCharacterSequence(ss, $"command {index}");
-                        var command = _parser.Parse(sequence).Value;
-                        ExecuteCommand(command, state);
-                        if (state.ShouldExit)
-                            return;
-                    }
+                    var sequence = new StringCharacterSequence(commandString);
+                    var command = _parser.Parse(sequence).Value;
+                    GetCommand(command, state).Execute();
+                    if (state.ShouldExit)
+                        return;
+                    ReadLine.AddHistory(commandString);
                 }
                 catch (Exception e)
                 {
@@ -119,10 +120,7 @@ namespace StoneFruit.Execution
             }
         }
 
-        private void ExecuteCommand(CompleteCommand commandRequest, EngineState state)
-        {
-            var command = _commandSource.GetCommandInstance(commandRequest, _environments, state, _output) ?? new NotFoundCommandVerb(commandRequest.Verb, _output);
-            command.Execute();
-        }
+        private ICommandVerb GetCommand(CompleteCommand commandRequest, EngineState state) 
+            => _commandSource.GetCommandInstance(commandRequest, _environments, state, _output) ?? new NotFoundCommandVerb(commandRequest.Verb, _output);
     }
 }

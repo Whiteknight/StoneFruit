@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "StoneFruit.Cli": {
+      "commandName": "Project"
+    }
+  }
+}

@@ -14,4 +14,8 @@
     <ProjectReference Include="..\StoneFruit\StoneFruit.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
 </Project>

@@ -10,11 +10,36 @@ namespace StoneFruit.Cli
         static void Main(string[] args)
         {
             var engine = new EngineBuilder()
-                //.UseStructureMapContainerSource()
+                .UseStructureMapContainerSource()
                 //.UseCommands(typeof(HelpCommand), typeof(ExitCommand))
-                //.UseEnvironmentFactory(new MyEnvironmentFactory())
+                .UseEnvironmentFactory(new MyEnvironmentFactory())
                 .Build();
             engine.Start(args);
+            Console.ReadKey();
+        }
+    }
+
+    public class TestACommand : ICommandVerb
+    {
+        public void Execute()
+        {
+            Console.WriteLine("TESTA");
+        }
+    }
+
+    public class TestBCommand : ICommandVerb
+    {
+        public void Execute()
+        {
+            Console.WriteLine("TESTB");
+        }
+    }
+
+    public class TestCCommand : ICommandVerb
+    {
+        public void Execute()
+        {
+            Console.WriteLine("TESTC");
         }
     }
 

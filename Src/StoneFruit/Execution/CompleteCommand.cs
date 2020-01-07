@@ -12,5 +12,9 @@ namespace StoneFruit.Execution
 
         public string Verb { get; }
         public CommandArguments Arguments { get; }
+
+        // TODO: Should we keep track of other information? 
+        // Complete command string?
+        // Start time? / End time?
     }
 }

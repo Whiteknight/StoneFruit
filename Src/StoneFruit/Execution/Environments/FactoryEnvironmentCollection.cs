@@ -21,6 +21,9 @@ namespace StoneFruit.Execution.Environments
             _validNames = new HashSet<string>(environments);
         }
 
+        public object Current { get; private set; }
+        public string CurrentName { get; private set; }
+
         public IReadOnlyDictionary<int, string> GetNames() => _nameIndices;
 
         public string GetName(int index)
@@ -45,9 +48,6 @@ namespace StoneFruit.Execution.Environments
                 return Get(_nameIndices[idx]);
             return default;
         }
-
-        public object Current { get; private set; }
-        public string CurrentName { get; private set; }
 
         public bool IsValid(string name)
         {

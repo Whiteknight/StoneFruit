@@ -10,7 +10,7 @@ namespace StoneFruit.Execution
     {
         public static IParser<char, CompleteCommand> GetParser(IParser<char, IArgument> argParser = null)
         {
-            argParser = argParser ?? SimplifiedArgumentGrammar.GetParser();
+            argParser ??= SimplifiedArgumentGrammar.GetParser();
 
             var firstChar = Match<char>(c => c == '_' || char.IsLetter(c));
             var bodyChars = Match<char>(c => c == '_' || c == '-' || char.IsLetterOrDigit(c));

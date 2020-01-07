@@ -11,8 +11,8 @@ namespace StoneFruit.Execution.Arguments
     {
         public static IParser<char, IArgument> GetParser()
         {
-            var doubleQuotedString = DoubleQuotedStringWithEscapedQuotes();
-            var singleQuotedString = SingleQuotedStringWithEscapedQuotes();
+            var doubleQuotedString = StrippedDoubleQuotedStringWithEscapedQuotes();
+            var singleQuotedString = StrippedSingleQuotedStringWithEscapedQuotes();
             var unquotedValue = Match<char>(c => !char.IsWhiteSpace(c)).List(c => new string(c.ToArray()), true);
 
             var value = First(

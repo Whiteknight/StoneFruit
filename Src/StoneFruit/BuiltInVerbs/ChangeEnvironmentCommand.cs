@@ -26,7 +26,7 @@ namespace StoneFruit.BuiltInVerbs
         public void Execute()
         {
             var target = _args.ShiftNextPositional();
-            if (target != null)
+            if (target.Exists())
             {
                 if (!TrySetEnvironment(target.Value))
                     throw new Exception($"Could not set environment {target.Value}");

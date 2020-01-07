@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ParserObjects" Version="0.0.2" />
+    <PackageReference Include="ParserObjects" Version="0.0.3" />
     <PackageReference Include="ReadLine" Version="2.0.1" />
   </ItemGroup>
 

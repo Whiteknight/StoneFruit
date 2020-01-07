@@ -6,6 +6,7 @@ namespace StoneFruit.Execution.Arguments
     public class CommandArguments
     {
         private readonly IReadOnlyList<PositionalArgument> _positionals;
+        private readonly IReadOnlyCollection<string> _flags;
         private readonly IReadOnlyDictionary<string, List<NamedArgument>> _nameds;
 
         private int _positionalIndex;
@@ -15,12 +16,15 @@ namespace StoneFruit.Execution.Arguments
             _positionalIndex = 0;
             _positionals = new PositionalArgument[0];
             _nameds = new Dictionary<string, List<NamedArgument>>();
+            _flags = new List<string>();
         }
 
         public CommandArguments(IEnumerable<IArgument> arguments)
         {
+            // TODO: Handle FlagArguments
             var positionals = new List<PositionalArgument>();
             var nameds = new Dictionary<string, List<NamedArgument>>();
+            var flags = new HashSet<string>();
             foreach (var arg in arguments)
             {
                 if (arg is PositionalArgument positional)
@@ -35,12 +39,28 @@ namespace StoneFruit.Execution.Arguments
                     if (!nameds.ContainsKey(name))
                         nameds.Add(name, new List<NamedArgument>());
                     nameds[name].Add(named);
+                    continue;
+                }
+
+                if (arg is FlagArgument flag)
+                {
+                    flags.Add(flag.Value);
+                    continue;
                 }
             }
 
+            // TODO: Also keep track of the relative ordering of all args, so that we could have 
+            // sequences like "-x value" for certain parsers
+
             _positionals = positionals;
             _nameds = nameds;
+            _flags = flags;
             _positionalIndex = 0;
+        }
+
+        public static CommandArguments Single(string arg)
+        {
+            return new CommandArguments(new[] { new PositionalArgument(arg) });
         }
 
         public IArgument ShiftNextPositional()
@@ -81,5 +101,12 @@ namespace StoneFruit.Execution.Arguments
         {
             return _positionals.Where(a => !a.Consumed);
         }
+
+        public bool HasFlag(string name)
+        {
+            return _flags.Contains(name);
+        }
+
+        // TODO: Method to map argument values to an argument object. Mapper should be pluggable
     }
 }
