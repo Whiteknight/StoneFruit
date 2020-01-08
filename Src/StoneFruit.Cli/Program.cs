@@ -14,7 +14,6 @@ namespace StoneFruit.Cli
                 .UseEnvironmentFactory(new MyEnvironmentFactory())
                 .Build();
             engine.Run(args);
-            Console.ReadKey();
         }
     }
 

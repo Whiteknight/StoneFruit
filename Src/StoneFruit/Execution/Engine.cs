@@ -43,7 +43,7 @@ namespace StoneFruit.Execution
             if (args.Length == 1 && args[0] == "help")
             {
                 // TODO: A HeadlessHelpCommand that includes more info about headless usage?
-                new HelpCommand(_output, _commandSource).Execute();
+                new HelpCommand(_output, _commandSource, new CommandArguments()).Execute();
                 return;
             }
 

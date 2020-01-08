@@ -8,23 +8,11 @@ namespace StoneFruit.Execution.Commands
 {
     public class ManualCommandSource : ICommandSource
     {
-        private readonly IReadOnlyDictionary<string, CommandTypeAndDescription> _commands;
-
-        private class CommandTypeAndDescription
-        {
-            public CommandTypeAndDescription(Type type, string description)
-            {
-                Type = type;
-                Description = description;
-            }
-
-            public Type Type { get; }
-            public string Description { get; }
-        }
+        private readonly IReadOnlyDictionary<string, Type> _commands;
 
         public ManualCommandSource(IEnumerable<Type> commandTypes)
         {
-            var nameMap = new Dictionary<string, CommandTypeAndDescription>();
+            var nameMap = new Dictionary<string, Type>();
             foreach (var commandType in commandTypes)
             {
                 if (!typeof(ICommandVerb).IsAssignableFrom(commandType))
@@ -36,7 +24,7 @@ namespace StoneFruit.Execution.Commands
                     var name = attr.CommandName.ToLowerInvariant();
                     if (nameMap.ContainsKey(name))
                         continue;
-                    nameMap.Add(name, new CommandTypeAndDescription(commandType, attr.Description ?? ""));
+                    nameMap.Add(name, commandType);
                 }
 
                 if (attrs.Count == 0)
@@ -46,7 +34,7 @@ namespace StoneFruit.Execution.Commands
                         name = name.Substring(0, name.Length - 4);
                     if (name.EndsWith("command"))
                         name = name.Substring(0, name.Length - 7);
-                    nameMap.Add(name, new CommandTypeAndDescription(commandType, ""));
+                    nameMap.Add(name, commandType);
                 }
             }
 
@@ -58,7 +46,7 @@ namespace StoneFruit.Execution.Commands
             var commandType = _commands.ContainsKey(command.Verb) ? _commands[command.Verb] : null;
             if (commandType == null)
                 return null;
-            var commandVerb = DuckTypeConstructorInvoker.TryConstruct(commandType.Type, new object[]
+            var commandVerb = DuckTypeConstructorInvoker.TryConstruct(commandType, new object[]
             {
                 environments,
                 environments.Current,
@@ -71,9 +59,9 @@ namespace StoneFruit.Execution.Commands
             return commandVerb as ICommandVerb;
         }
 
-        public IEnumerable<CommandDescription> GetAll()
-        {
-            return _commands.Select(kvp => new CommandDescription(kvp.Key, kvp.Value.Description ?? ""));
-        }
+        public IEnumerable<Type> GetAll() => _commands.Select(kvp => kvp.Value);
+
+        public Type GetCommandTypeByName(string name) 
+            => _commands.ContainsKey(name) ? _commands[name] : null;
     }
 }

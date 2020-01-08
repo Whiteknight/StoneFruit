@@ -34,7 +34,7 @@ namespace StoneFruit.Execution
         public int ConsoleWidth => System.Console.WindowWidth;
         public int ConsoleHeight => System.Console.WindowHeight;
 
-        private void WithColor(ConsoleColor color, Action act)
+        private static void WithColor(ConsoleColor color, Action act)
         {
             var currentColor = Console.ForegroundColor;
             Console.ForegroundColor = color;

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace StoneFruit.Execution.Commands
@@ -24,7 +25,7 @@ namespace StoneFruit.Execution.Commands
             return null;
         }
 
-        public IEnumerable<CommandDescription> GetAll()
+        public IEnumerable<Type> GetAll()
         {
             // TODO: De-dupe by name. Names will be hidden by earlier sources
             return _sources.SelectMany(s => s.GetAll());
@@ -42,6 +43,18 @@ namespace StoneFruit.Execution.Commands
             if (_sources.Count == 1)
                 return _sources[0];
             return this;
+        }
+
+        public Type GetCommandTypeByName(string name)
+        {
+            foreach (var source in _sources)
+            {
+                var type = source.GetCommandTypeByName(name);
+                if (type != null)
+                    return type;
+            }
+
+            return null;
         }
     }
 }

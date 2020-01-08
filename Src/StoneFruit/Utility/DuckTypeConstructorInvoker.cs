@@ -4,6 +4,8 @@ using System.Reflection;
 
 namespace StoneFruit.Utility
 {
+    // a poor-mans DI/IoC "container". Given a list of available values and a type whose constructors may
+    // require one or more of those values, attempt to construct an instance of that type.
     public static class DuckTypeConstructorInvoker
     {
         public static object TryConstruct(Type typeToConstruct, object[] availableArguments)

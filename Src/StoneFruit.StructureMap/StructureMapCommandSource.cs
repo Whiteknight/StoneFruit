@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using StoneFruit.Execution;
-using StoneFruit.Execution.Commands;
 using StructureMap;
 
 namespace StoneFruit.StructureMap
@@ -11,19 +10,7 @@ namespace StoneFruit.StructureMap
     public class StructureMapCommandSource : ICommandSource
     {
         private readonly IContainer _container;
-        private readonly IReadOnlyDictionary<string, CommandTypeAndDescription> _nameMap;
-
-        private class CommandTypeAndDescription
-        {
-            public CommandTypeAndDescription(Type type, string description)
-            {
-                Type = type;
-                Description = description;
-            }
-
-            public Type Type { get; }
-            public string Description { get; }
-        }
+        private readonly IReadOnlyDictionary<string, Type> _nameMap;
 
         public StructureMapCommandSource()
         {
@@ -39,13 +26,13 @@ namespace StoneFruit.StructureMap
             _nameMap = SetupNameMapping();
         }
 
-        private IReadOnlyDictionary<string, CommandTypeAndDescription> SetupNameMapping()
+        private IReadOnlyDictionary<string, Type> SetupNameMapping()
         {
             var commandTypes = _container.Model.AllInstances
                 .Where(i => typeof(ICommandVerb).IsAssignableFrom(i.PluginType))
                 .Select(i => i.ReturnedType ?? i.PluginType)
                 .ToList();
-            var nameMap = new Dictionary<string, CommandTypeAndDescription>();
+            var nameMap = new Dictionary<string, Type>();
             foreach (var commandType in commandTypes)
             {
                 var attrs = commandType.GetCustomAttributes<CommandDetailsAttribute>().ToList();
@@ -54,7 +41,7 @@ namespace StoneFruit.StructureMap
                     var name = attr.CommandName.ToLowerInvariant();
                     if (nameMap.ContainsKey(name))
                         continue;
-                    nameMap.Add(name, new CommandTypeAndDescription(commandType, attr.Description ?? ""));
+                    nameMap.Add(name, commandType);
                 }
 
                 if (attrs.Count == 0)
@@ -64,7 +51,7 @@ namespace StoneFruit.StructureMap
                         name = name.Substring(0, name.Length - 4);
                     if (name.EndsWith("command"))
                         name = name.Substring(0, name.Length - 7);
-                    nameMap.Add(name, new CommandTypeAndDescription(commandType, ""));
+                    nameMap.Add(name, commandType);
                 }
             }
 
@@ -86,13 +73,13 @@ namespace StoneFruit.StructureMap
                 .With(typeof(ICommandSource), this);
             if (environments.Current != null)
                 context = context.With(environments.Current.GetType(), environments.Current);
-            var commandObj = context.GetInstance(type.Type);
+            var commandObj = context.GetInstance(type);
             return commandObj as ICommandVerb;
         }
 
-        public IEnumerable<CommandDescription> GetAll()
-        {
-            return _nameMap.Select(kvp => new CommandDescription(kvp.Key, kvp.Value.Description ?? ""));
-        }
+        public IEnumerable<Type> GetAll() => _nameMap.Select(kvp => kvp.Value);
+
+        public Type GetCommandTypeByName(string name)
+            => _nameMap.ContainsKey(name) ? _nameMap[name] : null;
     }
 }
