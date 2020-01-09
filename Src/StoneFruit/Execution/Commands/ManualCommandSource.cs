@@ -59,7 +59,7 @@ namespace StoneFruit.Execution.Commands
             return commandVerb as ICommandVerb;
         }
 
-        public IEnumerable<Type> GetAll() => _commands.Select(kvp => kvp.Value);
+        public IReadOnlyDictionary<string, Type> GetAll() => _commands;
 
         public Type GetCommandTypeByName(string name) 
             => _commands.ContainsKey(name) ? _commands[name] : null;

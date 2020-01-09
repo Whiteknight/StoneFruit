@@ -6,7 +6,6 @@ using StoneFruit.Utility;
 
 namespace StoneFruit.BuiltInVerbs
 {
-    [CommandDetails("help", "Get help for available commands")]
     public class HelpCommand : ICommandVerb
     {
         private readonly ITerminalOutput _output;
@@ -20,8 +19,12 @@ namespace StoneFruit.BuiltInVerbs
             _args = args;
         }
 
+        public static string Description => "List all commands or get detailed information for a single command";
+
         public static string Help => @"help 
-Get overview information for all available verbs
+Get overview information for all available verbs. The verb Command class must implement
+
+    public static string Description {{ get; }} 
 
 help <command-name>
 Get detailed help information for the given verb. The verb Command class must implement
@@ -55,17 +58,17 @@ Get detailed help information for the given verb. The verb Command class must im
         private void GetOverview()
         {
             var commandsList = _commands.GetAll().ToList();
-            int maxCommandLength = commandsList.Select(c => c.Name.Length).Max();
+            int maxCommandLength = commandsList.Select(c => c.Key.Length).Max();
             int descStartColumn = maxCommandLength + 2;
             var blankPrefix = new string(' ', descStartColumn);
             int maxDescLineLength = _output.ConsoleWidth - descStartColumn;
 
             foreach (var type in _commands.GetAll())
             {
-                _output.Write(ConsoleColor.Green, type.Name);
-                var buffer = new string(' ', descStartColumn - type.Name.Length);
+                _output.Write(ConsoleColor.Green, type.Key);
+                var buffer = new string(' ', descStartColumn - type.Key.Length);
                 _output.Write(buffer);
-                var desc = type.GetDescription();
+                var desc = type.Value.GetDescription();
                 var lines = GetDescriptionLines(desc, maxDescLineLength);
                 if (lines.Count == 0)
                 {

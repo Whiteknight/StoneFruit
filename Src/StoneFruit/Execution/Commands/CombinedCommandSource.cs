@@ -25,10 +25,17 @@ namespace StoneFruit.Execution.Commands
             return null;
         }
 
-        public IEnumerable<Type> GetAll()
+        public IReadOnlyDictionary<string, Type> GetAll()
         {
-            // TODO: De-dupe by name. Names will be hidden by earlier sources
-            return _sources.SelectMany(s => s.GetAll());
+            var allPairs = _sources.SelectMany(s => s.GetAll());
+            var dict = new Dictionary<string, Type>();
+            foreach (var pair in allPairs)
+            {
+                if (!dict.ContainsKey(pair.Key))
+                    dict.Add(pair.Key, pair.Value);
+            }
+
+            return dict;
         }
 
         public void Add(ICommandSource source)

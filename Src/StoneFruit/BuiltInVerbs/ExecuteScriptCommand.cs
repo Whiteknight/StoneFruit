@@ -5,7 +5,7 @@ using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.BuiltInVerbs
 {
-    [CommandDetails("exec", "Execute a script file containing a list of commands")]
+    [CommandDetails("exec")]
     public class ExecuteScriptCommand : ICommandVerb
     {
         private readonly CommandArguments _args;
@@ -16,6 +16,11 @@ namespace StoneFruit.BuiltInVerbs
             _args = args;
             _state = state;
         }
+
+        public static string Description => "Executes a script containing commands, one per line";
+
+        public static string Help => @"exec <fileName>
+Loads the contents of the file and treats each line as a separate command to execute in sequence.";
 
         public void Execute()
         {

@@ -77,7 +77,7 @@ namespace StoneFruit.StructureMap
             return commandObj as ICommandVerb;
         }
 
-        public IEnumerable<Type> GetAll() => _nameMap.Select(kvp => kvp.Value);
+        public IReadOnlyDictionary<string, Type> GetAll() => _nameMap;
 
         public Type GetCommandTypeByName(string name)
             => _nameMap.ContainsKey(name) ? _nameMap[name] : null;

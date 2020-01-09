@@ -8,17 +8,21 @@ namespace StoneFruit.Utility
     {
         public static string GetDescription(this Type type)
         {
-            return type.GetCustomAttributes<CommandDetailsAttribute>()
-                .Select(attr => attr.Description)
-                .FirstOrDefault(desc => !string.IsNullOrEmpty(desc));
+            return GetPublicStaticStringPropertyValue(type, "Description");
         }
+
 
         public static string GetHelp(this Type type)
         {
-            var property = type.GetProperty("Help", BindingFlags.Public | BindingFlags.Static);
-            if (property != null)
-                return (property.GetValue(null) as string) ?? type.GetDescription() ?? "";
-            return type.GetDescription() ?? "";
+            return GetPublicStaticStringPropertyValue(type, "Help") ?? GetDescription(type);
+        }
+
+        private static string GetPublicStaticStringPropertyValue(Type type, string name)
+        {
+            var property = type.GetProperty(name, BindingFlags.Public | BindingFlags.Static | BindingFlags.IgnoreCase);
+            if (property != null && property.PropertyType == typeof(string))
+                return property.GetValue(null) as string;
+            return null;
         }
     }
 }

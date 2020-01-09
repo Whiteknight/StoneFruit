@@ -5,7 +5,7 @@ using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.BuiltInVerbs
 {
-    [CommandDetails(ChangeEnvironmentCommand.Name, "Change environment if multiple environments are configured")]
+    [CommandDetails(ChangeEnvironmentCommand.Name)]
     public class ChangeEnvironmentCommand : ICommandVerb
     {
         public const string Name = "change-env";
@@ -22,6 +22,18 @@ namespace StoneFruit.BuiltInVerbs
             _state = state;
             _environments = environments;
         }
+
+        public static string Description => "Change environment if multiple environments are configured";
+
+        public static string Help => @"change-env
+Show a list of possible environments and a prompt to select the one you want.
+
+change-env <envName>
+Change directly to the specified environment
+
+change-env <number>
+Change directly to the environment at the specified position
+";
 
         public void Execute()
         {
