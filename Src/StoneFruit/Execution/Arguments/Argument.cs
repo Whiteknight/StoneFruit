@@ -2,6 +2,9 @@
 
 namespace StoneFruit.Execution.Arguments
 {
+    /// <summary>
+    /// Represents a single argument, either positional, named, or otherwise
+    /// </summary>
     public interface IArgument
     {
         string Value { get; }

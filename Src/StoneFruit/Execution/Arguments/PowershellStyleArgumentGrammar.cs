@@ -7,6 +7,9 @@ using static ParserObjects.Parsers.Specialty.ProgrammingParserMethods;
 
 namespace StoneFruit.Execution.Arguments
 {
+    /// <summary>
+    /// A grammar for Powershell-style arguments
+    /// </summary>
     public class PowershellStyleArgumentGrammar
     {
         public static IParser<char, IEnumerable<IArgument>> GetParser()

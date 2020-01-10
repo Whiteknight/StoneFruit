@@ -10,6 +10,9 @@ using StoneFruit.Execution.Environments;
 
 namespace StoneFruit.Execution
 {
+    /// <summary>
+    /// The execution core
+    /// </summary>
     public class Engine
     {
         private readonly IEnvironmentCollection _environments;
@@ -17,13 +20,18 @@ namespace StoneFruit.Execution
         private readonly ITerminalOutput _output;
         private readonly IParser<char, CompleteCommand> _parser;
 
-        public Engine(ICommandSource commands, IEnvironmentCollection environments, IParser<char, IEnumerable<IArgument>> argParser)
+        // TODO: Be able to specify startup commands that will execute as soon as the engine starts
+        // like "change-env" does
+
+        public Engine(ICommandSource commands, IEnvironmentCollection environments, IParser<char, IEnumerable<IArgument>> argParser, ITerminalOutput output)
         {
-            // TODO: If we have 0 commands, we might want to just abort?
+            
             _environments = environments ?? new InstanceEnvironmentCollection(null);
+            // TODO: If we have 0 commands, we might want to just abort?
+            // Otherwise, how do we enforce that we have something here?
             _commandSource = commands;
             _parser = CompleteCommandGrammar.GetParser(argParser);
-            _output = new ConsoleTerminalOutput();
+            _output = output ?? new ConsoleTerminalOutput();
         }
 
         public void Run(string[] args = null)
@@ -55,9 +63,14 @@ namespace StoneFruit.Execution
             var state = new EngineState(true);
 
             var env = arg[0];
-            new ChangeEnvironmentCommand(_output, CommandArguments.Single(env), state, _environments).Execute();
+            if (_environments.IsValid(env))
+            {
+                new ChangeEnvironmentCommand(_output, CommandArguments.Single(env), state, _environments).Execute();
+                state.AddCommand(string.Join(" ", arg.Skip(1)));
+            }
+            else
+                state.AddCommand(string.Join(" ", arg));
 
-            state.AddCommand(string.Join(" ", arg.Skip(1)));
             ExecuteCommandQueue(state);
         }
 
@@ -86,9 +99,7 @@ namespace StoneFruit.Execution
 
             while (true)
             {
-                var commandString = ReadLine.Read($"{_environments.CurrentName}> ");
-                if (string.IsNullOrWhiteSpace(commandString))
-                    continue;
+                var commandString = _output.Prompt($"{_environments.CurrentName}");
                 state.AddCommand(commandString);
 
                 ExecuteCommandQueue(state);
@@ -111,7 +122,6 @@ namespace StoneFruit.Execution
                     GetCommand(command, state).Execute();
                     if (state.ShouldExit)
                         return;
-                    ReadLine.AddHistory(commandString);
                 }
                 catch (Exception e)
                 {

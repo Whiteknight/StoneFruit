@@ -2,6 +2,9 @@
 
 namespace StoneFruit.Execution.Environments
 {
+    /// <summary>
+    /// An IEnvironmentFactory implementation which always returns exactly one instance
+    /// </summary>
     public class InstanceEnvironmentFactory : IEnvironmentFactory
     {
         private readonly object _instance;

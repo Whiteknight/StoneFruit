@@ -1,5 +1,8 @@
 ﻿namespace StoneFruit.Execution.Arguments
 {
+    /// <summary>
+    /// An argument defined by a name
+    /// </summary>
     public class NamedArgument : IArgument
     {
         public NamedArgument(string name, string value)

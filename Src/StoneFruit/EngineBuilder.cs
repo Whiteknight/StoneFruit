@@ -14,6 +14,7 @@ namespace StoneFruit
         private readonly CombinedCommandSource _commandSource;
         private IEnvironmentCollection _environments;
         private IParser<char, IEnumerable<IArgument>> _argParser;
+        private ITerminalOutput _output;
 
         public EngineBuilder()
         {
@@ -46,7 +47,7 @@ namespace StoneFruit
 
         public EngineBuilder UseSingleEnvironment(object environment)
         {
-            _environments = new InstanceEnvironmentCollection(null);
+            _environments = new InstanceEnvironmentCollection(environment);
             return this;
         }
 
@@ -61,12 +62,18 @@ namespace StoneFruit
             return this;
         }
 
+        public EngineBuilder UseTerminalOutput(ITerminalOutput output)
+        {
+            _output = output;
+            return this;
+        }
+
         public Engine Build()
         {
             var commandSource = _commandSource.Simplify();
             var environmentFactory = _environments;
             var argParser = _argParser ?? SimplifiedArgumentGrammar.GetParser();
-            return new Engine(commandSource, environmentFactory, argParser);
+            return new Engine(commandSource, environmentFactory, argParser, _output);
         }
     }
 }

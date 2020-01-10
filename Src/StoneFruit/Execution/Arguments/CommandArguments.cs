@@ -3,6 +3,9 @@ using System.Linq;
 
 namespace StoneFruit.Execution.Arguments
 {
+    /// <summary>
+    /// Provides access to a list of IArgument objects but name or position.
+    /// </summary>
     public class CommandArguments
     {
         private readonly IReadOnlyList<PositionalArgument> _positionals;
@@ -63,7 +66,7 @@ namespace StoneFruit.Execution.Arguments
             return new CommandArguments(new[] { new PositionalArgument(arg) });
         }
 
-        public IArgument ShiftNextPositional()
+        public IArgument Shift()
         {
             while (_positionalIndex < _positionals.Count)
             {

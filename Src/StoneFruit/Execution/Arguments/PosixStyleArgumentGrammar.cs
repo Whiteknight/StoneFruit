@@ -7,6 +7,9 @@ using static ParserObjects.Parsers.ParserMethods;
 
 namespace StoneFruit.Execution.Arguments
 {
+    /// <summary>
+    /// A grammar for posix-style arguments
+    /// </summary>
     public class PosixStyleArgumentGrammar
     {
         public static IParser<char, IEnumerable<IArgument>> GetParser()

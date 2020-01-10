@@ -2,6 +2,9 @@
 
 namespace StoneFruit.Execution.Environments
 {
+    /// <summary>
+    /// An IEnvironmentCollection implementation for a single environment
+    /// </summary>
     public class InstanceEnvironmentCollection : IEnvironmentCollection
     {
         public InstanceEnvironmentCollection(object environment)

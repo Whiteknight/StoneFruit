@@ -3,6 +3,10 @@ using System.Linq;
 
 namespace StoneFruit.Execution.Environments
 {
+    /// <summary>
+    /// An IEnvironmentCollection implementation which uses an IEnvironmentFactory to create environments
+    /// on demand
+    /// </summary>
     public class FactoryEnvironmentCollection : IEnvironmentCollection
     {
         private readonly IEnvironmentFactory _environmentFactory;

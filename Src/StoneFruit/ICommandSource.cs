@@ -4,6 +4,9 @@ using StoneFruit.Execution;
 
 namespace StoneFruit
 {
+    /// <summary>
+    /// Manages the list of available verbs
+    /// </summary>
     public interface ICommandSource
     {
         ICommandVerb GetCommandInstance(CompleteCommand command, IEnvironmentCollection environments, EngineState state, ITerminalOutput output);

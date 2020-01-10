@@ -8,6 +8,9 @@ using static ParserObjects.Parsers.Specialty.ParserMethods;
 
 namespace StoneFruit.Execution.Arguments
 {
+    /// <summary>
+    /// A grammar for simplified arguments
+    /// </summary>
     public class SimplifiedArgumentGrammar
     {
         public static IParser<char, IEnumerable<IArgument>> GetParser()
@@ -16,25 +19,34 @@ namespace StoneFruit.Execution.Arguments
             var singleQuotedString = StrippedSingleQuotedStringWithEscapedQuotes();
             var unquotedValue = Match<char>(c => !char.IsWhiteSpace(c)).List(c => new string(c.ToArray()), true);
 
-            var value = First(
+            var values = First(
                 doubleQuotedString,
                 singleQuotedString,
                 unquotedValue
             );
 
-            var name = CStyleIdentifier();
+            var names = CStyleIdentifier();
 
-            var namedArg = Rule(
-                name,
-                Match("=", c => c),
-                value,
+            // TODO: Figure out what we want this syntax to be, we want it as simple and ceremony-free as possible
+            var flagArg = Rule(
+                Match("-", c => c),
+                names,
 
-                (n, e, v) => new IArgument[] { new NamedArgument(n, v) }
+                (start, name) => new FlagArgument(name)
             );
 
-            var args = First<char, IEnumerable<IArgument>>(
+            var namedArg = Rule(
+                names,
+                Match("=", c => c),
+                values,
+
+                (name, equals, value) => new NamedArgument(name, value) 
+            );
+
+            var args = First<char, IArgument>(
+                flagArg,
                 namedArg,
-                value.Transform(v => new [] { new PositionalArgument(v) })
+                values.Transform(v => new PositionalArgument(v) )
             );
 
             var whitespace = Whitespace();
@@ -43,7 +55,7 @@ namespace StoneFruit.Execution.Arguments
                 whitespace,
                 args,
 
-                (ws, arg) => arg
+                (ws, arg) => new [] { arg }
             );
         }
     }

@@ -1,5 +1,8 @@
 ﻿namespace StoneFruit.Execution.Arguments
 {
+    /// <summary>
+    /// A Null Object implementation of IArgument
+    /// </summary>
     public class MissingArgument : IArgument
     {
         public string Message { get; }

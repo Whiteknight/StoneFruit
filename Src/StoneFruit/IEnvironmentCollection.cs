@@ -2,6 +2,10 @@
 
 namespace StoneFruit
 {
+    /// <summary>
+    /// Manages the list of possible environments. Environments are cached after creation, each environment
+    /// is only created once. Environments are ordered and can be accessed by name or number
+    /// </summary>
     public interface IEnvironmentCollection
     {
         IReadOnlyDictionary<int, string> GetNames();

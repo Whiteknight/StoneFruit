@@ -2,6 +2,9 @@
 
 namespace StoneFruit.Execution
 {
+    /// <summary>
+    /// The runtime state of the engine.
+    /// </summary>
     public class EngineState
     {
         private readonly Queue<string> _additionalCommands;

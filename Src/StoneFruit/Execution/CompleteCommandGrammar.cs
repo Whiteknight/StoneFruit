@@ -7,6 +7,9 @@ using static ParserObjects.Parsers.ParserMethods;
 
 namespace StoneFruit.Execution
 {
+    /// <summary>
+    /// Grammar for parsing a complete command with verb and arguments
+    /// </summary>
     public static class CompleteCommandGrammar
     {
         public static IParser<char, CompleteCommand> GetParser(IParser<char, IEnumerable<IArgument>> argParser = null)

@@ -7,6 +7,9 @@ using ParserMethods = ParserObjects.Parsers.ParserMethods;
 
 namespace StoneFruit.Execution.Arguments
 {
+    /// <summary>
+    /// An argument grammar for windows CMD-style arguments
+    /// </summary>
     public class WindowsCmdArgumentGrammar
     {
         public static IParser<char, IEnumerable<IArgument>> GetParser()

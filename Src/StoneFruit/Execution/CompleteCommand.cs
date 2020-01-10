@@ -2,6 +2,9 @@
 
 namespace StoneFruit.Execution
 {
+    /// <summary>
+    /// A complete command with a verb and arguments
+    /// </summary>
     public class CompleteCommand
     {
         public CompleteCommand(string verb, CommandArguments arguments)

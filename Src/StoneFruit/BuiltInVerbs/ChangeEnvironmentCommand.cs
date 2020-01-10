@@ -37,7 +37,7 @@ Change directly to the environment at the specified position
 
         public void Execute()
         {
-            var target = _args.ShiftNextPositional();
+            var target = _args.Shift();
             if (target.Exists())
             {
                 if (!TrySetEnvironment(target.Value))
@@ -61,11 +61,11 @@ Change directly to the environment at the specified position
                 _output.WriteLine(ConsoleColor.DarkCyan, "Please select an environment:");
                 foreach (var env in environments)
                 {
-                    _output.Write(ConsoleColor.White, "{0}) ", env.Key);
+                    _output.Write(ConsoleColor.White, $"{env.Key}) ");
                     _output.WriteLine(ConsoleColor.Cyan, env.Value);
                 }
-                _output.Write("> ");
-                var envIndex = Console.ReadLine();
+
+                var envIndex = _output.Prompt("", true, false);
                 if (TrySetEnvironment(envIndex))
                     break;
             }

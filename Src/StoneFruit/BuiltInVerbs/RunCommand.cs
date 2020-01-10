@@ -27,7 +27,7 @@ arguments. For example:
         {
             while (true)
             {
-                var arg = _args.ShiftNextPositional();
+                var arg = _args.Shift();
                 if (arg == null || arg is MissingArgument)
                     return;
                 _state.AddCommand(arg.Value);

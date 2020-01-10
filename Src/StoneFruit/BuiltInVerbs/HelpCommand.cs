@@ -36,7 +36,7 @@ Get detailed help information for the given verb. The verb Command class must im
         {
             // TODO: Mode where we take the name of a command and try to offer detailed information
             // Will probably require some kind of extension to the command object to provide that info
-            var arg = _args.ShiftNextPositional();
+            var arg = _args.Shift();
             if (arg.Exists())
             {
                 GetDetail(arg.Value);

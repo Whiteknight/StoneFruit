@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace StoneFruit.Execution.Commands
 {
+    /// <summary>
+    /// Combines multiple ICommandSource implementations together in priorty order.
+    /// </summary>
     public class CombinedCommandSource : ICommandSource
     {
         private readonly List<ICommandSource> _sources;

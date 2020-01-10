@@ -6,6 +6,9 @@ using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Commands
 {
+    /// <summary>
+    /// A command source where the commands are added through method calls instead of found dynamically
+    /// </summary>
     public class ManualCommandSource : ICommandSource
     {
         private readonly IReadOnlyDictionary<string, Type> _commands;
