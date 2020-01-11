@@ -16,11 +16,23 @@ namespace StoneFruit.Execution.Commands
             _sources = new List<ICommandSource>();
         }
 
-        public ICommandVerb GetCommandInstance(CompleteCommand command, IEnvironmentCollection environments, EngineState state, ITerminalOutput output)
+        public ICommandVerb GetCommandInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher)
         {
             foreach (var source in _sources)
             {
-                var commandVerb = source.GetCommandInstance(command, environments, state, output);
+                var commandVerb = source.GetCommandInstance(completeCommand, dispatcher);
+                if (commandVerb != null)
+                    return commandVerb;
+            }
+
+            return null;
+        }
+
+        public ICommandVerb GetCommandInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher) where TCommand : class, ICommandVerb
+        {
+            foreach (var source in _sources)
+            {
+                var commandVerb = source.GetCommandInstance<TCommand>(completeCommand, dispatcher);
                 if (commandVerb != null)
                     return commandVerb;
             }

@@ -5,22 +5,24 @@ using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.BuiltInVerbs
 {
-    [CommandDetails(ChangeEnvironmentCommand.Name)]
-    public class ChangeEnvironmentCommand : ICommandVerb
+    [CommandDetails(EnvironmentChangeCommand.Name)]
+    public class EnvironmentChangeCommand : ICommandVerb
     {
-        public const string Name = "change-env";
+        public const string Name = "env-change";
 
         private readonly ITerminalOutput _output;
         private readonly CommandArguments _args;
         private readonly EngineState _state;
         private readonly IEnvironmentCollection _environments;
+        private readonly CommandDispatcher _dispatcher;
 
-        public ChangeEnvironmentCommand(ITerminalOutput output, CommandArguments args, EngineState state, IEnvironmentCollection environments)
+        public EnvironmentChangeCommand(ITerminalOutput output, CommandArguments args, EngineState state, IEnvironmentCollection environments, CommandDispatcher dispatcher)
         {
             _output = output;
             _args = args;
             _state = state;
             _environments = environments;
+            _dispatcher = dispatcher;
         }
 
         public static string Description => "Change environment if multiple environments are configured";
@@ -59,11 +61,7 @@ Change directly to the environment at the specified position
             while (true)
             {
                 _output.WriteLine(ConsoleColor.DarkCyan, "Please select an environment:");
-                foreach (var env in environments)
-                {
-                    _output.Write(ConsoleColor.White, $"{env.Key}) ");
-                    _output.WriteLine(ConsoleColor.Cyan, env.Value);
-                }
+                _dispatcher.Execute(EnvironmentListCommand.Name);
 
                 var envIndex = _output.Prompt("", true, false);
                 if (TrySetEnvironment(envIndex))

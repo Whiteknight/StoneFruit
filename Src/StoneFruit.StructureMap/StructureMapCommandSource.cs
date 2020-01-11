@@ -58,28 +58,36 @@ namespace StoneFruit.StructureMap
             return nameMap;
         }
 
-        public ICommandVerb GetCommandInstance(CompleteCommand command, IEnvironmentCollection environments, EngineState state, ITerminalOutput output)
+        public ICommandVerb GetCommandInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher)
         {
-            var verb = command.Verb.ToLowerInvariant();
+            var verb = completeCommand.Verb.ToLowerInvariant();
             var type = _nameMap.ContainsKey(verb) ? _nameMap[verb] : null;
-            if (type == null)
-                return null;
-            var context = _container
-                .With(environments)
-                .With(state)
-                .With(output)
-                .With(command)
-                .With(command.Arguments)
-                .With(typeof(ICommandSource), this);
-            if (environments.Current != null)
-                context = context.With(environments.Current.GetType(), environments.Current);
-            var commandObj = context.GetInstance(type);
-            return commandObj as ICommandVerb;
+            return type == null ? null : ResolveCommand(completeCommand, dispatcher, type);
         }
+
+        public ICommandVerb GetCommandInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher) 
+            where TCommand : class, ICommandVerb 
+            => ResolveCommand(completeCommand, dispatcher, typeof(TCommand));
 
         public IReadOnlyDictionary<string, Type> GetAll() => _nameMap;
 
         public Type GetCommandTypeByName(string name)
             => _nameMap.ContainsKey(name) ? _nameMap[name] : null;
+
+        private ICommandVerb ResolveCommand(CompleteCommand completeCommand, CommandDispatcher dispatcher, Type type)
+        {
+            var context = _container
+                .With(dispatcher)
+                .With(dispatcher.Environments)
+                .With(dispatcher.State)
+                .With(dispatcher.Output)
+                .With(completeCommand)
+                .With(completeCommand.Arguments)
+                .With(typeof(ICommandSource), this);
+            if (dispatcher.Environments.Current != null)
+                context = context.With(dispatcher.Environments.Current.GetType(), dispatcher.Environments.Current);
+            var commandObj = context.GetInstance(type);
+            return commandObj as ICommandVerb;
+        }
     }
 }

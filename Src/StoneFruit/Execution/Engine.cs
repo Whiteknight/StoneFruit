@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using ParserObjects;
-using ParserObjects.Sequences;
 using StoneFruit.BuiltInVerbs;
-using StoneFruit.BuiltInVerbs.Hidden;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Environments;
 
@@ -25,7 +23,6 @@ namespace StoneFruit.Execution
 
         public Engine(ICommandSource commands, IEnvironmentCollection environments, IParser<char, IEnumerable<IArgument>> argParser, ITerminalOutput output)
         {
-            
             _environments = environments ?? new InstanceEnvironmentCollection(null);
             // TODO: If we have 0 commands, we might want to just abort?
             // Otherwise, how do we enforce that we have something here?
@@ -61,37 +58,40 @@ namespace StoneFruit.Execution
         public void RunHeadless(string[] arg)
         {
             var state = new EngineState(true);
+            var dispatcher = new CommandDispatcher(_parser, _commandSource, _environments, state, _output);
 
             var env = arg[0];
             if (_environments.IsValid(env))
             {
-                new ChangeEnvironmentCommand(_output, CommandArguments.Single(env), state, _environments).Execute();
+                dispatcher.Execute(EnvironmentChangeCommand.Name + " " + env);
                 state.AddCommand(string.Join(" ", arg.Skip(1)));
             }
             else
                 state.AddCommand(string.Join(" ", arg));
 
-            ExecuteCommandQueue(state);
+            ExecuteCommandQueue(state, dispatcher);
         }
 
         public void RunInteractively()
         {
             var state = new EngineState(false);
+            var dispatcher = new CommandDispatcher(_parser, _commandSource, _environments, state, _output);
 
             if (_environments.Current == null)
-                new ChangeEnvironmentCommand(_output, new CommandArguments(), state, _environments).Execute();
+                dispatcher.Execute(EnvironmentChangeCommand.Name);
 
-            RunInteractivelyWithEnvironment(state);
+            RunInteractivelyWithEnvironment(state, dispatcher);
         }
 
         public void RunInteractively(string environment)
         {
             var state = new EngineState(false);
-            new ChangeEnvironmentCommand(_output, CommandArguments.Single(environment), state, _environments).Execute();
-            RunInteractivelyWithEnvironment(state);
+            var dispatcher = new CommandDispatcher(_parser, _commandSource, _environments, state, _output);
+            dispatcher.Execute(EnvironmentChangeCommand.Name);
+            RunInteractivelyWithEnvironment(state, dispatcher);
         }
 
-        private void RunInteractivelyWithEnvironment(EngineState state)
+        private void RunInteractivelyWithEnvironment(EngineState state, CommandDispatcher dispatcher)
         {
             _output.Write("Enter command ");
             _output.Write(ConsoleColor.DarkGray, "('help' for help, 'exit' to quit)");
@@ -102,13 +102,13 @@ namespace StoneFruit.Execution
                 var commandString = _output.Prompt($"{_environments.CurrentName}");
                 state.AddCommand(commandString);
 
-                ExecuteCommandQueue(state);
+                ExecuteCommandQueue(state, dispatcher);
                 if (state.ShouldExit)
                     return;
             }
         }
 
-        private void ExecuteCommandQueue(EngineState state)
+        private void ExecuteCommandQueue(EngineState state, CommandDispatcher dispatcher)
         {
             while (true)
             {
@@ -117,9 +117,7 @@ namespace StoneFruit.Execution
                     return;
                 try
                 {
-                    var sequence = new StringCharacterSequence(commandString);
-                    var command = _parser.Parse(sequence).Value;
-                    GetCommand(command, state).Execute();
+                    dispatcher.Execute(commandString);
                     if (state.ShouldExit)
                         return;
                 }
@@ -130,8 +128,5 @@ namespace StoneFruit.Execution
                 }
             }
         }
-
-        private ICommandVerb GetCommand(CompleteCommand commandRequest, EngineState state) 
-            => _commandSource.GetCommandInstance(commandRequest, _environments, state, _output) ?? new NotFoundCommandVerb(commandRequest.Verb, _output);
     }
 }

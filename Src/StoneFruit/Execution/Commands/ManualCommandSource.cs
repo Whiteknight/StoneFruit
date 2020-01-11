@@ -44,19 +44,27 @@ namespace StoneFruit.Execution.Commands
             _commands = nameMap;
         }
 
-        public ICommandVerb GetCommandInstance(CompleteCommand command, IEnvironmentCollection environments, EngineState state, ITerminalOutput output)
+        public ICommandVerb GetCommandInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher)
         {
-            var commandType = _commands.ContainsKey(command.Verb) ? _commands[command.Verb] : null;
-            if (commandType == null)
-                return null;
-            var commandVerb = DuckTypeConstructorInvoker.TryConstruct(commandType, new object[]
+            var commandType = _commands.ContainsKey(completeCommand.Verb) ? _commands[completeCommand.Verb] : null;
+            return commandType == null ? null : ResolveInstance(completeCommand, dispatcher, commandType);
+        }
+
+        public ICommandVerb GetCommandInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher) 
+            where TCommand : class, ICommandVerb 
+            => ResolveInstance(completeCommand, dispatcher, typeof(TCommand));
+
+        private ICommandVerb ResolveInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher, Type commandType)
+        {
+            var commandVerb = DuckTypeConstructorInvoker.TryConstruct(commandType, new[]
             {
-                environments,
-                environments.Current,
-                state,
-                output,
-                command,
-                command.Arguments,
+                dispatcher,
+                dispatcher.Environments,
+                dispatcher.Environments.Current,
+                dispatcher.State,
+                dispatcher.Output,
+                completeCommand,
+                completeCommand.Arguments,
                 this
             });
             return commandVerb as ICommandVerb;

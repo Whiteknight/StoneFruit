@@ -9,7 +9,10 @@ namespace StoneFruit
     /// </summary>
     public interface ICommandSource
     {
-        ICommandVerb GetCommandInstance(CompleteCommand command, IEnvironmentCollection environments, EngineState state, ITerminalOutput output);
+        ICommandVerb GetCommandInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher);
+
+        ICommandVerb GetCommandInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher)
+            where TCommand : class, ICommandVerb;
         IReadOnlyDictionary<string, Type> GetAll();
         Type GetCommandTypeByName(string name);
     }
