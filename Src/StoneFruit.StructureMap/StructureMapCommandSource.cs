@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using StoneFruit.Execution;
+using StoneFruit.Utility;
 using StructureMap;
 
 namespace StoneFruit.StructureMap
@@ -32,30 +32,14 @@ namespace StoneFruit.StructureMap
                 .Where(i => typeof(ICommandVerb).IsAssignableFrom(i.PluginType))
                 .Select(i => i.ReturnedType ?? i.PluginType)
                 .ToList();
-            var nameMap = new Dictionary<string, Type>();
-            foreach (var commandType in commandTypes)
-            {
-                var attrs = commandType.GetCustomAttributes<CommandDetailsAttribute>().ToList();
-                foreach (var attr in attrs)
-                {
-                    var name = attr.CommandName.ToLowerInvariant();
-                    if (nameMap.ContainsKey(name))
-                        continue;
-                    nameMap.Add(name, commandType);
-                }
 
-                if (attrs.Count == 0)
-                {
-                    var name = commandType.Name.ToLowerInvariant();
-                    if (name.EndsWith("verb"))
-                        name = name.Substring(0, name.Length - 4);
-                    if (name.EndsWith("command"))
-                        name = name.Substring(0, name.Length - 7);
-                    nameMap.Add(name, commandType);
-                }
-            }
-
-            return nameMap;
+            return commandTypes
+                .OrEmptyIfNull()
+                .SelectMany(commandType => commandType
+                    .GetVerbs()
+                    .Select(verb => (verb, commandType))
+                )
+                .ToDictionaryUnique();
         }
 
         public ICommandVerb GetCommandInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher)

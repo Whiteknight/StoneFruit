@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Commands
@@ -15,33 +14,13 @@ namespace StoneFruit.Execution.Commands
 
         public ManualCommandSource(IEnumerable<Type> commandTypes)
         {
-            var nameMap = new Dictionary<string, Type>();
-            foreach (var commandType in commandTypes)
-            {
-                if (!typeof(ICommandVerb).IsAssignableFrom(commandType))
-                    continue;
-
-                var attrs = commandType.GetCustomAttributes<CommandDetailsAttribute>().ToList();
-                foreach (var attr in attrs)
-                {
-                    var name = attr.CommandName.ToLowerInvariant();
-                    if (nameMap.ContainsKey(name))
-                        continue;
-                    nameMap.Add(name, commandType);
-                }
-
-                if (attrs.Count == 0)
-                {
-                    var name = commandType.Name.ToLowerInvariant();
-                    if (name.EndsWith("verb"))
-                        name = name.Substring(0, name.Length - 4);
-                    if (name.EndsWith("command"))
-                        name = name.Substring(0, name.Length - 7);
-                    nameMap.Add(name, commandType);
-                }
-            }
-
-            _commands = nameMap;
+            _commands = commandTypes
+                .OrEmptyIfNull()
+                .SelectMany(commandType => commandType
+                    .GetVerbs()
+                    .Select(verb => (verb, commandType))
+                )
+                .ToDictionaryUnique();
         }
 
         public ICommandVerb GetCommandInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher)

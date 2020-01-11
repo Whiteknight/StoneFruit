@@ -11,21 +11,16 @@ namespace StoneFruit.Utility
         public static object TryConstruct(Type typeToConstruct, object[] availableArguments)
         {
             var constructors = typeToConstruct.GetConstructors().OrderByDescending(ci => ci.GetParameters().Length).ToList();
-            foreach (var constructor in constructors)
-            {
-                var result = TryConstruct(constructor, availableArguments);
-                if (result != null)
-                    return result;
-            }
-
-            return null;
+            return constructors
+                .Select(constructor => TryConstruct(constructor, availableArguments))
+                .FirstOrDefault(result => result != null);
         }
 
         private static object TryConstruct(ConstructorInfo constructor, object[] availableArguments)
         {
             var parameters = constructor.GetParameters();
             var arguments = new object[parameters.Length];
-            for (int i = 0; i < parameters.Length; i++)
+            for (var i = 0; i < parameters.Length; i++)
             {
                 var parameter = parameters[i];
                 var value = TryGetValue(parameter.ParameterType, availableArguments);
@@ -37,17 +32,9 @@ namespace StoneFruit.Utility
             return constructor.Invoke(arguments);
         }
 
-        private static object TryGetValue(Type parameterType, object[] availableArguments)
-        {
-            foreach (var arg in availableArguments)
-            {
-                if (arg == null)
-                    continue;
-                if (parameterType.IsInstanceOfType(arg))
-                    return arg;
-            }
-
-            return null;
-        }
+        private static object TryGetValue(Type parameterType, object[] availableArguments) 
+            => availableArguments
+                .Where(arg => arg != null)
+                .FirstOrDefault(parameterType.IsInstanceOfType);
     }
 }

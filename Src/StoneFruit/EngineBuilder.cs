@@ -41,29 +41,31 @@ namespace StoneFruit
 
         public EngineBuilder UseEnvironmentFactory(IEnvironmentFactory factory)
         {
+            EnsureEnvironmentsNotSet();
             _environments = factory == null ? null : new FactoryEnvironmentCollection(factory);
             return this;
         }
 
         public EngineBuilder UseSingleEnvironment(object environment)
         {
+            EnsureEnvironmentsNotSet();
             _environments = new InstanceEnvironmentCollection(environment);
             return this;
         }
 
-        public EngineBuilder NoEnvironment()
-        {
-            return UseSingleEnvironment(null);
-        }
+        public EngineBuilder NoEnvironment() => UseSingleEnvironment(null);
 
         public EngineBuilder UseArgumentParser(IParser<char, IEnumerable<IArgument>> argParser)
         {
+            EnsureArgumentParserNotSet();
             _argParser = argParser;
             return this;
         }
 
         public EngineBuilder UseTerminalOutput(ITerminalOutput output)
         {
+            // TODO: should we have some sort of tee/multiplex output?
+            EnsureOutputNotSet();
             _output = output;
             return this;
         }
@@ -74,6 +76,24 @@ namespace StoneFruit
             var environmentFactory = _environments;
             var argParser = _argParser ?? SimplifiedArgumentGrammar.GetParser();
             return new Engine(commandSource, environmentFactory, argParser, _output);
+        }
+
+        private void EnsureEnvironmentsNotSet()
+        {
+            if (_environments != null)
+                throw new Exception("Environments are already configured for this builder. You cannot set environments again");
+        }
+
+        private void EnsureArgumentParserNotSet()
+        {
+            if (_argParser != null)
+                throw new Exception("Argument parser is already set for this builder. You cannot set a second argument parser.");
+        }
+
+        private void EnsureOutputNotSet()
+        {
+            if (_output != null)
+                throw new Exception("Terminal Output already setup for this builder. You cannot set a second terminal output.");
         }
     }
 }

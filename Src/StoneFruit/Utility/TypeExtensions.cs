@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace StoneFruit.Utility
@@ -14,6 +16,24 @@ namespace StoneFruit.Utility
         public static string GetHelp(this Type type)
         {
             return GetPublicStaticStringPropertyValue(type, "Help") ?? GetDescription(type);
+        }
+
+        public static IEnumerable<string> GetVerbs(this Type type)
+        {
+            if (!typeof(ICommandVerb).IsAssignableFrom(type))
+                return Enumerable.Empty<string>();
+
+            var attrs = type.GetCustomAttributes<CommandDetailsAttribute>().ToList();
+            if (attrs.Any())
+                return attrs.Select(a => a.CommandName.ToLowerInvariant()).Distinct();
+
+            // TODO: Would like to convert CamelCase to spinal-case
+            var name = type.Name.ToLowerInvariant();
+            if (name.EndsWith("verb"))
+                name = name.Substring(0, name.Length - 4);
+            if (name.EndsWith("command"))
+                name = name.Substring(0, name.Length - 7);
+            return new[] { name };
         }
 
         private static string GetPublicStaticStringPropertyValue(Type type, string name)
