@@ -17,20 +17,9 @@ namespace StoneFruit.Execution
             WithColor(color, () => WriteLine(line));
         }
 
-        public void WriteLineFmt(ConsoleColor color, string fmt, params object[] args)
-        {
-            WithColor(color, () => WriteLineFmt(fmt, args));
-        }
-
         public void WriteLine(string line)
         {
             Console.WriteLine(line);
-        }
-
-        public void WriteLineFmt(string fmt, params object[] args)
-        {
-            var str = string.Format(fmt, args);
-            Console.WriteLine(str);
         }
 
         public void Write(ConsoleColor color, string str)
@@ -38,19 +27,8 @@ namespace StoneFruit.Execution
             WithColor(color, () => Write(str));
         }
 
-        public void WriteFmt(ConsoleColor color, string fmt, params object[] args)
-        {
-            WithColor(color, () => WriteFmt(fmt, args));
-        }
-
         public void Write(string str)
         {
-            Console.Write(str);
-        }
-
-        public void WriteFmt(string fmt, params object[] args)
-        {
-            var str = string.Format(fmt, args);
             Console.Write(str);
         }
 
