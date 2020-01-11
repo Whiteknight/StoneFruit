@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit", "StoneFruit\St
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Cli", "StoneFruit.Cli\StoneFruit.Cli.csproj", "{358D8E26-F81E-475E-9FBA-3060FFBA6E56}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoneFruit.StructureMap", "StoneFruit.StructureMap\StoneFruit.StructureMap.csproj", "{E8097812-505F-49BE-B404-044145B1280C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.StructureMap", "StoneFruit.StructureMap\StoneFruit.StructureMap.csproj", "{E8097812-505F-49BE-B404-044145B1280C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoneFruit.Tests", "StoneFruit.Tests\StoneFruit.Tests.csproj", "{EB62CC40-2896-4F87-A6E5-44710BAD9FA1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{E8097812-505F-49BE-B404-044145B1280C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E8097812-505F-49BE-B404-044145B1280C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E8097812-505F-49BE-B404-044145B1280C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB62CC40-2896-4F87-A6E5-44710BAD9FA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB62CC40-2896-4F87-A6E5-44710BAD9FA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB62CC40-2896-4F87-A6E5-44710BAD9FA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB62CC40-2896-4F87-A6E5-44710BAD9FA1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

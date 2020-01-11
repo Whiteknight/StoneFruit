@@ -47,7 +47,7 @@ namespace StoneFruit.Execution.Arguments
 
                 if (arg is FlagArgument flag)
                 {
-                    flags.Add(flag.Value);
+                    flags.Add(flag.Name);
                     continue;
                 }
             }
