@@ -5,7 +5,7 @@ using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.BuiltInVerbs
 {
-    [CommandDetails("exec")]
+    [CommandName("exec")]
     public class ExecuteScriptCommand : ICommandVerb
     {
         private readonly CommandArguments _args;

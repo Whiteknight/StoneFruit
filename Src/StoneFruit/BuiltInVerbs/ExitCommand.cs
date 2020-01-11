@@ -3,8 +3,8 @@
 namespace StoneFruit.BuiltInVerbs
 {
     // TODO: Do we need both?
-    [CommandDetails("exit")]
-    [CommandDetails("quit")]
+    [CommandName("exit")]
+    [CommandName("quit")]
     public class ExitCommand : ICommandVerb
     {
         private readonly EngineState _state;

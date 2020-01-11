@@ -7,23 +7,19 @@ namespace StoneFruit.Utility
 {
     public static class TypeExtensions
     {
-        public static string GetDescription(this Type type)
-        {
-            return GetPublicStaticStringPropertyValue(type, "Description");
-        }
+        public static string GetDescription(this Type type) 
+            => GetPublicStaticStringPropertyValue(type, "Description");
 
 
-        public static string GetHelp(this Type type)
-        {
-            return GetPublicStaticStringPropertyValue(type, "Help") ?? GetDescription(type);
-        }
+        public static string GetHelp(this Type type) 
+            => GetPublicStaticStringPropertyValue(type, "Help") ?? GetDescription(type);
 
         public static IEnumerable<string> GetVerbs(this Type type)
         {
             if (!typeof(ICommandVerb).IsAssignableFrom(type))
                 return Enumerable.Empty<string>();
 
-            var attrs = type.GetCustomAttributes<CommandDetailsAttribute>().ToList();
+            var attrs = type.GetCustomAttributes<CommandNameAttribute>().ToList();
             if (attrs.Any())
                 return attrs.Select(a => a.CommandName.ToLowerInvariant()).Distinct();
 

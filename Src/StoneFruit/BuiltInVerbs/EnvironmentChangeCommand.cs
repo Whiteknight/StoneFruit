@@ -5,7 +5,7 @@ using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.BuiltInVerbs
 {
-    [CommandDetails(EnvironmentChangeCommand.Name)]
+    [CommandName(EnvironmentChangeCommand.Name)]
     public class EnvironmentChangeCommand : ICommandVerb
     {
         public const string Name = "env-change";

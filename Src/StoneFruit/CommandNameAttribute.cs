@@ -3,11 +3,11 @@
 namespace StoneFruit
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
-    public class CommandDetailsAttribute : Attribute
+    public class CommandNameAttribute : Attribute
     {
         public string CommandName { get; }
 
-        public CommandDetailsAttribute(string command)
+        public CommandNameAttribute(string command)
         {
             CommandName = command;
         }
