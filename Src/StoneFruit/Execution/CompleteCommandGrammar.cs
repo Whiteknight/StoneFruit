@@ -20,13 +20,13 @@ namespace StoneFruit.Execution
             var bodyChars = Match<char>(c => c == '_' || c == '-' || char.IsLetterOrDigit(c));
             var commandName = Rule(
                 firstChar,
-                bodyChars.List(c => new string(c.ToArray())),
+                bodyChars.ListCharToString(),
                 (first, rest) => (first + rest).ToLowerInvariant()
             );
 
             return Rule(
                 commandName,
-                argParser.List(a => new CommandArguments(a.SelectMany(x => x))),
+                argParser.List().Transform(a => new CommandArguments(a.SelectMany(x => x))),
 
                 (name, args) => new CompleteCommand(name, args)
             );

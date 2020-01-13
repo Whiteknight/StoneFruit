@@ -4,7 +4,7 @@ using ParserObjects;
 using ParserObjects.Parsers;
 using static ParserObjects.Parsers.ParserMethods;
 using static ParserObjects.Parsers.Specialty.ProgrammingParserMethods;
-using static ParserObjects.Parsers.Specialty.ParserMethods;
+using static ParserObjects.Parsers.Specialty.WhitespaceParsersMethods;
 
 namespace StoneFruit.Execution.Arguments
 {
@@ -17,7 +17,9 @@ namespace StoneFruit.Execution.Arguments
         {
             var doubleQuotedString = StrippedDoubleQuotedStringWithEscapedQuotes();
             var singleQuotedString = StrippedSingleQuotedStringWithEscapedQuotes();
-            var unquotedValue = Match<char>(c => !char.IsWhiteSpace(c)).List(c => new string(c.ToArray()), true);
+            var unquotedValue = Match<char>(c => !char.IsWhiteSpace(c))
+                .List(true)
+                .Transform(c => new string(c.ToArray()));
 
             var values = First(
                 doubleQuotedString,
@@ -27,9 +29,9 @@ namespace StoneFruit.Execution.Arguments
 
             var names = CStyleIdentifier();
 
-            // TODO: Figure out what we want this syntax to be, we want it as simple and ceremony-free as possible
+            // TODO: Figure out what we want this syntax to be, it should be as simple and ceremony-free as possible
             var flagArg = Rule(
-                Match("-", c => c),
+                Match('-'),
                 names,
 
                 (start, name) => new FlagArgument(name)
@@ -37,7 +39,7 @@ namespace StoneFruit.Execution.Arguments
 
             var namedArg = Rule(
                 names,
-                Match("=", c => c),
+                Match('='),
                 values,
 
                 (name, equals, value) => new NamedArgument(name, value) 

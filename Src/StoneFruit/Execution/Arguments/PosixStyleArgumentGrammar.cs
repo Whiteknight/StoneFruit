@@ -2,8 +2,9 @@
 using System.Linq;
 using ParserObjects;
 using ParserObjects.Parsers;
-using static ParserObjects.Parsers.Specialty.ProgrammingParserMethods;
 using static ParserObjects.Parsers.ParserMethods;
+using static ParserObjects.Parsers.Specialty.ProgrammingParserMethods;
+using static ParserObjects.Parsers.Specialty.WhitespaceParsersMethods;
 
 namespace StoneFruit.Execution.Arguments
 {
@@ -16,7 +17,10 @@ namespace StoneFruit.Execution.Arguments
         {
             var doubleQuotedString = StrippedDoubleQuotedStringWithEscapedQuotes();
             var singleQuotedString = StrippedSingleQuotedStringWithEscapedQuotes();
-            var unquotedValue = Match<char>(c => !char.IsWhiteSpace(c)).List(c => new string(c.ToArray()), true);
+            var unquotedValue = Match<char>(c => !char.IsWhiteSpace(c))
+                .List(true)
+                .Transform(c => new string(c.ToArray()));
+            var whitespace = Whitespace();
 
             var value = First(
                 doubleQuotedString,
@@ -27,24 +31,24 @@ namespace StoneFruit.Execution.Arguments
             var name = CStyleIdentifier();
 
             var namedArg = Rule(
-                Match("--", c => c),
+                Match<char>("--"),
                 name,
-                Match("=", c => c),
+                Match('='),
                 value,
 
                 (s, n, e, v) => new [] { new NamedArgument(n, v) }
             );
 
             var longFlagArg = Rule(
-                Match("--", c => c),
+                Match<char>("--"),
                 name,
 
                 (s, n) => new [] { new FlagArgument(n) }
             );
 
             var shortFlagArg = Rule(
-                Match("-", c => c),
-                Match<char>(char.IsLetterOrDigit).List(c => c, true),
+                Match('-'),
+                Match<char>(char.IsLetterOrDigit).List(true),
 
                 (s, n) => n.Select(x =>  new FlagArgument(x.ToString()))
             );
@@ -54,8 +58,6 @@ namespace StoneFruit.Execution.Arguments
                 shortFlagArg,
                 value.Transform(v => new [] { new PositionalArgument(v) })
             );
-
-            var whitespace = ParserObjects.Parsers.Specialty.ParserMethods.Whitespace();
 
             return Rule(
                 whitespace,

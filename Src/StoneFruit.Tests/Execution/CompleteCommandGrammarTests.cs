@@ -34,7 +34,6 @@ namespace StoneFruit.Tests.Execution
             named2.Value.Should().Be("value2");
         }
 
-
         [Test]
         public void Simplified_Flags()
         {

@@ -4,6 +4,7 @@ using ParserObjects;
 using ParserObjects.Parsers;
 using static ParserObjects.Parsers.ParserMethods;
 using static ParserObjects.Parsers.Specialty.ProgrammingParserMethods;
+using static ParserObjects.Parsers.Specialty.WhitespaceParsersMethods;
 
 namespace StoneFruit.Execution.Arguments
 {
@@ -16,8 +17,10 @@ namespace StoneFruit.Execution.Arguments
         {
             var doubleQuotedString = StrippedDoubleQuotedStringWithEscapedQuotes();
             var singleQuotedString = StrippedSingleQuotedStringWithEscapedQuotes();
-            var unquotedValue = Match<char>(c => !char.IsWhiteSpace(c)).List(c => new string(c.ToArray()), true);
-            var whitespace = ParserObjects.Parsers.Specialty.ParserMethods.Whitespace();
+            var unquotedValue = Match<char>(c => !char.IsWhiteSpace(c))
+                .List(true)
+                .Transform(c => new string(c.ToArray()));
+            var whitespace = Whitespace();
 
             var values = First(
                 doubleQuotedString,
@@ -32,7 +35,7 @@ namespace StoneFruit.Execution.Arguments
             // downstream we can access it however it makes sense (but if you .Consume() one, it breaks your
             // ability to access things a different way)
             var namedArg = Rule(
-                Match("-", c => c),
+                Match('-'),
                 names,
                 whitespace,
                 values,
@@ -41,7 +44,7 @@ namespace StoneFruit.Execution.Arguments
             );
 
             var longFlagArg = Rule(
-                Match("-", c => c),
+                Match('-'),
                 names,
 
                 (s, name) => new[] { new FlagArgument(name) }

@@ -2,8 +2,9 @@
 using System.Linq;
 using ParserObjects;
 using ParserObjects.Parsers;
-using ParserObjects.Parsers.Specialty;
-using ParserMethods = ParserObjects.Parsers.ParserMethods;
+using static ParserObjects.Parsers.ParserMethods;
+using static ParserObjects.Parsers.Specialty.ProgrammingParserMethods;
+using static ParserObjects.Parsers.Specialty.WhitespaceParsersMethods;
 
 namespace StoneFruit.Execution.Arguments
 {
@@ -14,43 +15,44 @@ namespace StoneFruit.Execution.Arguments
     {
         public static IParser<char, IEnumerable<IArgument>> GetParser()
         {
-            var doubleQuotedString = ProgrammingParserMethods.StrippedDoubleQuotedStringWithEscapedQuotes();
-            var singleQuotedString = ProgrammingParserMethods.StrippedSingleQuotedStringWithEscapedQuotes();
-            var unquotedValue = ParserMethods.Match<char>(c => !char.IsWhiteSpace(c)).List(c => new string(Enumerable.ToArray<char>(c)), true);
+            var doubleQuotedString = StrippedDoubleQuotedStringWithEscapedQuotes();
+            var singleQuotedString = StrippedSingleQuotedStringWithEscapedQuotes();
+            var unquotedValue = Match<char>(c => !char.IsWhiteSpace(c))
+                .List(true)
+                .Transform(c => new string(c.ToArray()));
+            var whitespace = Whitespace();
 
-            var value = ParserMethods.First(
+            var value = First(
                 doubleQuotedString,
                 singleQuotedString,
                 unquotedValue
             );
 
-            var name = ProgrammingParserMethods.CStyleIdentifier();
+            var name = CStyleIdentifier();
 
-            var namedArg = ParserMethods.Rule(
-                ParserMethods.Match("/", c => c),
+            var namedArg = Rule(
+                Match('/'),
                 name,
-                ParserMethods.Match(":", c => c),
+                Match(':'),
                 value,
 
                 (s, n, e, v) => new [] { new NamedArgument(n, v) }
             );
 
-            var flagArg = ParserMethods.Rule(
-                ParserMethods.Match("/", c => c),
+            var flagArg = Rule(
+                Match('/'),
                 name,
 
                 (s, n) => new [] { new FlagArgument(n) }
             );
 
-            var args = ParserMethods.First<char, IEnumerable<IArgument>>(
+            var args = First<char, IEnumerable<IArgument>>(
                 namedArg,
                 flagArg,
                 value.Transform(v => new [] { new PositionalArgument(v) })
             );
 
-            var whitespace = ParserObjects.Parsers.Specialty.ParserMethods.Whitespace();
-
-            return ParserMethods.Rule(
+            return Rule(
                 whitespace,
                 args,
 

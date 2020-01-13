@@ -6,7 +6,7 @@
     <RootNamespace>StoneFruit</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <LangVersion>8.0</LangVersion>
-    <Version>0.0.2</Version>
+    <Version>0.0.3</Version>
     <Authors>Andrew F. Whitworth</Authors>
     <Company />
     <Description>CLI Commendlet host and execution engine</Description>
@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ParserObjects" Version="0.0.3" />
+    <PackageReference Include="ParserObjects" Version="0.1.0" />
     <PackageReference Include="ReadLine" Version="2.0.1" />
   </ItemGroup>
 

@@ -57,6 +57,7 @@ namespace StoneFruit.Execution
 
         public void RunHeadless(string[] arg)
         {
+            // TODO: If we get here with no args, show help and exit
             var state = new EngineState(true);
             var dispatcher = new CommandDispatcher(_parser, _commandSource, _environments, state, _output);
 
