@@ -60,18 +60,25 @@ namespace StoneFruit.StructureMap
 
         private ICommandVerb ResolveCommand(CompleteCommand completeCommand, CommandDispatcher dispatcher, Type type)
         {
+            // TODO: Some of these .With() instances are long-lived and probably can be registered
+            // into the container properly instead of treated transiently. I don't know if this is a
+            // necessary optimization
             var context = _container
+                // long-lived
                 .With(dispatcher)
                 .With(dispatcher.Environments)
                 .With(dispatcher.State)
                 .With(dispatcher.Output)
+                .With(dispatcher.Parser)
+
+                // transient
                 .With(completeCommand)
                 .With(completeCommand.Arguments)
                 .With(typeof(ICommandSource), this);
             if (dispatcher.Environments.Current != null)
                 context = context.With(dispatcher.Environments.Current.GetType(), dispatcher.Environments.Current);
-            var commandObj = context.GetInstance(type);
-            return commandObj as ICommandVerb;
+
+            return context.GetInstance(type) as ICommandVerb;
         }
     }
 }

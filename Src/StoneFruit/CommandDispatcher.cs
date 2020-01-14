@@ -1,21 +1,19 @@
-﻿using ParserObjects;
-using ParserObjects.Sequences;
-using StoneFruit.BuiltInVerbs.Hidden;
+﻿using StoneFruit.BuiltInVerbs.Hidden;
 using StoneFruit.Execution;
 
 namespace StoneFruit
 {
     public class CommandDispatcher
     {
-        private readonly IParser<char, CompleteCommand> _parser;
+        public CommandParser Parser { get; }
         public ICommandSource Commands { get; }
         public IEnvironmentCollection Environments { get; }
         public EngineState State { get; }
         public ITerminalOutput Output { get; }
 
-        public CommandDispatcher(IParser<char, CompleteCommand> parser, ICommandSource commands, IEnvironmentCollection environments, EngineState state, ITerminalOutput output)
+        public CommandDispatcher(CommandParser parser, ICommandSource commands, IEnvironmentCollection environments, EngineState state, ITerminalOutput output)
         {
-            _parser = parser;
+            Parser = parser;
             Commands = commands;
             Environments = environments;
             State = state;
@@ -24,8 +22,7 @@ namespace StoneFruit
 
         public void Execute(string commandString)
         {
-            var sequence = new StringCharacterSequence(commandString);
-            var completeCommand = _parser.Parse(sequence).Value;
+            var completeCommand = Parser.ParseCommand(commandString);
             var verbObject = Commands.GetCommandInstance(completeCommand, this) ?? new NotFoundCommandVerb(completeCommand.Verb, Output);
             verbObject.Execute();
         }

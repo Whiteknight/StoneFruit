@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using FluentAssertions;
+﻿using FluentAssertions;
 using NUnit.Framework;
 using ParserObjects;
 using StoneFruit.Execution.Arguments;
@@ -9,7 +7,7 @@ namespace StoneFruit.Tests.Execution.Arguments
 {
     public class SimplifiedArgumentGrammarTests
     {
-        private static IParser<char, IEnumerable<IArgument>> GetParser() 
+        private static IParser<char, IArgument> GetParser() 
             => SimplifiedArgumentGrammar.GetParser();
 
         [Test]
@@ -24,7 +22,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         public void Positionals_Tests()
         {
             var parser = GetParser();
-            var result = parser.Parse("testa").Value.FirstOrDefault();
+            var result = parser.Parse("testa").Value;
             result.Value.Should().Be("testa");
         }
 
@@ -32,7 +30,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         public void Positionals_SingleQuotedString()
         {
             var parser = GetParser();
-            var result = parser.Parse("'test a'").Value.FirstOrDefault();
+            var result = parser.Parse("'test a'").Value;
             result.Value.Should().Be("test a");
         }
 
@@ -40,7 +38,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         public void Positionals_DoubleQuotedString()
         {
             var parser = GetParser();
-            var result = parser.Parse("\"test a\"").Value.FirstOrDefault();
+            var result = parser.Parse("\"test a\"").Value;
             result.Value.Should().Be("test a");
         }
 
@@ -48,7 +46,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         public void Positionals_LeadingWhitespace()
         {
             var parser = GetParser();
-            var result = parser.Parse("   testa").Value.FirstOrDefault();
+            var result = parser.Parse("   testa").Value;
             result.Value.Should().Be("testa");
         }
 
@@ -56,7 +54,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         public void Named_Tests()
         {
             var parser = GetParser();
-            var result = parser.Parse("name1=value1").Value.FirstOrDefault() as NamedArgument;
+            var result = parser.Parse("name1=value1").Value as NamedArgument;
             result.Name.Should().Be("name1");
             result.Value.Should().Be("value1");
         }
@@ -65,7 +63,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         public void Named_LeadingWhitespace()
         {
             var parser = GetParser();
-            var result = parser.Parse("    name1=value1").Value.FirstOrDefault() as NamedArgument;
+            var result = parser.Parse("    name1=value1").Value as NamedArgument;
             result.Name.Should().Be("name1");
             result.Value.Should().Be("value1");
         }
@@ -74,7 +72,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         public void Named_SingleQuotedValue()
         {
             var parser = GetParser();
-            var result = parser.Parse("name1='value1'").Value.FirstOrDefault() as NamedArgument;
+            var result = parser.Parse("name1='value1'").Value as NamedArgument;
             result.Name.Should().Be("name1");
             result.Value.Should().Be("value1");
         }
@@ -83,7 +81,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         public void Named_DoubleQuotedValue()
         {
             var parser = GetParser();
-            var result = parser.Parse("name1=\"value1\"").Value.FirstOrDefault() as NamedArgument;
+            var result = parser.Parse("name1=\"value1\"").Value as NamedArgument;
             result.Name.Should().Be("name1");
             result.Value.Should().Be("value1");
         }
@@ -92,7 +90,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         public void Flags_Tests()
         {
             var parser = GetParser();
-            var result = parser.Parse("-testa").Value.FirstOrDefault() as FlagArgument;
+            var result = parser.Parse("-testa").Value as FlagArgument;
             result.Name.Should().Be("testa");
             result.Value.Should().Be("");
         }

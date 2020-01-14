@@ -37,11 +37,15 @@ namespace StoneFruit.Execution.Commands
         {
             var commandVerb = DuckTypeConstructorInvoker.TryConstruct(commandType, new[]
             {
+                // long-lived objects
                 dispatcher,
                 dispatcher.Environments,
-                dispatcher.Environments.Current,
                 dispatcher.State,
                 dispatcher.Output,
+                dispatcher.Parser,
+
+                // transient objects
+                dispatcher.Environments.Current,
                 completeCommand,
                 completeCommand.Arguments,
                 this

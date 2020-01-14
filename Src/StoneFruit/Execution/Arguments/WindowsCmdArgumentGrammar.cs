@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using ParserObjects;
 using ParserObjects.Parsers;
 using static ParserObjects.Parsers.ParserMethods;
@@ -13,7 +12,7 @@ namespace StoneFruit.Execution.Arguments
     /// </summary>
     public class WindowsCmdArgumentGrammar
     {
-        public static IParser<char, IEnumerable<IArgument>> GetParser()
+        public static IParser<char, IArgument> GetParser()
         {
             var doubleQuotedString = StrippedDoubleQuotedStringWithEscapedQuotes();
             var singleQuotedString = StrippedSingleQuotedStringWithEscapedQuotes();
@@ -34,22 +33,23 @@ namespace StoneFruit.Execution.Arguments
                 Match('/'),
                 name,
                 Match(':'),
+                // TODO: don't backtrack here
                 value,
 
-                (s, n, e, v) => new [] { new NamedArgument(n, v) }
+                (s, n, e, v) => new NamedArgument(n, v)
             );
 
             var flagArg = Rule(
                 Match('/'),
                 name,
 
-                (s, n) => new [] { new FlagArgument(n) }
+                (s, n) => new FlagArgument(n)
             );
 
-            var args = First<char, IEnumerable<IArgument>>(
+            var args = First<char, IArgument>(
                 namedArg,
                 flagArg,
-                value.Transform(v => new [] { new PositionalArgument(v) })
+                value.Transform(v => new PositionalArgument(v))
             );
 
             return Rule(

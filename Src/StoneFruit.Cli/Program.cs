@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using StoneFruit.Execution;
+using StoneFruit.Execution.Arguments;
 using StoneFruit.StructureMap;
 
 namespace StoneFruit.Cli
@@ -17,8 +19,27 @@ namespace StoneFruit.Cli
         }
     }
 
+    public class TestArgsA
+    {
+        [ArgumentIndex(0)]
+        public string Arg1 { get; set; }
+
+        [ArgumentIndex(1)]
+        public string Arg2 { get; set; }
+
+        [ArgumentIndex(2)]
+        public string Arg3 { get; set; }
+    }
+
     public class TestACommand : ICommandVerb
     {
+        private readonly TestArgsA _args;
+
+        public TestACommand(CommandParser parser)
+        {
+            _args = parser.ParseArguments("x y z").MapTo<TestArgsA>();
+        }
+
         public void Execute()
         {
             Console.WriteLine("TESTA");

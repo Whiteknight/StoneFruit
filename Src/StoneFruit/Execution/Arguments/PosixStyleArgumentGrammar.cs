@@ -28,12 +28,14 @@ namespace StoneFruit.Execution.Arguments
                 unquotedValue
             );
 
+            // TODO: we can be more flexible here, because the "--" prefix demarcates the name unambiguously
             var name = CStyleIdentifier();
 
             var namedArg = Rule(
                 Match<char>("--"),
                 name,
                 Match('='),
+                // TODO: Don't backtrack here.
                 value,
 
                 (s, n, e, v) => new [] { new NamedArgument(n, v) }

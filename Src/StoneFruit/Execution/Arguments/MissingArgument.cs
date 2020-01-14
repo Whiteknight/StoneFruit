@@ -18,6 +18,14 @@
 
         public IArgument MarkConsumed() => this;
 
+        public string AsString(string defaultValue = null) => defaultValue;
+
+        public bool AsBool(bool defaultValue = false) => defaultValue;
+
+        public int AsInt(int defaultValue = 0) => defaultValue;
+
+        public long AsLong(long defaultValue = 0) => defaultValue;
+
         public void Throw() => throw new CommandArgumentException(Message);
     }
 }

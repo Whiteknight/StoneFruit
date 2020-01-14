@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using ParserObjects;
 using StoneFruit.BuiltInVerbs;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Environments;
@@ -16,18 +14,18 @@ namespace StoneFruit.Execution
         private readonly IEnvironmentCollection _environments;
         private readonly ICommandSource _commandSource;
         private readonly ITerminalOutput _output;
-        private readonly IParser<char, CompleteCommand> _parser;
+        private readonly CommandParser _parser;
 
         // TODO: Be able to specify startup commands that will execute as soon as the engine starts
         // like "change-env" does
 
-        public Engine(ICommandSource commands, IEnvironmentCollection environments, IParser<char, IEnumerable<IArgument>> argParser, ITerminalOutput output)
+        public Engine(ICommandSource commands, IEnvironmentCollection environments, CommandParser parser, ITerminalOutput output)
         {
             _environments = environments ?? new InstanceEnvironmentCollection(null);
             // TODO: If we have 0 commands, we might want to just abort?
             // Otherwise, how do we enforce that we have something here?
             _commandSource = commands;
-            _parser = CompleteCommandGrammar.GetParser(argParser);
+            _parser = parser ?? CommandParser.GetDefault();
             _output = output ?? new ConsoleTerminalOutput();
         }
 

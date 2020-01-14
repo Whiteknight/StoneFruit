@@ -38,7 +38,7 @@ namespace StoneFruit.Execution.Arguments
 
                 if (arg is NamedArgument named)
                 {
-                    var name = named.Name;
+                    var name = named.Name.ToLowerInvariant();
                     if (!nameds.ContainsKey(name))
                         nameds.Add(name, new List<NamedArgument>());
                     nameds[name].Add(named);
@@ -47,7 +47,9 @@ namespace StoneFruit.Execution.Arguments
 
                 if (arg is FlagArgument flag)
                 {
-                    flags.Add(flag.Name);
+                    var name = flag.Name.ToLowerInvariant();
+                    if (!flags.Contains(name))
+                        flags.Add(name);
                     continue;
                 }
             }
@@ -88,6 +90,7 @@ namespace StoneFruit.Execution.Arguments
 
         public IArgument Get(string name)
         {
+            name = name.ToLowerInvariant();
             if (!_nameds.ContainsKey(name))
                 return new MissingArgument($"Cannot get argument named '{name}'");
             return _nameds[name].FirstOrDefault(a => !a.Consumed);
@@ -95,10 +98,17 @@ namespace StoneFruit.Execution.Arguments
 
         public IEnumerable<IArgument> GetAll(string name)
         {
+            name = name.ToLowerInvariant();
             if (_nameds.ContainsKey(name))
                 return Enumerable.Empty<IArgument>();
             return _nameds[name].Where(a => !a.Consumed);
         }
+
+        // TODO: GetLike(string part)
+        // TODO: GetAllPositionalValues (naming?)
+        // TODO: GetAllFlags (naming?)
+        // TODO: GetAllNamedValues (naming?)
+
 
         public IEnumerable<IArgument> GetAllPositionals()
         {
@@ -107,9 +117,14 @@ namespace StoneFruit.Execution.Arguments
 
         public bool HasFlag(string name)
         {
+            name = name.ToLowerInvariant();
             return _flags.Contains(name);
         }
 
-        // TODO: Method to map argument values to an argument object. Mapper should be pluggable
+        // TODO: Method to create a sub-CommandArguments instance with some arguments added/removed
+
+        public T MapTo<T>()
+            where T : new() 
+            => new CommandArgumentMapper().Map<T>(this);
     }
 }

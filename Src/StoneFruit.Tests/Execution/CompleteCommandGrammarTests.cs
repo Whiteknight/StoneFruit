@@ -9,7 +9,9 @@ namespace StoneFruit.Tests.Execution
     public class CompleteCommandGrammarTests
     {
         private IParser<char, CompleteCommand> GetSimplifiedParser() 
-            => CompleteCommandGrammar.GetParser(SimplifiedArgumentGrammar.GetParser());
+            => CompleteCommandGrammar.GetParser(
+                CommandArgumentsGrammar.GetParser(
+                    SimplifiedArgumentGrammar.GetParser()));
 
         [Test]
         public void Simplified_Positional()
