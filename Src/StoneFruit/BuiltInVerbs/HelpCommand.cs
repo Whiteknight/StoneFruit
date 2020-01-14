@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Utility;
@@ -61,13 +60,14 @@ Get detailed help information for the given verb. The verb Command class must im
             int maxCommandLength = commandsList.Select(c => c.Key.Length).Max();
             int descStartColumn = maxCommandLength + 2;
             var blankPrefix = new string(' ', descStartColumn);
-            int maxDescLineLength = _output.ConsoleWidth - descStartColumn;
+            int maxDescLineLength = System.Console.WindowWidth - descStartColumn;
 
             foreach (var type in _commands.GetAll())
             {
-                _output.Write(ConsoleColor.Green, type.Key);
-                var buffer = new string(' ', descStartColumn - type.Key.Length);
-                _output.Write(buffer);
+                _output
+                    .Color(ConsoleColor.Green)
+                    .Write(type.Key)
+                    .Write(new string(' ', descStartColumn - type.Key.Length));
                 var desc = type.Value.GetDescription();
                 var lines = GetDescriptionLines(desc, maxDescLineLength);
                 if (lines.Count == 0)

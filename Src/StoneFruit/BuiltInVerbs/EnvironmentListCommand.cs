@@ -20,13 +20,17 @@ namespace StoneFruit.BuiltInVerbs
 
         public void Execute()
         {
+            var highlight = new Brush(ConsoleColor.Black, ConsoleColor.Cyan);
             foreach (var env in _environments.GetNames())
             {
-                _output.Write(ConsoleColor.White, env.Key.ToString());
-                _output.Write(ConsoleColor.DarkGray, ") ");
-                _output.Write(ConsoleColor.Cyan, env.Value);
+                _output
+                    .Color(ConsoleColor.White).Write(env.Key.ToString())
+                    .Color(ConsoleColor.DarkGray).Write(") ");
                 if (env.Value == _environments.CurrentName)
-                    _output.Write(ConsoleColor.White, "*");
+                    _output.Color(highlight).Write(env.Value);
+                else
+                    _output.Color(ConsoleColor.Cyan).Write(env.Value);
+
                 _output.WriteLine();
             }
         }

@@ -60,7 +60,7 @@ Change directly to the environment at the specified position
 
             while (true)
             {
-                _output.WriteLine(ConsoleColor.DarkCyan, "Please select an environment:");
+                _output.Color(ConsoleColor.DarkCyan).WriteLine("Please select an environment:");
                 _dispatcher.Execute(EnvironmentListCommand.Name);
 
                 var envIndex = _output.Prompt("", true, false);
@@ -90,7 +90,7 @@ Change directly to the environment at the specified position
                 return true;
             }
 
-            _output.RedLine($"Unknown environment '{arg}'");
+            _output.Color(ConsoleColor.Red).WriteLine($"Unknown environment '{arg}'");
             return false;
         }
     }

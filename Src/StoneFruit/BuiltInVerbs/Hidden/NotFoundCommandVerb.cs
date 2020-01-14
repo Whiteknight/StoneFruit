@@ -18,7 +18,9 @@ namespace StoneFruit.BuiltInVerbs.Hidden
 
         public void Execute()
         {
-            _output.WriteLine(ConsoleColor.Red, $"Command '{_verb}' not found. Please check your spelling or help output and try again");
+            _output
+                .Color(ConsoleColor.Red)
+                .WriteLine($"Command '{_verb}' not found. Please check your spelling or help output and try again");
         }
     }
 }

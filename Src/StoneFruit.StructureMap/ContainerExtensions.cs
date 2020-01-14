@@ -1,4 +1,5 @@
 ﻿using StructureMap;
+using StructureMap.Graph;
 
 namespace StoneFruit.StructureMap
 {

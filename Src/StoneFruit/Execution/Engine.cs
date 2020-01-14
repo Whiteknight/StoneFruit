@@ -17,7 +17,7 @@ namespace StoneFruit.Execution
         private readonly CommandParser _parser;
 
         // TODO: Be able to specify startup commands that will execute as soon as the engine starts
-        // like "change-env" does
+        // like "env-change" does
 
         public Engine(ICommandSource commands, IEnvironmentCollection environments, CommandParser parser, ITerminalOutput output)
         {
@@ -92,9 +92,10 @@ namespace StoneFruit.Execution
 
         private void RunInteractivelyWithEnvironment(EngineState state, CommandDispatcher dispatcher)
         {
-            _output.Write("Enter command ");
-            _output.Write(ConsoleColor.DarkGray, "('help' for help, 'exit' to quit)");
-            _output.WriteLine(":");
+            _output
+                .Write("Enter command ")
+                .Color(ConsoleColor.DarkGray).Write("('help' for help, 'exit' to quit)")
+                .Color(ConsoleColor.Gray).WriteLine(":");
 
             while (true)
             {
@@ -122,8 +123,10 @@ namespace StoneFruit.Execution
                 }
                 catch (Exception e)
                 {
-                    _output.RedLine(e.Message);
-                    _output.RedLine(e.StackTrace);
+                    _output
+                        .Color(ConsoleColor.Red)
+                        .WriteLine(e.Message)
+                        .WriteLine(e.StackTrace);
                 }
             }
         }

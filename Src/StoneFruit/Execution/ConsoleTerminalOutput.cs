@@ -7,29 +7,24 @@ namespace StoneFruit.Execution
     /// </summary>
     public class ConsoleTerminalOutput : ITerminalOutput
     {
-        public void WriteLine()
+        public ITerminalOutput Color(Brush brush) => new ColoredTerminalOutputWrapper(brush, this);
+
+        public ITerminalOutput WriteLine()
         {
             Console.WriteLine();
+            return this;
         }
 
-        public void WriteLine(ConsoleColor color, string line)
-        {
-            WithColor(color, () => WriteLine(line));
-        }
-
-        public void WriteLine(string line)
+        public ITerminalOutput WriteLine(string line)
         {
             Console.WriteLine(line);
+            return this;
         }
 
-        public void Write(ConsoleColor color, string str)
-        {
-            WithColor(color, () => Write(str));
-        }
-
-        public void Write(string str)
+        public ITerminalOutput Write(string str)
         {
             Console.Write(str);
+            return this;
         }
 
         public string Prompt(string prompt, bool mustProvide = true, bool keepHistory = true)
@@ -42,23 +37,6 @@ namespace StoneFruit.Execution
                 if (keepHistory)
                     ReadLine.AddHistory(value);
                 return value;
-            }
-        }
-
-        public int ConsoleWidth => System.Console.WindowWidth;
-        public int ConsoleHeight => System.Console.WindowHeight;
-
-        private static void WithColor(ConsoleColor color, Action act)
-        {
-            var currentColor = Console.ForegroundColor;
-            Console.ForegroundColor = color;
-            try
-            {
-                act();
-            }
-            finally
-            {
-                Console.ForegroundColor = currentColor;
             }
         }
     }
