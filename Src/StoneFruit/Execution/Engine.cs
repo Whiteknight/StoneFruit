@@ -7,7 +7,7 @@ using StoneFruit.Execution.Environments;
 namespace StoneFruit.Execution
 {
     /// <summary>
-    /// The execution core
+    /// The execution core. Provides a run loop to receive user commands and execute them
     /// </summary>
     public class Engine
     {
@@ -29,6 +29,12 @@ namespace StoneFruit.Execution
             _output = output ?? new ConsoleTerminalOutput();
         }
 
+        /// <summary>
+        /// Selects the appropriate run mode and executes it. If a command is provided, the application
+        /// is inferred to be in headless mode. If no arguments are provided the application is inferred to
+        /// be in interactive mode.
+        /// </summary>
+        /// <param name="args"></param>
         public void Run(string[] args = null)
         {
             if (args == null || args.Length == 0)
@@ -53,6 +59,11 @@ namespace StoneFruit.Execution
             RunHeadless(args);
         }
 
+        /// <summary>
+        /// Runs headless without an interactive prompt. All command information comes from the provided
+        /// arguments (which typically come from command line arguments)
+        /// </summary>
+        /// <param name="arg"></param>
         public void RunHeadless(string[] arg)
         {
             // TODO: If we get here with no args, show help and exit
@@ -71,6 +82,12 @@ namespace StoneFruit.Execution
             ExecuteCommandQueue(state, dispatcher);
         }
 
+        /// <summary>
+        /// Runs interactively, prompting the user for input and executing each command in turn. If an
+        /// environment is not set, the user is prompted to select one before any commands are executed.
+        /// Returns when the user has entered the 'exit' or 'quit' commands, or when some other verb has
+        /// set the exit condition.
+        /// </summary>
         public void RunInteractively()
         {
             var state = new EngineState(false);
@@ -82,6 +99,12 @@ namespace StoneFruit.Execution
             RunInteractivelyWithEnvironment(state, dispatcher);
         }
 
+        /// <summary>
+        /// Runs interactively, setting the environment to the value given and then prompting the user for
+        /// commands to execute. Returns when the user has entered the 'exit' or 'quit' commands, or when
+        /// some other verb has set the exit condition.
+        /// </summary>
+        /// <param name="environment"></param>
         public void RunInteractively(string environment)
         {
             var state = new EngineState(false);

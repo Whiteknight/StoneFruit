@@ -63,6 +63,8 @@ namespace StoneFruit.Execution.Arguments
             _positionalIndex = 0;
         }
 
+        public static CommandArguments Empty() => new CommandArguments();
+
         public static CommandArguments Single(string arg)
         {
             return new CommandArguments(new[] { new PositionalArgument(arg) });

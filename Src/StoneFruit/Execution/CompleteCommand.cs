@@ -10,7 +10,7 @@ namespace StoneFruit.Execution
         public CompleteCommand(string verb, CommandArguments arguments)
         {
             Verb = verb;
-            Arguments = arguments;
+            Arguments = arguments ?? CommandArguments.Empty();
         }
 
         public string Verb { get; }
