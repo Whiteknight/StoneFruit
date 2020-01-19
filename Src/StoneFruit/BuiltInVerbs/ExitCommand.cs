@@ -2,9 +2,9 @@
 
 namespace StoneFruit.BuiltInVerbs
 {
-    // TODO: Do we need both?
+    
     [CommandName(Name)]
-    [CommandName("quit")]
+    [CommandName("quit", showInHelp: false)]
     public class ExitCommand : ICommandVerb
     {
         public const string Name = "exit";
@@ -20,6 +20,7 @@ namespace StoneFruit.BuiltInVerbs
 
         public void Execute()
         {
+            // TODO: Exit Code argument
             _state.ShouldExit = true;
         }
     }

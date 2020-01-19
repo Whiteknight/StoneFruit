@@ -22,8 +22,7 @@ namespace StoneFruit.Cli
                 .SetupEvents(e => 
                     { 
                         e.EngineStartInteractive.Add("help");
-                        e.EngineStartInteractive.Add("echo 'hello'");
-                        e.EngineStopInteractive.Add("env-change");
+                        e.EngineStopInteractive.Add("echo 'goodbye'");
                     }
                 )
                 .Build();

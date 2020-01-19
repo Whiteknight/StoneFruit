@@ -6,6 +6,7 @@ using StoneFruit.Utility;
 
 namespace StoneFruit.BuiltInVerbs
 {
+    [CommandName(Name)]
     public class HelpCommand : ICommandVerb
     {
         public const string Name = "help";
@@ -23,7 +24,7 @@ namespace StoneFruit.BuiltInVerbs
 
         public static string Description => "List all commands or get detailed information for a single command";
 
-        public static string Help => @"help 
+        public static string Help => @"help [-showall]
 Get overview information for all available verbs. The verb Command class must implement
 
     public static string Description {{ get; }} 
@@ -32,12 +33,13 @@ help <command-name>
 Get detailed help information for the given verb. The verb Command class must implement
 
     public static string Help {{ get; }}
+
+The help command by default hides some internal commands which are not necessary for normal user interaction.
+To see all commands, use the -showall flag
 ";
 
         public void Execute()
         {
-            // TODO: Mode where we take the name of a command and try to offer detailed information
-            // Will probably require some kind of extension to the command object to provide that info
             var arg = _args.Shift();
             if (arg.Exists())
             {
@@ -45,7 +47,8 @@ Get detailed help information for the given verb. The verb Command class must im
                 return;
             }
 
-            GetOverview();
+            var showAll = _args.HasFlag("showall");
+            GetOverview(showAll);
         }
 
         private void GetDetail(string name)
@@ -57,15 +60,18 @@ Get detailed help information for the given verb. The verb Command class must im
             _output.WriteLine(help);
         }
 
-        private void GetOverview()
+        private void GetOverview(bool showAll)
         {
             var commandsList = _commands.GetAll().ToList();
+            if (!showAll)
+                commandsList = commandsList.Where(kvp => kvp.Value.ShouldShowInHelp(kvp.Key)).ToList();
+
             int maxCommandLength = commandsList.Select(c => c.Key.Length).Max();
             int descStartColumn = maxCommandLength + 2;
             var blankPrefix = new string(' ', descStartColumn);
             int maxDescLineLength = System.Console.WindowWidth - descStartColumn;
 
-            foreach (var type in _commands.GetAll())
+            foreach (var type in commandsList)
             {
                 _output
                     .Color(ConsoleColor.Green)

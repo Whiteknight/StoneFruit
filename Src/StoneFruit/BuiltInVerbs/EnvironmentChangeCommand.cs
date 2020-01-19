@@ -6,8 +6,7 @@ using StoneFruit.Execution.Arguments;
 namespace StoneFruit.BuiltInVerbs
 {
     [CommandName(Name)]
-    // TODO: Would like a way to not have this one listed in help
-    [CommandName(NotSetName)]
+    [CommandName(NotSetName, showInHelp: false)]
     public class EnvironmentChangeCommand : ICommandVerb
     {
         public const string Name = "env-change";
@@ -32,22 +31,25 @@ namespace StoneFruit.BuiltInVerbs
 
         public static string Description => "Change environment if multiple environments are configured";
 
-        public static string Help => @"change-env
+        public static string Help => $@"{Name}
 Show a list of possible environments and a prompt to select the one you want.
 
-change-env <envName>
+{Name} <envName>
 Change directly to the specified environment
 
-change-env <number>
+{Name} <number>
 Change directly to the environment at the specified position
+
+To prompt the user for an environment only if one is not currently set, use the {NotSetName} verb instead
 ";
 
         public void Execute()
         {
             if (_command.Verb == NotSetName)
             {
-                if (_environments.Current != null)
-                    return;
+                if (_environments.Current == null)
+                    PromptUserForEnvironment();
+                return;
             }
 
             ChangeEnvironment();
@@ -75,6 +77,11 @@ Change directly to the environment at the specified position
             if (_state.Headless)
                 throw new Exception("Environment not specified in headless mode");
 
+            PromptUserForEnvironment();
+        }
+
+        private void PromptUserForEnvironment()
+        {
             while (true)
             {
                 _output.Color(ConsoleColor.DarkCyan).WriteLine("Please select an environment:");

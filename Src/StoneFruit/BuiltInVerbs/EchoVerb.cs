@@ -2,7 +2,7 @@
 
 namespace StoneFruit.BuiltInVerbs
 {
-    [CommandName(Name)]
+    [CommandName(Name, showInHelp: false)]
     public class EchoVerb : ICommandVerb
     {
         public const string Name = "echo";
@@ -18,6 +18,8 @@ namespace StoneFruit.BuiltInVerbs
 
         public void Execute()
         {
+            // TODO: Argument to specify color
+            // TODO: Argument to specify whether to write a newline or not
             foreach (var arg in _args.GetAllPositionals())
                 _output.WriteLine(arg.Value);
         }

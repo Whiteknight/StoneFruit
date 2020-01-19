@@ -2,7 +2,7 @@
 
 namespace StoneFruit.BuiltInVerbs
 {
-    [CommandName(EnvironmentListCommand.Name)]
+    [CommandName(Name)]
     public class EnvironmentListCommand : ICommandVerb
     {
         public const string Name = "env-list";

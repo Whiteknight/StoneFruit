@@ -21,7 +21,11 @@ namespace StoneFruit.Utility
 
             var attrs = type.GetCustomAttributes<CommandNameAttribute>().ToList();
             if (attrs.Any())
-                return attrs.Select(a => a.CommandName.ToLowerInvariant()).Distinct();
+            {
+                return attrs
+                    .Select(a => a.CommandName.ToLowerInvariant())
+                    .Distinct();
+            }
 
             // TODO: Would like to convert CamelCase to spinal-case
             var name = type.Name.ToLowerInvariant();
@@ -38,6 +42,17 @@ namespace StoneFruit.Utility
             if (property != null && property.PropertyType == typeof(string))
                 return property.GetValue(null) as string;
             return null;
+        }
+
+        public static bool ShouldShowInHelp(this Type type, string verb)
+        {
+            var attrs = type.GetCustomAttributes<CommandNameAttribute>().ToList();
+
+            // If there are no attributes, we're using a class name and we always show it
+            if (!attrs.Any())
+                return true;
+
+            return attrs.Any(a => a.CommandName == verb && a.ShowInHelp);
         }
     }
 }
