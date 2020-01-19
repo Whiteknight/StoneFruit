@@ -19,6 +19,8 @@ namespace StoneFruit.Execution
         // TODO: Be able to specify startup commands that will execute as soon as the engine starts
         // like "env-change" does
 
+        // TODO: Take an object with behavior scripts to execute when things go wrong or in response to
+        // certain events
         public Engine(ICommandSource commands, IEnvironmentCollection environments, CommandParser parser, ITerminalOutput output)
         {
             _environments = environments ?? new InstanceEnvironmentCollection(null);
@@ -66,7 +68,7 @@ namespace StoneFruit.Execution
         /// <param name="arg"></param>
         public void RunHeadless(string[] arg)
         {
-            // TODO: If we get here with no args, show help and exit
+            // TODO: Configurable behavior if we get here with no args. Show help? Exit silently? Show error?
             var state = new EngineState(true);
             var dispatcher = new CommandDispatcher(_parser, _commandSource, _environments, state, _output);
 
@@ -140,6 +142,7 @@ namespace StoneFruit.Execution
                     return;
                 try
                 {
+                    // TODO: Configurable behavior when a verb is not found. Either show error, show help, etc
                     dispatcher.Execute(commandString);
                     if (state.ShouldExit)
                         return;

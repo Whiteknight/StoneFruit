@@ -8,6 +8,8 @@ namespace StoneFruit.BuiltInVerbs
 {
     public class HelpCommand : ICommandVerb
     {
+        public const string Name = "help";
+
         private readonly ITerminalOutput _output;
         private readonly ICommandSource _commands;
         private readonly CommandArguments _args;
