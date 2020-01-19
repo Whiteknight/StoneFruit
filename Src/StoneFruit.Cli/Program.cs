@@ -19,14 +19,13 @@ namespace StoneFruit.Cli
                 .UseStructureMapContainerSource()
                 //.UseCommands(typeof(HelpCommand), typeof(ExitCommand))
                 .UseEnvironmentFactory(new MyEnvironmentFactory())
-                .SetupEvents(e => 
-                    { 
-                        e.EngineStartInteractive.Add("help");
-                        e.EngineStopInteractive.Add("echo 'goodbye'");
-                    }
-                )
+                .SetupEvents(e =>
+                {
+                    e.EngineStartInteractive.Add("help");
+                    e.EngineStopInteractive.Add("echo 'goodbye'");
+                })
                 .Build();
-            engine.Run(args);
+            Environment.ExitCode = engine.Run(args);
         }
     }
 

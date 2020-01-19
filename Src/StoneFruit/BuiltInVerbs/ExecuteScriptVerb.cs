@@ -6,12 +6,12 @@ using StoneFruit.Execution.Arguments;
 namespace StoneFruit.BuiltInVerbs
 {
     [CommandName("exec")]
-    public class ExecuteScriptCommand : ICommandVerb
+    public class ExecuteScriptVerb : ICommandVerb
     {
         private readonly CommandArguments _args;
         private readonly EngineState _state;
 
-        public ExecuteScriptCommand(CommandArguments args, EngineState state)
+        public ExecuteScriptVerb(CommandArguments args, EngineState state)
         {
             _args = args;
             _state = state;

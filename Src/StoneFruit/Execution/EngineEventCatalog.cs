@@ -13,7 +13,7 @@ namespace StoneFruit.Execution
 
             // Events when the engine starts and stops interactive mode
             EngineStartInteractive = new EventScript(
-                $"{EnvironmentChangeCommand.NotSetName}"
+                $"{EnvironmentChangeVerb.NotSetName}"
             );
             EngineStopInteractive = new EventScript();
             
@@ -24,7 +24,7 @@ namespace StoneFruit.Execution
             HeadlessNoArgs = new EventScript(
                 $"{EchoVerb.Name} 'Please provide a verb'",
                 // We exit here so the engine doesn't try to continue execution
-                $"{ExitCommand.Name}"
+                $"{ExitVerb.Name} {Engine.ExitCodeOk}"
             );
 
             // TODO: It would be nice to be able to pass the name of the unknown verb here, so we could
@@ -52,15 +52,9 @@ namespace StoneFruit.Execution
                 _lines.AddRange(_initialLines);
             }
 
-            public void Clear()
-            {
-                _lines.Clear();
-            }
+            public void Clear() => _lines.Clear();
 
-            public void Add(params string[] lines)
-            {
-                _lines.AddRange(lines);
-            }
+            public void Add(params string[] lines) => _lines.AddRange(lines);
 
             public void EnqueueScript(EngineState state)
             {
@@ -68,7 +62,7 @@ namespace StoneFruit.Execution
                     state.AddCommand(line);
             }
 
-            public IEnumerable<string> GetLines() => _lines;
+            public override string ToString() => string.Join("\n", _lines);
         }
 
         public EventScript HeadlessNoArgs { get; }

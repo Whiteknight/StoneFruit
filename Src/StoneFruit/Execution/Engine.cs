@@ -12,14 +12,14 @@ namespace StoneFruit.Execution
     /// </summary>
     public class Engine
     {
+        public const int ExitCodeOk = 0;
+        public const int ExitCodeHeadlessNoArgs = 1;
+
         private readonly IEnvironmentCollection _environments;
         private readonly ICommandSource _commandSource;
         private readonly EngineEventCatalog _eventCatalog;
         private readonly ITerminalOutput _output;
         private readonly CommandParser _parser;
-
-        // TODO: Be able to specify startup commands that will execute as soon as the engine starts
-        // like "env-change" does
 
         public Engine(ICommandSource commands, IEnvironmentCollection environments, CommandParser parser, ITerminalOutput output, EngineEventCatalog eventCatalog)
         {
@@ -38,28 +38,22 @@ namespace StoneFruit.Execution
         /// be in interactive mode.
         /// </summary>
         /// <param name="args"></param>
-        public void Run(string[] args = null)
+        public int Run(string[] args = null)
         {
             if (args == null || args.Length == 0)
-            {
-                RunInteractively();
-                return;
-            }
+                return RunInteractively();
 
             if (args.Length == 1 && _environments.IsValid(args[0]))
-            {
-                RunInteractively();
-                return;
-            }
+                return RunInteractively();
 
             if (args.Length == 1 && args[0] == "help")
             {
                 // TODO: A HeadlessHelpCommand that includes more info about headless usage?
-                new HelpCommand(_output, _commandSource, new CommandArguments()).Execute();
-                return;
+                new HelpVerb(_output, _commandSource, new CommandArguments()).Execute();
+                return ExitCodeOk;
             }
 
-            RunHeadless(args);
+            return RunHeadless(args);
         }
 
         /// <summary>
@@ -67,7 +61,7 @@ namespace StoneFruit.Execution
         /// arguments (which typically come from command line arguments)
         /// </summary>
         /// <param name="arg"></param>
-        public void RunHeadless(string[] arg)
+        public int RunHeadless(string[] arg)
         {
             var state = new EngineState(true, _eventCatalog);
             var dispatcher = new CommandDispatcher(_parser, _commandSource, _environments, state, _output);
@@ -75,14 +69,14 @@ namespace StoneFruit.Execution
             {
                 state.HeadlessNoArgs();
                 ExecuteCommandQueue(state, dispatcher);
-                return;
+                return ExitCodeHeadlessNoArgs;
             }
 
             var env = arg[0];
             IEnumerable<string> realArgs = arg;
             if (_environments.IsValid(env))
             {
-                state.AddCommand($"{EnvironmentChangeCommand.Name} '{env}'");
+                state.AddCommand($"{EnvironmentChangeVerb.Name} '{env}'");
                 realArgs = arg.Skip(1);
             }
 
@@ -91,6 +85,7 @@ namespace StoneFruit.Execution
             ExecuteCommandQueue(state, dispatcher);
             state.EngineStopHeadless();
             ExecuteCommandQueue(state, dispatcher);
+            return state.ExitCode;
         }
 
         /// <summary>
@@ -99,11 +94,11 @@ namespace StoneFruit.Execution
         /// Returns when the user has entered the 'exit' or 'quit' commands, or when some other verb has
         /// set the exit condition.
         /// </summary>
-        public void RunInteractively()
+        public int RunInteractively()
         {
             var state = new EngineState(false, _eventCatalog);
             var dispatcher = new CommandDispatcher(_parser, _commandSource, _environments, state, _output);
-            RunInteractivelyWithEnvironment(state, dispatcher);
+            return RunInteractivelyWithEnvironment(state, dispatcher);
         }
 
         /// <summary>
@@ -112,15 +107,15 @@ namespace StoneFruit.Execution
         /// some other verb has set the exit condition.
         /// </summary>
         /// <param name="environment"></param>
-        public void RunInteractively(string environment)
+        public int RunInteractively(string environment)
         {
             var state = new EngineState(false, _eventCatalog);
             var dispatcher = new CommandDispatcher(_parser, _commandSource, _environments, state, _output);
-            state.AddCommand($"{EnvironmentChangeCommand.Name} {environment}");
-            RunInteractivelyWithEnvironment(state, dispatcher);
+            state.AddCommand($"{EnvironmentChangeVerb.Name} {environment}");
+            return RunInteractivelyWithEnvironment(state, dispatcher);
         }
 
-        private void RunInteractivelyWithEnvironment(EngineState state, CommandDispatcher dispatcher)
+        private int RunInteractivelyWithEnvironment(EngineState state, CommandDispatcher dispatcher)
         {
             state.EngineStartInteractive();
             ExecuteCommandQueue(state, dispatcher);
@@ -142,6 +137,7 @@ namespace StoneFruit.Execution
 
             state.EngineStopInteractive();
             ExecuteCommandQueue(state, dispatcher);
+            return state.ExitCode;
         }
 
         private void ExecuteCommandQueue(EngineState state, CommandDispatcher dispatcher)

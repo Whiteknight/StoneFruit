@@ -1,27 +1,29 @@
 ﻿using StoneFruit.Execution;
+using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.BuiltInVerbs
 {
-    
     [CommandName(Name)]
     [CommandName("quit", showInHelp: false)]
-    public class ExitCommand : ICommandVerb
+    public class ExitVerb : ICommandVerb
     {
         public const string Name = "exit";
 
         private readonly EngineState _state;
+        private readonly CommandArguments _args;
 
-        public ExitCommand(EngineState state)
+        public ExitVerb(EngineState state, CommandArguments args)
         {
             _state = state;
+            _args = args;
         }
 
         public static string Description => "Exits the application";
 
         public void Execute()
         {
-            // TODO: Exit Code argument
-            _state.ShouldExit = true;
+            var exitCode = _args.Shift().AsInt();
+            _state.Exit(exitCode);
         }
     }
 }

@@ -17,9 +17,16 @@ namespace StoneFruit.Execution
             _additionalCommands = new Queue<string>();
         }
 
-        public bool ShouldExit { get; set; }
+        public bool ShouldExit { get; private set; }
+        public int ExitCode { get; private set; }
         public bool Headless { get; }
         public EngineEventCatalog EventCatalog { get; }
+
+        public void Exit(int exitCode = 0)
+        {
+            ShouldExit = true;
+            ExitCode = exitCode;
+        }
 
         public void AddCommand(string command)
         {
@@ -41,7 +48,6 @@ namespace StoneFruit.Execution
         // TODO: Configurable loop limit so we don't keep adding commands to the queue in an endless loop
 
         // TODO: Some kind of metadata mechanism so verbs can store metadata here in the state and retrieve it later
-        // TODO: Exit code so we can force the application to exit with a specific code for shell scripting purposes
 
         public void EngineStartHeadless() => EventCatalog.EngineStartHeadless.EnqueueScript(this);
         public void EngineStartInteractive() => EventCatalog.EngineStartInteractive.EnqueueScript(this);

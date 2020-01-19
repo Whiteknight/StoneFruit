@@ -16,6 +16,8 @@ namespace StoneFruit.BuiltInVerbs
             _args = args;
         }
 
+        public static string Description => "Writes a string of output to the console";
+
         public void Execute()
         {
             // TODO: Argument to specify color

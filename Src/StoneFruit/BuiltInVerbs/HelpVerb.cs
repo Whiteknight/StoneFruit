@@ -7,7 +7,7 @@ using StoneFruit.Utility;
 namespace StoneFruit.BuiltInVerbs
 {
     [CommandName(Name)]
-    public class HelpCommand : ICommandVerb
+    public class HelpVerb : ICommandVerb
     {
         public const string Name = "help";
 
@@ -15,7 +15,7 @@ namespace StoneFruit.BuiltInVerbs
         private readonly ICommandSource _commands;
         private readonly CommandArguments _args;
 
-        public HelpCommand(ITerminalOutput output, ICommandSource commands, CommandArguments args)
+        public HelpVerb(ITerminalOutput output, ICommandSource commands, CommandArguments args)
         {
             _output = output;
             _commands = commands;
