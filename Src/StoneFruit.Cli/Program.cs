@@ -10,15 +10,22 @@ namespace StoneFruit.Cli
     {
         static void Main(string[] args)
         {
-            var x = SimplifiedArgumentGrammar.GetParser().ParseArguments(args).MapTo<TestArgsA>();
-            var y = WindowsCmdArgumentGrammar.GetParser().ParseArguments(args).MapTo<TestArgsA>();
-            var z = PosixStyleArgumentGrammar.GetParser().ParseArguments(args).MapTo<TestArgsA>();
-            var w = PowershellStyleArgumentGrammar.GetParser().ParseArguments(args).MapTo<TestArgsA>();
+            //var x = SimplifiedArgumentGrammar.GetParser().ParseArguments(args).MapTo<TestArgsA>();
+            //var y = WindowsCmdArgumentGrammar.GetParser().ParseArguments(args).MapTo<TestArgsA>();
+            //var z = PosixStyleArgumentGrammar.GetParser().ParseArguments(args).MapTo<TestArgsA>();
+            //var w = PowershellStyleArgumentGrammar.GetParser().ParseArguments(args).MapTo<TestArgsA>();
 
             var engine = new EngineBuilder()
                 .UseStructureMapContainerSource()
                 //.UseCommands(typeof(HelpCommand), typeof(ExitCommand))
                 .UseEnvironmentFactory(new MyEnvironmentFactory())
+                .SetupEvents(e => 
+                    { 
+                        e.EngineStartInteractive.Add("help");
+                        e.EngineStartInteractive.Add("echo 'hello'");
+                        e.EngineStopInteractive.Add("env-change");
+                    }
+                )
                 .Build();
             engine.Run(args);
         }

@@ -9,15 +9,17 @@ namespace StoneFruit.Execution
     {
         private readonly Queue<string> _additionalCommands;
 
-        public EngineState(bool headless)
+        public EngineState(bool headless, EngineEventCatalog eventCatalog)
         {
             Headless = headless;
+            EventCatalog = eventCatalog;
             ShouldExit = false;
             _additionalCommands = new Queue<string>();
         }
 
         public bool ShouldExit { get; set; }
         public bool Headless { get; }
+        public EngineEventCatalog EventCatalog { get; }
 
         public void AddCommand(string command)
         {
@@ -41,5 +43,12 @@ namespace StoneFruit.Execution
         // TODO: Some kind of metadata mechanism so verbs can store metadata here in the state and retrieve it later
         // TODO: Exit code so we can force the application to exit with a specific code for shell scripting purposes
 
+        public void EngineStartHeadless() => EventCatalog.EngineStartHeadless.EnqueueScript(this);
+        public void EngineStartInteractive() => EventCatalog.EngineStartInteractive.EnqueueScript(this);
+        public void EngineStopInteractive() => EventCatalog.EngineStopInteractive.EnqueueScript(this);
+        public void EngineStopHeadless() => EventCatalog.EngineStopHeadless.EnqueueScript(this);
+        public void EnvironmentChanged() => EventCatalog.EnvironmentChanged.EnqueueScript(this);
+        public void HeadlessNoArgs() => EventCatalog.HeadlessNoArgs.EnqueueScript(this);
+        public void VerbNotFound() => EventCatalog.VerbNotFound.EnqueueScript(this);
     }
 }

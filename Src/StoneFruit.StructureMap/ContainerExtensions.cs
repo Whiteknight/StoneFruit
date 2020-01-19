@@ -1,5 +1,4 @@
 ﻿using StructureMap;
-using StructureMap.Graph;
 
 namespace StoneFruit.StructureMap
 {
@@ -9,7 +8,6 @@ namespace StoneFruit.StructureMap
         {
             config.Scan(s =>
             {
-                s.ExcludeNamespace(nameof(StoneFruit.BuiltInVerbs.Hidden));
                 s.AssemblyContainingType<ICommandVerb>();
                 s.AssembliesFromApplicationBaseDirectory();
                 s.AddAllTypesOf<ICommandVerb>();

@@ -12,6 +12,7 @@ namespace StoneFruit
     public class EngineBuilder
     {
         private readonly CombinedCommandSource _commandSource;
+        private readonly EngineEventCatalog _eventCatalog;
         private IEnvironmentCollection _environments;
         private IParser<char, CommandArguments> _argParser;
         private ITerminalOutput _output;
@@ -19,6 +20,7 @@ namespace StoneFruit
         public EngineBuilder()
         {
             _commandSource = new CombinedCommandSource();
+            _eventCatalog = new EngineEventCatalog();
         }
 
         /// <summary>
@@ -146,6 +148,12 @@ namespace StoneFruit
             return this;
         }
 
+        public EngineBuilder SetupEvents(Action<EngineEventCatalog> setup)
+        {
+            setup?.Invoke(_eventCatalog);
+            return this;
+        }
+
         /// <summary>
         /// Build the Engine using configured objects
         /// </summary>
@@ -155,7 +163,7 @@ namespace StoneFruit
             var commandSource = _commandSource.Simplify();
             var environmentFactory = _environments;
             var parser = new CommandParser(_argParser);
-            return new Engine(commandSource, environmentFactory, parser, _output);
+            return new Engine(commandSource, environmentFactory, parser, _output, _eventCatalog);
         }
 
         private void EnsureEnvironmentsNotSet()

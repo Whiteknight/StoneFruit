@@ -1,4 +1,4 @@
-﻿using StoneFruit.BuiltInVerbs.Hidden;
+﻿using System;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Utility;
@@ -28,8 +28,16 @@ namespace StoneFruit
         private void Execute(CompleteCommand completeCommand)
         {
             Assert.ArgumentNotNull(completeCommand, nameof(completeCommand));
-            var verbObject = Commands.GetCommandInstance(completeCommand, this) ?? new NotFoundCommandVerb(completeCommand.Verb, Output);
-            verbObject.Execute();
+            var verbObject = Commands.GetCommandInstance(completeCommand, this);
+            if (verbObject != null)
+            {
+                verbObject.Execute();
+                return;
+            }
+            Output
+                .Color(ConsoleColor.Red)
+                .WriteLine($"Command '{completeCommand.Verb}' not found. Please check your spelling or help output and try again");
+            State.VerbNotFound();
         }
 
         public void Execute(string commandString)

@@ -5,21 +5,26 @@ using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.BuiltInVerbs
 {
-    [CommandName(EnvironmentChangeCommand.Name)]
+    [CommandName(Name)]
+    // TODO: Would like a way to not have this one listed in help
+    [CommandName(NotSetName)]
     public class EnvironmentChangeCommand : ICommandVerb
     {
         public const string Name = "env-change";
+        public const string NotSetName = "env-change-notset";
 
         private readonly ITerminalOutput _output;
+        private readonly CompleteCommand _command;
         private readonly CommandArguments _args;
         private readonly EngineState _state;
         private readonly IEnvironmentCollection _environments;
         private readonly CommandDispatcher _dispatcher;
 
-        public EnvironmentChangeCommand(ITerminalOutput output, CommandArguments args, EngineState state, IEnvironmentCollection environments, CommandDispatcher dispatcher)
+        public EnvironmentChangeCommand(ITerminalOutput output, CompleteCommand command, EngineState state, IEnvironmentCollection environments, CommandDispatcher dispatcher)
         {
             _output = output;
-            _args = args;
+            _command = command;
+            _args = command.Arguments;
             _state = state;
             _environments = environments;
             _dispatcher = dispatcher;
@@ -39,6 +44,17 @@ Change directly to the environment at the specified position
 
         public void Execute()
         {
+            if (_command.Verb == NotSetName)
+            {
+                if (_environments.Current != null)
+                    return;
+            }
+
+            ChangeEnvironment();
+        }
+
+        private void ChangeEnvironment()
+        {
             var target = _args.Shift();
             if (target.Exists())
             {
@@ -52,6 +68,7 @@ Change directly to the environment at the specified position
             if (environments.Count == 1)
             {
                 _environments.SetCurrent(1);
+                _state.EnvironmentChanged();
                 return;
             }
 
@@ -65,7 +82,10 @@ Change directly to the environment at the specified position
 
                 var envIndex = _output.Prompt("", true, false);
                 if (TrySetEnvironment(envIndex))
+                {
+                    _state.EnvironmentChanged();
                     break;
+                }
             }
         }
 

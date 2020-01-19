@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using StoneFruit.BuiltInVerbs;
 using StoneFruit.Execution.Arguments;
@@ -13,20 +14,20 @@ namespace StoneFruit.Execution
     {
         private readonly IEnvironmentCollection _environments;
         private readonly ICommandSource _commandSource;
+        private readonly EngineEventCatalog _eventCatalog;
         private readonly ITerminalOutput _output;
         private readonly CommandParser _parser;
 
         // TODO: Be able to specify startup commands that will execute as soon as the engine starts
         // like "env-change" does
 
-        // TODO: Take an object with behavior scripts to execute when things go wrong or in response to
-        // certain events
-        public Engine(ICommandSource commands, IEnvironmentCollection environments, CommandParser parser, ITerminalOutput output)
+        public Engine(ICommandSource commands, IEnvironmentCollection environments, CommandParser parser, ITerminalOutput output, EngineEventCatalog eventCatalog)
         {
             _environments = environments ?? new InstanceEnvironmentCollection(null);
             // TODO: If we have 0 commands, we might want to just abort?
             // Otherwise, how do we enforce that we have something here?
             _commandSource = commands;
+            _eventCatalog = eventCatalog;
             _parser = parser ?? CommandParser.GetDefault();
             _output = output ?? new ConsoleTerminalOutput();
         }
@@ -68,19 +69,27 @@ namespace StoneFruit.Execution
         /// <param name="arg"></param>
         public void RunHeadless(string[] arg)
         {
-            // TODO: Configurable behavior if we get here with no args. Show help? Exit silently? Show error?
-            var state = new EngineState(true);
+            var state = new EngineState(true, _eventCatalog);
             var dispatcher = new CommandDispatcher(_parser, _commandSource, _environments, state, _output);
+            if (arg == null || arg.Length == 0)
+            {
+                state.HeadlessNoArgs();
+                ExecuteCommandQueue(state, dispatcher);
+                return;
+            }
 
             var env = arg[0];
+            IEnumerable<string> realArgs = arg;
             if (_environments.IsValid(env))
             {
-                dispatcher.Execute(EnvironmentChangeCommand.Name + " " + env);
-                state.AddCommand(string.Join(" ", arg.Skip(1)));
+                state.AddCommand($"{EnvironmentChangeCommand.Name} '{env}'");
+                realArgs = arg.Skip(1);
             }
-            else
-                state.AddCommand(string.Join(" ", arg));
 
+            state.EngineStartHeadless();
+            state.AddCommand(string.Join(" ", realArgs));
+            ExecuteCommandQueue(state, dispatcher);
+            state.EngineStopHeadless();
             ExecuteCommandQueue(state, dispatcher);
         }
 
@@ -92,12 +101,8 @@ namespace StoneFruit.Execution
         /// </summary>
         public void RunInteractively()
         {
-            var state = new EngineState(false);
+            var state = new EngineState(false, _eventCatalog);
             var dispatcher = new CommandDispatcher(_parser, _commandSource, _environments, state, _output);
-
-            if (_environments.Current == null)
-                dispatcher.Execute(EnvironmentChangeCommand.Name);
-
             RunInteractivelyWithEnvironment(state, dispatcher);
         }
 
@@ -109,14 +114,17 @@ namespace StoneFruit.Execution
         /// <param name="environment"></param>
         public void RunInteractively(string environment)
         {
-            var state = new EngineState(false);
+            var state = new EngineState(false, _eventCatalog);
             var dispatcher = new CommandDispatcher(_parser, _commandSource, _environments, state, _output);
-            dispatcher.Execute(EnvironmentChangeCommand.Name);
+            state.AddCommand($"{EnvironmentChangeCommand.Name} {environment}");
             RunInteractivelyWithEnvironment(state, dispatcher);
         }
 
         private void RunInteractivelyWithEnvironment(EngineState state, CommandDispatcher dispatcher)
         {
+            state.EngineStartInteractive();
+            ExecuteCommandQueue(state, dispatcher);
+
             _output
                 .Write("Enter command ")
                 .Color(ConsoleColor.DarkGray).Write("('help' for help, 'exit' to quit)")
@@ -129,8 +137,11 @@ namespace StoneFruit.Execution
 
                 ExecuteCommandQueue(state, dispatcher);
                 if (state.ShouldExit)
-                    return;
+                    break;
             }
+
+            state.EngineStopInteractive();
+            ExecuteCommandQueue(state, dispatcher);
         }
 
         private void ExecuteCommandQueue(EngineState state, CommandDispatcher dispatcher)
@@ -142,7 +153,6 @@ namespace StoneFruit.Execution
                     return;
                 try
                 {
-                    // TODO: Configurable behavior when a verb is not found. Either show error, show help, etc
                     dispatcher.Execute(commandString);
                     if (state.ShouldExit)
                         return;
