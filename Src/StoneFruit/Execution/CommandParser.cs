@@ -23,10 +23,8 @@ namespace StoneFruit.Execution
             return _commandParser.Parse(sequence).Value;
         }
 
-        public CommandArguments ParseArguments(string args)
-        {
-            var sequence = new StringCharacterSequence(args);
-            return _argsParser.Parse(sequence).Value;
-        }
+        public CommandArguments ParseArguments(string args) => _argsParser.ParseArguments(args);
+
+        // TODO: Helper methods here to parse all the different dialects, in case the default is not wanted
     }
 }

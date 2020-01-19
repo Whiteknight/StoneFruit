@@ -10,6 +10,11 @@ namespace StoneFruit.Cli
     {
         static void Main(string[] args)
         {
+            var x = SimplifiedArgumentGrammar.GetParser().ParseArguments(args).MapTo<TestArgsA>();
+            var y = WindowsCmdArgumentGrammar.GetParser().ParseArguments(args).MapTo<TestArgsA>();
+            var z = PosixStyleArgumentGrammar.GetParser().ParseArguments(args).MapTo<TestArgsA>();
+            var w = PowershellStyleArgumentGrammar.GetParser().ParseArguments(args).MapTo<TestArgsA>();
+
             var engine = new EngineBuilder()
                 .UseStructureMapContainerSource()
                 //.UseCommands(typeof(HelpCommand), typeof(ExitCommand))

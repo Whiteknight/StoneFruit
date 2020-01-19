@@ -121,6 +121,18 @@ namespace StoneFruit
             return this;
         }
 
+        public EngineBuilder UseSimplifiedArgumentParser()
+            => UseArgumentParser(SimplifiedArgumentGrammar.GetParser());
+
+        public EngineBuilder UsePosixStyleArgumentParser()
+            => UseArgumentParser(PosixStyleArgumentGrammar.GetParser());
+
+        public EngineBuilder UsePowershellStyleArgumentParser()
+            => UseArgumentParser(PowershellStyleArgumentGrammar.GetParser());
+
+        public EngineBuilder UseWindowsCmdArgumentParser()
+            => UseArgumentParser(WindowsCmdArgumentGrammar.GetParser());
+
         /// <summary>
         /// Specify the object to use for user I/O and interaction
         /// </summary>

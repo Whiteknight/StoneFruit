@@ -65,10 +65,8 @@ namespace StoneFruit.Execution.Arguments
 
         public static CommandArguments Empty() => new CommandArguments();
 
-        public static CommandArguments Single(string arg)
-        {
-            return new CommandArguments(new[] { new PositionalArgument(arg) });
-        }
+        public static CommandArguments Single(string arg) 
+            => new CommandArguments(new[] { new PositionalArgument(arg) });
 
         public IArgument Shift()
         {
@@ -111,11 +109,7 @@ namespace StoneFruit.Execution.Arguments
         // TODO: GetAllFlags (naming?)
         // TODO: GetAllNamedValues (naming?)
 
-
-        public IEnumerable<IArgument> GetAllPositionals()
-        {
-            return _positionals.Where(a => !a.Consumed);
-        }
+        public IEnumerable<IArgument> GetAllPositionals() => _positionals.Where(a => !a.Consumed);
 
         public bool HasFlag(string name)
         {
