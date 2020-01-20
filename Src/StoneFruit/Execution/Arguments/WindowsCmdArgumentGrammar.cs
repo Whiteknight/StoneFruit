@@ -15,10 +15,13 @@ namespace StoneFruit.Execution.Arguments
         public static IParser<char, IArgument> GetParser()
         {
             var doubleQuotedString = StrippedDoubleQuotedStringWithEscapedQuotes();
+
             var singleQuotedString = StrippedSingleQuotedStringWithEscapedQuotes();
+
             var unquotedValue = Match<char>(c => !char.IsWhiteSpace(c))
                 .List(true)
                 .Transform(c => new string(c.ToArray()));
+
             var whitespace = Whitespace();
 
             var value = First(
@@ -29,6 +32,7 @@ namespace StoneFruit.Execution.Arguments
 
             var name = CStyleIdentifier();
 
+            // '/' <name> ':' <value>
             var namedArg = Rule(
                 Match('/'),
                 name,
@@ -39,6 +43,7 @@ namespace StoneFruit.Execution.Arguments
                 (s, n, e, v) => new NamedArgument(n, v)
             );
 
+            // '/' <name>
             var flagArg = Rule(
                 Match('/'),
                 name,
@@ -46,6 +51,7 @@ namespace StoneFruit.Execution.Arguments
                 (s, n) => new FlagArgument(n)
             );
 
+            // <named> | <flag> | <positional>
             var args = First<char, IArgument>(
                 namedArg,
                 flagArg,

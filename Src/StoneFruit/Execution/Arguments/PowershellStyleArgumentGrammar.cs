@@ -16,12 +16,16 @@ namespace StoneFruit.Execution.Arguments
         public static IParser<char, IEnumerable<IArgument>> GetParser()
         {
             var doubleQuotedString = StrippedDoubleQuotedStringWithEscapedQuotes();
+
             var singleQuotedString = StrippedSingleQuotedStringWithEscapedQuotes();
+
             var unquotedValue = Match<char>(c => !char.IsWhiteSpace(c))
                 .List(true)
                 .Transform(c => new string(c.ToArray()));
+
             var whitespace = Whitespace();
 
+            // <doubleQuotedString> | <singleQuotedString> | <unquotedValue>
             var values = First(
                 doubleQuotedString,
                 singleQuotedString,
@@ -34,6 +38,8 @@ namespace StoneFruit.Execution.Arguments
             // named arg or just a switch followed by a positional. We'll return all three versions so
             // downstream we can access it however it makes sense (but if you .Consume() one, it breaks your
             // ability to access things a different way)
+
+            // '-' <name> <whitespace> <value>
             var namedArg = Rule(
                 Match('-'),
                 names,
@@ -43,6 +49,7 @@ namespace StoneFruit.Execution.Arguments
                 (s, name, e, value) => new IArgument[] { new FlagArgument(name), new PositionalArgument(value), new NamedArgument(name, value)  }
             );
 
+            // '-' <name>
             var longFlagArg = Rule(
                 Match('-'),
                 names,
@@ -50,6 +57,7 @@ namespace StoneFruit.Execution.Arguments
                 (s, name) => new[] { new FlagArgument(name) }
             );
 
+            // <named> | <longFlag> | <positional>
             var args = First<char, IEnumerable<IArgument>>(
                 namedArg,
                 longFlagArg,

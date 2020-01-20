@@ -15,11 +15,14 @@ namespace StoneFruit.Execution.Arguments
         public static IParser<char, IArgument> GetParser()
         {
             var doubleQuotedString = StrippedDoubleQuotedStringWithEscapedQuotes();
+
             var singleQuotedString = StrippedSingleQuotedStringWithEscapedQuotes();
+
             var unquotedValue = Match<char>(c => !char.IsWhiteSpace(c))
                 .List(true)
                 .Transform(c => new string(c.ToArray()));
 
+            // <doubleQuotedString> | <singleQuotedString> | <unquotedValue>
             var values = First(
                 doubleQuotedString,
                 singleQuotedString,
@@ -29,6 +32,7 @@ namespace StoneFruit.Execution.Arguments
             var names = CStyleIdentifier();
 
             // TODO: Figure out what we want this syntax to be, it should be as simple and ceremony-free as possible
+            // '-' <name>
             var flagArg = Rule(
                 Match('-'),
                 names,
@@ -36,6 +40,7 @@ namespace StoneFruit.Execution.Arguments
                 (start, name) => new FlagArgument(name)
             );
 
+            // <name> '=' <value>
             var namedArg = Rule(
                 names,
                 Match('='),
@@ -44,6 +49,7 @@ namespace StoneFruit.Execution.Arguments
                 (name, equals, value) => new NamedArgument(name, value) 
             );
 
+            // <flag> | <named> | <positional>
             var args = First<char, IArgument>(
                 flagArg,
                 namedArg,

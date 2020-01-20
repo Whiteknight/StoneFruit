@@ -80,10 +80,10 @@ namespace StoneFruit.Execution
                 realArgs = arg.Skip(1);
             }
 
-            state.EngineStartHeadless();
+            state.StartHeadless();
             state.AddCommand(string.Join(" ", realArgs));
             ExecuteCommandQueue(state, dispatcher);
-            state.EngineStopHeadless();
+            state.StopHeadless();
             ExecuteCommandQueue(state, dispatcher);
             return state.ExitCode;
         }
@@ -117,7 +117,7 @@ namespace StoneFruit.Execution
 
         private int RunInteractivelyWithEnvironment(EngineState state, CommandDispatcher dispatcher)
         {
-            state.EngineStartInteractive();
+            state.StartInteractive();
             ExecuteCommandQueue(state, dispatcher);
 
             _output
@@ -135,7 +135,7 @@ namespace StoneFruit.Execution
                     break;
             }
 
-            state.EngineStopInteractive();
+            state.StopInteractive();
             ExecuteCommandQueue(state, dispatcher);
             return state.ExitCode;
         }

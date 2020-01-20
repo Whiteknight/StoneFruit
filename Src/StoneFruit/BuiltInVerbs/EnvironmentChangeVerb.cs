@@ -45,6 +45,7 @@ To prompt the user for an environment only if one is not currently set, use the 
 
         public void Execute()
         {
+            // If we're executing as notset, only prompt the user if we don't have an environment set
             if (_command.Verb == NotSetName)
             {
                 if (_environments.Current == null)
@@ -52,11 +53,14 @@ To prompt the user for an environment only if one is not currently set, use the 
                 return;
             }
 
+            // Otherwise do the normal environment switching logic
             ChangeEnvironment();
         }
 
         private void ChangeEnvironment()
         {
+            // If invoked with an argument, it is the name or index of an environment. Attempt to set that
+            // environment and exit
             var target = _args.Shift();
             if (target.Exists())
             {
@@ -66,6 +70,7 @@ To prompt the user for an environment only if one is not currently set, use the 
                 return;
             }
 
+            // If we only have a single environment, switch directly to it with no input from the user
             var environments = _environments.GetNames();
             if (environments.Count == 1)
             {
@@ -74,14 +79,17 @@ To prompt the user for an environment only if one is not currently set, use the 
                 return;
             }
 
-            if (_state.Headless)
-                throw new Exception("Environment not specified in headless mode");
-
             PromptUserForEnvironment();
         }
 
         private void PromptUserForEnvironment()
         {
+            // In headless mode we can't prompt, so at this point we just throw an exception
+            if (_state.Headless)
+                throw new Exception("Environment not specified in headless mode");
+
+            // Use the env-list verb to show the list, then prompt the user to make a selection. Loop until
+            // a valid selection is made.
             while (true)
             {
                 _output.Color(ConsoleColor.DarkCyan).WriteLine("Please select an environment:");
@@ -98,9 +106,11 @@ To prompt the user for an environment only if one is not currently set, use the 
 
         private bool TrySetEnvironment(string arg)
         {
+            // No argument, nothing to do. Fail
             if (string.IsNullOrEmpty(arg))
                 return false;
 
+            // Argument is a number. Set the environment by index
             if (arg.All(char.IsDigit))
             {
                 var asInt = int.Parse(arg);
@@ -111,12 +121,14 @@ To prompt the user for an environment only if one is not currently set, use the 
                 }
             }
 
+            // Argument is a name of a valid environment. Set it and exit.
             if (_environments.IsValid(arg))
             {
                 _environments.SetCurrent(arg);
                 return true;
             }
 
+            // Invalid selection, show an error and return failure
             _output.Color(ConsoleColor.Red).WriteLine($"Unknown environment '{arg}'");
             return false;
         }
