@@ -9,7 +9,7 @@ namespace StoneFruit.Execution.Arguments
     public class CommandArguments
     {
         private readonly IReadOnlyList<PositionalArgument> _positionals;
-        private readonly IReadOnlyCollection<string> _flags;
+        private readonly IReadOnlyDictionary<string, FlagArgument> _flags;
         private readonly IReadOnlyDictionary<string, List<NamedArgument>> _nameds;
 
         private int _positionalIndex;
@@ -19,47 +19,19 @@ namespace StoneFruit.Execution.Arguments
             _positionalIndex = 0;
             _positionals = new PositionalArgument[0];
             _nameds = new Dictionary<string, List<NamedArgument>>();
-            _flags = new List<string>();
+            _flags = new Dictionary<string, FlagArgument>();
         }
 
-        public CommandArguments(IEnumerable<IArgument> arguments)
+        public CommandArguments(IReadOnlyList<IArgument> arguments)
         {
-            // TODO: Handle FlagArguments
-            var positionals = new List<PositionalArgument>();
-            var nameds = new Dictionary<string, List<NamedArgument>>();
-            var flags = new HashSet<string>();
-            foreach (var arg in arguments)
-            {
-                if (arg is PositionalArgument positional)
-                {
-                    positionals.Add(positional);
-                    continue;
-                }
-
-                if (arg is NamedArgument named)
-                {
-                    var name = named.Name.ToLowerInvariant();
-                    if (!nameds.ContainsKey(name))
-                        nameds.Add(name, new List<NamedArgument>());
-                    nameds[name].Add(named);
-                    continue;
-                }
-
-                if (arg is FlagArgument flag)
-                {
-                    var name = flag.Name.ToLowerInvariant();
-                    if (!flags.Contains(name))
-                        flags.Add(name);
-                    continue;
-                }
-            }
-
-            // TODO: Also keep track of the relative ordering of all args, so that we could have 
-            // sequences like "-x value" for certain parsers
-
-            _positionals = positionals;
-            _nameds = nameds;
-            _flags = flags;
+            _positionals = arguments
+                .OfType<PositionalArgument>()
+                .ToList();
+            _nameds = arguments
+                .OfType<NamedArgument>()
+                .GroupBy(n => n.Name.ToLowerInvariant())
+                .ToDictionary(g => g.Key, g => g.ToList());
+            _flags = arguments.OfType<FlagArgument>().GroupBy(f => f.Value.ToLowerInvariant()).ToDictionary(g => g.Key, g => g.FirstOrDefault());
             _positionalIndex = 0;
         }
 
@@ -114,7 +86,7 @@ namespace StoneFruit.Execution.Arguments
         public bool HasFlag(string name)
         {
             name = name.ToLowerInvariant();
-            return _flags.Contains(name);
+            return _flags.ContainsKey(name) && _flags[name] != null && !_flags[name].Consumed;
         }
 
         // TODO: Method to create a sub-CommandArguments instance with some arguments added/removed
