@@ -13,7 +13,9 @@ namespace StoneFruit
 
         ICommandVerb GetCommandInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher)
             where TCommand : class, ICommandVerb;
+
         IReadOnlyDictionary<string, Type> GetAll();
+
         Type GetCommandTypeByName(string name);
     }
 }

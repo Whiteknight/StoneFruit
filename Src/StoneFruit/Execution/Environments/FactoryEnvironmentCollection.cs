@@ -26,14 +26,12 @@ namespace StoneFruit.Execution.Environments
         }
 
         public object Current { get; private set; }
+
         public string CurrentName { get; private set; }
 
         public IReadOnlyDictionary<int, string> GetNames() => _nameIndices;
 
-        public string GetName(int index)
-        {
-            return _nameIndices.ContainsKey(index) ? _nameIndices[index] : null;
-        }
+        public string GetName(int index) => _nameIndices.ContainsKey(index) ? _nameIndices[index] : null;
 
         public object Get(string name)
         {
@@ -46,22 +44,11 @@ namespace StoneFruit.Execution.Environments
             return env;
         }
 
-        public object Get(int idx)
-        {
-            if (_nameIndices.ContainsKey(idx))
-                return Get(_nameIndices[idx]);
-            return default;
-        }
+        public object Get(int idx) => _nameIndices.ContainsKey(idx) ? Get(_nameIndices[idx]) : default;
 
-        public bool IsValid(string name)
-        {
-            return _validNames.Contains(name);
-        }
+        public bool IsValid(string name) => _validNames.Contains(name);
 
-        public bool IsValid(int index)
-        {
-            return _nameIndices.ContainsKey(index);
-        }
+        public bool IsValid(int index) => _nameIndices.ContainsKey(index);
 
         public void SetCurrent(string name)
         {
@@ -71,9 +58,8 @@ namespace StoneFruit.Execution.Environments
 
         public void SetCurrent(int index)
         {
-            if (!_nameIndices.ContainsKey(index))
-                return;
-            SetCurrent(_nameIndices[index]);
+            if (_nameIndices.ContainsKey(index))
+                SetCurrent(_nameIndices[index]);
         }
     }
 }

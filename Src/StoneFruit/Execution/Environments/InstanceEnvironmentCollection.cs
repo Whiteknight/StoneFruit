@@ -13,18 +13,9 @@ namespace StoneFruit.Execution.Environments
             CurrentName = "";
         }
 
-        public IReadOnlyDictionary<int, string> GetNames()
-        {
-            return new Dictionary<int, string>
-            {
-                { 0, "" }
-            };
-        }
+        public IReadOnlyDictionary<int, string> GetNames() => new Dictionary<int, string> { { 0, "" } };
 
-        public string GetName(int index)
-        {
-            return "";
-        }
+        public string GetName(int index) => "";
 
         public void SetCurrent(string name)
         {
@@ -36,25 +27,13 @@ namespace StoneFruit.Execution.Environments
 
         public string CurrentName { get; }
 
-        public bool IsValid(string name)
-        {
-            return name == "";
-        }
+        public bool IsValid(string name) => name == "";
 
-        public bool IsValid(int index)
-        {
-            return index == 1;
-        }
+        public bool IsValid(int index) => index == 1;
 
-        public object Get(string name)
-        {
-            return Current;
-        }
+        public object Get(string name) => Current;
 
-        public object Get(int idx)
-        {
-            return Current;
-        }
+        public object Get(int idx) => Current;
 
         public object Current { get; }
     }

@@ -15,7 +15,7 @@ namespace StoneFruit.Execution
         {
             var firstChar = Match<char>(c => c == '_' || char.IsLetter(c));
             var bodyChars = Match<char>(c => c == '_' || c == '-' || char.IsLetterOrDigit(c));
-            var commandName = Rule(
+            var verb = Rule(
                 firstChar,
                 bodyChars.ListCharToString(),
                 (first, rest) => (first + rest).ToLowerInvariant()
@@ -23,12 +23,12 @@ namespace StoneFruit.Execution
             var whitespace = Whitespace().Optional();
 
             return Rule(
-                commandName,
+                verb,
                 argParser,
                 whitespace,
                 End<char>(),
 
-                (name, args, ws, end) => new CompleteCommand(name, args)
+                (v, args, ws, end) => new CompleteCommand(v, args)
             );
         }
     }

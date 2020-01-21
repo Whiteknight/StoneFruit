@@ -31,10 +31,7 @@ namespace StoneFruit
             System.Console.BackgroundColor = Background;
         }
 
-        public override readonly string ToString()
-        {
-            return Foreground + " on " + Background;
-        }
+        public override readonly string ToString() => Foreground + " on " + Background;
 
         public readonly string ToString(string fmt)
         {
@@ -50,6 +47,7 @@ namespace StoneFruit
         public byte ByteValue { get; }
 
         public ConsoleColor Foreground { get; }
+
         public ConsoleColor Background { get; }
 
         public readonly Brush Swap() => new Brush(Background, Foreground);

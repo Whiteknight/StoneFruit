@@ -18,39 +18,23 @@ namespace StoneFruit.Execution.Commands
 
         public ICommandVerb GetCommandInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher)
         {
-            foreach (var source in _sources)
-            {
-                var commandVerb = source.GetCommandInstance(completeCommand, dispatcher);
-                if (commandVerb != null)
-                    return commandVerb;
-            }
-
-            return null;
+            return _sources
+                .Select(source => source.GetCommandInstance(completeCommand, dispatcher))
+                .FirstOrDefault(commandVerb => commandVerb != null);
         }
 
         public ICommandVerb GetCommandInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher) where TCommand : class, ICommandVerb
         {
-            foreach (var source in _sources)
-            {
-                var commandVerb = source.GetCommandInstance<TCommand>(completeCommand, dispatcher);
-                if (commandVerb != null)
-                    return commandVerb;
-            }
-
-            return null;
+            return _sources
+                .Select(source => source.GetCommandInstance<TCommand>(completeCommand, dispatcher))
+                .FirstOrDefault(commandVerb => commandVerb != null);
         }
 
         public IReadOnlyDictionary<string, Type> GetAll()
         {
-            var allPairs = _sources.SelectMany(s => s.GetAll());
-            var dict = new Dictionary<string, Type>();
-            foreach (var pair in allPairs)
-            {
-                if (!dict.ContainsKey(pair.Key))
-                    dict.Add(pair.Key, pair.Value);
-            }
-
-            return dict;
+            return _sources.SelectMany(s => s.GetAll())
+                .GroupBy(kvp => kvp.Key)
+                .ToDictionary(g => g.Key, g => g.First().Value);
         }
 
         public void Add(ICommandSource source)
@@ -62,21 +46,14 @@ namespace StoneFruit.Execution.Commands
 
         public ICommandSource Simplify()
         {
-            if (_sources.Count == 1)
-                return _sources[0];
-            return this;
+            return _sources.Count == 1 ? _sources[0] : this;
         }
 
         public Type GetCommandTypeByName(string name)
         {
-            foreach (var source in _sources)
-            {
-                var type = source.GetCommandTypeByName(name);
-                if (type != null)
-                    return type;
-            }
-
-            return null;
+            return _sources
+                .Select(source => source.GetCommandTypeByName(name))
+                .FirstOrDefault(type => type != null);
         }
     }
 }

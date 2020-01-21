@@ -19,7 +19,7 @@ namespace StoneFruit
 
     public static class TerminalOutputExtensions
     {
-        public static ITerminalOutput WriteLineFmt(this ITerminalOutput output, string fmt, params object[] args)
+        public static ITerminalOutput WriteLineFormat(this ITerminalOutput output, string fmt, params object[] args)
         {
             Assert.ArgumentNotNull(output, nameof(output));
             Assert.ArgumentNotNullOrEmpty(fmt, nameof(fmt));

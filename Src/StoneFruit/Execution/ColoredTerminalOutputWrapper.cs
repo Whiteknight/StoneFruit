@@ -13,10 +13,7 @@ namespace StoneFruit.Execution
             _inner = inner;
         }
 
-        public ITerminalOutput Color(Brush brush)
-        {
-            return new ColoredTerminalOutputWrapper(brush, _inner);
-        }
+        public ITerminalOutput Color(Brush brush) => new ColoredTerminalOutputWrapper(brush, _inner);
 
         public ITerminalOutput WriteLine()
         {
@@ -36,10 +33,8 @@ namespace StoneFruit.Execution
             return this;
         }
 
-        public string Prompt(string prompt, bool mustProvide = true, bool keepHistory = true)
-        {
-            return _inner.Prompt(prompt, mustProvide, keepHistory);
-        }
+        public string Prompt(string prompt, bool mustProvide = true, bool keepHistory = true) 
+            => _inner.Prompt(prompt, mustProvide, keepHistory);
 
         private void WithBrush(Action act)
         {

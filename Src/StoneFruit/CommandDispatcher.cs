@@ -28,16 +28,8 @@ namespace StoneFruit
         private void Execute(CompleteCommand completeCommand)
         {
             Assert.ArgumentNotNull(completeCommand, nameof(completeCommand));
-            var verbObject = Commands.GetCommandInstance(completeCommand, this);
-            if (verbObject != null)
-            {
-                verbObject.Execute();
-                return;
-            }
-            Output
-                .Color(ConsoleColor.Red)
-                .WriteLine($"Command '{completeCommand.Verb}' not found. Please check your spelling or help output and try again");
-            State.VerbNotFound();
+            var verbObject = Commands.GetCommandInstance(completeCommand, this) ?? new NotFoundVerb(completeCommand, State, Output);
+            verbObject.Execute();
         }
 
         public void Execute(string commandString)
@@ -52,6 +44,28 @@ namespace StoneFruit
             Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
             var completeCommand = new CompleteCommand(verb, args);
             Execute(completeCommand);
+        }
+
+        private class NotFoundVerb : ICommandVerb
+        {
+            private readonly CompleteCommand _command;
+            private readonly EngineState _state;
+            private readonly ITerminalOutput _output;
+
+            public NotFoundVerb(CompleteCommand command, EngineState state, ITerminalOutput output)
+            {
+                _command = command;
+                _state = state;
+                _output = output;
+            }
+
+            public void Execute()
+            {
+                _output
+                    .Color(ConsoleColor.Red)
+                    .WriteLine($"Command '{_command.Verb}' not found. Please check your spelling or help output and try again");
+                _state.VerbNotFound();
+            }
         }
     }
 }
