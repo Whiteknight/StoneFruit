@@ -94,5 +94,11 @@ namespace StoneFruit.Execution.Arguments
         public T MapTo<T>()
             where T : new() 
             => new CommandArgumentMapper().Map<T>(this);
+
+        public IEnumerable<IArgument> GetAllArguments()
+            => _positionals.Cast<IArgument>()
+                .Concat(_nameds.SelectMany(kvp => kvp.Value))
+                .Concat(_flags.Select(kvp => kvp.Value))
+                .Where(p => !p.Consumed);
     }
 }
