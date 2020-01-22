@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using StoneFruit.Execution.Arguments;
-using StoneFruit.Utility;
 
 namespace StoneFruit.BuiltInVerbs
 {
@@ -12,10 +11,10 @@ namespace StoneFruit.BuiltInVerbs
         public const string Name = "help";
 
         private readonly ITerminalOutput _output;
-        private readonly ICommandSource _commands;
+        private readonly ICommandVerbSource _commands;
         private readonly CommandArguments _args;
 
-        public HelpVerb(ITerminalOutput output, ICommandSource commands, CommandArguments args)
+        public HelpVerb(ITerminalOutput output, ICommandVerbSource commands, CommandArguments args)
         {
             _output = output;
             _commands = commands;
@@ -53,31 +52,30 @@ To see all commands, use the -showall flag
 
         private void GetDetail(string name)
         {
-            var commandType = _commands.GetCommandTypeByName(name);
-            if (commandType == null)
+            var info = _commands.GetByName(name);
+            if (info == null)
                 throw new Exception($"Cannot find command named '{name}'");
-            var help = commandType.GetHelp();
-            _output.WriteLine(help);
+            _output.WriteLine(info.Help);
         }
 
         private void GetOverview(bool showAll)
         {
-            var commandsList = _commands.GetAll().ToList();
+            var infoList = _commands.GetAll().ToList();
             if (!showAll)
-                commandsList = commandsList.Where(kvp => kvp.Value.ShouldShowInHelp(kvp.Key)).ToList();
+                infoList = infoList.Where(i => i.ShouldShowInHelp).ToList();
 
-            int maxCommandLength = commandsList.Select(c => c.Key.Length).Max();
+            int maxCommandLength = infoList.Select(c => c.Verb.Length).Max();
             int descStartColumn = maxCommandLength + 2;
             var blankPrefix = new string(' ', descStartColumn);
             int maxDescLineLength = System.Console.WindowWidth - descStartColumn;
 
-            foreach (var type in commandsList)
+            foreach (var info in infoList)
             {
                 _output
                     .Color(ConsoleColor.Green)
-                    .Write(type.Key)
-                    .Write(new string(' ', descStartColumn - type.Key.Length));
-                var desc = type.Value.GetDescription();
+                    .Write(info.Verb)
+                    .Write(new string(' ', descStartColumn - info.Verb.Length));
+                var desc = info.Description;
                 var lines = GetDescriptionLines(desc, maxDescLineLength);
                 if (lines.Count == 0)
                 {

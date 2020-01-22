@@ -16,12 +16,12 @@ namespace StoneFruit.Execution
         public const int ExitCodeHeadlessNoArgs = 1;
 
         private readonly IEnvironmentCollection _environments;
-        private readonly ICommandSource _commandSource;
+        private readonly ICommandVerbSource _commandSource;
         private readonly EngineEventCatalog _eventCatalog;
         private readonly ITerminalOutput _output;
         private readonly CommandParser _parser;
 
-        public Engine(ICommandSource commands, IEnvironmentCollection environments, CommandParser parser, ITerminalOutput output, EngineEventCatalog eventCatalog)
+        public Engine(ICommandVerbSource commands, IEnvironmentCollection environments, CommandParser parser, ITerminalOutput output, EngineEventCatalog eventCatalog)
         {
             _environments = environments ?? new InstanceEnvironmentCollection(null);
             // TODO: If we have 0 commands, we might want to just abort?

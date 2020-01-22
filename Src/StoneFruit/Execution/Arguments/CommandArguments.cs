@@ -31,7 +31,10 @@ namespace StoneFruit.Execution.Arguments
                 .OfType<NamedArgument>()
                 .GroupBy(n => n.Name.ToLowerInvariant())
                 .ToDictionary(g => g.Key, g => g.ToList());
-            _flags = arguments.OfType<FlagArgument>().GroupBy(f => f.Value.ToLowerInvariant()).ToDictionary(g => g.Key, g => g.FirstOrDefault());
+            _flags = arguments
+                .OfType<FlagArgument>()
+                .GroupBy(f => f.Name.ToLowerInvariant())
+                .ToDictionary(g => g.Key, g => g.FirstOrDefault());
             _positionalIndex = 0;
         }
 

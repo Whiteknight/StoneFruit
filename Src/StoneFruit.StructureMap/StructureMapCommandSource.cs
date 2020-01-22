@@ -7,7 +7,7 @@ using StructureMap;
 
 namespace StoneFruit.StructureMap
 {
-    public class StructureMapCommandSource : ICommandSource
+    public class StructureMapCommandSource : ICommandVerbSource
     {
         private readonly IContainer _container;
         private readonly IReadOnlyDictionary<string, Type> _nameMap;
@@ -42,21 +42,21 @@ namespace StoneFruit.StructureMap
                 .ToDictionaryUnique();
         }
 
-        public ICommandVerb GetCommandInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher)
+        public ICommandVerb GetInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher)
         {
             var verb = completeCommand.Verb.ToLowerInvariant();
             var type = _nameMap.ContainsKey(verb) ? _nameMap[verb] : null;
             return type == null ? null : ResolveCommand(completeCommand, dispatcher, type);
         }
 
-        public ICommandVerb GetCommandInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher) 
+        public ICommandVerb GetInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher) 
             where TCommand : class, ICommandVerb 
             => ResolveCommand(completeCommand, dispatcher, typeof(TCommand));
 
-        public IReadOnlyDictionary<string, Type> GetAll() => _nameMap;
+        public IEnumerable<IVerbInfo> GetAll() => _nameMap.Select(kvp => new VerbInfo(kvp.Key, kvp.Value));
 
-        public Type GetCommandTypeByName(string name)
-            => _nameMap.ContainsKey(name) ? _nameMap[name] : null;
+        public IVerbInfo GetByName(string name)
+            => _nameMap.ContainsKey(name) ? new VerbInfo(name, _nameMap[name]) : null;
 
         private ICommandVerb ResolveCommand(CompleteCommand completeCommand, CommandDispatcher dispatcher, Type type)
         {
@@ -74,11 +74,27 @@ namespace StoneFruit.StructureMap
                 // transient
                 .With(completeCommand)
                 .With(completeCommand.Arguments)
-                .With(typeof(ICommandSource), this);
+                .With(typeof(ICommandVerbSource), this);
             if (dispatcher.Environments.Current != null)
                 context = context.With(dispatcher.Environments.Current.GetType(), dispatcher.Environments.Current);
 
             return context.GetInstance(type) as ICommandVerb;
+        }
+
+        private class VerbInfo : IVerbInfo
+        {
+            private readonly Type _type;
+
+            public VerbInfo(string verb, Type type)
+            {
+                _type = type;
+                Verb = verb;
+            }
+
+            public string Verb { get; }
+            public string Description => _type.GetDescription();
+            public string Help => _type.GetHelp();
+            public bool ShouldShowInHelp => _type.ShouldShowInHelp(Verb);
         }
     }
 }

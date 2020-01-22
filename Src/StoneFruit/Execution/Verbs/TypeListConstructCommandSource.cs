@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using StoneFruit.Utility;
 
-namespace StoneFruit.Execution.Commands
+namespace StoneFruit.Execution.Verbs
 {
     /// <summary>
-    /// A command source where the commands are added through method calls instead of found dynamically
+    /// A command source which takes a list of Type and attempts to construct one using built-in mechanisms
     /// </summary>
-    public class ManualCommandSource : ICommandSource
+    public class TypeListConstructCommandSource : ICommandVerbSource
     {
         private readonly IReadOnlyDictionary<string, Type> _commands;
 
-        public ManualCommandSource(IEnumerable<Type> commandTypes)
+        public TypeListConstructCommandSource(IEnumerable<Type> commandTypes)
         {
             _commands = commandTypes
                 .OrEmptyIfNull()
@@ -23,14 +23,14 @@ namespace StoneFruit.Execution.Commands
                 .ToDictionaryUnique();
         }
 
-        public ICommandVerb GetCommandInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher)
+        public ICommandVerb GetInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher)
         {
             var commandType = _commands.ContainsKey(completeCommand.Verb) ? _commands[completeCommand.Verb] : null;
             return commandType == null ? null : ResolveInstance(completeCommand, dispatcher, commandType);
         }
 
-        public ICommandVerb GetCommandInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher) 
-            where TCommand : class, ICommandVerb 
+        public ICommandVerb GetInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher)
+            where TCommand : class, ICommandVerb
             => ResolveInstance(completeCommand, dispatcher, typeof(TCommand));
 
         private ICommandVerb ResolveInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher, Type commandType)
@@ -53,9 +53,25 @@ namespace StoneFruit.Execution.Commands
             return commandVerb as ICommandVerb;
         }
 
-        public IReadOnlyDictionary<string, Type> GetAll() => _commands;
+        public IEnumerable<IVerbInfo> GetAll() => _commands.Select(kvp => new VerbInfo(kvp.Key, kvp.Value));
 
-        public Type GetCommandTypeByName(string name) 
-            => _commands.ContainsKey(name) ? _commands[name] : null;
+        public IVerbInfo GetByName(string name)
+            => _commands.ContainsKey(name) ? new VerbInfo(name, _commands[name]) : null;
+
+        private class VerbInfo : IVerbInfo
+        {
+            private readonly Type _type;
+
+            public VerbInfo(string verb, Type type)
+            {
+                Verb = verb;
+                _type = type;
+            }
+
+            public string Verb { get; }
+            public string Description => _type.GetDescription();
+            public string Help => _type.GetHelp();
+            public bool ShouldShowInHelp => _type.ShouldShowInHelp(Verb);
+        }
     }
 }

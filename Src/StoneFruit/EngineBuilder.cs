@@ -4,8 +4,8 @@ using System.Linq;
 using ParserObjects;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
-using StoneFruit.Execution.Commands;
 using StoneFruit.Execution.Environments;
+using StoneFruit.Execution.Verbs;
 
 namespace StoneFruit
 {
@@ -29,7 +29,7 @@ namespace StoneFruit
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public EngineBuilder UseCommandSource(ICommandSource source)
+        public EngineBuilder UseCommandSource(ICommandVerbSource source)
         {
             _commandSource.Add(source);
             return this;
@@ -40,9 +40,9 @@ namespace StoneFruit
         /// </summary>
         /// <param name="commandTypes"></param>
         /// <returns></returns>
-        public EngineBuilder UseCommands(IEnumerable<Type> commandTypes)
+        public EngineBuilder UseCommandTypes(IEnumerable<Type> commandTypes)
         {
-            _commandSource.Add(new ManualCommandSource(commandTypes ?? Enumerable.Empty<Type>()));
+            _commandSource.Add(new TypeListConstructCommandSource(commandTypes ?? Enumerable.Empty<Type>()));
             return this;
         }
 
@@ -51,9 +51,9 @@ namespace StoneFruit
         /// </summary>
         /// <param name="commandTypes"></param>
         /// <returns></returns>
-        public EngineBuilder UseCommands(params Type[] commandTypes)
+        public EngineBuilder UseCommandType(params Type[] commandTypes)
         {
-            _commandSource.Add(new ManualCommandSource(commandTypes ?? Enumerable.Empty<Type>()));
+            _commandSource.Add(new TypeListConstructCommandSource(commandTypes ?? Enumerable.Empty<Type>()));
             return this;
         }
 

@@ -11,12 +11,12 @@ namespace StoneFruit
     public class CommandDispatcher
     {
         public CommandParser Parser { get; }
-        public ICommandSource Commands { get; }
+        public ICommandVerbSource Commands { get; }
         public IEnvironmentCollection Environments { get; }
         public EngineState State { get; }
         public ITerminalOutput Output { get; }
 
-        public CommandDispatcher(CommandParser parser, ICommandSource commands, IEnvironmentCollection environments, EngineState state, ITerminalOutput output)
+        public CommandDispatcher(CommandParser parser, ICommandVerbSource commands, IEnvironmentCollection environments, EngineState state, ITerminalOutput output)
         {
             Parser = parser;
             Commands = commands;
@@ -28,7 +28,7 @@ namespace StoneFruit
         private void Execute(CompleteCommand completeCommand)
         {
             Assert.ArgumentNotNull(completeCommand, nameof(completeCommand));
-            var verbObject = Commands.GetCommandInstance(completeCommand, this) ?? new NotFoundVerb(completeCommand, State, Output);
+            var verbObject = Commands.GetInstance(completeCommand, this) ?? new NotFoundVerb(completeCommand, State, Output);
             verbObject.Execute();
         }
 
