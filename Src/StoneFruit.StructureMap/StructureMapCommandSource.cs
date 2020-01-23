@@ -93,7 +93,7 @@ namespace StoneFruit.StructureMap
 
             public string Verb { get; }
             public string Description => _type.GetDescription();
-            public string Help => _type.GetHelp();
+            public string Help => _type.GetUsage();
             public bool ShouldShowInHelp => _type.ShouldShowInHelp(Verb);
         }
     }

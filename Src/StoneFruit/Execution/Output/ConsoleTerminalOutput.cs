@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace StoneFruit.Execution
+namespace StoneFruit.Execution.Output
 {
     /// <summary>
     /// An ITerminalOutput adaptor for System.Console and ReadLine

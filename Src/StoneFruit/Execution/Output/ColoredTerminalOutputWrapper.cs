@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace StoneFruit.Execution
+namespace StoneFruit.Execution.Output
 {
     public class ColoredTerminalOutputWrapper : ITerminalOutput
     {

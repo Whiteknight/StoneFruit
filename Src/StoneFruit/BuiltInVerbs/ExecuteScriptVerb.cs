@@ -20,7 +20,8 @@ namespace StoneFruit.BuiltInVerbs
 
         public static string Description => "Executes a script containing commands, one per line";
 
-        public static string Help => @"exec <fileName>
+        public static string Usage => @"exec <fileName>
+
 Loads the contents of the file and treats each line as a separate command to execute in sequence.";
 
         public void Execute()

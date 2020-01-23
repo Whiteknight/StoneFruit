@@ -31,7 +31,7 @@ namespace StoneFruit.BuiltInVerbs
 
         public static string Description => "Change environment if multiple environments are configured";
 
-        public static string Help => $@"{Name}
+        public static string Usage => $@"{Name}
 Show a list of possible environments and a prompt to select the one you want.
 
 {Name} <envName>

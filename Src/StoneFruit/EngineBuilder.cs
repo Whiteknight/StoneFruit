@@ -5,7 +5,7 @@ using ParserObjects;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Environments;
-using StoneFruit.Execution.Verbs;
+using StoneFruit.Execution.VerbSources;
 
 namespace StoneFruit
 {

@@ -7,4 +7,6 @@
     {
         void Execute();
     }
+
+    // TODO: Async version
 }

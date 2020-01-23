@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace StoneFruit.Execution.Verbs
+namespace StoneFruit.Execution.VerbSources
 {
     public class NamedInstanceCommandSource : ICommandVerbSource
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using StoneFruit.Utility;
 
-namespace StoneFruit.Execution.Verbs
+namespace StoneFruit.Execution.VerbSources
 {
     /// <summary>
     /// A command source which takes a list of Type and attempts to construct one using built-in mechanisms
@@ -70,7 +70,7 @@ namespace StoneFruit.Execution.Verbs
 
             public string Verb { get; }
             public string Description => _type.GetDescription();
-            public string Help => _type.GetHelp();
+            public string Help => _type.GetUsage();
             public bool ShouldShowInHelp => _type.ShouldShowInHelp(Verb);
         }
     }

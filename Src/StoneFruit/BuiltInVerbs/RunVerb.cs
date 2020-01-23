@@ -16,7 +16,7 @@ namespace StoneFruit.BuiltInVerbs
 
         public static string Description => "Run a single command or a list of commands";
 
-        public static string Help => @"run ...
+        public static string Usage => @"run ...
 Allows passing a list of commands to be executed sequentially. Use quotes to group commands and their
 arguments. For example:
 

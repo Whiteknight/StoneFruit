@@ -4,7 +4,7 @@ using ParserObjects;
 using ParserObjects.Parsers;
 using static ParserObjects.Parsers.ParserMethods;
 using static ParserObjects.Parsers.Specialty.ProgrammingParserMethods;
-using static ParserObjects.Parsers.Specialty.WhitespaceParsersMethods;
+using static ParserObjects.Parsers.Specialty.WhitespaceParserMethods;
 
 namespace StoneFruit.Execution.Arguments
 {

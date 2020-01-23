@@ -11,8 +11,8 @@ namespace StoneFruit.Utility
             => GetPublicStaticStringPropertyValue(type, "Description");
 
 
-        public static string GetHelp(this Type type) 
-            => GetPublicStaticStringPropertyValue(type, "Help") ?? GetDescription(type);
+        public static string GetUsage(this Type type) 
+            => GetPublicStaticStringPropertyValue(type, "Usage") ?? GetDescription(type);
 
         public static IEnumerable<string> GetVerbs(this Type type)
         {

@@ -23,7 +23,7 @@ namespace StoneFruit.BuiltInVerbs
 
         public static string Description => "List all commands or get detailed information for a single command";
 
-        public static string Help => @"help [-showall]
+        public static string Usage => @"help [-showall]
 Get overview information for all available verbs. The verb Command class must implement
 
     public static string Description {{ get; }} 
@@ -31,7 +31,7 @@ Get overview information for all available verbs. The verb Command class must im
 help <command-name>
 Get detailed help information for the given verb. The verb Command class must implement
 
-    public static string Help {{ get; }}
+    public static string Usage {{ get; }}
 
 The help command by default hides some internal commands which are not necessary for normal user interaction.
 To see all commands, use the -showall flag

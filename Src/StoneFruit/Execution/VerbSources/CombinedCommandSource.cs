@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace StoneFruit.Execution.Verbs
+namespace StoneFruit.Execution.VerbSources
 {
     /// <summary>
     /// Combines multiple ICommandSource implementations together in priorty order.
