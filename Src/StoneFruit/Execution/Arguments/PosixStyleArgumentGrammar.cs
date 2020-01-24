@@ -35,9 +35,13 @@ namespace StoneFruit.Execution.Arguments
             // TODO: we can be more flexible here, because the "--" prefix demarcates the name unambiguously
             var name = CStyleIdentifier();
 
+            var singleDash = Match('-');
+            var doubleDash = Match<char>("--");
+            var singleIdChar = Match<char>(char.IsLetterOrDigit);
+
             // '--' <name> '=' <value>
-            var namedArg = Rule(
-                Match<char>("--"),
+            var longEqualsNamedArg = Rule(
+                doubleDash,
                 name,
                 Match('='),
                 // TODO: Don't backtrack here.
@@ -46,32 +50,57 @@ namespace StoneFruit.Execution.Arguments
                 (s, n, e, v) => new [] { new NamedArgument(n, v) }
             );
 
+            // '--' <name> <ws> <value>
+            var longImpliedNamedArg = Rule(
+                doubleDash,
+                name,
+                whitespace,
+                // TODO: Don't backtrack here.
+                value,
+
+                (s, n, e, v) => new IArgument[] { new FlagArgument(n), new NamedArgument(n, v), new PositionalArgument(v) }
+            );
+
             // '--' <name>
             var longFlagArg = Rule(
-                Match<char>("--"),
+                doubleDash,
                 name,
 
                 (s, n) => new [] { new FlagArgument(n) }
             );
 
+            // We include this case because some short args with a positional following, are treated like
+            // a named arg. Provide all cases, because we don't know the intent.
+            // '-' <char> <ws> <value>
+            var shortImpliedNamedArg = Rule(
+                singleDash,
+                singleIdChar.Transform(c => c.ToString()),
+                whitespace,
+                value,
+
+                (dash, n, ws, v) => new IArgument[] { new FlagArgument(n), new NamedArgument(n, v), new PositionalArgument(v) }
+            );
+
             // '-' <char>*
             var shortFlagArg = Rule(
-                Match('-'),
-                Match<char>(char.IsLetterOrDigit).List(true),
+                singleDash,
+                singleIdChar.List(true),
 
                 (s, n) => n.Select(x =>  new FlagArgument(x.ToString()))
             );
 
             // <named> | <longFlag> | <shortFlag> | <positional>
             var args = First<char, IEnumerable<IArgument>>(
-                namedArg,
+                longEqualsNamedArg,
+                longImpliedNamedArg,
                 longFlagArg,
+                shortImpliedNamedArg,
                 shortFlagArg,
                 value.Transform(v => new [] { new PositionalArgument(v) })
             );
 
             return Rule(
-                whitespace,
+                whitespace.Optional(),
                 args,
 
                 (ws, arg) => arg

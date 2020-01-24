@@ -10,7 +10,6 @@ namespace StoneFruit.Utility
         public static string GetDescription(this Type type) 
             => GetPublicStaticStringPropertyValue(type, "Description");
 
-
         public static string GetUsage(this Type type) 
             => GetPublicStaticStringPropertyValue(type, "Usage") ?? GetDescription(type);
 
