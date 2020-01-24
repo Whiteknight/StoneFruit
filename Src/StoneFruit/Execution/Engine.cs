@@ -4,6 +4,7 @@ using System.Linq;
 using StoneFruit.BuiltInVerbs;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Environments;
+using StoneFruit.Execution.Output;
 
 namespace StoneFruit.Execution
 {
@@ -73,11 +74,11 @@ namespace StoneFruit.Execution
             }
 
             var env = arg[0];
-            IEnumerable<string> realArgs = arg;
+            var realArgs = arg;
             if (_environments.IsValid(env))
             {
                 state.AddCommand($"{EnvironmentChangeVerb.Name} '{env}'");
-                realArgs = arg.Skip(1);
+                realArgs = arg.Skip(1).ToArray();
             }
 
             state.StartHeadless();
@@ -87,6 +88,18 @@ namespace StoneFruit.Execution
             ExecuteCommandQueue(state, dispatcher);
             return state.ExitCode;
         }
+
+        //private string FixIncomingArguments(string[] args)
+        //{
+        //    for (int i = 1; i < args.Length; i++)
+        //    {
+        //        var arg = args[i];
+        //        if (!arg.Contains(' '))
+        //            continue;
+        //        if (!arg.Contains('='))
+        //            args[i] = $"\"{arg}\"";
+        //    }
+        //}
 
         /// <summary>
         /// Runs interactively, prompting the user for input and executing each command in turn. If an

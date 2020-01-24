@@ -8,10 +8,10 @@ namespace StoneFruit
     /// </summary>
     public interface ICommandVerbSource
     {
-        ICommandVerb GetInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher);
+        ICommandVerbBase GetInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher);
 
-        ICommandVerb GetInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher)
-            where TCommand : class, ICommandVerb;
+        ICommandVerbBase GetInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher)
+            where TCommand : class, ICommandVerbBase;
 
         IEnumerable<IVerbInfo> GetAll();
 

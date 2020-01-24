@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.StructureMap;
@@ -64,11 +65,12 @@ namespace StoneFruit.Cli
         }
     }
 
-    public class TestCCommand : ICommandVerb
+    public class TestCCommand : ICommandVerbAsync
     {
-        public void Execute()
+        public Task ExecuteAsync()
         {
             Console.WriteLine("TESTC");
+            return Task.CompletedTask;
         }
     }
 

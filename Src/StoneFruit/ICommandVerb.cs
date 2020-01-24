@@ -1,12 +1,21 @@
-﻿namespace StoneFruit
+﻿using System.Threading.Tasks;
+
+namespace StoneFruit
 {
+    public interface ICommandVerbBase
+    {
+    }
+
     /// <summary>
     /// Implements a verb
     /// </summary>
-    public interface ICommandVerb
+    public interface ICommandVerb : ICommandVerbBase
     {
         void Execute();
     }
 
-    // TODO: Async version
+    public interface ICommandVerbAsync : ICommandVerbBase
+    {
+        Task ExecuteAsync();
+    }
 }

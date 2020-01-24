@@ -22,11 +22,11 @@ namespace StoneFruit.Execution.VerbSources
             _verbs.Add(verb, info);
         }
 
-        public ICommandVerb GetInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher) 
+        public ICommandVerbBase GetInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher) 
             => _verbs.ContainsKey(completeCommand.Verb) ? _verbs[completeCommand.Verb].VerbObject : null;
 
-        public ICommandVerb GetInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher) 
-            where TCommand : class, ICommandVerb 
+        public ICommandVerbBase GetInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher) 
+            where TCommand : class, ICommandVerbBase
             => _verbs.Values.OfType<TCommand>().FirstOrDefault();
 
         public IEnumerable<IVerbInfo> GetAll() => _verbs.Values;

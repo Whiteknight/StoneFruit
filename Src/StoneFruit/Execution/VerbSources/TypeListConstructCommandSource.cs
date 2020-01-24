@@ -23,17 +23,17 @@ namespace StoneFruit.Execution.VerbSources
                 .ToDictionaryUnique();
         }
 
-        public ICommandVerb GetInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher)
+        public ICommandVerbBase GetInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher)
         {
             var commandType = _commands.ContainsKey(completeCommand.Verb) ? _commands[completeCommand.Verb] : null;
             return commandType == null ? null : ResolveInstance(completeCommand, dispatcher, commandType);
         }
 
-        public ICommandVerb GetInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher)
-            where TCommand : class, ICommandVerb
+        public ICommandVerbBase GetInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher)
+            where TCommand : class, ICommandVerbBase
             => ResolveInstance(completeCommand, dispatcher, typeof(TCommand));
 
-        private ICommandVerb ResolveInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher, Type commandType)
+        private ICommandVerbBase ResolveInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher, Type commandType)
         {
             var commandVerb = DuckTypeConstructorInvoker.TryConstruct(commandType, new[]
             {
@@ -50,7 +50,7 @@ namespace StoneFruit.Execution.VerbSources
                 completeCommand.Arguments,
                 this
             });
-            return commandVerb as ICommandVerb;
+            return commandVerb as ICommandVerbBase;
         }
 
         public IEnumerable<IVerbInfo> GetAll() => _commands.Select(kvp => new VerbInfo(kvp.Key, kvp.Value));

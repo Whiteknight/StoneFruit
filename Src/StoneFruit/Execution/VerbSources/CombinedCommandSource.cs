@@ -15,14 +15,15 @@ namespace StoneFruit.Execution.VerbSources
             _sources = new List<ICommandVerbSource>();
         }
 
-        public ICommandVerb GetInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher)
+        public ICommandVerbBase GetInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher)
         {
             return _sources
                 .Select(source => source.GetInstance(completeCommand, dispatcher))
                 .FirstOrDefault(commandVerb => commandVerb != null);
         }
 
-        public ICommandVerb GetInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher) where TCommand : class, ICommandVerb
+        public ICommandVerbBase GetInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher) 
+            where TCommand : class, ICommandVerbBase
         {
             return _sources
                 .Select(source => source.GetInstance<TCommand>(completeCommand, dispatcher))

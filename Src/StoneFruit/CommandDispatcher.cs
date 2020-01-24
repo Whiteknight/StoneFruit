@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Utility;
@@ -29,7 +30,8 @@ namespace StoneFruit
         {
             Assert.ArgumentNotNull(completeCommand, nameof(completeCommand));
             var verbObject = Commands.GetInstance(completeCommand, this) ?? new NotFoundVerb(completeCommand, State, Output);
-            verbObject.Execute();
+            var syncVerb = (verbObject as ICommandVerb) ?? new AsyncDispatchVerb(verbObject as ICommandVerbAsync);
+            syncVerb.Execute();
         }
 
         public void Execute(string commandString)
@@ -44,6 +46,23 @@ namespace StoneFruit
             Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
             var completeCommand = new CompleteCommand(verb, args);
             Execute(completeCommand);
+        }
+
+        private class AsyncDispatchVerb : ICommandVerb
+        {
+            private readonly ICommandVerbAsync _asyncVerb;
+
+            public AsyncDispatchVerb(ICommandVerbAsync asyncVerb)
+            {
+                _asyncVerb = asyncVerb;
+            }
+
+            public void Execute()
+            {
+                if (_asyncVerb == null)
+                    return;
+                Task.Run(async () => await _asyncVerb.ExecuteAsync()).ConfigureAwait(false).GetAwaiter().GetResult();
+            }
         }
 
         private class NotFoundVerb : ICommandVerb
