@@ -21,6 +21,7 @@ namespace StoneFruit
         }
 
         public static Brush Default => new Brush(ConsoleColor.Gray, ConsoleColor.Black);
+
         public static Brush Current => new Brush(System.Console.ForegroundColor, System.Console.BackgroundColor);
 
         public static implicit operator Brush(ConsoleColor color) => new Brush(color, System.Console.BackgroundColor);
@@ -31,14 +32,14 @@ namespace StoneFruit
             System.Console.BackgroundColor = Background;
         }
 
-        public override readonly string ToString() => Foreground + " on " + Background;
+        public override readonly string ToString() => ToString("N");
 
         public readonly string ToString(string fmt)
         {
             if (fmt == "N")
-                return ToString();
+                return $"{Foreground} on {Background}";
             if (fmt == "C")
-                return Foreground + "," + Background;
+                return $"{Foreground},{Background}";
             if (fmt == "B")
                 return ByteValue.ToString("X");
             throw new Exception("Unknown ToString format " + fmt);

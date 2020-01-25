@@ -7,7 +7,12 @@ namespace StoneFruit.Execution.Output
     /// </summary>
     public class ConsoleTerminalOutput : ITerminalOutput
     {
-        public ITerminalOutput Color(Brush brush) => new ColoredTerminalOutputWrapper(brush, this);
+        public ITerminalOutput Color(Brush brush)
+        {
+            if (brush.Equals(Brush.Current))
+                return this;
+            return new ColoredTerminalOutputWrapper(brush, this);
+        }
 
         public ITerminalOutput WriteLine()
         {

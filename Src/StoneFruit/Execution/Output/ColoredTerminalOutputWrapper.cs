@@ -13,7 +13,12 @@ namespace StoneFruit.Execution.Output
             _inner = inner;
         }
 
-        public ITerminalOutput Color(Brush brush) => new ColoredTerminalOutputWrapper(brush, _inner);
+        public ITerminalOutput Color(Brush brush)
+        {
+            if (brush.Equals(_color))
+                return this;
+            return new ColoredTerminalOutputWrapper(brush, _inner);
+        }
 
         public ITerminalOutput WriteLine()
         {
