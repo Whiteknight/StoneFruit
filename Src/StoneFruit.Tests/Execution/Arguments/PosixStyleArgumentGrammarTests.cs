@@ -17,6 +17,16 @@ namespace StoneFruit.Tests.Execution.Arguments
         }
 
         [Test]
+        public void Positional_Test()
+        {
+            var result = Parse("a b c");
+            result.Shift().Value.Should().Be("a");
+            result.Shift().Value.Should().Be("b");
+            result.Shift().Value.Should().Be("c");
+            result.Shift().Value.Should().Be(null);
+        }
+
+        [Test]
         public void Flags_ShortC()
         {
             var result = Parse("-a");

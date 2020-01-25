@@ -7,6 +7,14 @@ namespace StoneFruit.Tests.Execution.CommandSources
     public class CombinedCommandSourceTests
     {
         [Test]
+        public void GetNextCommand_Empty()
+        {
+            var target = new CombinedCommandSource();
+            target.Start();
+            target.GetNextCommand().Should().Be(null);
+        }
+
+        [Test]
         public void GetNextCommand_Test()
         {
             var target = new CombinedCommandSource();

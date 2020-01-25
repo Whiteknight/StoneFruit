@@ -68,13 +68,13 @@ namespace StoneFruit.Execution.Arguments
             name = name.ToLowerInvariant();
             if (!_nameds.ContainsKey(name))
                 return new MissingArgument($"Cannot get argument named '{name}'");
-            return _nameds[name].FirstOrDefault(a => !a.Consumed);
+            return _nameds[name].FirstOrDefault(a => !a.Consumed) ?? (IArgument)new MissingArgument($"Cannot get argument named '{name}'");
         }
 
         public IEnumerable<IArgument> GetAll(string name)
         {
             name = name.ToLowerInvariant();
-            if (_nameds.ContainsKey(name))
+            if (!_nameds.ContainsKey(name))
                 return Enumerable.Empty<IArgument>();
             return _nameds[name].Where(a => !a.Consumed);
         }
