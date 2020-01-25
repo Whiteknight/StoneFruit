@@ -19,6 +19,10 @@
     <PackageReference Include="structuremap" Version="4.7.0" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+    <ProjectReference Include="..\StoneFruit\StoneFruit.csproj" />
+  </ItemGroup>
+
   <ItemGroup Condition="'$(Configuration)' == 'Release'">
     <PackageReference Include="StoneFruit" Version="0.1.0"></PackageReference>
   </ItemGroup>
@@ -27,10 +31,6 @@
     <None Include="LICENSE" Pack="true" PackagePath="">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\StoneFruit\StoneFruit.csproj" />
   </ItemGroup>
 
 </Project>
