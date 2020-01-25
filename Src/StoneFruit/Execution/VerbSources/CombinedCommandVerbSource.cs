@@ -6,11 +6,11 @@ namespace StoneFruit.Execution.VerbSources
     /// <summary>
     /// Combines multiple ICommandSource implementations together in priorty order.
     /// </summary>
-    public class CombinedCommandSource : ICommandVerbSource
+    public class CombinedCommandVerbSource : ICommandVerbSource
     {
         private readonly List<ICommandVerbSource> _sources;
 
-        public CombinedCommandSource()
+        public CombinedCommandVerbSource()
         {
             _sources = new List<ICommandVerbSource>();
         }

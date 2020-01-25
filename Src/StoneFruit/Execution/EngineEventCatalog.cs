@@ -9,12 +9,11 @@ namespace StoneFruit.Execution
         {
             // Events when the engine starts and then stops headless mode
             EngineStartHeadless = new EventScript();
-            EngineStopHeadless = new EventScript(
-                ExitVerb.Name
-            );
+            EngineStopHeadless = new EventScript();
 
             // Events when the engine starts and stops interactive mode
             EngineStartInteractive = new EventScript(
+                // Call the env-change command to make sure we have an environment set
                 $"{EnvironmentChangeVerb.NotSetName}"
             );
             EngineStopInteractive = new EventScript();
@@ -22,11 +21,18 @@ namespace StoneFruit.Execution
             // Event when the environment has been successfully changed
             EnvironmentChanged = new EventScript();
 
+            // We're executing basic help command headlessly
+            HeadlessHelp = new EventScript(
+                $"{HelpVerb.Name}",
+                // Call 'exit' explicitly so we can set the exit code
+                $"{ExitVerb.Name} {Engine.ExitCodeHeadlessHelp}"
+            );
+
             // Attempt to enter headless mode without providing any arguments
             HeadlessNoArgs = new EventScript(
                 $"{EchoVerb.Name} 'Please provide a verb'",
-                // We exit here so the engine doesn't try to continue execution
-                $"{ExitVerb.Name} {Engine.ExitCodeOk}"
+                // Call 'exit' so we can set an explicit error exit code
+                $"{ExitVerb.Name} {Engine.ExitCodeHeadlessNoVerb}"
             );
 
             // TODO: It would be nice to be able to pass the name of the unknown verb here, so we could
@@ -37,36 +43,6 @@ namespace StoneFruit.Execution
             );
         }
 
-        public class EventScript
-        {
-            private readonly string[] _initialLines;
-            private readonly List<string> _lines;
-
-            public EventScript(params string[] initialLines)
-            {
-                _initialLines = initialLines;
-                _lines = new List<string>(initialLines);
-            }
-
-            public void Reset()
-            {
-                _lines.Clear();
-                _lines.AddRange(_initialLines);
-            }
-
-            public void Clear() => _lines.Clear();
-
-            public void Add(params string[] lines) => _lines.AddRange(lines);
-
-            public void EnqueueScript(EngineState state)
-            {
-                foreach (var line in _lines)
-                    state.AddCommand(line);
-            }
-
-            public override string ToString() => string.Join("\n", _lines);
-        }
-
         public EventScript HeadlessNoArgs { get; }
         public EventScript EngineStartHeadless { get; }
         public EventScript EngineStartInteractive { get; }
@@ -74,5 +50,32 @@ namespace StoneFruit.Execution
         public EventScript EngineStopHeadless { get; }
         public EventScript VerbNotFound { get; }
         public EventScript EnvironmentChanged { get; }
+        public EventScript HeadlessHelp { get; }
+    }
+
+    public class EventScript
+    {
+        private readonly string[] _initialLines;
+        private readonly List<string> _lines;
+
+        public EventScript(params string[] initialLines)
+        {
+            _initialLines = initialLines;
+            _lines = new List<string>(initialLines);
+        }
+
+        public void Reset()
+        {
+            _lines.Clear();
+            _lines.AddRange(_initialLines);
+        }
+
+        public void Clear() => _lines.Clear();
+
+        public void Add(params string[] lines) => _lines.AddRange(lines);
+
+        public IEnumerable<string> GetCommands() => _lines;
+
+        public override string ToString() => string.Join("\n", _lines);
     }
 }

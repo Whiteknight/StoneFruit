@@ -11,7 +11,7 @@ namespace StoneFruit
 {
     public class EngineBuilder
     {
-        private readonly CombinedCommandSource _commandSource;
+        private readonly CombinedCommandVerbSource _commandSource;
         private readonly EngineEventCatalog _eventCatalog;
         private IEnvironmentCollection _environments;
         private IParser<char, CommandArguments> _argParser;
@@ -19,7 +19,7 @@ namespace StoneFruit
 
         public EngineBuilder()
         {
-            _commandSource = new CombinedCommandSource();
+            _commandSource = new CombinedCommandVerbSource();
             _eventCatalog = new EngineEventCatalog();
         }
 

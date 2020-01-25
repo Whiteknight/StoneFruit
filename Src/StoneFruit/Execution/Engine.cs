@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using StoneFruit.BuiltInVerbs;
-using StoneFruit.Execution.Arguments;
+using StoneFruit.Execution.CommandSources;
 using StoneFruit.Execution.Environments;
 using StoneFruit.Execution.Output;
 
@@ -16,7 +13,8 @@ namespace StoneFruit.Execution
     public class Engine
     {
         public const int ExitCodeOk = 0;
-        public const int ExitCodeHeadlessNoArgs = 1;
+        public const int ExitCodeHeadlessHelp = 0;
+        public const int ExitCodeHeadlessNoVerb = 1;
 
         private readonly IEnvironmentCollection _environments;
         private readonly ICommandVerbSource _commandSource;
@@ -52,61 +50,18 @@ namespace StoneFruit.Execution
             /*
              * 1. If we have no args, interactive mode
              * 2. If we have exactly one arg "help" show help and exit
-             * 3. If we have switchtable environments AND we have at least 1 arg
-             *    AND that arg is a valid environment, switch to that environment and continue
+             * 3. If we have multiple environments AND we have exactly 1 arg
+             *    AND that arg is a valid environment, switch to that environment and continue interactive
              * 4. Pass all args as headless mode then, if we don't exit, interactive mode
              */
             if (string.IsNullOrEmpty(commandLine))
                 return RunInteractively();
 
-            if (commandLine == "help")
-            {
-                // TODO: A HeadlessHelpCommand that includes more info about headless usage?
-                new HelpVerb(_output, _commandSource, new CommandArguments()).Execute();
-                return ExitCodeOk;
-            }
-
             if (_environments.IsValid(commandLine))
                 return RunInteractively(commandLine);
 
-            return RunHeadlessWithCommandLineArgs();
+            return RunHeadless(commandLine);
         }
-
-        // <summary>
-        // Runs headless without an interactive prompt. All command information comes from the provided
-        // arguments array. Notice that the args array from your Main() function probably don't work here
-        // because the shell will automatically strip quotes and other punctuation. If you want to use your
-        // command line arguments, use RunHeadlessWithCommandLineArgs() instead
-        // </summary>
-        // <param name="arg"></param>
-        //public int RunHeadless(string[] arg)
-        //{
-        //    var state = new EngineState(true, _eventCatalog);
-        //    var dispatcher = new CommandDispatcher(_parser, _commandSource, _environments, state, _output);
-        //    if (arg == null || arg.Length == 0)
-        //    {
-        //        state.HeadlessNoArgs();
-        //        ExecuteCommandQueue(state, dispatcher);
-        //        return ExitCodeHeadlessNoArgs;
-        //    }
-
-        //    var env = arg[0];
-        //    var realArgs = arg;
-        //    if (_environments.IsValid(env))
-        //    {
-        //        state.AddCommand($"{EnvironmentChangeVerb.Name} '{env}'");
-        //        realArgs = arg.Skip(1).ToArray();
-        //    }
-
-        //    var firstCommand = FixIncomingArguments(realArgs);
-
-        //    state.StartHeadless();
-        //    state.AddCommand(firstCommand);
-        //    ExecuteCommandQueue(state, dispatcher);
-        //    state.StopHeadless();
-        //    ExecuteCommandQueue(state, dispatcher);
-        //    return state.ExitCode;
-        //}
 
         public int RunHeadlessWithCommandLineArgs()
         {
@@ -119,6 +74,13 @@ namespace StoneFruit.Execution
         {
             var state = new EngineState(true, _eventCatalog);
             var dispatcher = new CommandDispatcher(_parser, _commandSource, _environments, state, _output);
+
+            // If we have a single argument "help", run the help script and exit
+            if (commandLine == "help")
+            {
+                var source = new ScriptCommandSource(state.EventCatalog.HeadlessHelp);
+                return RunLoop(state, dispatcher, source);
+            }
 
             // Now see if the first argument is the name of an environment. If so, switch to that environment
             // and continue
@@ -139,17 +101,11 @@ namespace StoneFruit.Execution
 
         private int RunHeadlessInternal(string commandLine, EngineState state, CommandDispatcher dispatcher)
         {
-            state.StartHeadless();
-            state.AddCommand(commandLine);
-            ExecuteCommandQueue(state, dispatcher);
-
-            // The default StopHeadless script exits, but if we've removed that we can go into an interactive 
-            // mode
-            state.StopHeadless();
-            ExecuteCommandQueue(state, dispatcher);
-            if (state.ShouldExit)
-                return state.ExitCode;
-            return RunInteractively();
+            var source = new CombinedCommandSource();
+            source.AddSource(new ScriptCommandSource(state.EventCatalog.EngineStartHeadless));
+            source.AddSource(new SingleCommandSource(commandLine));
+            source.AddSource(new ScriptCommandSource(state.EventCatalog.EngineStopHeadless));
+            return RunLoop(state, dispatcher, source);
         }
 
         private static string GetRawCommandLineArguments()
@@ -188,27 +144,32 @@ namespace StoneFruit.Execution
 
         private int RunInteractiveInternal(EngineState state, CommandDispatcher dispatcher)
         {
-            state.StartInteractive();
+            var source = new CombinedCommandSource();
+            source.AddSource(new ScriptCommandSource(state.EventCatalog.EngineStartInteractive));
+            source.AddSource(new PromptCommandSource(_output, _environments));
+            source.AddSource(new ScriptCommandSource(state.EventCatalog.EngineStopInteractive));
+            return RunLoop(state, dispatcher, source);
+        }
+
+        private int RunLoop(EngineState state, CommandDispatcher dispatcher, ICommandSource source)
+        {
+            // Drain the state queue first, in case there's anything in there.
             ExecuteCommandQueue(state, dispatcher);
+            if (state.ShouldExit)
+                return state.ExitCode;
 
-            _output
-                .Write("Enter command ")
-                .Color(ConsoleColor.DarkGray).Write("('help' for help, 'exit' to quit)")
-                .Color(ConsoleColor.Gray).WriteLine(":");
-
+            // Now start draining the command source, executing each in turn.
+            source.Start();
             while (true)
             {
-                var commandString = _output.Prompt($"{_environments.CurrentName}");
-                state.AddCommand(commandString);
-
+                var command = source.GetNextCommand();
+                if (string.IsNullOrEmpty(command))
+                    return state.ExitCode;
+                state.AddCommand(command);
                 ExecuteCommandQueue(state, dispatcher);
                 if (state.ShouldExit)
-                    break;
+                    return state.ExitCode;
             }
-
-            state.StopInteractive();
-            ExecuteCommandQueue(state, dispatcher);
-            return state.ExitCode;
         }
 
         private void ExecuteCommandQueue(EngineState state, CommandDispatcher dispatcher)

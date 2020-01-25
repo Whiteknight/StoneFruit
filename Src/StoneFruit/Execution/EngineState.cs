@@ -30,6 +30,12 @@ namespace StoneFruit.Execution
 
         public void AddCommand(string command) => _additionalCommands.Enqueue(command);
 
+        public void AddCommands(IEnumerable<string> commands)
+        {
+            foreach (var command in commands)
+                AddCommand(command);
+        }
+
         public string GetNextCommand()
         {
             if (_additionalCommands.Count == 0)
@@ -42,13 +48,5 @@ namespace StoneFruit.Execution
         // TODO: Configurable loop limit so we don't keep adding commands to the queue in an endless loop
 
         // TODO: Some kind of metadata mechanism so verbs can store metadata here in the state and retrieve it later
-
-        public void StartHeadless() => EventCatalog.EngineStartHeadless.EnqueueScript(this);
-        public void StartInteractive() => EventCatalog.EngineStartInteractive.EnqueueScript(this);
-        public void StopInteractive() => EventCatalog.EngineStopInteractive.EnqueueScript(this);
-        public void StopHeadless() => EventCatalog.EngineStopHeadless.EnqueueScript(this);
-        public void EnvironmentChanged() => EventCatalog.EnvironmentChanged.EnqueueScript(this);
-        public void HeadlessNoArgs() => EventCatalog.HeadlessNoArgs.EnqueueScript(this);
-        public void VerbNotFound() => EventCatalog.VerbNotFound.EnqueueScript(this);
     }
 }

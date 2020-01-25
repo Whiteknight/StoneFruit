@@ -83,7 +83,7 @@ namespace StoneFruit
                 _output
                     .Color(ConsoleColor.Red)
                     .WriteLine($"Command '{_command.Verb}' not found. Please check your spelling or help output and try again");
-                _state.VerbNotFound();
+                _state.AddCommands(_state.EventCatalog.VerbNotFound.GetCommands());
             }
         }
     }

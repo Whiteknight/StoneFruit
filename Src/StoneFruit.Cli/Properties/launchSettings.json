@@ -1,8 +1,7 @@
 {
   "profiles": {
     "StoneFruit.Cli": {
-      "commandName": "Project",
-      "commandLineArgs": "help"
+      "commandName": "Project"
     }
   }
 }
