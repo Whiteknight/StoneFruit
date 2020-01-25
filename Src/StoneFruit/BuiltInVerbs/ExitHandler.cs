@@ -5,14 +5,14 @@ namespace StoneFruit.BuiltInVerbs
 {
     [CommandName(Name)]
     [CommandName("quit", showInHelp: false)]
-    public class ExitVerb : ICommandVerb
+    public class ExitHandler : ICommandHandler
     {
         public const string Name = "exit";
 
         private readonly EngineState _state;
         private readonly CommandArguments _args;
 
-        public ExitVerb(EngineState state, CommandArguments args)
+        public ExitHandler(EngineState state, CommandArguments args)
         {
             _state = state;
             _args = args;

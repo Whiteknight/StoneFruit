@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace StoneFruit.Execution.VerbSources
+namespace StoneFruit.Execution.HandlerSources
 {
-    public class NamedInstanceCommandSource : ICommandVerbSource
+    public class NamedInstanceCommandSource : ICommandHandlerSource
     {
         private readonly Dictionary<string, VerbInfo> _verbs;
 
@@ -13,20 +13,20 @@ namespace StoneFruit.Execution.VerbSources
             _verbs = new Dictionary<string, VerbInfo>();
         }
 
-        public void Add(string verb, ICommandVerb verbObject, string description = null, string help = null)
+        public void Add(string verb, ICommandHandler handlerObject, string description = null, string help = null)
         {
             verb = verb.ToLowerInvariant();
             if (_verbs.ContainsKey(verb))
                 throw new Exception("Cannot add verbs with duplicate names");
-            var info = new VerbInfo(verb, verbObject, description, help);
+            var info = new VerbInfo(verb, handlerObject, description, help);
             _verbs.Add(verb, info);
         }
 
-        public ICommandVerbBase GetInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher) 
-            => _verbs.ContainsKey(completeCommand.Verb) ? _verbs[completeCommand.Verb].VerbObject : null;
+        public ICommandHandlerBase GetInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher) 
+            => _verbs.ContainsKey(completeCommand.Verb) ? _verbs[completeCommand.Verb].HandlerObject : null;
 
-        public ICommandVerbBase GetInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher) 
-            where TCommand : class, ICommandVerbBase
+        public ICommandHandlerBase GetInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher) 
+            where TCommand : class, ICommandHandlerBase
             => _verbs.Values.OfType<TCommand>().FirstOrDefault();
 
         public IEnumerable<IVerbInfo> GetAll() => _verbs.Values;
@@ -35,15 +35,15 @@ namespace StoneFruit.Execution.VerbSources
 
         private class VerbInfo : IVerbInfo
         {
-            public VerbInfo(string verb, ICommandVerb verbObject, string description, string help)
+            public VerbInfo(string verb, ICommandHandler handlerObject, string description, string help)
             {
                 Verb = verb;
-                VerbObject = verbObject;
+                HandlerObject = handlerObject;
                 Description = description;
                 Help = help;
             }
 
-            public ICommandVerb VerbObject { get; }
+            public ICommandHandler HandlerObject { get; }
             public string Verb { get; }
             public string Description { get; }
             public string Help { get; }

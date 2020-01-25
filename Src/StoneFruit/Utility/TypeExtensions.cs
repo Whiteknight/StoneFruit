@@ -15,7 +15,7 @@ namespace StoneFruit.Utility
 
         public static IEnumerable<string> GetVerbs(this Type type)
         {
-            if (!typeof(ICommandVerbBase).IsAssignableFrom(type))
+            if (!typeof(ICommandHandlerBase).IsAssignableFrom(type))
                 return Enumerable.Empty<string>();
 
             var attrs = type.GetCustomAttributes<CommandNameAttribute>().ToList();

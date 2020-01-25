@@ -3,12 +3,12 @@ using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.BuiltInVerbs
 {
-    public class RunVerb : ICommandVerb
+    public class RunHandler : ICommandHandler
     {
         private readonly CommandArguments _args;
         private readonly EngineState _state;
 
-        public RunVerb(CommandArguments args, EngineState state)
+        public RunHandler(CommandArguments args, EngineState state)
         {
             _args = args;
             _state = state;

@@ -18,12 +18,12 @@ namespace StoneFruit.Execution
         public const int ExitCodeHeadlessNoVerb = 1;
 
         private readonly IEnvironmentCollection _environments;
-        private readonly ICommandVerbSource _commandSource;
+        private readonly ICommandHandlerSource _commandSource;
         private readonly EngineEventCatalog _eventCatalog;
         private readonly ITerminalOutput _output;
         private readonly CommandParser _parser;
 
-        public Engine(ICommandVerbSource commands, IEnvironmentCollection environments, CommandParser parser, ITerminalOutput output, EngineEventCatalog eventCatalog)
+        public Engine(ICommandHandlerSource commands, IEnvironmentCollection environments, CommandParser parser, ITerminalOutput output, EngineEventCatalog eventCatalog)
         {
             _environments = environments ?? new InstanceEnvironmentCollection(null);
             // TODO: If we have 0 commands, we might want to just abort?
@@ -109,7 +109,7 @@ namespace StoneFruit.Execution
                 var env = parts[0];
                 if (_environments.IsValid(env))
                 {
-                    state.AddCommand($"{EnvironmentChangeVerb.Name} '{env}'");
+                    state.AddCommand($"{EnvironmentChangeHandler.Name} '{env}'");
                     commandLine = parts[1];
                 }
             }
@@ -158,7 +158,7 @@ namespace StoneFruit.Execution
         {
             var state = new EngineState(false, _eventCatalog);
             var dispatcher = new CommandDispatcher(_parser, _commandSource, _environments, state, _output);
-            state.AddCommand($"{EnvironmentChangeVerb.Name} {environment}");
+            state.AddCommand($"{EnvironmentChangeHandler.Name} {environment}");
             return RunInteractiveInternal(state, dispatcher);
         }
 

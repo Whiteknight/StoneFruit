@@ -2,19 +2,19 @@
 
 namespace StoneFruit
 {
-    public interface ICommandVerbBase
+    public interface ICommandHandlerBase
     {
     }
 
     /// <summary>
     /// Implements a verb
     /// </summary>
-    public interface ICommandVerb : ICommandVerbBase
+    public interface ICommandHandler : ICommandHandlerBase
     {
         void Execute();
     }
 
-    public interface ICommandVerbAsync : ICommandVerbBase
+    public interface ICommandHandlerAsync : ICommandHandlerBase
     {
         Task ExecuteAsync();
     }

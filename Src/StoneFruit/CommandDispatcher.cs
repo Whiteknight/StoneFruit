@@ -12,12 +12,12 @@ namespace StoneFruit
     public class CommandDispatcher
     {
         public CommandParser Parser { get; }
-        public ICommandVerbSource Commands { get; }
+        public ICommandHandlerSource Commands { get; }
         public IEnvironmentCollection Environments { get; }
         public EngineState State { get; }
         public ITerminalOutput Output { get; }
 
-        public CommandDispatcher(CommandParser parser, ICommandVerbSource commands, IEnvironmentCollection environments, EngineState state, ITerminalOutput output)
+        public CommandDispatcher(CommandParser parser, ICommandHandlerSource commands, IEnvironmentCollection environments, EngineState state, ITerminalOutput output)
         {
             Parser = parser;
             Commands = commands;
@@ -29,8 +29,8 @@ namespace StoneFruit
         private void Execute(CompleteCommand completeCommand)
         {
             Assert.ArgumentNotNull(completeCommand, nameof(completeCommand));
-            var verbObject = Commands.GetInstance(completeCommand, this) ?? new NotFoundVerb(completeCommand, State, Output);
-            var syncVerb = (verbObject as ICommandVerb) ?? new AsyncDispatchVerb(verbObject as ICommandVerbAsync);
+            var verbObject = Commands.GetInstance(completeCommand, this) ?? new NotFoundHandler(completeCommand, State, Output);
+            var syncVerb = (verbObject as ICommandHandler) ?? new AsyncDispatchHandler(verbObject as ICommandHandlerAsync);
             syncVerb.Execute();
         }
 
@@ -48,30 +48,30 @@ namespace StoneFruit
             Execute(completeCommand);
         }
 
-        private class AsyncDispatchVerb : ICommandVerb
+        private class AsyncDispatchHandler : ICommandHandler
         {
-            private readonly ICommandVerbAsync _asyncVerb;
+            private readonly ICommandHandlerAsync _asyncHandler;
 
-            public AsyncDispatchVerb(ICommandVerbAsync asyncVerb)
+            public AsyncDispatchHandler(ICommandHandlerAsync asyncHandler)
             {
-                _asyncVerb = asyncVerb;
+                _asyncHandler = asyncHandler;
             }
 
             public void Execute()
             {
-                if (_asyncVerb == null)
+                if (_asyncHandler == null)
                     return;
-                Task.Run(async () => await _asyncVerb.ExecuteAsync()).ConfigureAwait(false).GetAwaiter().GetResult();
+                Task.Run(async () => await _asyncHandler.ExecuteAsync()).ConfigureAwait(false).GetAwaiter().GetResult();
             }
         }
 
-        private class NotFoundVerb : ICommandVerb
+        private class NotFoundHandler : ICommandHandler
         {
             private readonly CompleteCommand _command;
             private readonly EngineState _state;
             private readonly ITerminalOutput _output;
 
-            public NotFoundVerb(CompleteCommand command, EngineState state, ITerminalOutput output)
+            public NotFoundHandler(CompleteCommand command, EngineState state, ITerminalOutput output)
             {
                 _command = command;
                 _state = state;

@@ -7,12 +7,12 @@ using StoneFruit.Execution.Arguments;
 namespace StoneFruit.BuiltInVerbs
 {
     [CommandName("exec")]
-    public class ExecuteScriptVerb : ICommandVerb
+    public class ExecuteScriptHandler : ICommandHandler
     {
         private readonly CommandArguments _args;
         private readonly EngineState _state;
 
-        public ExecuteScriptVerb(CommandArguments args, EngineState state)
+        public ExecuteScriptHandler(CommandArguments args, EngineState state)
         {
             _args = args;
             _state = state;

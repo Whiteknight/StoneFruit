@@ -43,7 +43,7 @@ namespace StoneFruit.Cli
         public string Arg3 { get; set; }
     }
 
-    public class TestACommand : ICommandVerb
+    public class TestACommand : ICommandHandler
     {
         private readonly TestArgsA _args;
 
@@ -58,7 +58,7 @@ namespace StoneFruit.Cli
         }
     }
 
-    public class TestBCommand : ICommandVerb
+    public class TestBCommand : ICommandHandler
     {
         public void Execute()
         {
@@ -66,7 +66,7 @@ namespace StoneFruit.Cli
         }
     }
 
-    public class TestCCommand : ICommandVerbAsync
+    public class TestCCommand : ICommandHandlerAsync
     {
         public Task ExecuteAsync()
         {

@@ -5,13 +5,13 @@ using ParserObjects;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Environments;
-using StoneFruit.Execution.VerbSources;
+using StoneFruit.Execution.HandlerSources;
 
 namespace StoneFruit
 {
     public class EngineBuilder
     {
-        private readonly CombinedCommandVerbSource _commandSource;
+        private readonly CombinedCommandHandlerSource _commandSource;
         private readonly EngineEventCatalog _eventCatalog;
         private IEnvironmentCollection _environments;
         private IParser<char, CommandArguments> _argParser;
@@ -19,7 +19,7 @@ namespace StoneFruit
 
         public EngineBuilder()
         {
-            _commandSource = new CombinedCommandVerbSource();
+            _commandSource = new CombinedCommandHandlerSource();
             _eventCatalog = new EngineEventCatalog();
         }
 
@@ -29,7 +29,7 @@ namespace StoneFruit
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public EngineBuilder UseCommandSource(ICommandVerbSource source)
+        public EngineBuilder UseCommandSource(ICommandHandlerSource source)
         {
             _commandSource.Add(source);
             return this;

@@ -14,7 +14,7 @@ namespace StoneFruit.Execution
             // Events when the engine starts and stops interactive mode
             EngineStartInteractive = new EventScript(
                 // Call the env-change command to make sure we have an environment set
-                $"{EnvironmentChangeVerb.NotSetName}"
+                $"{EnvironmentChangeHandler.NotSetName}"
             );
             EngineStopInteractive = new EventScript();
             
@@ -23,23 +23,23 @@ namespace StoneFruit.Execution
 
             // We're executing basic help command headlessly
             HeadlessHelp = new EventScript(
-                $"{HelpVerb.Name}",
+                $"{HelpHandler.Name}",
                 // Call 'exit' explicitly so we can set the exit code
-                $"{ExitVerb.Name} {Engine.ExitCodeHeadlessHelp}"
+                $"{ExitHandler.Name} {Engine.ExitCodeHeadlessHelp}"
             );
 
             // Attempt to enter headless mode without providing any arguments
             HeadlessNoArgs = new EventScript(
-                $"{EchoVerb.Name} 'Please provide a verb'",
+                $"{EchoHandler.Name} 'Please provide a verb'",
                 // Call 'exit' so we can set an explicit error exit code
-                $"{ExitVerb.Name} {Engine.ExitCodeHeadlessNoVerb}"
+                $"{ExitHandler.Name} {Engine.ExitCodeHeadlessNoVerb}"
             );
 
             // TODO: It would be nice to be able to pass the name of the unknown verb here, so we could
             // make suggestions or give more insight
             // Attempt to execute an unknown verb
             VerbNotFound = new EventScript(
-                $"{EchoVerb.Name} 'Verb not found. Please check your spelling or help output and try again.'"
+                $"{EchoHandler.Name} 'Verb not found. Please check your spelling or help output and try again.'"
             );
         }
 

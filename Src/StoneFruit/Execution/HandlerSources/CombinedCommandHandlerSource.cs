@@ -1,29 +1,29 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace StoneFruit.Execution.VerbSources
+namespace StoneFruit.Execution.HandlerSources
 {
     /// <summary>
     /// Combines multiple ICommandSource implementations together in priorty order.
     /// </summary>
-    public class CombinedCommandVerbSource : ICommandVerbSource
+    public class CombinedCommandHandlerSource : ICommandHandlerSource
     {
-        private readonly List<ICommandVerbSource> _sources;
+        private readonly List<ICommandHandlerSource> _sources;
 
-        public CombinedCommandVerbSource()
+        public CombinedCommandHandlerSource()
         {
-            _sources = new List<ICommandVerbSource>();
+            _sources = new List<ICommandHandlerSource>();
         }
 
-        public ICommandVerbBase GetInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher)
+        public ICommandHandlerBase GetInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher)
         {
             return _sources
                 .Select(source => source.GetInstance(completeCommand, dispatcher))
                 .FirstOrDefault(commandVerb => commandVerb != null);
         }
 
-        public ICommandVerbBase GetInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher) 
-            where TCommand : class, ICommandVerbBase
+        public ICommandHandlerBase GetInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher) 
+            where TCommand : class, ICommandHandlerBase
         {
             return _sources
                 .Select(source => source.GetInstance<TCommand>(completeCommand, dispatcher))
@@ -37,14 +37,14 @@ namespace StoneFruit.Execution.VerbSources
                 .Select(g => g.First());
         }
 
-        public void Add(ICommandVerbSource source)
+        public void Add(ICommandHandlerSource source)
         {
             if (source == null)
                 return;
             _sources.Add(source);
         }
 
-        public ICommandVerbSource Simplify()
+        public ICommandHandlerSource Simplify()
         {
             return _sources.Count == 1 ? _sources[0] : this;
         }

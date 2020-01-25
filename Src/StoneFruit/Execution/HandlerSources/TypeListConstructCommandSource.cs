@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using StoneFruit.Utility;
 
-namespace StoneFruit.Execution.VerbSources
+namespace StoneFruit.Execution.HandlerSources
 {
     /// <summary>
     /// A command source which takes a list of Type and attempts to construct one using built-in mechanisms
     /// </summary>
-    public class TypeListConstructCommandSource : ICommandVerbSource
+    public class TypeListConstructCommandSource : ICommandHandlerSource
     {
         private readonly IReadOnlyDictionary<string, Type> _commands;
 
@@ -23,17 +23,17 @@ namespace StoneFruit.Execution.VerbSources
                 .ToDictionaryUnique();
         }
 
-        public ICommandVerbBase GetInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher)
+        public ICommandHandlerBase GetInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher)
         {
             var commandType = _commands.ContainsKey(completeCommand.Verb) ? _commands[completeCommand.Verb] : null;
             return commandType == null ? null : ResolveInstance(completeCommand, dispatcher, commandType);
         }
 
-        public ICommandVerbBase GetInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher)
-            where TCommand : class, ICommandVerbBase
+        public ICommandHandlerBase GetInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher)
+            where TCommand : class, ICommandHandlerBase
             => ResolveInstance(completeCommand, dispatcher, typeof(TCommand));
 
-        private ICommandVerbBase ResolveInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher, Type commandType)
+        private ICommandHandlerBase ResolveInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher, Type commandType)
         {
             var commandVerb = DuckTypeConstructorInvoker.TryConstruct(commandType, new[]
             {
@@ -50,7 +50,7 @@ namespace StoneFruit.Execution.VerbSources
                 completeCommand.Arguments,
                 this
             });
-            return commandVerb as ICommandVerbBase;
+            return commandVerb as ICommandHandlerBase;
         }
 
         public IEnumerable<IVerbInfo> GetAll() => _commands.Select(kvp => new VerbInfo(kvp.Key, kvp.Value));

@@ -7,7 +7,7 @@ namespace StoneFruit.BuiltInVerbs
 {
     [CommandName(Name)]
     [CommandName(NotSetName, showInHelp: false)]
-    public class EnvironmentChangeVerb : ICommandVerb
+    public class EnvironmentChangeHandler : ICommandHandler
     {
         public const string Name = "env-change";
         public const string NotSetName = "env-change-notset";
@@ -19,7 +19,7 @@ namespace StoneFruit.BuiltInVerbs
         private readonly IEnvironmentCollection _environments;
         private readonly CommandDispatcher _dispatcher;
 
-        public EnvironmentChangeVerb(ITerminalOutput output, CompleteCommand command, EngineState state, IEnvironmentCollection environments, CommandDispatcher dispatcher)
+        public EnvironmentChangeHandler(ITerminalOutput output, CompleteCommand command, EngineState state, IEnvironmentCollection environments, CommandDispatcher dispatcher)
         {
             _output = output;
             _command = command;
@@ -93,7 +93,7 @@ To prompt the user for an environment only if one is not currently set, use the 
             while (true)
             {
                 _output.Color(ConsoleColor.DarkCyan).WriteLine("Please select an environment:");
-                _dispatcher.Execute(EnvironmentListVerb.Name);
+                _dispatcher.Execute(EnvironmentListHandler.Name);
 
                 var envIndex = _output.Prompt("", true, false);
                 if (TrySetEnvironment(envIndex))
