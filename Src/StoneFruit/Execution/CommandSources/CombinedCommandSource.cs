@@ -46,6 +46,7 @@ namespace StoneFruit.Execution.CommandSources
         private void StartNextSource()
         {
             _current = _sources.Any() ? _sources.Dequeue() : null;
+            _current?.Start();
         }
     }
 }
