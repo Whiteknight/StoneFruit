@@ -12,6 +12,7 @@ namespace StoneFruit.Execution
     /// </summary>
     public class Engine
     {
+        // TODO: Move these to a better place
         public const int ExitCodeOk = 0;
         public const int ExitCodeHeadlessHelp = 0;
         public const int ExitCodeHeadlessNoVerb = 1;
@@ -33,6 +34,13 @@ namespace StoneFruit.Execution
             _output = output ?? new ConsoleTerminalOutput();
         }
 
+        /// <summary>
+        /// Selects the appropriate run mode and executes it based on the raw command line arguments passed
+        /// to the application. If command line arguments are provided, they are executed in headless mode
+        /// and the application will exit. If no arguments are provided the application will run in
+        /// interactive mode.
+        /// </summary>
+        /// <returns></returns>
         public int RunWithCommandLineArguments()
         {
             var commandLine = GetRawCommandLineArguments();
@@ -63,6 +71,11 @@ namespace StoneFruit.Execution
             return RunHeadless(commandLine);
         }
 
+        /// <summary>
+        /// Run the application in headless mode with the raw commandline arguments then exits the
+        /// application
+        /// </summary>
+        /// <returns></returns>
         public int RunHeadlessWithCommandLineArgs()
         {
             // Environment.CommandLine includes the name of the exe invoked, so strip that off the front
@@ -70,6 +83,11 @@ namespace StoneFruit.Execution
             return RunHeadless(commandLine);
         }
 
+        /// <summary>
+        /// Run the application in headless mode with the provide commandline string.
+        /// </summary>
+        /// <param name="commandLine"></param>
+        /// <returns></returns>
         public int RunHeadless(string commandLine)
         {
             var state = new EngineState(true, _eventCatalog);
@@ -99,6 +117,7 @@ namespace StoneFruit.Execution
             return RunHeadlessInternal(commandLine, state, dispatcher);
         }
 
+        // Sets up the command source for headless mode and passes it to the RunLoop
         private int RunHeadlessInternal(string commandLine, EngineState state, CommandDispatcher dispatcher)
         {
             var source = new CombinedCommandSource();
@@ -108,6 +127,7 @@ namespace StoneFruit.Execution
             return RunLoop(state, dispatcher, source);
         }
 
+        // Attempt to get the raw commandline arguments as they were passed to the application
         private static string GetRawCommandLineArguments()
         {
             var exeName = Environment.GetCommandLineArgs()[0];
@@ -142,6 +162,7 @@ namespace StoneFruit.Execution
             return RunInteractiveInternal(state, dispatcher);
         }
 
+        // Sets up command sources for interactive mode and passes them to the RunLoop
         private int RunInteractiveInternal(EngineState state, CommandDispatcher dispatcher)
         {
             var source = new CombinedCommandSource();
@@ -151,6 +172,8 @@ namespace StoneFruit.Execution
             return RunLoop(state, dispatcher, source);
         }
 
+        // Pulls commands from the command source until the source is empty or an exit signal is received
+        // Each command is added to the command queue and the queue is drained
         private int RunLoop(EngineState state, CommandDispatcher dispatcher, ICommandSource source)
         {
             // Drain the state queue first, in case there's anything in there.
@@ -172,6 +195,8 @@ namespace StoneFruit.Execution
             }
         }
 
+        // Drains the command queue. Executed commands may add more commands to the queue during execution
+        // so we loop until the queue is empty or until an exit signal is received
         private void ExecuteCommandQueue(EngineState state, CommandDispatcher dispatcher)
         {
             while (true)
@@ -187,6 +212,7 @@ namespace StoneFruit.Execution
                 }
                 catch (Exception e)
                 {
+                    // TODO: Should make this behavior configurable
                     _output
                         .Color(ConsoleColor.Red)
                         .WriteLine(e.Message)
