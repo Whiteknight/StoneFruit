@@ -22,11 +22,13 @@ namespace StoneFruit.Cli
                 .UseEnvironmentFactory(new MyEnvironmentFactory())
                 .SetupEvents(e =>
                 {
+                    e.EngineStopHeadless.Clear();
                     e.EngineStartInteractive.Add("help");
                     e.EngineStopInteractive.Add("echo 'goodbye'");
                 })
                 .Build();
-            Environment.ExitCode = engine.Run(args);
+            Environment.ExitCode = engine.RunWithCommandLineArguments();
+            Console.ReadKey();
         }
     }
 

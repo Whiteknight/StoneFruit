@@ -9,7 +9,9 @@ namespace StoneFruit.Execution
         {
             // Events when the engine starts and then stops headless mode
             EngineStartHeadless = new EventScript();
-            EngineStopHeadless = new EventScript();
+            EngineStopHeadless = new EventScript(
+                ExitVerb.Name
+            );
 
             // Events when the engine starts and stops interactive mode
             EngineStartInteractive = new EventScript(

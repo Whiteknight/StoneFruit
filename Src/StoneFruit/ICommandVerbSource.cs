@@ -17,4 +17,5 @@ namespace StoneFruit
 
         IVerbInfo GetByName(string name);
     }
+
 }
