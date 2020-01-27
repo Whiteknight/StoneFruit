@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using StoneFruit.BuiltInVerbs;
+﻿using StoneFruit.BuiltInVerbs;
 
 namespace StoneFruit.Execution
 {
@@ -48,40 +47,55 @@ namespace StoneFruit.Execution
             );
         }
 
+        /// <summary>
+        /// The engine has been run in headless mode without a command.
+        /// </summary>
         public EventScript HeadlessNoArgs { get; }
+
+        /// <summary>
+        /// The engine has started in headless mode. This script is run, followed by the
+        /// input command, and then the EngineStopHeadless script.
+        /// </summary>
         public EventScript EngineStartHeadless { get; }
-        public EventScript EngineStartInteractive { get; }
-        public EventScript EngineStopInteractive { get; }
+
+        /// <summary>
+        /// The engine has stopped headless mode. This script is executed after EngineStartHeadless script
+        /// and the user command.
+        /// </summary>
         public EventScript EngineStopHeadless { get; }
+
+        /// <summary>
+        /// The engine has started in interactive mode. This script will execute, then the user will be
+        /// shown a REPL prompt.
+        /// </summary>
+        public EventScript EngineStartInteractive { get; }
+
+        /// <summary>
+        /// The engine has ended interactive mode. This script will not usually be called because most of
+        /// the time the REPL will exit directly.
+        /// </summary>
+        public EventScript EngineStopInteractive { get; }
+        
+        /// <summary>
+        /// There is no handler for the specified verb.
+        /// </summary>
         public EventScript VerbNotFound { get; }
+
+        /// <summary>
+        /// The environment has been changed
+        /// </summary>
         public EventScript EnvironmentChanged { get; }
+
+        /// <summary>
+        /// "help" has been executed in headless mode. Can be used to show more detail than a simple help
+        /// handler
+        /// </summary>
         public EventScript HeadlessHelp { get; }
+
+        /// <summary>
+        /// An unhandled exception has been received by the engine. The exception may have come from engine
+        /// internals or from within one of the handlers.
+        /// </summary>
         public EventScript EngineError { get; }
-    }
-
-    public class EventScript
-    {
-        private readonly string[] _initialLines;
-        private readonly List<string> _lines;
-
-        public EventScript(params string[] initialLines)
-        {
-            _initialLines = initialLines;
-            _lines = new List<string>(initialLines);
-        }
-
-        public void Reset()
-        {
-            _lines.Clear();
-            _lines.AddRange(_initialLines);
-        }
-
-        public void Clear() => _lines.Clear();
-
-        public void Add(params string[] lines) => _lines.AddRange(lines);
-
-        public IEnumerable<string> GetCommands() => _lines;
-
-        public override string ToString() => string.Join("\n", _lines);
     }
 }
