@@ -24,9 +24,10 @@ namespace StoneFruit.Cli
                 {
                     e.EngineStartInteractive.Add("help");
                     e.EngineStopInteractive.Add("echo 'goodbye'");
+                    e.EngineError.Add("echo 'you dun goofed'");
                 })
                 .Build();
-            Environment.ExitCode = engine.RunHeadless("help");
+            Environment.ExitCode = engine.RunWithCommandLineArguments();
             Console.ReadKey();
         }
     }
@@ -62,7 +63,7 @@ namespace StoneFruit.Cli
     {
         public void Execute()
         {
-            Console.WriteLine("TESTB");
+            throw new Exception("TESTB");
         }
     }
 

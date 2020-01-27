@@ -16,6 +16,9 @@ namespace StoneFruit.Execution
         public const int ExitCodeOk = 0;
         public const int ExitCodeHeadlessHelp = 0;
         public const int ExitCodeHeadlessNoVerb = 1;
+        public const int ExitCodeCascadeError = 2;
+
+        public const string MetadataError = "__CURRENT_EXCEPTION";
 
         private readonly IEnvironmentCollection _environments;
         private readonly ICommandHandlerSource _commandSource;
@@ -92,12 +95,13 @@ namespace StoneFruit.Execution
         {
             var state = new EngineState(true, _eventCatalog);
             var dispatcher = new CommandDispatcher(_parser, _commandSource, _environments, state, _output);
+            var sources = new CommandSourceCollection();
 
             // If we have a single argument "help", run the help script and exit
             if (commandLine == "help")
             {
-                var source = new ScriptCommandSource(state.EventCatalog.HeadlessHelp);
-                return RunLoop(state, dispatcher, source);
+                sources.AddToEnd(new ScriptCommandSource(state.EventCatalog.HeadlessHelp));
+                return RunLoop(state, dispatcher, sources);
             }
 
             // Now see if the first argument is the name of an environment. If so, switch to that environment
@@ -109,23 +113,17 @@ namespace StoneFruit.Execution
                 var env = parts[0];
                 if (_environments.IsValid(env))
                 {
-                    state.AddCommand($"{EnvironmentChangeHandler.Name} '{env}'");
+                    sources.AddToEnd(new SingleCommandSource($"{EnvironmentChangeHandler.Name} '{env}'"));
                     commandLine = parts[1];
                 }
             }
 
-            return RunHeadlessInternal(commandLine, state, dispatcher);
+            sources.AddToEnd(new ScriptCommandSource(state.EventCatalog.EngineStartHeadless));
+            sources.AddToEnd(new SingleCommandSource(commandLine));
+            sources.AddToEnd(new ScriptCommandSource(state.EventCatalog.EngineStopHeadless));
+            return RunLoop(state, dispatcher, sources);
         }
 
-        // Sets up the command source for headless mode and passes it to the RunLoop
-        private int RunHeadlessInternal(string commandLine, EngineState state, CommandDispatcher dispatcher)
-        {
-            var source = new CombinedCommandSource();
-            source.AddSource(new ScriptCommandSource(state.EventCatalog.EngineStartHeadless));
-            source.AddSource(new SingleCommandSource(commandLine));
-            source.AddSource(new ScriptCommandSource(state.EventCatalog.EngineStopHeadless));
-            return RunLoop(state, dispatcher, source);
-        }
 
         // Attempt to get the raw commandline arguments as they were passed to the application
         private static string GetRawCommandLineArguments()
@@ -145,7 +143,11 @@ namespace StoneFruit.Execution
         {
             var state = new EngineState(false, _eventCatalog);
             var dispatcher = new CommandDispatcher(_parser, _commandSource, _environments, state, _output);
-            return RunInteractiveInternal(state, dispatcher);
+            var source = new CommandSourceCollection();
+            source.AddToEnd(new ScriptCommandSource(state.EventCatalog.EngineStartInteractive));
+            source.AddToEnd(new PromptCommandSource(_output, _environments));
+            source.AddToEnd(new ScriptCommandSource(state.EventCatalog.EngineStopInteractive));
+            return RunLoop(state, dispatcher, source);
         }
 
         /// <summary>
@@ -158,23 +160,17 @@ namespace StoneFruit.Execution
         {
             var state = new EngineState(false, _eventCatalog);
             var dispatcher = new CommandDispatcher(_parser, _commandSource, _environments, state, _output);
-            state.AddCommand($"{EnvironmentChangeHandler.Name} {environment}");
-            return RunInteractiveInternal(state, dispatcher);
-        }
-
-        // Sets up command sources for interactive mode and passes them to the RunLoop
-        private int RunInteractiveInternal(EngineState state, CommandDispatcher dispatcher)
-        {
-            var source = new CombinedCommandSource();
-            source.AddSource(new ScriptCommandSource(state.EventCatalog.EngineStartInteractive));
-            source.AddSource(new PromptCommandSource(_output, _environments));
-            source.AddSource(new ScriptCommandSource(state.EventCatalog.EngineStopInteractive));
+            var source = new CommandSourceCollection();
+            source.AddToEnd(new SingleCommandSource($"{EnvironmentChangeHandler.Name} {environment}"));
+            source.AddToEnd(new ScriptCommandSource(state.EventCatalog.EngineStartInteractive));
+            source.AddToEnd(new PromptCommandSource(_output, _environments));
+            source.AddToEnd(new ScriptCommandSource(state.EventCatalog.EngineStopInteractive));
             return RunLoop(state, dispatcher, source);
         }
 
         // Pulls commands from the command source until the source is empty or an exit signal is received
         // Each command is added to the command queue and the queue is drained
-        private int RunLoop(EngineState state, CommandDispatcher dispatcher, ICommandSource source)
+        private int RunLoop(EngineState state, CommandDispatcher dispatcher, CommandSourceCollection sources)
         {
             // Drain the state queue first, in case there's anything in there.
             ExecuteCommandQueue(state, dispatcher);
@@ -182,10 +178,9 @@ namespace StoneFruit.Execution
                 return state.ExitCode;
 
             // Now start draining the command source, executing each in turn.
-            source.Start();
             while (true)
             {
-                var command = source.GetNextCommand();
+                var command = sources.GetNextCommand();
                 if (string.IsNullOrEmpty(command))
                     return state.ExitCode;
                 state.AddCommand(command);
@@ -207,18 +202,37 @@ namespace StoneFruit.Execution
                 try
                 {
                     dispatcher.Execute(commandString);
-                    if (state.ShouldExit)
-                        return;
                 }
                 catch (Exception e)
                 {
-                    // TODO: Should make this behavior configurable
-                    _output
-                        .Color(ConsoleColor.Red)
-                        .WriteLine(e.Message)
-                        .WriteLine(e.StackTrace);
+                    HandleError(state, e);
                 }
+                if (state.ShouldExit)
+                    return;
             }
+        }
+
+        private void HandleError(EngineState state, Exception e)
+        {
+            // If we're in an error loop (throw an exception while handling a previous exception) show an
+            // angry error message and signal for exit.
+            var currentException = state.GetMetadata(MetadataError);
+            if (currentException != null)
+            {
+                _output
+                    .Color(ConsoleColor.Red)
+                    .WriteLine("Received an exception while attempting to handle a previous exception")
+                    .WriteLine("This is a fatal condition and the engine will exit")
+                    .WriteLine("Make sure you clear the current exception when you are done handling it to avoid these situations")
+                    .WriteLine(e.Message)
+                    .WriteLine(e.StackTrace);
+                state.Exit(ExitCodeCascadeError);
+            }
+
+            // Otherwise add the error-handling script to the command queue so the queue loop can handle it.
+            state.AddMetadata(MetadataError, e, false);
+            state.PrependCommand($"{MetadataRemoveHandler.Name} {MetadataError}");
+            state.PrependCommands(state.EventCatalog.EngineError.GetCommands());
         }
     }
 }

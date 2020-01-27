@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace StoneFruit.Execution
 {
@@ -7,14 +8,16 @@ namespace StoneFruit.Execution
     /// </summary>
     public class EngineState
     {
-        private readonly Queue<string> _additionalCommands;
+        private readonly LinkedList<string> _additionalCommands;
+        private readonly Dictionary<string, object> _metadata;
 
         public EngineState(bool headless, EngineEventCatalog eventCatalog)
         {
             Headless = headless;
             EventCatalog = eventCatalog;
             ShouldExit = false;
-            _additionalCommands = new Queue<string>();
+            _additionalCommands = new LinkedList<string>();
+            _metadata = new Dictionary<string, object>();
         }
 
         public bool ShouldExit { get; private set; }
@@ -28,7 +31,10 @@ namespace StoneFruit.Execution
             ExitCode = exitCode;
         }
 
-        public void AddCommand(string command) => _additionalCommands.Enqueue(command);
+        public void AddCommand(string command)
+        {
+            _additionalCommands.AddLast(command);
+        }
 
         public void AddCommands(IEnumerable<string> commands)
         {
@@ -36,17 +42,54 @@ namespace StoneFruit.Execution
                 AddCommand(command);
         }
 
+        public void PrependCommands(IEnumerable<string> commands)
+        {
+            var list = commands.ToList();
+            for (int i = list.Count - 1; i >= 0; i--)
+                _additionalCommands.AddFirst(list[i]);
+        }
+
+        public void PrependCommand(string command)
+        {
+            _additionalCommands.AddFirst(command);
+        }
+
         public string GetNextCommand()
         {
             if (_additionalCommands.Count == 0)
                 return null;
-            return _additionalCommands.Dequeue();
+            var next = _additionalCommands.First.Value;
+            _additionalCommands.RemoveFirst();
+            return next;
         }
 
         public void ClearAdditionalCommands() => _additionalCommands.Clear();
 
-        // TODO: Configurable loop limit so we don't keep adding commands to the queue in an endless loop
+        public void AddMetadata(string name, object value, bool allowOverwrite = true)
+        {
+            if (_metadata.ContainsKey(name))
+            {
+                if (!allowOverwrite)
+                    return;
+                _metadata.Remove(name);
+            }
 
-        // TODO: Some kind of metadata mechanism so verbs can store metadata here in the state and retrieve it later
+            _metadata.Add(name, value);
+        }
+
+        public object GetMetadata(string name)
+        {
+            if (!_metadata.ContainsKey(name))
+                return null;
+            return _metadata[name];
+        }
+
+        public void RemoveMetadata(string name)
+        {
+            if (_metadata.ContainsKey(name))
+                _metadata.Remove(name);
+        }
+
+        // TODO: Configurable loop limit so we don't keep adding commands to the queue in an endless loop
     }
 }

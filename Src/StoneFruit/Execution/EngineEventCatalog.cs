@@ -7,6 +7,11 @@ namespace StoneFruit.Execution
     {
         public EngineEventCatalog()
         {
+            // When there's an unhandled exception caught by the engine
+            EngineError = new EventScript(
+                $"{ShowExceptionHandler.Name}"
+            );
+
             // Events when the engine starts and then stops headless mode
             EngineStartHeadless = new EventScript();
             EngineStopHeadless = new EventScript();
@@ -51,6 +56,7 @@ namespace StoneFruit.Execution
         public EventScript VerbNotFound { get; }
         public EventScript EnvironmentChanged { get; }
         public EventScript HeadlessHelp { get; }
+        public EventScript EngineError { get; }
     }
 
     public class EventScript
