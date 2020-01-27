@@ -28,7 +28,7 @@ namespace StoneFruit.Cli
                 })
                 .Build();
             Environment.ExitCode = engine.RunWithCommandLineArguments();
-            Console.ReadKey();
+            //Console.ReadKey();
         }
     }
 

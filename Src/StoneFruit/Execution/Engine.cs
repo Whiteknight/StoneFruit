@@ -58,19 +58,16 @@ namespace StoneFruit.Execution
         /// <param name="commandLine"></param>
         public int Run(string commandLine)
         {
-            /*
-             * 1. If we have no args, interactive mode
-             * 2. If we have exactly one arg "help" show help and exit
-             * 3. If we have multiple environments AND we have exactly 1 arg
-             *    AND that arg is a valid environment, switch to that environment and continue interactive
-             * 4. Pass all args as headless mode then, if we don't exit, interactive mode
-             */
+            // If there are no arguments, enter interactive mode
             if (string.IsNullOrEmpty(commandLine))
                 return RunInteractively();
 
+            // if there is exactly one argument and it's the name of a valid environment, start interactive
+            // mode setting that environment first.
             if (_environments.IsValid(commandLine))
                 return RunInteractively(commandLine);
 
+            // Otherwise run in headless mode and figure it out from there.
             return RunHeadless(commandLine);
         }
 
@@ -97,7 +94,8 @@ namespace StoneFruit.Execution
             var dispatcher = new CommandDispatcher(_parser, _commandSource, _environments, state, _output);
             var sources = new CommandSourceCollection();
 
-            // If we have a single argument "help", run the help script and exit
+            // If we have a single argument "help", run the help script and exit. We don't require a valid
+            // environment to run help
             if (commandLine == "help")
             {
                 sources.AddToEnd(new ScriptCommandSource(state.EventCatalog.HeadlessHelp));
@@ -118,19 +116,12 @@ namespace StoneFruit.Execution
                 }
             }
 
+            // Setup the Headless start script, the user command, and the headless stop script before
+            // running the RunLoop
             sources.AddToEnd(new ScriptCommandSource(state.EventCatalog.EngineStartHeadless));
             sources.AddToEnd(new SingleCommandSource(commandLine));
             sources.AddToEnd(new ScriptCommandSource(state.EventCatalog.EngineStopHeadless));
             return RunLoop(state, dispatcher, sources);
-        }
-
-
-        // Attempt to get the raw commandline arguments as they were passed to the application
-        private static string GetRawCommandLineArguments()
-        {
-            var exeName = Environment.GetCommandLineArgs()[0];
-            var firstCommand = Environment.CommandLine.Substring(exeName.Length).Trim();
-            return firstCommand;
         }
 
         /// <summary>
@@ -168,50 +159,48 @@ namespace StoneFruit.Execution
             return RunLoop(state, dispatcher, source);
         }
 
-        // Pulls commands from the command source until the source is empty or an exit signal is received
-        // Each command is added to the command queue and the queue is drained
-        private int RunLoop(EngineState state, CommandDispatcher dispatcher, CommandSourceCollection sources)
+        // Attempt to get the raw commandline arguments as they were passed to the application. We have to
+        // do it this way because (string[] args) will be parsed by the shell and quotes may be stripped
+        // from arguments. Environment.CommandLine is unmodified but we have to pull the exe name off the
+        // front.
+        private static string GetRawCommandLineArguments()
         {
-            // Drain the state queue first, in case there's anything in there.
-            ExecuteCommandQueue(state, dispatcher);
-            if (state.ShouldExit)
-                return state.ExitCode;
-
-            // Now start draining the command source, executing each in turn.
-            while (true)
-            {
-                var command = sources.GetNextCommand();
-                if (string.IsNullOrEmpty(command))
-                    return state.ExitCode;
-                state.AddCommand(command);
-                ExecuteCommandQueue(state, dispatcher);
-                if (state.ShouldExit)
-                    return state.ExitCode;
-            }
+            var exeName = Environment.GetCommandLineArgs()[0];
+            var firstCommand = Environment.CommandLine.Substring(exeName.Length).Trim();
+            return firstCommand;
         }
 
-        // Drains the command queue. Executed commands may add more commands to the queue during execution
-        // so we loop until the queue is empty or until an exit signal is received
-        private void ExecuteCommandQueue(EngineState state, CommandDispatcher dispatcher)
+        // Pulls commands from the command source until the source is empty or an exit signal is received
+        // Each command is added to the command queue and the queue is drained. 
+        private int RunLoop(EngineState state, CommandDispatcher dispatcher, CommandSourceCollection sources)
         {
             while (true)
             {
-                var commandString = state.GetNextCommand();
-                if (string.IsNullOrEmpty(commandString))
-                    return;
+                // Get a command. If we have one in the state use that. Otherwise try to get one from the
+                // sources.
+                var command = state.GetNextCommand();
+                if (string.IsNullOrEmpty(command))
+                    command = sources.GetNextCommand();
+                if (string.IsNullOrEmpty(command))
+                    return ExitCodeOk;
+
+                // Dispatch the command to the handler, dealing with any errors that may arise
                 try
                 {
-                    dispatcher.Execute(commandString);
+                    dispatcher.Execute(command);
                 }
                 catch (Exception e)
                 {
                     HandleError(state, e);
                 }
+
+                // If exit is signaled, return. 
                 if (state.ShouldExit)
-                    return;
+                    return state.ExitCode;
             }
         }
 
+        // Handle an error from the dispatcher.
         private void HandleError(EngineState state, Exception e)
         {
             // If we're in an error loop (throw an exception while handling a previous exception) show an

@@ -88,7 +88,7 @@ namespace StoneFruit.Execution
 
         /// <summary>
         /// "help" has been executed in headless mode. Can be used to show more detail than a simple help
-        /// handler
+        /// handle. Notice that this script may be run without a valid environment set.
         /// </summary>
         public EventScript HeadlessHelp { get; }
 
