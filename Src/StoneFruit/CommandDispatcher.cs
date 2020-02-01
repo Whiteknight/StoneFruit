@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
@@ -26,42 +27,54 @@ namespace StoneFruit
             Output = output;
         }
 
-        private void Execute(CompleteCommand completeCommand)
+        private void Execute(CompleteCommand completeCommand, CancellationTokenSource tokenSource = null)
         {
             Assert.ArgumentNotNull(completeCommand, nameof(completeCommand));
-            var verbObject = Commands.GetInstance(completeCommand, this) ?? new NotFoundHandler(completeCommand, State, Output);
-            var syncVerb = (verbObject as ICommandHandler) ?? new AsyncDispatchHandler(verbObject as ICommandHandlerAsync);
-            syncVerb.Execute();
+            var handler = Commands.GetInstance(completeCommand, this) ?? new NotFoundHandler(completeCommand, State, Output);
+            var syncHandler = GetSynchronousHandler(tokenSource, handler);
+            syncHandler.Execute();
         }
 
-        public void Execute(string commandString)
+        private static ICommandHandler GetSynchronousHandler(CancellationTokenSource tokenSource, ICommandHandlerBase verbObject)
+        {
+            if (verbObject is ICommandHandler syncVerb)
+                return syncVerb;
+
+            tokenSource ??= new CancellationTokenSource();
+            return new AsyncDispatchHandler(verbObject as ICommandHandlerAsync, tokenSource);
+        }
+
+        public void Execute(string commandString, CancellationTokenSource tokenSource = null)
         {
             Assert.ArgumentNotNullOrEmpty(commandString, nameof(commandString));
             var completeCommand = Parser.ParseCommand(commandString);
-            Execute(completeCommand);
+            Execute(completeCommand, tokenSource);
         }
 
-        public void Execute(string verb, CommandArguments args)
+        public void Execute(string verb, CommandArguments args, CancellationTokenSource tokenSource = null)
         {
             Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
             var completeCommand = new CompleteCommand(verb, args);
-            Execute(completeCommand);
+            Execute(completeCommand, tokenSource);
         }
 
         private class AsyncDispatchHandler : ICommandHandler
         {
             private readonly ICommandHandlerAsync _asyncHandler;
+            private readonly CancellationTokenSource _tokenSource;
 
-            public AsyncDispatchHandler(ICommandHandlerAsync asyncHandler)
+            public AsyncDispatchHandler(ICommandHandlerAsync asyncHandler, CancellationTokenSource tokenSource)
             {
                 _asyncHandler = asyncHandler;
+                _tokenSource = tokenSource;
             }
 
             public void Execute()
             {
                 if (_asyncHandler == null)
                     return;
-                Task.Run(async () => await _asyncHandler.ExecuteAsync()).ConfigureAwait(false).GetAwaiter().GetResult();
+                var token = _tokenSource.Token;
+                Task.Run(async () => await _asyncHandler.ExecuteAsync(token), token).ConfigureAwait(false).GetAwaiter().GetResult();
             }
         }
 

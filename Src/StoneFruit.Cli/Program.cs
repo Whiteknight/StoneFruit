@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
@@ -69,7 +70,7 @@ namespace StoneFruit.Cli
 
     public class TestCCommand : ICommandHandlerAsync
     {
-        public Task ExecuteAsync()
+        public Task ExecuteAsync(CancellationToken cancellation)
         {
             Console.WriteLine("TESTC");
             return Task.CompletedTask;

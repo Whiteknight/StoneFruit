@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace StoneFruit
 {
@@ -16,6 +17,6 @@ namespace StoneFruit
 
     public interface ICommandHandlerAsync : ICommandHandlerBase
     {
-        Task ExecuteAsync();
+        Task ExecuteAsync(CancellationToken cancellation);
     }
 }

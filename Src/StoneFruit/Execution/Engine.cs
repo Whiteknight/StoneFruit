@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using StoneFruit.BuiltInVerbs;
 using StoneFruit.Execution.CommandSources;
 using StoneFruit.Execution.Environments;
@@ -187,7 +188,11 @@ namespace StoneFruit.Execution
                 // Dispatch the command to the handler, dealing with any errors that may arise
                 try
                 {
-                    dispatcher.Execute(command);
+                    // TODO: Figure out how to set this? I assume ctrl+c would break it, but we would need
+                    // to setup handlers for that throughout
+                    // TODO: Should we maybe set some kind of timeout?
+                    var tokenSource = new CancellationTokenSource();
+                    dispatcher.Execute(command, tokenSource);
                 }
                 catch (Exception e)
                 {
