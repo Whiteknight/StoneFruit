@@ -13,7 +13,7 @@ namespace StoneFruit.Execution.Arguments
     /// </summary>
     public class PowershellStyleArgumentGrammar
     {
-        public static IParser<char, IEnumerable<IArgument>> GetParser()
+        public static IParser<char, IArgument> GetParser()
         {
             var doubleQuotedString = StrippedDoubleQuotedStringWithEscapedQuotes();
 
@@ -64,12 +64,14 @@ namespace StoneFruit.Execution.Arguments
                 values.Transform(v => new[] { new PositionalArgument(v) })
             );
 
-            return Rule(
+            var whitespaceAndArgs = Rule(
                 whitespace,
                 args,
 
                 (ws, arg) => arg
             );
+
+            return whitespaceAndArgs.Flatten<char, IEnumerable<IArgument>, IArgument>();
         }
     }
 }

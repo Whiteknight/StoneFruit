@@ -24,6 +24,7 @@ namespace StoneFruit.Execution.Arguments
 
         public CommandArguments(IReadOnlyList<IArgument> arguments)
         {
+            Raw = string.Empty;
             _positionals = arguments
                 .OfType<PositionalArgument>()
                 .ToList();
@@ -38,10 +39,29 @@ namespace StoneFruit.Execution.Arguments
             _positionalIndex = 0;
         }
 
+        public CommandArguments(string rawArgs, IReadOnlyList<IArgument> arguments)
+        {
+            Raw = rawArgs;
+            _positionals = arguments
+                .OfType<PositionalArgument>()
+                .ToList();
+            _nameds = arguments
+                .OfType<NamedArgument>()
+                .GroupBy(n => n.Name.ToLowerInvariant())
+                .ToDictionary(g => g.Key, g => g.ToList());
+            _flags = arguments
+                .OfType<FlagArgument>()
+                .GroupBy(f => f.Name.ToLowerInvariant())
+                .ToDictionary(g => g.Key, g => g.FirstOrDefault());
+            _positionalIndex = 0;
+        }
+
+        public string Raw { get; }
+
         public static CommandArguments Empty() => new CommandArguments();
 
         public static CommandArguments Single(string arg) 
-            => new CommandArguments(new[] { new PositionalArgument(arg) });
+            => new CommandArguments(arg, new[] { new PositionalArgument(arg) });
 
         public IArgument Shift()
         {

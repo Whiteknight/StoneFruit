@@ -11,8 +11,8 @@ namespace StoneFruit.Tests.Execution.Arguments
     {
         private static CommandArguments Parse(string args)
         {
-            var parser = PosixStyleArgumentGrammar.GetParser().List().Transform(a => a.SelectMany(x => x));
-            var arguments = parser.Parse(args).Value.ToList();
+            var parser = PosixStyleArgumentGrammar.GetParser();
+            var arguments = parser.List().Parse(args).Value.ToList();
             return new CommandArguments(arguments);
         }
 

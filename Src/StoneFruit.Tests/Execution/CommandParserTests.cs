@@ -65,5 +65,54 @@ namespace StoneFruit.Tests.Execution
             result.Y.Should().Be("b");
             result.Z.Should().Be("c");
         }
+
+        private CommandParser GetSimplifiedParser()
+            => new CommandParser(SimplifiedArgumentGrammar.GetParser());
+
+        [Test]
+        public void ParseCommand_Simplified_Positional()
+        {
+            var parser = GetSimplifiedParser();
+            var result = parser.ParseCommand("my-verb testa testb testc");
+            result.Verb.Should().Be("my-verb");
+            result.Arguments.Get(0).Value.Should().Be("testa");
+            result.Arguments.Get(1).Value.Should().Be("testb");
+            result.Arguments.Get(2).Value.Should().Be("testc");
+        }
+
+        [Test]
+        public void ParseCommand_Simplified_Named()
+        {
+            var parser = GetSimplifiedParser();
+            var result = parser.ParseCommand("my-verb name1=value1 name2=value2");
+            result.Verb.Should().Be("my-verb");
+            var named1 = result.Arguments.Get("name1");
+            named1.Value.Should().Be("value1");
+            var named2 = result.Arguments.Get("name2");
+            named2.Value.Should().Be("value2");
+        }
+
+        [Test]
+        public void ParseCommand_Simplified_Flags()
+        {
+            var parser = GetSimplifiedParser();
+            var result = parser.ParseCommand("my-verb -flaga -flagb");
+            result.Verb.Should().Be("my-verb");
+            result.Command.Should().Be("my-verb -flaga -flagb");
+            result.Arguments.Raw.Should().Be("-flaga -flagb");
+            result.Arguments.HasFlag("flaga").Should().BeTrue();
+            result.Arguments.HasFlag("flagb").Should().BeTrue();
+            result.Arguments.HasFlag("flagc").Should().BeFalse();
+        }
+
+        [Test]
+        public void ParseCommand_Simplified_Raw()
+        {
+            var parser = GetSimplifiedParser();
+            var result = parser.ParseCommand("my-verb positional named=value -flag");
+
+            result.Command.Should().Be("my-verb positional named=value -flag");
+            result.Arguments.Raw.Should().Be("positional named=value -flag");
+        }
     }
 }

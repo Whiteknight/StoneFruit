@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using ParserObjects;
+using ParserObjects.Parsers;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Environments;
@@ -14,7 +15,7 @@ namespace StoneFruit
         private readonly CombinedCommandHandlerSource _commandSource;
         private readonly EngineEventCatalog _eventCatalog;
         private IEnvironmentCollection _environments;
-        private IParser<char, CommandArguments> _argParser;
+        private IParser<char, IArgument> _argParser;
         private ITerminalOutput _output;
 
         public EngineBuilder()
@@ -96,8 +97,15 @@ namespace StoneFruit
         /// <returns></returns>
         public EngineBuilder UseArgumentParser(IParser<char, IArgument> argParser)
         {
-            var parser = CommandArgumentsGrammar.GetParser(argParser);
-            return UseArgumentParser(parser);
+            if (argParser == null)
+            {
+                _argParser = null;
+                return this;
+            }
+
+            EnsureArgumentParserNotSet();
+            _argParser = argParser;
+            return this;
         }
 
         /// <summary>
@@ -107,20 +115,8 @@ namespace StoneFruit
         /// <returns></returns>
         public EngineBuilder UseArgumentParser(IParser<char, IEnumerable<IArgument>> argParser)
         {
-            var parser = CommandArgumentsGrammar.GetParser(argParser);
+            var parser = argParser.Flatten<char, IEnumerable<IArgument>, IArgument>();
             return UseArgumentParser(parser);
-        }
-
-        /// <summary>
-        /// Specify an argument parser to use
-        /// </summary>
-        /// <param name="argParser"></param>
-        /// <returns></returns>
-        public EngineBuilder UseArgumentParser(IParser<char, CommandArguments> argParser)
-        {
-            EnsureArgumentParserNotSet();
-            _argParser = argParser;
-            return this;
         }
 
         public EngineBuilder UseSimplifiedArgumentParser()

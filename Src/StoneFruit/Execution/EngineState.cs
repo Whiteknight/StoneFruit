@@ -4,7 +4,8 @@ using System.Linq;
 namespace StoneFruit.Execution
 {
     /// <summary>
-    /// The runtime state of the engine.
+    /// The runtime state of the engine. Controls the execution of the
+    /// engine and contains data which persists between command executions
     /// </summary>
     public class EngineState
     {

@@ -13,7 +13,7 @@ namespace StoneFruit.Execution.Arguments
     /// </summary>
     public class PosixStyleArgumentGrammar
     {
-        public static IParser<char, IEnumerable<IArgument>> GetParser()
+        public static IParser<char, IArgument> GetParser()
         {
             var doubleQuotedString = StrippedDoubleQuotedStringWithEscapedQuotes();
 
@@ -99,12 +99,14 @@ namespace StoneFruit.Execution.Arguments
                 value.Transform(v => new [] { new PositionalArgument(v) })
             );
 
-            return Rule(
+            var whitespaceAndArgs = Rule(
                 whitespace.Optional(),
                 args,
 
                 (ws, arg) => arg
             );
+
+            return whitespaceAndArgs.Flatten<char, IEnumerable<IArgument>, IArgument>();
         }
     }
 }
