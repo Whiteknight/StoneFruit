@@ -2,15 +2,15 @@
 
 namespace StoneFruit.BuiltInVerbs
 {
-    [CommandName(Name, showInHelp: false)]
-    public class EchoHandler : ICommandHandler
+    [Verb(Name, showInHelp: false)]
+    public class EchoHandler : IHandler
     {
         public const string Name = "echo";
 
-        private readonly ITerminalOutput _output;
+        private readonly IOutput _output;
         private readonly CommandArguments _args;
 
-        public EchoHandler(ITerminalOutput output, CommandArguments args)
+        public EchoHandler(IOutput output, CommandArguments args)
         {
             _output = output;
             _args = args;

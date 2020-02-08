@@ -5,28 +5,28 @@ namespace StoneFruit.Execution.Output
     /// <summary>
     /// An ITerminalOutput adaptor for System.Console and ReadLine
     /// </summary>
-    public class ConsoleTerminalOutput : ITerminalOutput
+    public class ConsoleOutput : IOutput
     {
-        public ITerminalOutput Color(Brush brush)
+        public IOutput Color(Brush brush)
         {
             if (brush.Equals(Brush.Current))
                 return this;
-            return new ColoredTerminalOutputWrapper(brush, this);
+            return new ColoredOutputWrapper(brush, this);
         }
 
-        public ITerminalOutput WriteLine()
+        public IOutput WriteLine()
         {
             Console.WriteLine();
             return this;
         }
 
-        public ITerminalOutput WriteLine(string line)
+        public IOutput WriteLine(string line)
         {
             Console.WriteLine(line);
             return this;
         }
 
-        public ITerminalOutput Write(string str)
+        public IOutput Write(string str)
         {
             Console.Write(str);
             return this;

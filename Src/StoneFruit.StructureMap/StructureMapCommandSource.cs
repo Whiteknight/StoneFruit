@@ -7,7 +7,7 @@ using StructureMap;
 
 namespace StoneFruit.StructureMap
 {
-    public class StructureMapCommandSource : ICommandHandlerSource
+    public class StructureMapCommandSource : IHandlerSource
     {
         private readonly IContainer _container;
         private readonly IReadOnlyDictionary<string, Type> _nameMap;
@@ -31,7 +31,7 @@ namespace StoneFruit.StructureMap
         private IReadOnlyDictionary<string, Type> SetupNameMapping()
         {
             var commandTypes = _container.Model.AllInstances
-                .Where(i => typeof(ICommandHandlerBase).IsAssignableFrom(i.PluginType))
+                .Where(i => typeof(IHandlerBase).IsAssignableFrom(i.PluginType))
                 .Select(i => i.ReturnedType ?? i.PluginType)
                 .ToList();
 
@@ -44,23 +44,23 @@ namespace StoneFruit.StructureMap
                 .ToDictionaryUnique();
         }
 
-        public ICommandHandlerBase GetInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher)
+        public IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher)
         {
-            var verb = completeCommand.Verb.ToLowerInvariant();
+            var verb = command.Verb.ToLowerInvariant();
             var type = _nameMap.ContainsKey(verb) ? _nameMap[verb] : null;
-            return type == null ? null : ResolveCommand(completeCommand, dispatcher, type);
+            return type == null ? null : ResolveCommand(command, dispatcher, type);
         }
 
-        public ICommandHandlerBase GetInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher) 
-            where TCommand : class, ICommandHandlerBase
-            => ResolveCommand(completeCommand, dispatcher, typeof(TCommand));
+        public IHandlerBase GetInstance<TCommand>(Command Command, CommandDispatcher dispatcher) 
+            where TCommand : class, IHandlerBase
+            => ResolveCommand(Command, dispatcher, typeof(TCommand));
 
         public IEnumerable<IVerbInfo> GetAll() => _nameMap.Select(kvp => new VerbInfo(kvp.Key, kvp.Value));
 
         public IVerbInfo GetByName(string name)
             => _nameMap.ContainsKey(name) ? new VerbInfo(name, _nameMap[name]) : null;
 
-        private ICommandHandlerBase ResolveCommand(CompleteCommand completeCommand, CommandDispatcher dispatcher, Type type)
+        private IHandlerBase ResolveCommand(Command Command, CommandDispatcher dispatcher, Type type)
         {
             // TODO: Some of these .With() instances are long-lived and probably can be registered
             // into the container properly instead of treated transiently. I don't know if this is a
@@ -74,14 +74,14 @@ namespace StoneFruit.StructureMap
                 .With(dispatcher.Parser)
 
                 // transient
-                .With(completeCommand)
-                .With(completeCommand.Arguments)
-                .With(typeof(ICommandHandlerSource), this);
+                .With(Command)
+                .With(Command.Arguments)
+                .With(typeof(IHandlerSource), this);
             if (dispatcher.Environments.Current != null)
                 context = context.With(dispatcher.Environments.Current.GetType(), dispatcher.Environments.Current);
 
             var instance = context.GetInstance(type);
-            return instance as ICommandHandlerBase;
+            return instance as IHandlerBase;
         }
 
         private class VerbInfo : IVerbInfo

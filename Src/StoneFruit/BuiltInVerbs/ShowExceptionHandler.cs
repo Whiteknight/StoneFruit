@@ -3,15 +3,15 @@ using StoneFruit.Execution;
 
 namespace StoneFruit.BuiltInVerbs
 {
-    [CommandName(Name, false)]
-    public class ShowExceptionHandler : ICommandHandler
+    [Verb(Name, false)]
+    public class ShowExceptionHandler : IHandler
     {
         public const string Name = "showerror";
 
         private readonly EngineState _state;
-        private readonly ITerminalOutput _output;
+        private readonly IOutput _output;
 
-        public ShowExceptionHandler(EngineState state, ITerminalOutput output)
+        public ShowExceptionHandler(EngineState state, IOutput output)
         {
             _state = state;
             _output = output;

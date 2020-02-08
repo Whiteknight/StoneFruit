@@ -3,19 +3,19 @@ using System.Threading.Tasks;
 
 namespace StoneFruit
 {
-    public interface ICommandHandlerBase
+    public interface IHandlerBase
     {
     }
 
     /// <summary>
     /// Implements a verb
     /// </summary>
-    public interface ICommandHandler : ICommandHandlerBase
+    public interface IHandler : IHandlerBase
     {
         void Execute();
     }
 
-    public interface ICommandHandlerAsync : ICommandHandlerBase
+    public interface IAsyncHandler : IHandlerBase
     {
         Task ExecuteAsync(CancellationToken cancellation);
     }

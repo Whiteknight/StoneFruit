@@ -20,19 +20,35 @@ public static void Main(string[] args)
     var engine = new EngineBuilder()
         // ... setup the engine here ...
         .Build();
-    engine.Run(args);
+    engine.RunWithCommandLineArguments();
 }
 ```
 
 ## Key Concepts
 
+### Verbs, Commands and Handlers
+
+A **verb** is the name of the thing you want to do. A **command** is a combination of a verb and an optional list of arguments. A **handler** is the class which is invoked for a specific verb.
+
+Handlers are implemented in code with the `ICommandHandler` interface which exposes a `.Execute()` method. Any dependencies required by the class should be injected into the constructor. There are several types which can be injected by default, and more if you integrate your own DI/IoC container:
+
+* `ITerminalOutput` An abstraction over the output stream. By default wraps `System.Console` methods with a few helper methods thrown in (you can use `System.Console` if you prefer)
+* `IEnvironmentCollection` Provides access to the current environment and the list of possible environments
+* `CommandArguments` Provides access to the arguments of the command, if any
+* `EngineState` Provides access to the internal state of the execution engine, allowing you to control program execution and store metadata.
+* `ICommandHandlerSource` Provides access to all handlers in the system and their corresponding verbs.
+* 'CommandDispatcher' allows you to execute commands
+* 'CommandParser' allows you to parse commands and argument lists into objects
+
+The `ICommandHandlerSource` abstraction is responsible for managing a list of available verbs. This is where your DI/IoC container is most useful: scanning assemblies in the solution to find available `ICommandHandler` implementations and then to construct them using available dependencies.
+
 ### Interactive and Headless Modes
 
-StoneFruit supports two modes of operation: Interactive and Headless. In Interactive Mode StoneFruit will provide a prompt where you can enter verbs one after the other. In headless mode there is no prompt, and a single verb will be read from the commandline arguments passed to the program. 
+StoneFruit supports two modes of operation: Interactive and Headless. In Interactive Mode StoneFruit will provide a prompt where you can enter commands one after the other. In headless mode there is no prompt, and a single command will be read from the commandline arguments passed to the program. You can instruct the Engine to run in headless or interactive mode, or to see if there are any command-line arguments and decide which mode to enter.
 
 ### Environments
 
-StoneFruit supports the concept of "Environments". An environment is an execution context in which multiple subsequent verbs are executed. Consider the case where you have multiple execution environments ("Local", "Integration" and "Production" for example) with different configurations for each. Or consider that you want to work with multiple different resources, but only connect to one at a time. What's important is that each environment has a unique name.
+StoneFruit supports the concept of "Environments". An environment is an execution context in which commands are executed. Consider the case where you have multiple execution environments ("Local", "Integration" and "Production" for example) with different configurations for each. Or consider that you want to work with multiple different resources, but only connect to one at a time. What's important is that each environment has a unique name.
 
 An environment object can be any type of object you want. It can be a wrapper around a config file, or storage for runtime metadata, or whatever you want it to be. The `IEnvironmentFactory` is tasked with creating a new environment object given the selected environment name and providing a list of possible names. *You must provide or configure an `IEnvironmentFactory` implementation yourself*. StoneFruit cannot infer what your execution context is.
 
@@ -66,20 +82,6 @@ public class MyEnvironmentFactory : IEnvironmentFactory
 ```
 
 If your application does not use environments or only uses a single environment, you don't need to worry about it after setup. If you support multiple environments, you will be required to specify. In headless mode you must provide the name of the environment to use as the first argument on the command line. If you are running in interactive mode, StoneFruit will prompt you to select an environment before any verbs may be executed. You can change your current active environment at any time by using the `change-env` verb.
-
-### Verbs and `ICommandSource`
-
-Verbs are implemented in code with `ICommandVerb`. Each verb class must provide a `.Execute()` method. Any dependencies required by the class should be injected into the constructor. There are several types which can be injected by default, and more if you integrate your own DI/IoC container:
-
-* `ITerminalOutput` An abstraction over the output stream. By default wraps `System.Console` methods with a few helper methods thrown in (you can use `System.Console` if you prefer)
-* `IEnvironmentCollection` Provides access to the current environment and the list of possible environments
-* `CommandArguments` Provides access to the arguments passed to the verb, if any
-* `EngineState` Provides access to the internal state of the execution engine, allowing you to control program execution.
-* `ICommandSource` Provides access to all verbs in the system.
-
-When a verb is executed, a new instance of the corresponding `ICommandVerb` class is instantiated with appropriate arguments, and the `.Execute()` method is called.
-
-The `ICommandSource` abstraction is responsible for managing a list of available verbs. This is where your DI/IoC container is most useful: scanning assemblies in the solution to find available `ICommandVerb` implementations and then to construct them using available dependencies.
 
 ### Get Help
 

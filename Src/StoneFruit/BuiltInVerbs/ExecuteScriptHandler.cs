@@ -6,8 +6,8 @@ using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.BuiltInVerbs
 {
-    [CommandName("exec")]
-    public class ExecuteScriptHandler : ICommandHandler
+    [Verb("exec")]
+    public class ExecuteScriptHandler : IHandler
     {
         private readonly CommandArguments _args;
         private readonly EngineState _state;

@@ -3,9 +3,9 @@ using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.BuiltInVerbs
 {
-    [CommandName(Name)]
-    [CommandName("quit", showInHelp: false)]
-    public class ExitHandler : ICommandHandler
+    [Verb(Name)]
+    [Verb("quit", showInHelp: false)]
+    public class ExitHandler : IHandler
     {
         public const string Name = "exit";
 

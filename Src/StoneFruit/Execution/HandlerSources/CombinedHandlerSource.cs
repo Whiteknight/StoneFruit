@@ -6,27 +6,27 @@ namespace StoneFruit.Execution.HandlerSources
     /// <summary>
     /// Combines multiple ICommandSource implementations together in priorty order.
     /// </summary>
-    public class CombinedCommandHandlerSource : ICommandHandlerSource
+    public class CombinedHandlerSource : IHandlerSource
     {
-        private readonly List<ICommandHandlerSource> _sources;
+        private readonly List<IHandlerSource> _sources;
 
-        public CombinedCommandHandlerSource()
+        public CombinedHandlerSource()
         {
-            _sources = new List<ICommandHandlerSource>();
+            _sources = new List<IHandlerSource>();
         }
 
-        public ICommandHandlerBase GetInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher)
+        public IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher)
         {
             return _sources
-                .Select(source => source.GetInstance(completeCommand, dispatcher))
+                .Select(source => source.GetInstance(command, dispatcher))
                 .FirstOrDefault(commandVerb => commandVerb != null);
         }
 
-        public ICommandHandlerBase GetInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher) 
-            where TCommand : class, ICommandHandlerBase
+        public IHandlerBase GetInstance<TCommand>(Command command, CommandDispatcher dispatcher) 
+            where TCommand : class, IHandlerBase
         {
             return _sources
-                .Select(source => source.GetInstance<TCommand>(completeCommand, dispatcher))
+                .Select(source => source.GetInstance<TCommand>(command, dispatcher))
                 .FirstOrDefault(commandVerb => commandVerb != null);
         }
 
@@ -37,14 +37,14 @@ namespace StoneFruit.Execution.HandlerSources
                 .Select(g => g.First());
         }
 
-        public void Add(ICommandHandlerSource source)
+        public void Add(IHandlerSource source)
         {
             if (source == null)
                 return;
             _sources.Add(source);
         }
 
-        public ICommandHandlerSource Simplify()
+        public IHandlerSource Simplify()
         {
             return _sources.Count == 1 ? _sources[0] : this;
         }

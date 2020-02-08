@@ -45,11 +45,11 @@ namespace StoneFruit.Cli
         public string Arg3 { get; set; }
     }
 
-    public class TestACommand : ICommandHandler
+    public class TestAHandler : IHandler
     {
         private readonly TestArgsA _args;
 
-        public TestACommand(CommandParser parser)
+        public TestAHandler(CommandParser parser)
         {
             _args = parser.ParseArguments("x y z").MapTo<TestArgsA>();
         }
@@ -60,7 +60,8 @@ namespace StoneFruit.Cli
         }
     }
 
-    public class TestBCommand : ICommandHandler
+    [Verb("b")]
+    public class TestBHandler : IHandler
     {
         public void Execute()
         {
@@ -68,7 +69,7 @@ namespace StoneFruit.Cli
         }
     }
 
-    public class TestCCommand : ICommandHandlerAsync
+    public class TestCHandler : IAsyncHandler
     {
         public Task ExecuteAsync(CancellationToken cancellation)
         {

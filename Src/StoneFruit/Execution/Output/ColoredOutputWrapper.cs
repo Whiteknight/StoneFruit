@@ -2,37 +2,37 @@
 
 namespace StoneFruit.Execution.Output
 {
-    public class ColoredTerminalOutputWrapper : ITerminalOutput
+    public class ColoredOutputWrapper : IOutput
     {
         private readonly Brush _color;
-        private readonly ITerminalOutput _inner;
+        private readonly IOutput _inner;
 
-        public ColoredTerminalOutputWrapper(Brush color, ITerminalOutput inner)
+        public ColoredOutputWrapper(Brush color, IOutput inner)
         {
             _color = color;
             _inner = inner;
         }
 
-        public ITerminalOutput Color(Brush brush)
+        public IOutput Color(Brush brush)
         {
             if (brush.Equals(_color))
                 return this;
-            return new ColoredTerminalOutputWrapper(brush, _inner);
+            return new ColoredOutputWrapper(brush, _inner);
         }
 
-        public ITerminalOutput WriteLine()
+        public IOutput WriteLine()
         {
             WithBrush(() => _inner.WriteLine());
             return this;
         }
 
-        public ITerminalOutput WriteLine(string line)
+        public IOutput WriteLine(string line)
         {
             WithBrush(() => _inner.WriteLine(line));
             return this;
         }
 
-        public ITerminalOutput Write(string str)
+        public IOutput Write(string str)
         {
             WithBrush(() => _inner.Write(str));
             return this;

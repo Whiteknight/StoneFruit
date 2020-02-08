@@ -4,16 +4,16 @@ using System.Linq;
 
 namespace StoneFruit.Execution.HandlerSources
 {
-    public class NamedInstanceCommandSource : ICommandHandlerSource
+    public class NamedInstanceSource : IHandlerSource
     {
         private readonly Dictionary<string, VerbInfo> _verbs;
 
-        public NamedInstanceCommandSource()
+        public NamedInstanceSource()
         {
             _verbs = new Dictionary<string, VerbInfo>();
         }
 
-        public void Add(string verb, ICommandHandler handlerObject, string description = null, string help = null)
+        public void Add(string verb, IHandler handlerObject, string description = null, string help = null)
         {
             verb = verb.ToLowerInvariant();
             if (_verbs.ContainsKey(verb))
@@ -22,11 +22,11 @@ namespace StoneFruit.Execution.HandlerSources
             _verbs.Add(verb, info);
         }
 
-        public ICommandHandlerBase GetInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher) 
-            => _verbs.ContainsKey(completeCommand.Verb) ? _verbs[completeCommand.Verb].HandlerObject : null;
+        public IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher) 
+            => _verbs.ContainsKey(command.Verb) ? _verbs[command.Verb].HandlerObject : null;
 
-        public ICommandHandlerBase GetInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher) 
-            where TCommand : class, ICommandHandlerBase
+        public IHandlerBase GetInstance<TCommand>(Command command, CommandDispatcher dispatcher) 
+            where TCommand : class, IHandlerBase
             => _verbs.Values.OfType<TCommand>().FirstOrDefault();
 
         public IEnumerable<IVerbInfo> GetAll() => _verbs.Values;
@@ -35,7 +35,7 @@ namespace StoneFruit.Execution.HandlerSources
 
         private class VerbInfo : IVerbInfo
         {
-            public VerbInfo(string verb, ICommandHandler handlerObject, string description, string help)
+            public VerbInfo(string verb, IHandler handlerObject, string description, string help)
             {
                 Verb = verb;
                 HandlerObject = handlerObject;
@@ -43,7 +43,7 @@ namespace StoneFruit.Execution.HandlerSources
                 Help = help;
             }
 
-            public ICommandHandler HandlerObject { get; }
+            public IHandler HandlerObject { get; }
             public string Verb { get; }
             public string Description { get; }
             public string Help { get; }

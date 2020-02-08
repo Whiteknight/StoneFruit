@@ -8,11 +8,11 @@ namespace StoneFruit.Execution.HandlerSources
     /// <summary>
     /// A command source which takes a list of Type and attempts to construct one using built-in mechanisms
     /// </summary>
-    public class TypeListConstructCommandSource : ICommandHandlerSource
+    public class TypeListConstructSource : IHandlerSource
     {
         private readonly IReadOnlyDictionary<string, Type> _commands;
 
-        public TypeListConstructCommandSource(IEnumerable<Type> commandTypes)
+        public TypeListConstructSource(IEnumerable<Type> commandTypes)
         {
             _commands = commandTypes
                 .OrEmptyIfNull()
@@ -23,17 +23,17 @@ namespace StoneFruit.Execution.HandlerSources
                 .ToDictionaryUnique();
         }
 
-        public ICommandHandlerBase GetInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher)
+        public IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher)
         {
-            var commandType = _commands.ContainsKey(completeCommand.Verb) ? _commands[completeCommand.Verb] : null;
-            return commandType == null ? null : ResolveInstance(completeCommand, dispatcher, commandType);
+            var commandType = _commands.ContainsKey(command.Verb) ? _commands[command.Verb] : null;
+            return commandType == null ? null : ResolveInstance(command, dispatcher, commandType);
         }
 
-        public ICommandHandlerBase GetInstance<TCommand>(CompleteCommand completeCommand, CommandDispatcher dispatcher)
-            where TCommand : class, ICommandHandlerBase
-            => ResolveInstance(completeCommand, dispatcher, typeof(TCommand));
+        public IHandlerBase GetInstance<TCommand>(Command command, CommandDispatcher dispatcher)
+            where TCommand : class, IHandlerBase
+            => ResolveInstance(command, dispatcher, typeof(TCommand));
 
-        private ICommandHandlerBase ResolveInstance(CompleteCommand completeCommand, CommandDispatcher dispatcher, Type commandType)
+        private IHandlerBase ResolveInstance(Command command, CommandDispatcher dispatcher, Type commandType)
         {
             var commandVerb = DuckTypeConstructorInvoker.TryConstruct(commandType, new[]
             {
@@ -46,11 +46,11 @@ namespace StoneFruit.Execution.HandlerSources
 
                 // transient objects
                 dispatcher.Environments.Current,
-                completeCommand,
-                completeCommand.Arguments,
+                command,
+                command.Arguments,
                 this
             });
-            return commandVerb as ICommandHandlerBase;
+            return commandVerb as IHandlerBase;
         }
 
         public IEnumerable<IVerbInfo> GetAll() => _commands.Select(kvp => new VerbInfo(kvp.Key, kvp.Value));

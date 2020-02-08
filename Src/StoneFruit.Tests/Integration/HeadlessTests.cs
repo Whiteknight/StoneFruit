@@ -10,7 +10,7 @@ namespace StoneFruit.Tests.Integration
         [Test]
         public void StartAndStopEvents_Test()
         {
-            var output = new TestTerminalOutput();
+            var output = new TestOutput();
             var engine = new EngineBuilder()
                 .UseCommandType(typeof(EchoHandler))
                 .UseTerminalOutput(output)
@@ -27,12 +27,12 @@ namespace StoneFruit.Tests.Integration
             output.Lines[2].Should().Be("stop");
         }
 
-        [CommandName("test-help")]
-        public class TestHelpHandler : ICommandHandler
+        [Verb("test-help")]
+        public class TestHelpHandler : IHandler
         {
-            private readonly ITerminalOutput _output;
+            private readonly IOutput _output;
 
-            public TestHelpHandler(ITerminalOutput output)
+            public TestHelpHandler(IOutput output)
             {
                 _output = output;
             }
@@ -46,7 +46,7 @@ namespace StoneFruit.Tests.Integration
         [Test]
         public void HeadlessHelp_Test()
         {
-            var output = new TestTerminalOutput();
+            var output = new TestOutput();
             var engine = new EngineBuilder()
                 .UseCommandType(typeof(TestHelpHandler))
                 .UseTerminalOutput(output)

@@ -8,9 +8,9 @@ namespace StoneFruit.StructureMap
         {
             config.Scan(s =>
             {
-                s.AssemblyContainingType<ICommandHandlerBase>();
+                s.AssemblyContainingType<IHandlerBase>();
                 s.AssembliesFromApplicationBaseDirectory();
-                s.AddAllTypesOf<ICommandHandlerBase>();
+                s.AddAllTypesOf<IHandlerBase>();
                 s.WithDefaultConventions();
             });
             return config;

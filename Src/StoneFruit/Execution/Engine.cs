@@ -22,12 +22,12 @@ namespace StoneFruit.Execution
         public const string MetadataError = "__CURRENT_EXCEPTION";
 
         private readonly IEnvironmentCollection _environments;
-        private readonly ICommandHandlerSource _commandSource;
+        private readonly IHandlerSource _commandSource;
         private readonly EngineEventCatalog _eventCatalog;
-        private readonly ITerminalOutput _output;
+        private readonly IOutput _output;
         private readonly CommandParser _parser;
 
-        public Engine(ICommandHandlerSource commands, IEnvironmentCollection environments, CommandParser parser, ITerminalOutput output, EngineEventCatalog eventCatalog)
+        public Engine(IHandlerSource commands, IEnvironmentCollection environments, CommandParser parser, IOutput output, EngineEventCatalog eventCatalog)
         {
             _environments = environments ?? new InstanceEnvironmentCollection(null);
             // TODO: If we have 0 commands, we might want to just abort?
@@ -35,7 +35,7 @@ namespace StoneFruit.Execution
             _commandSource = commands;
             _eventCatalog = eventCatalog;
             _parser = parser ?? CommandParser.GetDefault();
-            _output = output ?? new ConsoleTerminalOutput();
+            _output = output ?? new ConsoleOutput();
         }
 
         /// <summary>

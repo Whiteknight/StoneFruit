@@ -11,14 +11,14 @@ namespace StoneFruit.Tests.Execution.VerbSources
 {
     public class TypeListConstructCommandSourceTests
     {
-        private class TestCommandHandler : ICommandHandler
+        private class TestCommandHandler : IHandler
         {
-            public ITerminalOutput Output { get; }
+            public IOutput Output { get; }
             public EngineState State { get; }
             public CommandArguments Args { get; }
             public CommandDispatcher Dispatcher { get; }
 
-            public TestCommandHandler(ITerminalOutput output, EngineState state, CommandArguments args, CommandDispatcher dispatcher)
+            public TestCommandHandler(IOutput output, EngineState state, CommandArguments args, CommandDispatcher dispatcher)
             {
                 Output = output;
                 State = state;
@@ -35,14 +35,14 @@ namespace StoneFruit.Tests.Execution.VerbSources
         [Test]
         public void GetInstance_Test()
         {
-            var target = new TypeListConstructCommandSource(new [] { typeof(TestCommandHandler) });
+            var target = new TypeListConstructSource(new [] { typeof(TestCommandHandler) });
             var args = new CommandArguments();
-            var command = new CompleteCommand("test", args);
+            var command = new Command("test", args);
             var parser = CommandParser.GetDefault();
-            var verbSource = new NamedInstanceCommandSource();
+            var verbSource = new NamedInstanceSource();
             var environments = new InstanceEnvironmentCollection(null);
             var state = new EngineState(true, null);
-            var output = new ConsoleTerminalOutput();
+            var output = new ConsoleOutput();
             var dispatcher = new CommandDispatcher(parser, verbSource, environments, state, output);
             var result = target.GetInstance<TestCommandHandler>(command, dispatcher) as TestCommandHandler;
             result.Args.Should().BeSameAs(args);

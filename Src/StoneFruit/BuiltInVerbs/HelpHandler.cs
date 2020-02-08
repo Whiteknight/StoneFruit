@@ -5,16 +5,16 @@ using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.BuiltInVerbs
 {
-    [CommandName(Name)]
-    public class HelpHandler : ICommandHandler
+    [Verb(Name)]
+    public class HelpHandler : IHandler
     {
         public const string Name = "help";
 
-        private readonly ITerminalOutput _output;
-        private readonly ICommandHandlerSource _commands;
+        private readonly IOutput _output;
+        private readonly IHandlerSource _commands;
         private readonly CommandArguments _args;
 
-        public HelpHandler(ITerminalOutput output, ICommandHandlerSource commands, CommandArguments args)
+        public HelpHandler(IOutput output, IHandlerSource commands, CommandArguments args)
         {
             _output = output;
             _commands = commands;

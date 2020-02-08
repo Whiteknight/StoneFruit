@@ -5,6 +5,20 @@ using System.Reflection;
 
 namespace StoneFruit.Utility
 {
+    public static class StringExtensions
+    {
+        public static string RemoveSuffix(this string s, string suffix)
+        {
+            if (string.IsNullOrEmpty(s))
+                return string.Empty;
+            if (s.Length < suffix.Length)
+                return s;
+            if (s.EndsWith(suffix))
+                return s.Substring(0, s.Length - suffix.Length);
+            return s;
+        }
+    }
+
     public static class TypeExtensions
     {
         public static string GetDescription(this Type type) 
@@ -15,10 +29,10 @@ namespace StoneFruit.Utility
 
         public static IEnumerable<string> GetVerbs(this Type type)
         {
-            if (!typeof(ICommandHandlerBase).IsAssignableFrom(type))
+            if (!typeof(IHandlerBase).IsAssignableFrom(type))
                 return Enumerable.Empty<string>();
 
-            var attrs = type.GetCustomAttributes<CommandNameAttribute>().ToList();
+            var attrs = type.GetCustomAttributes<VerbAttribute>().ToList();
             if (attrs.Any())
             {
                 return attrs
@@ -27,11 +41,12 @@ namespace StoneFruit.Utility
             }
 
             // TODO: Would like to convert CamelCase to spinal-case
-            var name = type.Name.ToLowerInvariant();
-            if (name.EndsWith("verb"))
-                name = name.Substring(0, name.Length - 4);
-            if (name.EndsWith("command"))
-                name = name.Substring(0, name.Length - 7);
+            var name = type.Name
+                .ToLowerInvariant()
+                .RemoveSuffix("verb")
+                .RemoveSuffix("command")
+                .RemoveSuffix("handler")
+                ;
             return new[] { name };
         }
 
@@ -45,7 +60,7 @@ namespace StoneFruit.Utility
 
         public static bool ShouldShowInHelp(this Type type, string verb)
         {
-            var attrs = type.GetCustomAttributes<CommandNameAttribute>().ToList();
+            var attrs = type.GetCustomAttributes<VerbAttribute>().ToList();
 
             // If there are no attributes, we're using a class name and we always show it
             if (!attrs.Any())

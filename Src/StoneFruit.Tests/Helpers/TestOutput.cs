@@ -3,11 +3,11 @@ using System.Linq;
 
 namespace StoneFruit.Tests.Helpers
 {
-    public class TestTerminalOutput : ITerminalOutput
+    public class TestOutput : IOutput
     {
         private readonly Queue<string> _inputs;
 
-        public TestTerminalOutput(params string[] inputs)
+        public TestOutput(params string[] inputs)
         {
             Lines = new List<string>();
             _inputs = new Queue<string>(inputs);
@@ -15,21 +15,21 @@ namespace StoneFruit.Tests.Helpers
 
         public List<string> Lines { get; }
 
-        public ITerminalOutput Color(Brush brush) => this;
+        public IOutput Color(Brush brush) => this;
 
-        public ITerminalOutput WriteLine()
+        public IOutput WriteLine()
         {
             Lines.Add("");
             return this;
         }
 
-        public ITerminalOutput WriteLine(string line)
+        public IOutput WriteLine(string line)
         {
             Lines.Add(line);
             return this;
         }
 
-        public ITerminalOutput Write(string str)
+        public IOutput Write(string str)
         {
             // This isn't perfect, but it's good enough for our test purposes
             Lines.Add(str);

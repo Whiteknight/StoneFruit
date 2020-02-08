@@ -2,15 +2,15 @@
 
 namespace StoneFruit.BuiltInVerbs
 {
-    [CommandName(Name)]
-    public class EnvironmentListHandler : ICommandHandler
+    [Verb(Name)]
+    public class EnvironmentListHandler : IHandler
     {
         public const string Name = "env-list";
 
         private readonly IEnvironmentCollection _environments;
-        private readonly ITerminalOutput _output;
+        private readonly IOutput _output;
 
-        public EnvironmentListHandler(IEnvironmentCollection environments, ITerminalOutput output)
+        public EnvironmentListHandler(IEnvironmentCollection environments, IOutput output)
         {
             _environments = environments;
             _output = output;

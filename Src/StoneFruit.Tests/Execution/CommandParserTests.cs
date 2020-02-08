@@ -98,7 +98,7 @@ namespace StoneFruit.Tests.Execution
             var parser = GetSimplifiedParser();
             var result = parser.ParseCommand("my-verb -flaga -flagb");
             result.Verb.Should().Be("my-verb");
-            result.Command.Should().Be("my-verb -flaga -flagb");
+            result.Raw.Should().Be("my-verb -flaga -flagb");
             result.Arguments.Raw.Should().Be("-flaga -flagb");
             result.Arguments.HasFlag("flaga").Should().BeTrue();
             result.Arguments.HasFlag("flagb").Should().BeTrue();
@@ -111,7 +111,7 @@ namespace StoneFruit.Tests.Execution
             var parser = GetSimplifiedParser();
             var result = parser.ParseCommand("my-verb positional named=value -flag");
 
-            result.Command.Should().Be("my-verb positional named=value -flag");
+            result.Raw.Should().Be("my-verb positional named=value -flag");
             result.Arguments.Raw.Should().Be("positional named=value -flag");
         }
     }

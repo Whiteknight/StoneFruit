@@ -5,21 +5,21 @@ using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.BuiltInVerbs
 {
-    [CommandName(Name)]
-    [CommandName(NotSetName, showInHelp: false)]
-    public class EnvironmentChangeHandler : ICommandHandler
+    [Verb(Name)]
+    [Verb(NotSetName, showInHelp: false)]
+    public class EnvironmentChangeHandler : IHandler
     {
         public const string Name = "env-change";
         public const string NotSetName = "env-change-notset";
 
-        private readonly ITerminalOutput _output;
-        private readonly CompleteCommand _command;
+        private readonly IOutput _output;
+        private readonly Command _command;
         private readonly CommandArguments _args;
         private readonly EngineState _state;
         private readonly IEnvironmentCollection _environments;
         private readonly CommandDispatcher _dispatcher;
 
-        public EnvironmentChangeHandler(ITerminalOutput output, CompleteCommand command, EngineState state, IEnvironmentCollection environments, CommandDispatcher dispatcher)
+        public EnvironmentChangeHandler(IOutput output, Command command, EngineState state, IEnvironmentCollection environments, CommandDispatcher dispatcher)
         {
             _output = output;
             _command = command;

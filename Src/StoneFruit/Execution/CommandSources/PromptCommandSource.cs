@@ -4,10 +4,10 @@ namespace StoneFruit.Execution.CommandSources
 {
     public class PromptCommandSource : ICommandSource
     {
-        private readonly ITerminalOutput _output;
+        private readonly IOutput _output;
         private readonly IEnvironmentCollection _environments;
 
-        public PromptCommandSource(ITerminalOutput output, IEnvironmentCollection environments)
+        public PromptCommandSource(IOutput output, IEnvironmentCollection environments)
         {
             _output = output;
             _environments = environments;

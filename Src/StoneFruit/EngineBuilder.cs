@@ -12,15 +12,15 @@ namespace StoneFruit
 {
     public class EngineBuilder
     {
-        private readonly CombinedCommandHandlerSource _commandSource;
+        private readonly CombinedHandlerSource _commandSource;
         private readonly EngineEventCatalog _eventCatalog;
         private IEnvironmentCollection _environments;
         private IParser<char, IArgument> _argParser;
-        private ITerminalOutput _output;
+        private IOutput _output;
 
         public EngineBuilder()
         {
-            _commandSource = new CombinedCommandHandlerSource();
+            _commandSource = new CombinedHandlerSource();
             _eventCatalog = new EngineEventCatalog();
         }
 
@@ -30,7 +30,7 @@ namespace StoneFruit
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public EngineBuilder UseCommandSource(ICommandHandlerSource source)
+        public EngineBuilder UseCommandSource(IHandlerSource source)
         {
             _commandSource.Add(source);
             return this;
@@ -43,7 +43,7 @@ namespace StoneFruit
         /// <returns></returns>
         public EngineBuilder UseCommandTypes(IEnumerable<Type> commandTypes)
         {
-            _commandSource.Add(new TypeListConstructCommandSource(commandTypes ?? Enumerable.Empty<Type>()));
+            _commandSource.Add(new TypeListConstructSource(commandTypes ?? Enumerable.Empty<Type>()));
             return this;
         }
 
@@ -54,7 +54,7 @@ namespace StoneFruit
         /// <returns></returns>
         public EngineBuilder UseCommandType(params Type[] commandTypes)
         {
-            _commandSource.Add(new TypeListConstructCommandSource(commandTypes ?? Enumerable.Empty<Type>()));
+            _commandSource.Add(new TypeListConstructSource(commandTypes ?? Enumerable.Empty<Type>()));
             return this;
         }
 
@@ -136,7 +136,7 @@ namespace StoneFruit
         /// </summary>
         /// <param name="output"></param>
         /// <returns></returns>
-        public EngineBuilder UseTerminalOutput(ITerminalOutput output)
+        public EngineBuilder UseTerminalOutput(IOutput output)
         {
             // TODO: should we have some sort of tee/multiplex output?
             EnsureOutputNotSet();

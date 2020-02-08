@@ -5,21 +5,25 @@ namespace StoneFruit
     /// <summary>
     /// Abstraction for output
     /// </summary>
-    public interface ITerminalOutput
+    public interface IOutput
     {
-        ITerminalOutput Color(Brush brush);
+        IOutput Color(Brush brush);
 
-        ITerminalOutput WriteLine();
-        ITerminalOutput WriteLine(string line);
+        IOutput WriteLine();
+        IOutput WriteLine(string line);
 
-        ITerminalOutput Write(string str);
+        IOutput Write(string str);
 
         string Prompt(string prompt, bool mustProvide = true, bool keepHistory = true);
+
+        // TODO: We need some kind of mechanism to synchronize in case we have multiple threads
+        // writing complex multi-color or multi-line outputs without smashing each other. Some kind of
+        // transaction abstraction, or a global output lock, or something will help here.
     }
 
     public static class TerminalOutputExtensions
     {
-        public static ITerminalOutput WriteLineFormat(this ITerminalOutput output, string fmt, params object[] args)
+        public static IOutput WriteLineFormat(this IOutput output, string fmt, params object[] args)
         {
             Assert.ArgumentNotNull(output, nameof(output));
             Assert.ArgumentNotNullOrEmpty(fmt, nameof(fmt));
@@ -27,7 +31,7 @@ namespace StoneFruit
             return output.WriteLine(line);
         }
 
-        public static ITerminalOutput WriteFormat(this ITerminalOutput output, string fmt, params object[] args)
+        public static IOutput WriteFormat(this IOutput output, string fmt, params object[] args)
         {
             Assert.ArgumentNotNull(output, nameof(output));
             Assert.ArgumentNotNullOrEmpty(fmt, nameof(fmt));

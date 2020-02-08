@@ -3,7 +3,7 @@ using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.BuiltInVerbs
 {
-    public class RunHandler : ICommandHandler
+    public class RunHandler : IHandler
     {
         private readonly CommandArguments _args;
         private readonly EngineState _state;

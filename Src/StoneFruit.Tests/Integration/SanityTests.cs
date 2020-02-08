@@ -13,7 +13,7 @@ namespace StoneFruit.Tests.Integration
         [Test]
         public void RunHeadless_Echo()
         {
-            var output = new TestTerminalOutput();
+            var output = new TestOutput();
             var engine = new EngineBuilder()
                 .UseCommandType(typeof(EchoHandler))
                 .UseTerminalOutput(output)

@@ -5,17 +5,17 @@ namespace StoneFruit.Execution
     /// <summary>
     /// A complete command with a verb and arguments
     /// </summary>
-    public class CompleteCommand
+    public class Command
     {
-        public CompleteCommand(string verb, CommandArguments arguments, string command = null)
+        public Command(string verb, CommandArguments arguments, string raw = null)
         {
             Verb = verb;
-            Command = command;
+            Raw = raw;
             Arguments = arguments ?? CommandArguments.Empty();
         }
 
         public string Verb { get; }
-        public string Command { get; }
+        public string Raw { get; }
 
         public CommandArguments Arguments { get; }
 

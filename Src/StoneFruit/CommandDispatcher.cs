@@ -13,12 +13,12 @@ namespace StoneFruit
     public class CommandDispatcher
     {
         public CommandParser Parser { get; }
-        public ICommandHandlerSource Commands { get; }
+        public IHandlerSource Commands { get; }
         public IEnvironmentCollection Environments { get; }
         public EngineState State { get; }
-        public ITerminalOutput Output { get; }
+        public IOutput Output { get; }
 
-        public CommandDispatcher(CommandParser parser, ICommandHandlerSource commands, IEnvironmentCollection environments, EngineState state, ITerminalOutput output)
+        public CommandDispatcher(CommandParser parser, IHandlerSource commands, IEnvironmentCollection environments, EngineState state, IOutput output)
         {
             Parser = parser;
             Commands = commands;
@@ -27,43 +27,43 @@ namespace StoneFruit
             Output = output;
         }
 
-        private void Execute(CompleteCommand completeCommand, CancellationTokenSource tokenSource = null)
+        private void Execute(Command command, CancellationTokenSource tokenSource = null)
         {
-            Assert.ArgumentNotNull(completeCommand, nameof(completeCommand));
-            var handler = Commands.GetInstance(completeCommand, this) ?? new NotFoundHandler(completeCommand, State, Output);
+            Assert.ArgumentNotNull(command, nameof(command));
+            var handler = Commands.GetInstance(command, this) ?? new NotFoundHandler(command, State, Output);
             var syncHandler = GetSynchronousHandler(tokenSource, handler);
             syncHandler.Execute();
         }
 
-        private static ICommandHandler GetSynchronousHandler(CancellationTokenSource tokenSource, ICommandHandlerBase verbObject)
+        private static IHandler GetSynchronousHandler(CancellationTokenSource tokenSource, IHandlerBase verbObject)
         {
-            if (verbObject is ICommandHandler syncVerb)
+            if (verbObject is IHandler syncVerb)
                 return syncVerb;
 
             tokenSource ??= new CancellationTokenSource();
-            return new AsyncDispatchHandler(verbObject as ICommandHandlerAsync, tokenSource);
+            return new AsyncDispatchHandler(verbObject as IAsyncHandler, tokenSource);
         }
 
         public void Execute(string commandString, CancellationTokenSource tokenSource = null)
         {
             Assert.ArgumentNotNullOrEmpty(commandString, nameof(commandString));
-            var completeCommand = Parser.ParseCommand(commandString);
-            Execute(completeCommand, tokenSource);
+            var Command = Parser.ParseCommand(commandString);
+            Execute(Command, tokenSource);
         }
 
         public void Execute(string verb, CommandArguments args, CancellationTokenSource tokenSource = null)
         {
             Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
-            var completeCommand = new CompleteCommand(verb, args);
-            Execute(completeCommand, tokenSource);
+            var Command = new Command(verb, args);
+            Execute(Command, tokenSource);
         }
 
-        private class AsyncDispatchHandler : ICommandHandler
+        private class AsyncDispatchHandler : IHandler
         {
-            private readonly ICommandHandlerAsync _asyncHandler;
+            private readonly IAsyncHandler _asyncHandler;
             private readonly CancellationTokenSource _tokenSource;
 
-            public AsyncDispatchHandler(ICommandHandlerAsync asyncHandler, CancellationTokenSource tokenSource)
+            public AsyncDispatchHandler(IAsyncHandler asyncHandler, CancellationTokenSource tokenSource)
             {
                 _asyncHandler = asyncHandler;
                 _tokenSource = tokenSource;
@@ -78,13 +78,13 @@ namespace StoneFruit
             }
         }
 
-        private class NotFoundHandler : ICommandHandler
+        private class NotFoundHandler : IHandler
         {
-            private readonly CompleteCommand _command;
+            private readonly Command _command;
             private readonly EngineState _state;
-            private readonly ITerminalOutput _output;
+            private readonly IOutput _output;
 
-            public NotFoundHandler(CompleteCommand command, EngineState state, ITerminalOutput output)
+            public NotFoundHandler(Command command, EngineState state, IOutput output)
             {
                 _command = command;
                 _state = state;

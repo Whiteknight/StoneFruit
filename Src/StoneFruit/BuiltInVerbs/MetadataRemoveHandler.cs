@@ -5,8 +5,8 @@ namespace StoneFruit.BuiltInVerbs
 {
     // TODO: Additional commands to show a list of existing metadata keys and get the .ToString version of
     // a single key
-    [CommandName(Name, false)]
-    public class MetadataRemoveHandler : ICommandHandler
+    [Verb(Name, false)]
+    public class MetadataRemoveHandler : IHandler
     {
         public const string Name = "metadata-remove";
 

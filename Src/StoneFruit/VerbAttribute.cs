@@ -3,9 +3,9 @@
 namespace StoneFruit
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
-    public class CommandNameAttribute : Attribute
+    public class VerbAttribute : Attribute
     {
-        public CommandNameAttribute(string command, bool showInHelp = true)
+        public VerbAttribute(string command, bool showInHelp = true)
         {
             CommandName = command;
             ShowInHelp = showInHelp;

@@ -20,7 +20,7 @@ namespace StoneFruit.Execution
 
         public static CommandParser GetDefault() => new CommandParser();
 
-        public static CompleteCommand ParseCommand(IParser<char, string> verbs, IParser<char, IArgument> args, string line)
+        public static Command ParseCommand(IParser<char, string> verbs, IParser<char, IArgument> args, string line)
         {
             var sequence = new StringCharacterSequence(line);
             var verb = verbs.Parse(sequence).Value;
@@ -33,10 +33,10 @@ namespace StoneFruit.Execution
             }
 
             var cmdArgs = new CommandArguments(rawArgs, argsList);
-            return new CompleteCommand(verb, cmdArgs, line);
+            return new Command(verb, cmdArgs, line);
         }
 
-        public CompleteCommand ParseCommand(string line) => ParseCommand(_verbParser, _argsParser, line);
+        public Command ParseCommand(string line) => ParseCommand(_verbParser, _argsParser, line);
 
         public CommandArguments ParseArguments(string args) => _argsParser.ParseArguments(args);
 

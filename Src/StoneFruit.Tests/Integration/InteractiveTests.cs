@@ -10,7 +10,7 @@ namespace StoneFruit.Tests.Integration
         [Test]
         public void StartAndStopEvents_Test()
         {
-            var output = new TestTerminalOutput("echo 'test'");
+            var output = new TestOutput("echo 'test'");
             var engine = new EngineBuilder()
                 .UseCommandType(typeof(EchoHandler))
                 .UseTerminalOutput(output)
