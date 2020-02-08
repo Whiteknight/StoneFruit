@@ -1,4 +1,5 @@
-﻿using StoneFruit.Execution.Arguments;
+﻿using System;
+using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.BuiltInVerbs
 {
@@ -18,12 +19,23 @@ namespace StoneFruit.BuiltInVerbs
 
         public static string Description => "Writes a string of output to the console";
 
+        public static string Usage => @"echo [color=<color>] ...
+
+Writes each argument to the output as a new line. If color is specified, use that color
+";
+
         public void Execute()
         {
-            // TODO: Argument to specify color
-            // TODO: Argument to specify whether to write a newline or not
+            var output = _output;
+            var colorName = _args.Get("color").AsString();
+            if (!string.IsNullOrEmpty(colorName))
+            {
+                var color = (ConsoleColor) Enum.Parse(typeof(ConsoleColor), colorName);
+                output = output.Color(color);
+            }
+
             foreach (var arg in _args.GetAllPositionals())
-                _output.WriteLine(arg.Value);
+                output.WriteLine(arg.Value);
         }
     }
 }

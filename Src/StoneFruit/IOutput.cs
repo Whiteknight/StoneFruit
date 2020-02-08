@@ -1,4 +1,5 @@
-﻿using StoneFruit.Utility;
+﻿using System;
+using StoneFruit.Utility;
 
 namespace StoneFruit
 {
@@ -37,6 +38,11 @@ namespace StoneFruit
             Assert.ArgumentNotNullOrEmpty(fmt, nameof(fmt));
             var line = string.Format(fmt, args);
             return output.Write(line);
+        }
+
+        public static IOutput Color(this IOutput output, ConsoleColor color)
+        {
+            return output.Color((Brush) color);
         }
     }
 }
