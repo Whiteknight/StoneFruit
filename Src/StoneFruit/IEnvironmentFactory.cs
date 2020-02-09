@@ -7,7 +7,17 @@ namespace StoneFruit
     /// </summary>
     public interface IEnvironmentFactory
     {
+        /// <summary>
+        /// Create the environment object for the environment of the given name.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         object Create(string name);
+
+        /// <summary>
+        /// Returns a list of valid environment names which can be passed to Create without
+        /// causing a problem
+        /// </summary>
         IReadOnlyCollection<string> ValidEnvironments { get; }
     }
 }

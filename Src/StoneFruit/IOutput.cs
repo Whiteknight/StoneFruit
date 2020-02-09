@@ -8,13 +8,42 @@ namespace StoneFruit
     /// </summary>
     public interface IOutput
     {
+        /// <summary>
+        /// Get a new output using the given color palette. If the output does not support
+        /// color this will be a no-op
+        /// </summary>
+        /// <param name="brush"></param>
+        /// <returns></returns>
         IOutput Color(Brush brush);
 
+        /// <summary>
+        /// Write a linebreak to the output
+        /// </summary>
+        /// <returns></returns>
         IOutput WriteLine();
+
+        /// <summary>
+        /// Write the given text followed by a line break to the output
+        /// </summary>
+        /// <param name="line"></param>
+        /// <returns></returns>
         IOutput WriteLine(string line);
 
+        /// <summary>
+        /// Write the given text to the output
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
         IOutput Write(string str);
 
+        /// <summary>
+        /// Show a prompt to the user to request input. For non-interactive outputs, this
+        /// will be a no-op
+        /// </summary>
+        /// <param name="prompt"></param>
+        /// <param name="mustProvide"></param>
+        /// <param name="keepHistory"></param>
+        /// <returns></returns>
         string Prompt(string prompt, bool mustProvide = true, bool keepHistory = true);
 
         // TODO: We need some kind of mechanism to synchronize in case we have multiple threads
