@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
-using StoneFruit.BuiltInVerbs;
+using StoneFruit.Handlers;
 using StoneFruit.Tests.Helpers;
 
 namespace StoneFruit.Tests.Integration

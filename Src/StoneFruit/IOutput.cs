@@ -22,7 +22,7 @@ namespace StoneFruit
         // transaction abstraction, or a global output lock, or something will help here.
     }
 
-    public static class TerminalOutputExtensions
+    public static class OutputExtensions
     {
         public static IOutput WriteLineFormat(this IOutput output, string fmt, params object[] args)
         {
