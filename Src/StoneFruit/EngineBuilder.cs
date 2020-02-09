@@ -36,6 +36,12 @@ namespace StoneFruit
             return this;
         }
 
+        public EngineBuilder UsePublicMethodsAsHandlers(object instance)
+        {
+            _commandSource.Add(new InstanceMethodHandlerSource(instance, null, null));
+            return this;
+        }
+
         /// <summary>
         /// Specify a list of Types of ICommandVerb classes to use
         /// </summary>

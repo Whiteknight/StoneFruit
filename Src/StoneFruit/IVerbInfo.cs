@@ -5,7 +5,7 @@
         string Verb { get; }
 
         string Description { get; }
-        string Help { get; }
+        string Usage { get; }
         bool ShouldShowInHelp { get; }
     }
 }

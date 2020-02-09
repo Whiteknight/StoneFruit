@@ -55,7 +55,7 @@ To see all commands, use the -showall flag
             var info = _commands.GetByName(name);
             if (info == null)
                 throw new Exception($"Cannot find command named '{name}'");
-            _output.WriteLine(info.Help);
+            _output.WriteLine(info.Usage);
         }
 
         private void GetOverview(bool showAll)

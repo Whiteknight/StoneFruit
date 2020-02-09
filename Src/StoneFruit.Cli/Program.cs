@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
+using StoneFruit.Execution.HandlerSources;
 using StoneFruit.StructureMap;
 
 namespace StoneFruit.Cli
@@ -18,7 +19,8 @@ namespace StoneFruit.Cli
             //var w = PowershellStyleArgumentGrammar.GetParser().ParseArguments(args).MapTo<TestArgsA>();
 
             var engine = new EngineBuilder()
-                .UseStructureMapContainerSource()
+                .UseStructureMapHandlerSource()
+                .UsePublicMethodsAsHandlers(new MyObject())
                 //.UseCommands(typeof(HelpCommand), typeof(ExitCommand))
                 .UseEnvironmentFactory(new MyEnvironmentFactory())
                 .SetupEvents(e =>
@@ -95,6 +97,20 @@ namespace StoneFruit.Cli
         public MyEnvironment(string name)
         {
             Name = name;
+        }
+    }
+
+    public class MyObject
+    {
+        public void TestD(IOutput output, string name)
+        {
+            output.WriteLine($"{name}: D");
+        }
+
+        public Task TestE(IOutput output)
+        {
+            output.WriteLine("E");
+            return Task.CompletedTask;
         }
     }
 }

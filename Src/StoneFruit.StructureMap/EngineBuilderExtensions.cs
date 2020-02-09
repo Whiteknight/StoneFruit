@@ -4,10 +4,10 @@ namespace StoneFruit.StructureMap
 {
     public static class EngineBuilderExtensions
     {
-        public static EngineBuilder UseStructureMapContainerSource(this EngineBuilder builder) 
-            => builder.UseCommandSource(new StructureMapCommandSource());
+        public static EngineBuilder UseStructureMapHandlerSource(this EngineBuilder builder) 
+            => builder.UseCommandSource(new StructureMapHandlerSource());
 
-        public static EngineBuilder UseStructureMapContainerSource(this EngineBuilder builder, IContainer container) 
-            => builder.UseCommandSource(new StructureMapCommandSource(container));
+        public static EngineBuilder UseStructureMapHandlerSource(this EngineBuilder builder, IContainer container) 
+            => builder.UseCommandSource(new StructureMapHandlerSource(container));
     }
 }

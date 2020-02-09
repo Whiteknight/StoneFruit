@@ -70,7 +70,7 @@ namespace StoneFruit.Execution.HandlerSources
 
             public string Verb { get; }
             public string Description => _type.GetDescription();
-            public string Help => _type.GetUsage();
+            public string Usage => _type.GetUsage();
             public bool ShouldShowInHelp => _type.ShouldShowInHelp(Verb);
         }
     }

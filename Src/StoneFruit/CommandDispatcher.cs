@@ -32,6 +32,8 @@ namespace StoneFruit
             Assert.ArgumentNotNull(command, nameof(command));
             var handler = Commands.GetInstance(command, this) ?? new NotFoundHandler(command, State, Output);
             var syncHandler = GetSynchronousHandler(tokenSource, handler);
+            // TODO: If the handler has a second Execute() method with arguments, we should attempt to invoke
+            // that version instead (converting named arguments to method arguments).
             syncHandler.Execute();
         }
 

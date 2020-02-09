@@ -40,13 +40,13 @@ namespace StoneFruit.Execution.HandlerSources
                 Verb = verb;
                 HandlerObject = handlerObject;
                 Description = description;
-                Help = help;
+                Usage = help;
             }
 
             public IHandler HandlerObject { get; }
             public string Verb { get; }
             public string Description { get; }
-            public string Help { get; }
+            public string Usage { get; }
             public bool ShouldShowInHelp => true;
         }
     }
