@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using ParserObjects;
 using ParserObjects.Parsers;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Environments;
-using StoneFruit.Execution.HandlerSources;
+using StoneFruit.Setup;
 
 namespace StoneFruit
 {
     public class EngineBuilder
     {
-        private readonly CombinedHandlerSource _commandSource;
+        private readonly HandlerSetup _handlers;
         private readonly EngineEventCatalog _eventCatalog;
         private IEnvironmentCollection _environments;
         private IParser<char, IArgument> _argParser;
@@ -20,47 +19,14 @@ namespace StoneFruit
 
         public EngineBuilder()
         {
-            _commandSource = new CombinedHandlerSource();
+            _handlers = new HandlerSetup();
             _eventCatalog = new EngineEventCatalog();
         }
 
-        /// <summary>
-        /// Specify an ICommandSource instance to use to find and instantiate ICommandVerb
-        /// instances
-        /// </summary>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public EngineBuilder UseCommandSource(IHandlerSource source)
-        {
-            _commandSource.Add(source);
-            return this;
-        }
 
-        public EngineBuilder UsePublicMethodsAsHandlers(object instance)
+        public EngineBuilder SetupHandlers(Action<IHandlerSetup> setup)
         {
-            _commandSource.Add(new InstanceMethodHandlerSource(instance, null, null));
-            return this;
-        }
-
-        /// <summary>
-        /// Specify a list of Types of ICommandVerb classes to use
-        /// </summary>
-        /// <param name="commandTypes"></param>
-        /// <returns></returns>
-        public EngineBuilder UseCommandTypes(IEnumerable<Type> commandTypes)
-        {
-            _commandSource.Add(new TypeListConstructSource(commandTypes ?? Enumerable.Empty<Type>()));
-            return this;
-        }
-
-        /// <summary>
-        /// Specify a list of Types of ICommandVebr classes to use
-        /// </summary>
-        /// <param name="commandTypes"></param>
-        /// <returns></returns>
-        public EngineBuilder UseCommandType(params Type[] commandTypes)
-        {
-            _commandSource.Add(new TypeListConstructSource(commandTypes ?? Enumerable.Empty<Type>()));
+            setup?.Invoke(_handlers);
             return this;
         }
 
@@ -162,7 +128,7 @@ namespace StoneFruit
         /// <returns></returns>
         public Engine Build()
         {
-            var commandSource = _commandSource.Simplify();
+            var commandSource = _handlers.Build();
             var environmentFactory = _environments;
             var parser = new CommandParser(_argParser);
             return new Engine(commandSource, environmentFactory, parser, _output, _eventCatalog);

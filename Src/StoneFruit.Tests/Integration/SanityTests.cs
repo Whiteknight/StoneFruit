@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using FluentAssertions;
+﻿using FluentAssertions;
 using NUnit.Framework;
 using StoneFruit.BuiltInVerbs;
 using StoneFruit.Tests.Helpers;
@@ -15,7 +12,7 @@ namespace StoneFruit.Tests.Integration
         {
             var output = new TestOutput();
             var engine = new EngineBuilder()
-                .UseCommandType(typeof(EchoHandler))
+                .SetupHandlers(h => h.UseHandlerTypes(typeof(EchoHandler)))
                 .UseTerminalOutput(output)
                 .Build();
             engine.RunHeadless("echo 'test'");

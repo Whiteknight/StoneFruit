@@ -12,7 +12,7 @@ namespace StoneFruit.Tests.Integration
         {
             var output = new TestOutput("echo 'test'");
             var engine = new EngineBuilder()
-                .UseCommandType(typeof(EchoHandler))
+                .SetupHandlers(h => h.UseHandlerTypes(typeof(EchoHandler)))
                 .UseTerminalOutput(output)
                 .SetupEvents(c =>
                 {
