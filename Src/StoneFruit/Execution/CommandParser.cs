@@ -24,11 +24,11 @@ namespace StoneFruit.Execution
         {
             var sequence = new StringCharacterSequence(line);
             var verb = verbs.Parse(sequence).Value;
-            var rawArgs = sequence.GetRemainer();
+            var rawArgs = sequence.GetRemainder();
             var argsList = args.List().Parse(sequence).Value.ToList();
             if (!sequence.IsAtEnd)
             {
-                var remainder = sequence.GetRemainer();
+                var remainder = sequence.GetRemainder();
                 throw new Exception($"Could not parse all arguments. '{remainder}' fails at {sequence.CurrentLocation}");
             }
 
