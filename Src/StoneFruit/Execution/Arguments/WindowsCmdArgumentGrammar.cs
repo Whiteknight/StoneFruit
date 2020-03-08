@@ -2,8 +2,9 @@
 using ParserObjects;
 using ParserObjects.Parsers;
 using static ParserObjects.Parsers.ParserMethods;
-using static ParserObjects.Parsers.Specialty.ProgrammingParserMethods;
+using static ParserObjects.Parsers.Specialty.QuotedParserMethods;
 using static ParserObjects.Parsers.Specialty.WhitespaceParserMethods;
+using static ParserObjects.Parsers.Specialty.CStyleParserMethods;
 
 namespace StoneFruit.Execution.Arguments
 {
@@ -14,9 +15,9 @@ namespace StoneFruit.Execution.Arguments
     {
         public static IParser<char, IArgument> GetParser()
         {
-            var doubleQuotedString = StrippedDoubleQuotedStringWithEscapedQuotes();
+            var doubleQuotedString = StrippedDoubleQuotedString();
 
-            var singleQuotedString = StrippedSingleQuotedStringWithEscapedQuotes();
+            var singleQuotedString = StrippedSingleQuotedString();
 
             var unquotedValue = Match<char>(c => !char.IsWhiteSpace(c))
                 .List(true)
@@ -30,7 +31,7 @@ namespace StoneFruit.Execution.Arguments
                 unquotedValue
             );
 
-            var name = CStyleIdentifier();
+            var name = Identifier();
 
             // '/' <name> ':' <value>
             var namedArg = Rule(

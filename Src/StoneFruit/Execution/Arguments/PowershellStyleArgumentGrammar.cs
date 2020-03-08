@@ -3,8 +3,9 @@ using System.Linq;
 using ParserObjects;
 using ParserObjects.Parsers;
 using static ParserObjects.Parsers.ParserMethods;
-using static ParserObjects.Parsers.Specialty.ProgrammingParserMethods;
+using static ParserObjects.Parsers.Specialty.QuotedParserMethods;
 using static ParserObjects.Parsers.Specialty.WhitespaceParserMethods;
+using static ParserObjects.Parsers.Specialty.CStyleParserMethods;
 
 namespace StoneFruit.Execution.Arguments
 {
@@ -15,9 +16,9 @@ namespace StoneFruit.Execution.Arguments
     {
         public static IParser<char, IArgument> GetParser()
         {
-            var doubleQuotedString = StrippedDoubleQuotedStringWithEscapedQuotes();
+            var doubleQuotedString = StrippedDoubleQuotedString();
 
-            var singleQuotedString = StrippedSingleQuotedStringWithEscapedQuotes();
+            var singleQuotedString = StrippedSingleQuotedString();
 
             var unquotedValue = Match<char>(c => !char.IsWhiteSpace(c))
                 .List(true)
@@ -32,7 +33,7 @@ namespace StoneFruit.Execution.Arguments
                 unquotedValue
             );
 
-            var names = CStyleIdentifier();
+            var names = Identifier();
 
             // Powershell convention doesn't really have a clear way to specify that a switch/value is a
             // named arg or just a switch followed by a positional. We'll return all three versions so
