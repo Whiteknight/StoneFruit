@@ -1,6 +1,6 @@
 ﻿using StructureMap;
 
-namespace StoneFruit.StructureMap
+namespace StoneFruit.Containers.StructureMap
 {
     public static class ContainerExtensions
     {

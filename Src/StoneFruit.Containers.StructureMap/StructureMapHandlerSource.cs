@@ -5,7 +5,7 @@ using StoneFruit.Execution;
 using StoneFruit.Utility;
 using StructureMap;
 
-namespace StoneFruit.StructureMap
+namespace StoneFruit.Containers.StructureMap
 {
     public class StructureMapHandlerSource : IHandlerSource
     {

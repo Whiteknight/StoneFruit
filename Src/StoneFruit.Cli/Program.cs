@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
-using StoneFruit.StructureMap;
+using StoneFruit.Containers.StructureMap;
 
 namespace StoneFruit.Cli
 {
