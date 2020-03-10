@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using StoneFruit.Containers.Lamar;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Containers.StructureMap;
@@ -19,7 +20,8 @@ namespace StoneFruit.Cli
 
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
-                    .UseStructureMapHandlerSource()
+                    .UseLamarMapHandlerSource()
+                    //.UseStructureMapHandlerSource()
                     //.UseCommands(typeof(HelpCommand), typeof(ExitCommand))
                     .UsePublicMethodsAsHandlers(new MyObject())
                     .Add("testf", (c, d) => d.Output.WriteLine("F"))

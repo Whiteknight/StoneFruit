@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\StoneFruit.Containers.Lamar\StoneFruit.Containers.Lamar.csproj" />
     <ProjectReference Include="..\StoneFruit.Containers.StructureMap\StoneFruit.Containers.StructureMap.csproj" />
     <ProjectReference Include="..\StoneFruit\StoneFruit.csproj" />
   </ItemGroup>

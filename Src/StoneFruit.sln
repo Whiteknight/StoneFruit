@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Tests", "StoneFr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Containers.StructureMap", "StoneFruit.Containers.StructureMap\StoneFruit.Containers.StructureMap.csproj", "{EF5BC48B-3169-42B9-B622-A14F2900A8AE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoneFruit.Containers.Lamar", "StoneFruit.Containers.Lamar\StoneFruit.Containers.Lamar.csproj", "{3195C070-122B-4D4C-BA1D-855BEAB6BA16}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{EF5BC48B-3169-42B9-B622-A14F2900A8AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF5BC48B-3169-42B9-B622-A14F2900A8AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF5BC48B-3169-42B9-B622-A14F2900A8AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3195C070-122B-4D4C-BA1D-855BEAB6BA16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3195C070-122B-4D4C-BA1D-855BEAB6BA16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3195C070-122B-4D4C-BA1D-855BEAB6BA16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3195C070-122B-4D4C-BA1D-855BEAB6BA16}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
