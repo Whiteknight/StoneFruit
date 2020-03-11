@@ -21,7 +21,7 @@ namespace StoneFruit.Cli
 
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
-                    //.UseLamarHandlerSource()
+                    .UseLamarHandlerSource()
                     //.UseNinjectHandlerSource()
                     //.UseStructureMapHandlerSource()
                     //.UseCommands(typeof(HelpCommand), typeof(ExitCommand))

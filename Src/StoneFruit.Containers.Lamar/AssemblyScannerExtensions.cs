@@ -6,10 +6,11 @@ namespace StoneFruit.Containers.Lamar
     {
         public static void ScanForCommandVerbs(this IAssemblyScanner scanner)
         {
+            scanner.TheCallingAssembly();
             scanner.AssemblyContainingType<IHandlerBase>();
             scanner.AssembliesFromApplicationBaseDirectory();
             scanner.AddAllTypesOf<IHandlerBase>();
-            scanner.WithDefaultConventions();
+            //scanner.WithDefaultConventions();
         }
     }
 }
