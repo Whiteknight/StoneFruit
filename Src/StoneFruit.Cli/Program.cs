@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using StoneFruit.Containers.Lamar;
+using StoneFruit.Containers.Ninject;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Containers.StructureMap;
@@ -20,7 +21,8 @@ namespace StoneFruit.Cli
 
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
-                    .UseLamarMapHandlerSource()
+                    //.UseLamarHandlerSource()
+                    .UseNinjectHandlerSource()
                     //.UseStructureMapHandlerSource()
                     //.UseCommands(typeof(HelpCommand), typeof(ExitCommand))
                     .UsePublicMethodsAsHandlers(new MyObject())

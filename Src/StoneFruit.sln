@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Containers.Struc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoneFruit.Containers.Lamar", "StoneFruit.Containers.Lamar\StoneFruit.Containers.Lamar.csproj", "{3195C070-122B-4D4C-BA1D-855BEAB6BA16}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoneFruit.Containers.Ninject", "StoneFruit.Containers.Ninject\StoneFruit.Containers.Ninject.csproj", "{FDCF1F6E-6BC6-4D84-8233-6D0141A626D9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{3195C070-122B-4D4C-BA1D-855BEAB6BA16}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3195C070-122B-4D4C-BA1D-855BEAB6BA16}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3195C070-122B-4D4C-BA1D-855BEAB6BA16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDCF1F6E-6BC6-4D84-8233-6D0141A626D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDCF1F6E-6BC6-4D84-8233-6D0141A626D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDCF1F6E-6BC6-4D84-8233-6D0141A626D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDCF1F6E-6BC6-4D84-8233-6D0141A626D9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
