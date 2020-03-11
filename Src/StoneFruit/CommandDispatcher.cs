@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
@@ -30,20 +29,26 @@ namespace StoneFruit
         private void Execute(Command command, CancellationTokenSource tokenSource = null)
         {
             Assert.ArgumentNotNull(command, nameof(command));
-            var handler = Commands.GetInstance(command, this) ?? new NotFoundHandler(command, State, Output);
+            var handler = Commands.GetInstance(command, this) ?? throw new VerbNotFoundException(command.Verb);
             var syncHandler = GetSynchronousHandler(tokenSource, handler);
             // TODO: If the handler has a second Execute() method with arguments, we should attempt to invoke
             // that version instead (converting named arguments to method arguments).
             syncHandler.Execute();
         }
 
+        // TODO: Do it the other way around, convert IHandler->IAsyncHandler and invoke asynchronously
         private static IHandler GetSynchronousHandler(CancellationTokenSource tokenSource, IHandlerBase verbObject)
         {
             if (verbObject is IHandler syncVerb)
                 return syncVerb;
 
-            tokenSource ??= new CancellationTokenSource();
-            return new AsyncDispatchHandler(verbObject as IAsyncHandler, tokenSource);
+            if (verbObject is IAsyncHandler asyncHandler)
+            {
+                tokenSource ??= new CancellationTokenSource();
+                return new AsyncDispatchHandler(asyncHandler, tokenSource);
+            }
+
+            return null;
         }
 
         public void Execute(string commandString, CancellationTokenSource tokenSource = null)
@@ -77,28 +82,6 @@ namespace StoneFruit
                     return;
                 var token = _tokenSource.Token;
                 Task.Run(async () => await _asyncHandler.ExecuteAsync(token), token).ConfigureAwait(false).GetAwaiter().GetResult();
-            }
-        }
-
-        private class NotFoundHandler : IHandler
-        {
-            private readonly Command _command;
-            private readonly EngineState _state;
-            private readonly IOutput _output;
-
-            public NotFoundHandler(Command command, EngineState state, IOutput output)
-            {
-                _command = command;
-                _state = state;
-                _output = output;
-            }
-
-            public void Execute()
-            {
-                _output
-                    .Color(ConsoleColor.Red)
-                    .WriteLine($"Command '{_command.Verb}' not found. Please check your spelling or help output and try again");
-                _state.AddCommands(_state.EventCatalog.VerbNotFound.GetCommands());
             }
         }
     }

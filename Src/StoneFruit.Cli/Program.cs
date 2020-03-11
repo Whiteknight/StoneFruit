@@ -22,13 +22,13 @@ namespace StoneFruit.Cli
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
                     //.UseLamarHandlerSource()
-                    .UseNinjectHandlerSource()
+                    //.UseNinjectHandlerSource()
                     //.UseStructureMapHandlerSource()
                     //.UseCommands(typeof(HelpCommand), typeof(ExitCommand))
                     .UsePublicMethodsAsHandlers(new MyObject())
                     .Add("testf", (c, d) => d.Output.WriteLine("F"))
                 )
-                .UseEnvironmentFactory(new MyEnvironmentFactory())
+                //.UseEnvironmentFactory(new MyEnvironmentFactory())
                 .SetupEvents(e =>
                 {
                     e.EngineStartInteractive.Add("help");
@@ -37,7 +37,7 @@ namespace StoneFruit.Cli
                 })
                 .Build();
             Environment.ExitCode = engine.RunWithCommandLineArguments();
-            //Console.ReadKey();
+            Console.ReadKey();
         }
     }
 

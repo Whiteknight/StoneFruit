@@ -194,9 +194,13 @@ namespace StoneFruit.Execution
                     var tokenSource = new CancellationTokenSource();
                     dispatcher.Execute(command, tokenSource);
                 }
+                catch (VerbNotFoundException vnf)
+                {
+                    HandleError(state, vnf, state.EventCatalog.VerbNotFound);
+                }
                 catch (Exception e)
                 {
-                    HandleError(state, e);
+                    HandleError(state, e, state.EventCatalog.EngineError);
                 }
 
                 // If exit is signaled, return. 
@@ -206,7 +210,7 @@ namespace StoneFruit.Execution
         }
 
         // Handle an error from the dispatcher.
-        private void HandleError(EngineState state, Exception e)
+        private void HandleError(EngineState state, Exception e, EventScript script)
         {
             // If we're in an error loop (throw an exception while handling a previous exception) show an
             // angry error message and signal for exit.
@@ -226,7 +230,7 @@ namespace StoneFruit.Execution
             // Otherwise add the error-handling script to the command queue so the queue loop can handle it.
             state.AddMetadata(MetadataError, e, false);
             state.PrependCommand($"{MetadataRemoveHandler.Name} {MetadataError}");
-            state.PrependCommands(state.EventCatalog.EngineError.GetCommands());
+            state.PrependCommands(script.GetCommands());
         }
     }
 }
