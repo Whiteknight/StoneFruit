@@ -1,5 +1,6 @@
 ﻿namespace StoneFruit.Execution.CommandSources
 {
+    // TODO: Change this so it contains a finite queue of commands instead of just one.
     public class SingleCommandSource : ICommandSource
     {
         private readonly string _command;

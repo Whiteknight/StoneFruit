@@ -3,6 +3,7 @@ using System.Runtime.Serialization;
 
 namespace StoneFruit
 {
+    // TODO: Move this to a more appropriate namespace
     [Serializable]
     public class VerbNotFoundException : Exception
     {

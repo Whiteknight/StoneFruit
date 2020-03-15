@@ -13,35 +13,19 @@ namespace StoneFruit.Execution.Output
             _inner = inner;
         }
 
-        public IOutput Color(Brush brush)
-        {
-            if (brush.Equals(_color))
-                return this;
-            return new ColoredOutputWrapper(brush, _inner);
-        }
+        public IOutput Color(Brush brush) 
+            => brush.Equals(_color) ? this : new ColoredOutputWrapper(brush, _inner);
 
-        public IOutput WriteLine()
-        {
-            WithBrush(() => _inner.WriteLine());
-            return this;
-        }
+        public IOutput WriteLine() => WithBrush(() => _inner.WriteLine());
 
-        public IOutput WriteLine(string line)
-        {
-            WithBrush(() => _inner.WriteLine(line));
-            return this;
-        }
+        public IOutput WriteLine(string line) => WithBrush(() => _inner.WriteLine(line));
 
-        public IOutput Write(string str)
-        {
-            WithBrush(() => _inner.Write(str));
-            return this;
-        }
+        public IOutput Write(string str) => WithBrush(() => _inner.Write(str));
 
         public string Prompt(string prompt, bool mustProvide = true, bool keepHistory = true) 
             => _inner.Prompt(prompt, mustProvide, keepHistory);
 
-        private void WithBrush(Action act)
+        private IOutput WithBrush(Action act)
         {
             var current = Brush.Current;
             _color.Set();
@@ -53,6 +37,8 @@ namespace StoneFruit.Execution.Output
             {
                 current.Set();
             }
+
+            return this;
         }
     }
 }

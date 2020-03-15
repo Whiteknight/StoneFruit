@@ -10,7 +10,6 @@ namespace StoneFruit.Execution.CommandSources
         public ScriptCommandSource(EventScript script)
         {
             _script = script.GetCommands().ToArray();
-            
         }
 
         public void Start()

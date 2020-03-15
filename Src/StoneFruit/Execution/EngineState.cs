@@ -32,6 +32,8 @@ namespace StoneFruit.Execution
             ExitCode = exitCode;
         }
 
+        // TODO: break this out into objects. state.Commands.Add|Remove|Prepend(), state.Metadata.Add|Get() etc
+
         public void AddCommand(string command)
         {
             _additionalCommands.AddLast(command);

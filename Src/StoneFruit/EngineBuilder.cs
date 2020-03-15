@@ -23,6 +23,7 @@ namespace StoneFruit
             _eventCatalog = new EngineEventCatalog();
         }
 
+        // TODO: Review all methods and make sure the names are good
 
         public EngineBuilder SetupHandlers(Action<IHandlerSetup> setup)
         {

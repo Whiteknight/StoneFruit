@@ -16,6 +16,7 @@ namespace StoneFruit
 
     public static class HandlerSetupExtensions
     {
+        // TODO: Review these method names to make sure they make sense
         public static IHandlerSetup UsePublicMethodsAsHandlers(this IHandlerSetup handlers, object instance)
         {
             return handlers.AddSource(new InstanceMethodHandlerSource(instance, null, null));

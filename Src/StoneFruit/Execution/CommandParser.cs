@@ -14,6 +14,7 @@ namespace StoneFruit.Execution
 
         public CommandParser(IParser<char, IArgument> argParser = null)
         {
+            // TODO: VerbParser should be pluggable
             _argsParser = argParser ?? SimplifiedArgumentGrammar.GetParser();
             _verbParser = VerbGrammar.GetParser();
         }

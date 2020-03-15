@@ -23,11 +23,8 @@ namespace StoneFruit.Execution.HandlerSources
                 .ToDictionaryUnique();
         }
 
-        public IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher)
-        {
-            var commandType = _commands.ContainsKey(command.Verb) ? _commands[command.Verb] : null;
-            return commandType == null ? null : ResolveInstance(command, dispatcher, commandType);
-        }
+        public IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher) 
+            => _commands.ContainsKey(command.Verb) ? ResolveInstance(command, dispatcher, _commands[command.Verb]) : null;
 
         public IHandlerBase GetInstance<TCommand>(Command command, CommandDispatcher dispatcher)
             where TCommand : class, IHandlerBase

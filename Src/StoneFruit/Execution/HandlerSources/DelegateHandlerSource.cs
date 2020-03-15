@@ -7,6 +7,7 @@ namespace StoneFruit.Execution.HandlerSources
 {
     public class DelegateHandlerSource : IHandlerSource
     {
+        // TODO: Unit tests
         private readonly Dictionary<string, HandlerFactory> _handlers;
 
         public DelegateHandlerSource()
@@ -16,25 +17,16 @@ namespace StoneFruit.Execution.HandlerSources
 
         public int Count => _handlers.Count;
 
-        public IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher)
-        {
-            return _handlers.ContainsKey(command.Verb) ? _handlers[command.Verb].Create(command, dispatcher) : null;
-        }
+        public IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher) 
+            => _handlers.ContainsKey(command.Verb) ? _handlers[command.Verb].Create(command, dispatcher) : null;
 
-        public IHandlerBase GetInstance<TCommand>(Command command, CommandDispatcher dispatcher) where TCommand : class, IHandlerBase
-        {
-            return null;
-        }
+        public IHandlerBase GetInstance<TCommand>(Command command, CommandDispatcher dispatcher) 
+            where TCommand : class, IHandlerBase 
+            => null;
 
-        public IEnumerable<IVerbInfo> GetAll()
-        {
-            return _handlers.Values;
-        }
+        public IEnumerable<IVerbInfo> GetAll() => _handlers.Values;
 
-        public IVerbInfo GetByName(string name)
-        {
-            return _handlers.ContainsKey(name) ? _handlers[name] : null;
-        }
+        public IVerbInfo GetByName(string name) => _handlers.ContainsKey(name) ? _handlers[name] : null;
 
         public DelegateHandlerSource Add(string verb, Action<Command, CommandDispatcher> act, string description = null, string usage = null)
         {
@@ -129,7 +121,6 @@ namespace StoneFruit.Execution.HandlerSources
                 _command = command;
                 _dispatcher = dispatcher;
             }
-
 
             public Task ExecuteAsync(CancellationToken cancellation)
             {

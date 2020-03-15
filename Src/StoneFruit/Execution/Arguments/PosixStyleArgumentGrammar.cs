@@ -33,7 +33,8 @@ namespace StoneFruit.Execution.Arguments
                 unquotedValue
             );
 
-            // TODO: we can be more flexible here, because the "--" prefix demarcates the name unambiguously
+            // TODO: we can be more flexible here, because the "--" prefix demarcates the name unambiguously.
+            // The name can be numbers or symbols or anything besides whitespace.
             var name = Identifier();
 
             var singleDash = Match('-');

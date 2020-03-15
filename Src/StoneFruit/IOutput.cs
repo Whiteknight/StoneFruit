@@ -69,9 +69,6 @@ namespace StoneFruit
             return output.Write(line);
         }
 
-        public static IOutput Color(this IOutput output, ConsoleColor color)
-        {
-            return output.Color((Brush) color);
-        }
+        public static IOutput Color(this IOutput output, ConsoleColor color) => output.Color((Brush) color);
     }
 }

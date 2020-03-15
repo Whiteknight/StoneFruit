@@ -2,6 +2,9 @@
 
 namespace StoneFruit.Execution.CommandSources
 {
+    /// <summary>
+    /// Ordered collection of ICommandSources
+    /// </summary>
     public class CommandSourceCollection 
     {
         private readonly LinkedList<Node> _sources;

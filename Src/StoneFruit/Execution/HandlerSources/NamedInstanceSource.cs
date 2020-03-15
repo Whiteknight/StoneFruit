@@ -6,6 +6,7 @@ namespace StoneFruit.Execution.HandlerSources
 {
     public class NamedInstanceSource : IHandlerSource
     {
+        // TODO: Unit tests
         private readonly Dictionary<string, VerbInfo> _verbs;
 
         public NamedInstanceSource()
