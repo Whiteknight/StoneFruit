@@ -5,28 +5,29 @@ using System.Reflection;
 
 namespace StoneFruit.Utility
 {
-    public static class StringExtensions
-    {
-        public static string RemoveSuffix(this string s, string suffix)
-        {
-            if (string.IsNullOrEmpty(s))
-                return string.Empty;
-            if (s.Length < suffix.Length)
-                return s;
-            if (s.EndsWith(suffix))
-                return s.Substring(0, s.Length - suffix.Length);
-            return s;
-        }
-    }
-
     public static class TypeExtensions
     {
+        /// <summary>
+        /// Attempt to get the Description of an IHandlerBase class
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static string GetDescription(this Type type) 
             => GetPublicStaticStringPropertyValue(type, "Description");
 
+        /// <summary>
+        /// Attempt to get the Usage of an IHandlerBase class
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static string GetUsage(this Type type) 
             => GetPublicStaticStringPropertyValue(type, "Usage") ?? GetDescription(type);
 
+        /// <summary>
+        /// Attempt to get the list of verbs for an IHandlerBase class
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static IEnumerable<string> GetVerbs(this Type type)
         {
             if (!typeof(IHandlerBase).IsAssignableFrom(type))
@@ -58,6 +59,13 @@ namespace StoneFruit.Utility
             return null;
         }
 
+        /// <summary>
+        /// Return true if the given verb should display in the Help output for the given handler. False
+        /// otherwise.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="verb"></param>
+        /// <returns></returns>
         public static bool ShouldShowInHelp(this Type type, string verb)
         {
             var attrs = type.GetCustomAttributes<VerbAttribute>().ToList();

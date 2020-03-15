@@ -4,6 +4,9 @@ using StoneFruit.Utility;
 
 namespace StoneFruit
 {
+    /// <summary>
+    /// Value to represent a foreground/background color combination for writing on the windows terminal.
+    /// </summary>
     public struct Brush : IEquatable<Brush>
     {
         public Brush(byte byteValue)

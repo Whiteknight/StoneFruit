@@ -16,7 +16,8 @@ namespace StoneFruit.Handlers
 
         public static string Description => "Run a single command or a list of commands";
 
-        public static string Usage => @"run ...
+        public static string Usage => @"run <command>+
+
 Allows passing a list of commands to be executed sequentially. Use quotes to group commands and their
 arguments. For example:
 

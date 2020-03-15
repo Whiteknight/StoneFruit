@@ -1,4 +1,5 @@
 ﻿using System;
+using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Arguments
 {
@@ -58,14 +59,13 @@ namespace StoneFruit.Execution.Arguments
     public static class ArgumentExtensions
     {
         /// <summary>
-        /// Throw an error if the argument doesn't exist, instead of using default values
+        /// Throw an exception if the argument does not exist.
         /// </summary>
         /// <param name="argument"></param>
         /// <returns></returns>
         public static IArgument Require(this IArgument argument)
         {
-            if (argument == null)
-                throw new ArgumentNullException(nameof(argument));
+            Assert.ArgumentNotNull(argument, nameof(argument));
             (argument as MissingArgument)?.Throw();
             return argument;
         }

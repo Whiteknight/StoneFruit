@@ -103,6 +103,7 @@ namespace StoneFruit.Execution.Arguments
         // TODO: GetAllPositionalValues (naming?)
         // TODO: GetAllFlags (naming?)
         // TODO: GetAllNamedValues (naming?)
+        // TODO: VerifyAllAreUsed() throws an exception for any unconsumed args
 
         public IEnumerable<IArgument> GetAllPositionals() => _positionals.Where(a => !a.Consumed);
 

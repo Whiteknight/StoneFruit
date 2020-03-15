@@ -7,7 +7,7 @@ using StoneFruit.Utility;
 namespace StoneFruit
 {
     /// <summary>
-    /// Handles dispatch of commands to appropriate ICommandVerb objects
+    /// Dispatches control to the appropriate handler for a given verb.
     /// </summary>
     public class CommandDispatcher
     {
@@ -24,6 +24,20 @@ namespace StoneFruit
             Environments = environments;
             State = state;
             Output = output;
+        }
+
+        public void Execute(string commandString, CancellationTokenSource tokenSource = null)
+        {
+            Assert.ArgumentNotNullOrEmpty(commandString, nameof(commandString));
+            var Command = Parser.ParseCommand(commandString);
+            Execute(Command, tokenSource);
+        }
+
+        public void Execute(string verb, CommandArguments args, CancellationTokenSource tokenSource = null)
+        {
+            Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
+            var Command = new Command(verb, args);
+            Execute(Command, tokenSource);
         }
 
         private void Execute(Command command, CancellationTokenSource tokenSource = null)
@@ -49,20 +63,6 @@ namespace StoneFruit
             }
 
             return null;
-        }
-
-        public void Execute(string commandString, CancellationTokenSource tokenSource = null)
-        {
-            Assert.ArgumentNotNullOrEmpty(commandString, nameof(commandString));
-            var Command = Parser.ParseCommand(commandString);
-            Execute(Command, tokenSource);
-        }
-
-        public void Execute(string verb, CommandArguments args, CancellationTokenSource tokenSource = null)
-        {
-            Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
-            var Command = new Command(verb, args);
-            Execute(Command, tokenSource);
         }
 
         private class AsyncDispatchHandler : IHandler
