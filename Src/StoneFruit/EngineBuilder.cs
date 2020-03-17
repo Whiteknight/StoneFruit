@@ -24,8 +24,11 @@ namespace StoneFruit
             _eventCatalog = new EngineEventCatalog();
         }
 
-        // TODO: Review all methods and make sure the names are good
-
+        /// <summary>
+        /// Setup verbs and their handlers
+        /// </summary>
+        /// <param name="setup"></param>
+        /// <returns></returns>
         public EngineBuilder SetupHandlers(Action<IHandlerSetup> setup)
         {
             setup?.Invoke(_handlers);
@@ -51,7 +54,7 @@ namespace StoneFruit
         /// </summary>
         /// <param name="environment"></param>
         /// <returns></returns>
-        public EngineBuilder UseSingleEnvironment(object environment)
+        public EngineBuilder UseEnvironment(object environment)
         {
             EnsureEnvironmentsNotSet();
             _environments = new InstanceEnvironmentCollection(environment);
@@ -62,7 +65,7 @@ namespace StoneFruit
         /// Specify that the application does not use an environment
         /// </summary>
         /// <returns></returns>
-        public EngineBuilder NoEnvironment() => UseSingleEnvironment(null);
+        public EngineBuilder NoEnvironment() => UseEnvironment(null);
 
         /// <summary>
         /// Specify an argument parser to use
@@ -110,7 +113,7 @@ namespace StoneFruit
         /// </summary>
         /// <param name="output"></param>
         /// <returns></returns>
-        public EngineBuilder UseTerminalOutput(IOutput output)
+        public EngineBuilder UseOutput(IOutput output)
         {
             // TODO: should we have some sort of tee/multiplex output?
             EnsureOutputNotSet();
@@ -118,6 +121,11 @@ namespace StoneFruit
             return this;
         }
 
+        /// <summary>
+        /// Setup the scripts which are executed in response to various events
+        /// </summary>
+        /// <param name="setup"></param>
+        /// <returns></returns>
         public EngineBuilder SetupEvents(Action<EngineEventCatalog> setup)
         {
             setup?.Invoke(_eventCatalog);

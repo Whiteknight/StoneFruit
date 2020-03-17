@@ -13,7 +13,7 @@ namespace StoneFruit.Tests.Integration
             var output = new TestOutput();
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(EchoHandler)))
-                .UseTerminalOutput(output)
+                .UseOutput(output)
                 .Build();
             engine.RunHeadless("echo 'test'");
             output.Lines.Count.Should().Be(1);
