@@ -29,14 +29,14 @@ namespace StoneFruit.Execution
             HeadlessHelp = new EventScript(
                 $"{HelpHandler.Name}",
                 // Call 'exit' explicitly so we can set the exit code
-                $"{ExitHandler.Name} {Engine.ExitCodeHeadlessHelp}"
+                $"{ExitHandler.Name} {Constants.ExitCodeHeadlessHelp}"
             );
 
             // Attempt to enter headless mode without providing any arguments
             HeadlessNoArgs = new EventScript(
                 $"{EchoHandler.Name} 'Please provide a verb'",
                 // Call 'exit' so we can set an explicit error exit code
-                $"{ExitHandler.Name} {Engine.ExitCodeHeadlessNoVerb}"
+                $"{ExitHandler.Name} {Constants.ExitCodeHeadlessNoVerb}"
             );
 
             // TODO: It would be nice to be able to pass the name of the unknown verb here, so we could

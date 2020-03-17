@@ -2,9 +2,8 @@
 using System.Linq;
 using System.Threading;
 using StoneFruit.Execution.CommandSources;
-using StoneFruit.Execution.Environments;
-using StoneFruit.Execution.Output;
 using StoneFruit.Handlers;
+using StoneFruit.Utility;
 
 namespace StoneFruit.Execution
 {
@@ -13,14 +12,6 @@ namespace StoneFruit.Execution
     /// </summary>
     public class Engine
     {
-        // TODO: Move these to a better place
-        public const int ExitCodeOk = 0;
-        public const int ExitCodeHeadlessHelp = 0;
-        public const int ExitCodeHeadlessNoVerb = 1;
-        public const int ExitCodeCascadeError = 2;
-
-        public const string MetadataError = "__CURRENT_EXCEPTION";
-
         private readonly IEnvironmentCollection _environments;
         private readonly IHandlerSource _commandSource;
         private readonly EngineEventCatalog _eventCatalog;
@@ -29,13 +20,20 @@ namespace StoneFruit.Execution
 
         public Engine(IHandlerSource commands, IEnvironmentCollection environments, CommandParser parser, IOutput output, EngineEventCatalog eventCatalog)
         {
-            _environments = environments ?? new InstanceEnvironmentCollection(null);
-            // TODO: If we have 0 commands, we might want to just abort?
-            // Otherwise, how do we enforce that we have something here?
-            _commandSource = commands;
+            Assert.ArgumentNotNull(commands, nameof(commands));
+            Assert.ArgumentNotNull(environments, nameof(environments));
+            Assert.ArgumentNotNull(parser, nameof(parser));
+            Assert.ArgumentNotNull(output, nameof(output));
+            Assert.ArgumentNotNull(eventCatalog, nameof(eventCatalog));
+            
+            _environments = environments;
             _eventCatalog = eventCatalog;
-            _parser = parser ?? CommandParser.GetDefault();
-            _output = output ?? new ConsoleOutput();
+            _parser = parser;
+            _output = output;
+            _commandSource = commands;
+
+            if (!_commandSource.GetAll().Any())
+                throw EngineException.NoHandlers();
         }
 
         /// <summary>
@@ -183,7 +181,7 @@ namespace StoneFruit.Execution
                 if (string.IsNullOrEmpty(command))
                     command = sources.GetNextCommand();
                 if (string.IsNullOrEmpty(command))
-                    return ExitCodeOk;
+                    return Constants.ExitCodeOk;
 
                 // Dispatch the command to the handler, dealing with any errors that may arise
                 try
@@ -214,7 +212,7 @@ namespace StoneFruit.Execution
         {
             // If we're in an error loop (throw an exception while handling a previous exception) show an
             // angry error message and signal for exit.
-            var currentException = state.GetMetadata(MetadataError);
+            var currentException = state.GetMetadata(Constants.MetadataError);
             if (currentException != null)
             {
                 _output
@@ -224,12 +222,12 @@ namespace StoneFruit.Execution
                     .WriteLine("Make sure you clear the current exception when you are done handling it to avoid these situations")
                     .WriteLine(e.Message)
                     .WriteLine(e.StackTrace);
-                state.Exit(ExitCodeCascadeError);
+                state.Exit(Constants.ExitCodeCascadeError);
             }
 
             // Otherwise add the error-handling script to the command queue so the queue loop can handle it.
-            state.AddMetadata(MetadataError, e, false);
-            state.PrependCommand($"{MetadataRemoveHandler.Name} {MetadataError}");
+            state.AddMetadata(Constants.MetadataError, e, false);
+            state.PrependCommand($"{MetadataRemoveHandler.Name} {Constants.MetadataError}");
             state.PrependCommands(script.GetCommands());
         }
     }

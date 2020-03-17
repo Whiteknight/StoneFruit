@@ -5,6 +5,7 @@ using ParserObjects.Parsers;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Environments;
+using StoneFruit.Execution.Output;
 using StoneFruit.Setup;
 
 namespace StoneFruit
@@ -130,9 +131,10 @@ namespace StoneFruit
         public Engine Build()
         {
             var commandSource = _handlers.Build();
-            var environmentFactory = _environments;
-            var parser = new CommandParser(_argParser);
-            return new Engine(commandSource, environmentFactory, parser, _output, _eventCatalog);
+            var environmentFactory = _environments ?? new InstanceEnvironmentCollection(null);
+            var parser = _argParser == null ? CommandParser.GetDefault() : new CommandParser(_argParser);
+            var output = _output ?? new ConsoleOutput();
+            return new Engine(commandSource, environmentFactory, parser, output, _eventCatalog);
         }
 
         private void EnsureEnvironmentsNotSet()
