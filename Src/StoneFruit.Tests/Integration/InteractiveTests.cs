@@ -13,7 +13,7 @@ namespace StoneFruit.Tests.Integration
             var output = new TestOutput("echo 'test'");
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(EchoHandler)))
-                .UseOutput(output)
+                .SetupOutput(o => o.Add(output))
                 .SetupEvents(c =>
                 {
                     // We have to clear the script here otherwise it will try to set the environment

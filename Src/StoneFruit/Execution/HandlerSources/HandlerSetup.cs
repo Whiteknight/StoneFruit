@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using StoneFruit.Execution;
-using StoneFruit.Execution.HandlerSources;
 
-namespace StoneFruit.Setup
+namespace StoneFruit.Execution.HandlerSources
 {
     public class HandlerSetup : IHandlerSetup
     {

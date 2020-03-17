@@ -5,23 +5,24 @@ using ParserObjects.Parsers;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Environments;
+using StoneFruit.Execution.HandlerSources;
 using StoneFruit.Execution.Output;
-using StoneFruit.Setup;
 
 namespace StoneFruit
 {
     public class EngineBuilder
     {
         private readonly HandlerSetup _handlers;
+        private readonly OutputSetup _output;
         private readonly EngineEventCatalog _eventCatalog;
         private IEnvironmentCollection _environments;
         private IParser<char, IArgument> _argParser;
-        private IOutput _output;
 
         public EngineBuilder()
         {
             _handlers = new HandlerSetup();
             _eventCatalog = new EngineEventCatalog();
+            _output = new OutputSetup();
         }
 
         /// <summary>
@@ -109,15 +110,13 @@ namespace StoneFruit
             => UseArgumentParser(WindowsCmdArgumentGrammar.GetParser());
 
         /// <summary>
-        /// Specify the object to use for user I/O and interaction
+        /// Setup output
         /// </summary>
-        /// <param name="output"></param>
+        /// <param name="setup"></param>
         /// <returns></returns>
-        public EngineBuilder UseOutput(IOutput output)
+        public EngineBuilder SetupOutput(Action<IOutputSetup> setup)
         {
-            // TODO: should we have some sort of tee/multiplex output?
-            EnsureOutputNotSet();
-            _output = output;
+            setup?.Invoke(_output);
             return this;
         }
 
@@ -141,7 +140,7 @@ namespace StoneFruit
             var commandSource = _handlers.Build();
             var environmentFactory = _environments ?? new InstanceEnvironmentCollection(null);
             var parser = _argParser == null ? CommandParser.GetDefault() : new CommandParser(_argParser);
-            var output = _output ?? new ConsoleOutput();
+            var output = _output.Build();
             return new Engine(commandSource, environmentFactory, parser, output, _eventCatalog);
         }
 
@@ -155,12 +154,6 @@ namespace StoneFruit
         {
             if (_argParser != null)
                 throw new Exception("Argument parser is already set for this builder. You cannot set a second argument parser.");
-        }
-
-        private void EnsureOutputNotSet()
-        {
-            if (_output != null)
-                throw new Exception("Terminal Output already setup for this builder. You cannot set a second terminal output.");
         }
     }
 }
