@@ -2,6 +2,8 @@
 {
     public interface IOutputSetup
     {
+        IOutputSetup DoNotUseConsole();
+
         /// <summary>
         /// Add a secondary output to receive a copy of output text. This text will not include color and
         /// will not participate with interactive prompts.

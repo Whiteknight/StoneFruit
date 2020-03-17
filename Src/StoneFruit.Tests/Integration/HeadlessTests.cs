@@ -13,7 +13,7 @@ namespace StoneFruit.Tests.Integration
             var output = new TestOutput();
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(EchoHandler)))
-                .SetupOutput(o => o.Add(output))
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEvents(c =>
                 {
                     c.EngineStartHeadless.Add("echo start");
@@ -49,7 +49,7 @@ namespace StoneFruit.Tests.Integration
             var output = new TestOutput();
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(EchoHandler), typeof(TestHelpHandler)))
-                .SetupOutput(o => o.Add(output))
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEvents(c =>
                 {
                     c.HeadlessHelp.Clear();

@@ -15,7 +15,7 @@ namespace StoneFruit
         private readonly HandlerSetup _handlers;
         private readonly OutputSetup _output;
         private readonly EngineEventCatalog _eventCatalog;
-        private IEnvironmentCollection _environments;
+        private readonly EnvironmentSetup _environments;
         private IParser<char, IArgument> _argParser;
 
         public EngineBuilder()
@@ -23,6 +23,7 @@ namespace StoneFruit
             _handlers = new HandlerSetup();
             _eventCatalog = new EngineEventCatalog();
             _output = new OutputSetup();
+            _environments = new EnvironmentSetup();
         }
 
         /// <summary>
@@ -36,37 +37,11 @@ namespace StoneFruit
             return this;
         }
 
-        /// <summary>
-        /// Specify a factory for available environments, if the user should be able to
-        /// select from multiple options
-        /// </summary>
-        /// <param name="factory"></param>
-        /// <returns></returns>
-        public EngineBuilder UseEnvironmentFactory(IEnvironmentFactory factory)
+        public EngineBuilder SetupEnvironments(Action<IEnvironmentSetup> setup)
         {
-            EnsureEnvironmentsNotSet();
-            _environments = factory == null ? null : new FactoryEnvironmentCollection(factory);
+            setup?.Invoke(_environments);
             return this;
         }
-
-        /// <summary>
-        /// Specify a single environment to use. An environment may represent configuration
-        /// or execution-context information
-        /// </summary>
-        /// <param name="environment"></param>
-        /// <returns></returns>
-        public EngineBuilder UseEnvironment(object environment)
-        {
-            EnsureEnvironmentsNotSet();
-            _environments = new InstanceEnvironmentCollection(environment);
-            return this;
-        }
-
-        /// <summary>
-        /// Specify that the application does not use an environment
-        /// </summary>
-        /// <returns></returns>
-        public EngineBuilder NoEnvironment() => UseEnvironment(null);
 
         /// <summary>
         /// Specify an argument parser to use
@@ -138,16 +113,10 @@ namespace StoneFruit
         public Engine Build()
         {
             var commandSource = _handlers.Build();
-            var environmentFactory = _environments ?? new InstanceEnvironmentCollection(null);
+            var environmentFactory = _environments.Build();
             var parser = _argParser == null ? CommandParser.GetDefault() : new CommandParser(_argParser);
             var output = _output.Build();
             return new Engine(commandSource, environmentFactory, parser, output, _eventCatalog);
-        }
-
-        private void EnsureEnvironmentsNotSet()
-        {
-            if (_environments != null)
-                throw new Exception("Environments are already configured for this builder. You cannot set environments again");
         }
 
         private void EnsureArgumentParserNotSet()
