@@ -31,9 +31,9 @@ namespace StoneFruit.Cli
                 //.UseEnvironmentFactory(new MyEnvironmentFactory())
                 .SetupEvents(e =>
                 {
-                    e.EngineStartInteractive.Add("help");
-                    e.EngineStopInteractive.Add("echo 'goodbye'");
-                    e.EngineError.Add("echo 'you dun goofed'");
+                    //e.EngineStartInteractive.Add("help");
+                    //e.EngineStopInteractive.Add("echo 'goodbye'");
+                    //e.EngineError.Add("echo 'you dun goofed'");
                 })
                 .Build();
             Environment.ExitCode = engine.RunWithCommandLineArguments();

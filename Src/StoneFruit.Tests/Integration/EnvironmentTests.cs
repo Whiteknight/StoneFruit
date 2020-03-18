@@ -103,10 +103,16 @@ namespace StoneFruit.Tests.Integration
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(TestEnvironmentHandler), typeof(EnvironmentChangeHandler), typeof(EchoHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEnvironments(e => e.UseFactory(new TestEnvironmentFactory()))
+                // Clear out start/stop scripts so we don't have anything extra in output
+                .SetupEvents(c =>
+                {
+                    c.EngineStartInteractive.Clear();
+                    c.EngineStopInteractive.Clear();
+                })
                 .Build();
             engine.RunInteractively("C");
-            output.Lines.Count.Should().Be(4);
-            output.Lines[3].Should().Be("C");
+            output.Lines.Count.Should().Be(1);
+            output.Lines[0].Should().Be("C");
         }
     }
 }

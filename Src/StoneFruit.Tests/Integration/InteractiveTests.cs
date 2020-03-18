@@ -23,12 +23,10 @@ namespace StoneFruit.Tests.Integration
                 })
                 .Build();
             engine.RunInteractively();
-            output.Lines.Count.Should().Be(6);
+            output.Lines.Count.Should().Be(3);
             output.Lines[0].Should().Be("start");
-            // TODO: Lines 1, 2, and 3 are prompt which we should be able to control and remove from the
-            // script somehow
-            output.Lines[4].Should().Be("test");
-            output.Lines[5].Should().Be("stop");
+            output.Lines[1].Should().Be("test");
+            output.Lines[2].Should().Be("stop");
         }
     }
 }
