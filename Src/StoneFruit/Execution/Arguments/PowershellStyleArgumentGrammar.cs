@@ -25,7 +25,7 @@ namespace StoneFruit.Execution.Arguments
                 .List(true)
                 .Transform(c => new string(c.ToArray()));
 
-            var whitespace = Whitespace();
+            var whitespace = OptionalWhitespace();
 
             // <doubleQuotedString> | <singleQuotedString> | <unquotedValue>
             var values = First(
