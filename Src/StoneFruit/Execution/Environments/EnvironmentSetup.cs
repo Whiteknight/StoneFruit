@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace StoneFruit.Execution.Environments
 {
@@ -16,7 +15,7 @@ namespace StoneFruit.Execution.Environments
         /// </summary>
         /// <param name="factory"></param>
         /// <returns></returns>
-        public IEnvironmentSetup UseEnvironmentFactory(IEnvironmentFactory factory)
+        public IEnvironmentSetup UseFactory(IEnvironmentFactory factory)
         {
             EnsureEnvironmentsNotSet();
             _environments = factory == null ? null : new FactoryEnvironmentCollection(factory);
@@ -29,14 +28,14 @@ namespace StoneFruit.Execution.Environments
         /// </summary>
         /// <param name="environment"></param>
         /// <returns></returns>
-        public IEnvironmentSetup UseEnvironment(object environment)
+        public IEnvironmentSetup UseInstance(object environment)
         {
             EnsureEnvironmentsNotSet();
             _environments = new InstanceEnvironmentCollection(environment);
             return this;
         }
 
-        public IEnvironmentSetup UseEnvironments(IReadOnlyDictionary<string, object> environments)
+        public IEnvironmentSetup UseInstances(IReadOnlyDictionary<string, object> environments)
         {
             EnsureEnvironmentsNotSet();
             _environments = environments == null ? null : new FactoryEnvironmentCollection(new DictionaryEnvironmentFactory(environments));
@@ -47,7 +46,7 @@ namespace StoneFruit.Execution.Environments
         /// Specify that the application does not use an environment
         /// </summary>
         /// <returns></returns>
-        public IEnvironmentSetup NoEnvironment() => UseEnvironment(null);
+        public IEnvironmentSetup None() => UseInstance(null);
 
         private void EnsureEnvironmentsNotSet()
         {

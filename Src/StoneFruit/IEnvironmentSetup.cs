@@ -1,9 +1,12 @@
-﻿namespace StoneFruit
+﻿using System.Collections.Generic;
+
+namespace StoneFruit
 {
     public interface IEnvironmentSetup
     {
-        IEnvironmentSetup UseEnvironmentFactory(IEnvironmentFactory factory);
-        IEnvironmentSetup UseEnvironment(object environment);
-        IEnvironmentSetup NoEnvironment();
+        IEnvironmentSetup UseFactory(IEnvironmentFactory factory);
+        IEnvironmentSetup UseInstance(object environment);
+        IEnvironmentSetup UseInstances(IReadOnlyDictionary<string, object> environments);
+        IEnvironmentSetup None();
     }
 }
