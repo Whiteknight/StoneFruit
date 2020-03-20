@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
+using StoneFruit.Execution.Scripts;
 using StoneFruit.Utility;
 
 namespace StoneFruit
@@ -24,6 +25,15 @@ namespace StoneFruit
             Environments = environments;
             State = state;
             Output = output;
+        }
+
+        public void Execute(CommandObjectOrString command, CancellationTokenSource tokenSource = null)
+        {
+            Assert.ArgumentNotNull(command, nameof(command));
+            if (command.Object != null)
+                Execute(command.Object, tokenSource);
+            else if (!string.IsNullOrEmpty(command.String))
+                Execute(command.String, tokenSource);
         }
 
         public void Execute(string commandString, CancellationTokenSource tokenSource = null)

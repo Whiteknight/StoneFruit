@@ -17,7 +17,7 @@
 
         public bool Consumed => true;
 
-        public IArgument MarkConsumed() => this;
+        public IArgument MarkConsumed(bool consumed = true) => this;
 
         public string AsString(string defaultValue = null) => defaultValue;
 

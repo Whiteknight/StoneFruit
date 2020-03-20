@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using StoneFruit.Execution.Scripts;
 
 namespace StoneFruit.Execution
 {
@@ -9,7 +10,7 @@ namespace StoneFruit.Execution
     /// </summary>
     public class EngineState
     {
-        private readonly LinkedList<string> _additionalCommands;
+        private readonly LinkedList<CommandObjectOrString> _additionalCommands;
         private readonly Dictionary<string, object> _metadata;
 
         public EngineState(bool headless, EngineEventCatalog eventCatalog)
@@ -17,7 +18,7 @@ namespace StoneFruit.Execution
             Headless = headless;
             EventCatalog = eventCatalog;
             ShouldExit = false;
-            _additionalCommands = new LinkedList<string>();
+            _additionalCommands = new LinkedList<CommandObjectOrString>();
             _metadata = new Dictionary<string, object>();
         }
 
@@ -36,7 +37,12 @@ namespace StoneFruit.Execution
 
         public void AddCommand(string command)
         {
-            _additionalCommands.AddLast(command);
+            _additionalCommands.AddLast(CommandObjectOrString.FromString(command));
+        }
+
+        public void AddCommand(Command command)
+        {
+            _additionalCommands.AddLast(CommandObjectOrString.FromObject(command));
         }
 
         public void AddCommands(IEnumerable<string> commands)
@@ -49,15 +55,20 @@ namespace StoneFruit.Execution
         {
             var list = commands.ToList();
             for (int i = list.Count - 1; i >= 0; i--)
-                _additionalCommands.AddFirst(list[i]);
+                _additionalCommands.AddFirst(CommandObjectOrString.FromString(list[i]));
         }
 
         public void PrependCommand(string command)
         {
-            _additionalCommands.AddFirst(command);
+            _additionalCommands.AddFirst(CommandObjectOrString.FromString(command));
         }
 
-        public string GetNextCommand()
+        public void PrependCommand(Command command)
+        {
+            _additionalCommands.AddFirst(CommandObjectOrString.FromObject(command));
+        }
+
+        public CommandObjectOrString GetNextCommand()
         {
             if (_additionalCommands.Count == 0)
                 return null;

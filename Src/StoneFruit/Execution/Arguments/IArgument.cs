@@ -22,7 +22,7 @@ namespace StoneFruit.Execution.Arguments
         /// Mark the value as being consumed
         /// </summary>
         /// <returns></returns>
-        IArgument MarkConsumed();
+        IArgument MarkConsumed(bool consumed = true);
 
         /// <summary>
         /// Get the value of the argument as a string, with a default value if the argument doesn't exist.

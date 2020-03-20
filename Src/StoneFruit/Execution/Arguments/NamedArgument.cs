@@ -17,9 +17,9 @@
         
         public bool Consumed { get; private set; }
 
-        public IArgument MarkConsumed()
+        public IArgument MarkConsumed(bool consumed = true)
         {
-            Consumed = true;
+            Consumed = consumed;
             return this;
         }
 

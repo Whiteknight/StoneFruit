@@ -18,6 +18,7 @@ namespace StoneFruit
         /// <returns></returns>
         IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher);
 
+        // TODO: Evaluate this method and make sure we need it on this abstraction
         /// <summary>
         /// Attempts to instantiate the handler of the specified type. For sources which
         /// do not use type-based handlers this will be a no-op.

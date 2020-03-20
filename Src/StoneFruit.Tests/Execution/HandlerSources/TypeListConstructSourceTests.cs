@@ -7,9 +7,9 @@ using StoneFruit.Execution.Environments;
 using StoneFruit.Execution.HandlerSources;
 using StoneFruit.Execution.Output;
 
-namespace StoneFruit.Tests.Execution.VerbSources
+namespace StoneFruit.Tests.Execution.HandlerSources
 {
-    public class TypeListConstructCommandSourceTests
+    public class TypeListConstructSourceTests
     {
         private class TestCommandHandler : IHandler
         {

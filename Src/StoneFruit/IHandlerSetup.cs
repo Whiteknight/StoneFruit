@@ -12,6 +12,8 @@ namespace StoneFruit
         IHandlerSetup AddSource(IHandlerSource source);
         IHandlerSetup Add(string verb, Action<Command, CommandDispatcher> handle, string description = null, string usage = null);
         IHandlerSetup AddAsync(string verb, Func<Command, CommandDispatcher, Task> handleAsync, string description = null, string usage = null);
+
+        IHandlerSetup AddScript(string verb, IEnumerable<string> lines, string description = null, string usage = null);
     }
 
     public static class HandlerSetupExtensions

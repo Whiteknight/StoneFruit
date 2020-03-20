@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using StoneFruit.Execution.CommandSources;
+using StoneFruit.Execution.Scripts;
 using StoneFruit.Handlers;
 using StoneFruit.Utility;
 
@@ -177,10 +178,8 @@ namespace StoneFruit.Execution
             {
                 // Get a command. If we have one in the state use that. Otherwise try to get one from the
                 // sources.
-                var command = state.GetNextCommand();
-                if (string.IsNullOrEmpty(command))
-                    command = sources.GetNextCommand();
-                if (string.IsNullOrEmpty(command))
+                var command = state.GetNextCommand() ?? CommandObjectOrString.FromString(sources.GetNextCommand());
+                if (command == null)
                     return Constants.ExitCodeOk;
 
                 // Dispatch the command to the handler, dealing with any errors that may arise

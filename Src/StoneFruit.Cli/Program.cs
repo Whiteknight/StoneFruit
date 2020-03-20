@@ -25,8 +25,10 @@ namespace StoneFruit.Cli
                     //.UseNinjectHandlerSource()
                     //.UseStructureMapHandlerSource()
                     //.UseCommands(typeof(HelpCommand), typeof(ExitCommand))
-                    .UsePublicMethodsAsHandlers(new MyObject())
-                    .Add("testf", (c, d) => d.Output.WriteLine("F"))
+                    //.UsePublicMethodsAsHandlers(new MyObject())
+                    //.Add("testf", (c, d) => d.Output.WriteLine("F"))
+                    .AddScript("testg", new [] { "echo test", "echo g" })
+                    .AddScript("testh", new[] { "echo [0]", "echo ['a']" })
                 )
                 //.UseEnvironmentFactory(new MyEnvironmentFactory())
                 .SetupEvents(e =>
