@@ -26,10 +26,6 @@ namespace StoneFruit.Execution.Scripts
             return new ScriptHandler(_scripts[command.Verb], command, dispatcher.State);
         }
 
-        public IHandlerBase GetInstance<TCommand>(Command command, CommandDispatcher dispatcher) 
-            where TCommand : class, IHandlerBase 
-            => null;
-
         public IEnumerable<IVerbInfo> GetAll() => _scripts.Values;
 
         public IVerbInfo GetByName(string name) => _scripts.ContainsKey(name) ? _scripts[name] : null;

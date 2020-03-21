@@ -20,10 +20,6 @@ namespace StoneFruit.Execution.HandlerSources
         public IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher) 
             => _handlers.ContainsKey(command.Verb) ? _handlers[command.Verb].Create(command, dispatcher) : null;
 
-        public IHandlerBase GetInstance<TCommand>(Command command, CommandDispatcher dispatcher) 
-            where TCommand : class, IHandlerBase 
-            => null;
-
         public IEnumerable<IVerbInfo> GetAll() => _handlers.Values;
 
         public IVerbInfo GetByName(string name) => _handlers.ContainsKey(name) ? _handlers[name] : null;

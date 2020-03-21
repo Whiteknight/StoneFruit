@@ -23,14 +23,6 @@ namespace StoneFruit.Execution.HandlerSources
                 .FirstOrDefault(commandVerb => commandVerb != null);
         }
 
-        public IHandlerBase GetInstance<TCommand>(Command command, CommandDispatcher dispatcher) 
-            where TCommand : class, IHandlerBase
-        {
-            return _sources
-                .Select(source => source.GetInstance<TCommand>(command, dispatcher))
-                .FirstOrDefault(commandVerb => commandVerb != null);
-        }
-
         public IEnumerable<IVerbInfo> GetAll()
         {
             return _sources.SelectMany(s => s.GetAll())

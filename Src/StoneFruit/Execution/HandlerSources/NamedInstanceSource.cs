@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace StoneFruit.Execution.HandlerSources
 {
@@ -25,10 +24,6 @@ namespace StoneFruit.Execution.HandlerSources
 
         public IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher) 
             => _verbs.ContainsKey(command.Verb) ? _verbs[command.Verb].HandlerObject : null;
-
-        public IHandlerBase GetInstance<TCommand>(Command command, CommandDispatcher dispatcher) 
-            where TCommand : class, IHandlerBase
-            => _verbs.Values.OfType<TCommand>().FirstOrDefault();
 
         public IEnumerable<IVerbInfo> GetAll() => _verbs.Values;
 

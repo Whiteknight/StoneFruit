@@ -18,18 +18,6 @@ namespace StoneFruit
         /// <returns></returns>
         IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher);
 
-        // TODO: Evaluate this method and make sure we need it on this abstraction
-        /// <summary>
-        /// Attempts to instantiate the handler of the specified type. For sources which
-        /// do not use type-based handlers this will be a no-op.
-        /// </summary>
-        /// <typeparam name="TCommand"></typeparam>
-        /// <param name="command"></param>
-        /// <param name="dispatcher"></param>
-        /// <returns></returns>
-        IHandlerBase GetInstance<TCommand>(Command command, CommandDispatcher dispatcher)
-            where TCommand : class, IHandlerBase;
-
         /// <summary>
         /// Get metadata information about all verbs registered with this source
         /// </summary>

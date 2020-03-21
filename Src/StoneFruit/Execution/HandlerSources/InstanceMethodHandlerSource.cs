@@ -41,12 +41,6 @@ namespace StoneFruit.Execution.HandlerSources
             return null;
         }
 
-        public IHandlerBase GetInstance<TCommand>(Command command, CommandDispatcher dispatcher) 
-            where TCommand : class, IHandlerBase
-        {
-            throw new NotImplementedException();
-        }
-
         public IEnumerable<IVerbInfo> GetAll()
         {
             return _methods.Select(kvp => new MethodInfoVerbInfo(kvp.Key, kvp.Value, _getDescription, _getUsage));
