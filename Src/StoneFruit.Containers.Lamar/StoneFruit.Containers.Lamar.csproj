@@ -6,7 +6,7 @@
     <RootNamespace>StoneFruit.Containers.Lamar</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <LangVersion>8.0</LangVersion>
-    <Version>0.5.1</Version>
+    <Version>0.6.0</Version>
     <Authors>Andrew F. Whitworth</Authors>
     <Company />
     <Description>CLI Commendlet host and execution engine, Lamar container bindings</Description>
