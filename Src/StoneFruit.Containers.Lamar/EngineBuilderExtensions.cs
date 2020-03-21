@@ -2,7 +2,6 @@
 
 namespace StoneFruit.Containers.Lamar
 {
-
     public static class EngineBuilderExtensions
     {
         public static IHandlerSetup UseLamarHandlerSource(this IHandlerSetup handlers)

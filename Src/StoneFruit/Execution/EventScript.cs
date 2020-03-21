@@ -7,6 +7,8 @@ namespace StoneFruit.Execution
     /// </summary>
     public class EventScript
     {
+        // TODO: Would like to unify this with the Script handlers mechanism, so that we can get argument translation.
+
         private readonly string[] _initialLines;
         private readonly List<string> _lines;
 
