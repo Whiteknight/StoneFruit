@@ -177,7 +177,7 @@ namespace StoneFruit.Execution
             {
                 // Get a command. If we have one in the state use that. Otherwise try to get one from the
                 // sources.
-                var command = state.GetNextCommand() ?? CommandObjectOrString.FromString(sources.GetNextCommand());
+                var command = state.Commands.GetNext() ?? CommandObjectOrString.FromString(sources.GetNextCommand());
                 if (command == null)
                     return Constants.ExitCodeOk;
 
@@ -210,7 +210,7 @@ namespace StoneFruit.Execution
         {
             // If we're in an error loop (throw an exception while handling a previous exception) show an
             // angry error message and signal for exit.
-            var currentException = state.GetMetadata(Constants.MetadataError);
+            var currentException = state.Metadata.Get(Constants.MetadataError);
             if (currentException != null)
             {
                 _output
@@ -224,9 +224,9 @@ namespace StoneFruit.Execution
             }
 
             // Otherwise add the error-handling script to the command queue so the queue loop can handle it.
-            state.AddMetadata(Constants.MetadataError, e, false);
-            state.PrependCommand($"{MetadataRemoveHandler.Name} {Constants.MetadataError}");
-            state.PrependCommands(script.GetCommands());
+            state.Metadata.Add(Constants.MetadataError, e, false);
+            state.Commands.Prepend($"{MetadataRemoveHandler.Name} {Constants.MetadataError}");
+            state.Commands.Prepend(script.GetCommands());
         }
     }
 }

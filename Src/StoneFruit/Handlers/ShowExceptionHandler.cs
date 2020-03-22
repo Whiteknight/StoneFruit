@@ -20,7 +20,7 @@ namespace StoneFruit.Handlers
         public void Execute()
         {
             // TODO: Arguments to control whether we show the message, the stacktrace, etc
-            if (!(_state.GetMetadata(Constants.MetadataError) is Exception e))
+            if (!(_state.Metadata.Get(Constants.MetadataError) is Exception e))
                 return;
             _output
                 .Color(ConsoleColor.Red)

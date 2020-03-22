@@ -102,7 +102,7 @@ namespace StoneFruit.Execution.Scripts
                     _command.Arguments.ResetAllArguments();
 
                     // Add the command to the EngineState for execution after this
-                    _state.AddCommand(command);
+                    _state.Commands.Append(command);
                 }
             }
         }

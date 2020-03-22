@@ -75,7 +75,7 @@ To prompt the user for an environment only if one is not currently set, use the 
             if (environments.Count == 1)
             {
                 _environments.SetCurrent(1);
-                _state.AddCommands(_state.EventCatalog.EnvironmentChanged.GetCommands());
+                _state.Commands.Append(_state.EventCatalog.EnvironmentChanged.GetCommands());
                 return;
             }
 
@@ -98,7 +98,7 @@ To prompt the user for an environment only if one is not currently set, use the 
                 var envIndex = _output.Prompt("", true, false);
                 if (TrySetEnvironment(envIndex))
                 {
-                    _state.AddCommands(_state.EventCatalog.EnvironmentChanged.GetCommands());
+                    _state.Commands.Append(_state.EventCatalog.EnvironmentChanged.GetCommands());
                     break;
                 }
             }

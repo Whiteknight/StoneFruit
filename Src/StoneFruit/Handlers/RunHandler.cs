@@ -31,7 +31,7 @@ arguments. For example:
                 var arg = _args.Shift();
                 if (!arg.Exists())
                     return;
-                _state.AddCommand(arg.Value);
+                _state.Commands.Append(arg.Value);
             }
         }
     }

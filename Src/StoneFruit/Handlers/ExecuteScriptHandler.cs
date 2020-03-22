@@ -37,7 +37,7 @@ Loads the contents of the file and treats each line as a separate command to exe
                 .Where(s => !string.IsNullOrWhiteSpace(s))
                 .ToArray();
             foreach (var line in contents)
-                _state.AddCommand(line);
+                _state.Commands.Append(line);
         }
     }
 }

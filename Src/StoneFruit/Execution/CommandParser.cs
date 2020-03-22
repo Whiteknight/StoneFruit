@@ -63,7 +63,5 @@ namespace StoneFruit.Execution
                 throw new ParseException($"Parse did not complete for format string '{script}'. Unparsed remainder: '{input.GetRemainder()}'");
             return parseResult.Value;
         }
-
-        // TODO: Helper methods here to parse all the different dialects, in case the default is not wanted
     }
 }

@@ -22,7 +22,7 @@ namespace StoneFruit.Handlers
         public void Execute()
         {
             var name = _args.Shift().Require().AsString();
-            _state.RemoveMetadata(name);
+            _state.Metadata.Remove(name);
         }
     }
 }
