@@ -6,7 +6,7 @@ using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.Execution
 {
-    public class ParserSetup : IParserSetup
+    public class ArgumentParserSetup : IArgumentParserSetup
     {
         private IParser<char, IArgument> _argParser;
 
@@ -23,7 +23,7 @@ namespace StoneFruit.Execution
         /// </summary>
         /// <param name="argParser"></param>
         /// <returns></returns>
-        public IParserSetup UseArgumentParser(IParser<char, IArgument> argParser)
+        public IArgumentParserSetup UseArgumentParser(IParser<char, IArgument> argParser)
         {
             if (argParser == null)
             {
@@ -41,7 +41,7 @@ namespace StoneFruit.Execution
         /// </summary>
         /// <param name="argParser"></param>
         /// <returns></returns>
-        public IParserSetup UseArgumentParser(IParser<char, IEnumerable<IArgument>> argParser)
+        public IArgumentParserSetup UseArgumentParser(IParser<char, IEnumerable<IArgument>> argParser)
         {
             var parser = argParser.Flatten<char, IEnumerable<IArgument>, IArgument>();
             return UseArgumentParser(parser);

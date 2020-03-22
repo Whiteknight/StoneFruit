@@ -8,6 +8,7 @@ namespace StoneFruit
     /// </summary>
     public interface IOutput
     {
+        // TODO: Some kind of method/property to get the current color, or to adjust it?
         /// <summary>
         /// Get a new output using the given color palette. If the output does not support
         /// color this will be a no-op
@@ -53,6 +54,13 @@ namespace StoneFruit
 
     public static class OutputExtensions
     {
+        /// <summary>
+        /// WriteLine with a format string and arguments
+        /// </summary>
+        /// <param name="output"></param>
+        /// <param name="fmt"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static IOutput WriteLineFormat(this IOutput output, string fmt, params object[] args)
         {
             Assert.ArgumentNotNull(output, nameof(output));
@@ -61,6 +69,13 @@ namespace StoneFruit
             return output.WriteLine(line);
         }
 
+        /// <summary>
+        /// Write with a format string and arguments
+        /// </summary>
+        /// <param name="output"></param>
+        /// <param name="fmt"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static IOutput WriteFormat(this IOutput output, string fmt, params object[] args)
         {
             Assert.ArgumentNotNull(output, nameof(output));
@@ -69,6 +84,13 @@ namespace StoneFruit
             return output.Write(line);
         }
 
+        /// <summary>
+        /// Get a new output with the given color for text and the current background color
+        /// unchanged. If the implementation does not support color this will be a no-op
+        /// </summary>
+        /// <param name="output"></param>
+        /// <param name="color"></param>
+        /// <returns></returns>
         public static IOutput Color(this IOutput output, ConsoleColor color) => output.Color((Brush) color);
     }
 }

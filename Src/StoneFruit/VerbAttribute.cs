@@ -2,6 +2,10 @@
 
 namespace StoneFruit
 {
+    /// <summary>
+    /// Specify a custom verb to use if the correct verb cannot be automatically determined
+    /// from the class name
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
     public class VerbAttribute : Attribute
     {

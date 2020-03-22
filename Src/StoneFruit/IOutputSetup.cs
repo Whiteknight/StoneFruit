@@ -1,7 +1,15 @@
 ﻿namespace StoneFruit
 {
+    /// <summary>
+    /// Setup the output streams
+    /// </summary>
     public interface IOutputSetup
     {
+        /// <summary>
+        /// Do not use a Console output. Console is the only output which supports color,
+        /// so removing it makes color operations into no-ops. 
+        /// </summary>
+        /// <returns></returns>
         IOutputSetup DoNotUseConsole();
 
         /// <summary>

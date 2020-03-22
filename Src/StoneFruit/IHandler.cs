@@ -17,6 +17,9 @@ namespace StoneFruit
     /// </summary>
     public interface IHandler : IHandlerBase
     {
+        /// <summary>
+        /// Execute the handler and perform any work
+        /// </summary>
         void Execute();
     }
 
@@ -27,6 +30,11 @@ namespace StoneFruit
     /// </summary>
     public interface IAsyncHandler : IHandlerBase
     {
+        /// <summary>
+        /// Execute the handler asynchronously and perform any work
+        /// </summary>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         Task ExecuteAsync(CancellationToken cancellation);
     }
 }

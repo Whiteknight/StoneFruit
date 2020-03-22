@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
-using StoneFruit.Execution.Scripts;
 using StoneFruit.Utility;
 
 namespace StoneFruit

@@ -4,6 +4,9 @@ using System.Runtime.Serialization;
 namespace StoneFruit
 {
     // TODO: Move this to a more appropriate namespace
+    /// <summary>
+    /// Exception thrown by the engine when a verb cannot be found. 
+    /// </summary>
     [Serializable]
     public class VerbNotFoundException : Exception
     {
