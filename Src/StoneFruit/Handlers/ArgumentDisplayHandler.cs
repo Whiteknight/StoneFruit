@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using StoneFruit.Execution.Arguments;
+﻿using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.Handlers
 {
@@ -27,10 +26,10 @@ namespace StoneFruit.Handlers
                 index++;
             }
 
-            foreach (var n in _args.GetAllNamed().Cast<NamedArgument>())
+            foreach (var n in _args.GetAllNamed())
                 _output.WriteLine($"'{n.Name}': {n.Value}");
 
-            foreach (var f in _args.GetAllFlags().Cast<FlagArgument>())
+            foreach (var f in _args.GetAllFlags())
                 _output.WriteLine($"flag: {f.Name}");
         }
     }
