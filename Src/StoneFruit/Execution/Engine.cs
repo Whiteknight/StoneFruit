@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading;
 using StoneFruit.Execution.CommandSources;
-using StoneFruit.Execution.Scripts;
 using StoneFruit.Handlers;
 using StoneFruit.Utility;
 

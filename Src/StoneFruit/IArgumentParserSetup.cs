@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using ParserObjects;
 using StoneFruit.Execution.Arguments;
+using StoneFruit.Execution.Scripts.Formatting;
 
 namespace StoneFruit
 {
@@ -9,6 +10,13 @@ namespace StoneFruit
     /// </summary>
     public interface IArgumentParserSetup
     {
+        /// <summary>
+        /// Specify a parser to use for verbs
+        /// </summary>
+        /// <param name="verbParser"></param>
+        /// <returns></returns>
+        IArgumentParserSetup UseVerbParser(IParser<char, string> verbParser);
+
         /// <summary>
         /// Specify an argument parser to use
         /// </summary>
@@ -22,6 +30,8 @@ namespace StoneFruit
         /// <param name="argParser"></param>
         /// <returns></returns>
         IArgumentParserSetup UseArgumentParser(IParser<char, IEnumerable<IArgument>> argParser);
+
+        IArgumentParserSetup UseScriptParser(IParser<char, CommandFormat> scriptParser);
     }
 
     public static class ParserSetupExtensions

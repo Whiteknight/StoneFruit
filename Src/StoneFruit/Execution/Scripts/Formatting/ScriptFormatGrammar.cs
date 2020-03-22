@@ -10,11 +10,8 @@ namespace StoneFruit.Execution.Scripts.Formatting
 {
     public static class ScriptFormatGrammar
     {
-        public static IParser<char, CommandFormat> CreateParser()
+        public static IParser<char, CommandFormat> CreateParser(IParser<char, string> verb)
         {
-            // TODO: Inject the verb parser from the Engine
-            var verb = VerbGrammar.GetParser();
-
             // We'll parse like simplified, with extensions as follows:
             // test a b=c -d
             // becomes:

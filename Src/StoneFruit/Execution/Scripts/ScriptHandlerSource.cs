@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using ParserObjects;
-using ParserObjects.Sequences;
+using System.Linq;
 using StoneFruit.Execution.Scripts.Formatting;
+using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Scripts
 {
@@ -11,19 +11,17 @@ namespace StoneFruit.Execution.Scripts
     public class ScriptHandlerSource : IHandlerSource
     {
         private readonly Dictionary<string, Script> _scripts;
-        private readonly IParser<char, CommandFormat> _formatParser;
 
         public ScriptHandlerSource()
         {
             _scripts = new Dictionary<string, Script>();
-            _formatParser = ScriptFormatGrammar.CreateParser();
         }
 
         public IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher)
         {
             if (!_scripts.ContainsKey(command.Verb))
                 return null;
-            return new ScriptHandler(_scripts[command.Verb], command, dispatcher.State);
+            return new ScriptHandler(dispatcher.Parser, _scripts[command.Verb], command, dispatcher.State);
         }
 
         public IEnumerable<IVerbInfo> GetAll() => _scripts.Values;
@@ -32,19 +30,7 @@ namespace StoneFruit.Execution.Scripts
 
         public void AddScript(string verb, IEnumerable<string> lines, string description = null, string usage = null)
         {
-            var formats = new List<CommandFormat>();
-            foreach (var line in lines)
-            {
-                var input = new StringCharacterSequence(line);
-                var parseResult = _formatParser.Parse(input);
-                if (!parseResult.Success)
-                    throw new ScriptParseException($"Could not parse command format string: '{line}'");
-                if (!input.IsAtEnd)
-                    throw new ScriptParseException($"Parse did not complete for format string '{line}'. Unparsed remainder: '{input.GetRemainder()}'");
-                formats.Add(parseResult.Value);
-            }
-
-            var script = new Script(verb, formats, description, usage);
+            var script = new Script(verb, lines.OrEmptyIfNull().ToList(), description, usage);
             _scripts.Add(verb, script);
         }
 
@@ -54,11 +40,12 @@ namespace StoneFruit.Execution.Scripts
 
         private class Script : IVerbInfo
         {
-            public IReadOnlyList<CommandFormat> Lines { get; }
+            private readonly IReadOnlyList<string> _lines;
+            private IReadOnlyList<CommandFormat> _formats;
 
-            public Script(string verb, IReadOnlyList<CommandFormat> lines, string description, string usage)
+            public Script(string verb, IReadOnlyList<string> lines, string description, string usage)
             {
-                Lines = lines;
+                _lines = lines;
                 Verb = verb;
                 Description = description;
                 Usage = usage;
@@ -68,16 +55,33 @@ namespace StoneFruit.Execution.Scripts
             public string Description { get; }
             public string Usage { get; }
             public bool ShouldShowInHelp => true;
+
+            public IEnumerable<CommandFormat> GetFormats(CommandParser parser)
+            {
+                if (_formats != null)
+                    return _formats;
+                var formats = new List<CommandFormat>();
+                foreach (var line in _lines)
+                {
+                    var result = parser.ParseScript(line);
+                    formats.Add(result);
+                }
+
+                _formats = formats;
+                return formats;
+            }
         }
 
         private class ScriptHandler : IHandler
         {
+            private readonly CommandParser _parser;
             private readonly Script _script;
             private readonly Command _command;
             private readonly EngineState _state;
 
-            public ScriptHandler(Script script, Command command, EngineState state)
+            public ScriptHandler(CommandParser parser, Script script, Command command, EngineState state)
             {
+                _parser = parser;
                 _script = script;
                 _command = command;
                 _state = state;
@@ -85,10 +89,15 @@ namespace StoneFruit.Execution.Scripts
 
             public void Execute()
             {
-                foreach (var lineFormat in _script.Lines)
+                // Get the format objects, parsing them if necessary
+                var formats = _script.GetFormats(_parser);
+                foreach (var lineFormat in formats)
                 {
+                    // Fill in arguments to the formats to create the command
                     var command = lineFormat.Format(_command.Arguments);
                     _command.Arguments.ResetAllArguments();
+
+                    // Add the command to the EngineState for execution after this
                     _state.AddCommand(command);
                 }
             }

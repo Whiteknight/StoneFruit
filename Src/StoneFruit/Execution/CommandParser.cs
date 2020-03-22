@@ -1,25 +1,37 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using ParserObjects;
 using ParserObjects.Parsers;
 using ParserObjects.Sequences;
 using StoneFruit.Execution.Arguments;
+using StoneFruit.Execution.Scripts.Formatting;
+using StoneFruit.Utility;
 
 namespace StoneFruit.Execution
 {
     public class CommandParser
     {
-        private readonly IParser<char, IArgument> _argsParser;
         private readonly IParser<char, string> _verbParser;
+        private readonly IParser<char, IArgument> _argsParser;
+        private readonly IParser<char, CommandFormat> _scriptParser;
 
-        public CommandParser(IParser<char, IArgument> argParser = null)
+        public CommandParser(IParser<char, string> verbParser, IParser<char, IArgument> argParser, IParser<char, CommandFormat> scriptParser)
         {
-            // TODO: VerbParser should be pluggable
-            _argsParser = argParser ?? SimplifiedArgumentGrammar.GetParser();
-            _verbParser = VerbGrammar.GetParser();
+            Assert.ArgumentNotNull(verbParser, nameof(verbParser));
+            Assert.ArgumentNotNull(argParser, nameof(argParser));
+            Assert.ArgumentNotNull(scriptParser, nameof(scriptParser));
+
+            _verbParser = verbParser;
+            _argsParser = argParser;
+            _scriptParser = scriptParser;
         }
 
-        public static CommandParser GetDefault() => new CommandParser();
+        public static CommandParser GetDefault()
+        {
+            var verbParser = VerbGrammar.GetParser();
+            var argParser = SimplifiedArgumentGrammar.GetParser();
+            var scriptParser = ScriptFormatGrammar.CreateParser(verbParser);
+            return new CommandParser(verbParser, argParser, scriptParser);
+        }
 
         public static Command ParseCommand(IParser<char, string> verbs, IParser<char, IArgument> args, string line)
         {
@@ -30,7 +42,7 @@ namespace StoneFruit.Execution
             if (!sequence.IsAtEnd)
             {
                 var remainder = sequence.GetRemainder();
-                throw new Exception($"Could not parse all arguments. '{remainder}' fails at {sequence.CurrentLocation}");
+                throw new ParseException($"Could not parse all arguments. '{remainder}' fails at {sequence.CurrentLocation}");
             }
 
             var cmdArgs = new CommandArguments(rawArgs, argsList);
@@ -40,6 +52,17 @@ namespace StoneFruit.Execution
         public Command ParseCommand(string line) => ParseCommand(_verbParser, _argsParser, line);
 
         public CommandArguments ParseArguments(string args) => _argsParser.ParseArguments(args);
+
+        public CommandFormat ParseScript(string script)
+        {
+            var input = new StringCharacterSequence(script);
+            var parseResult = _scriptParser.Parse(input);
+            if (!parseResult.Success)
+                throw new ParseException($"Could not parse command format string: '{script}'");
+            if (!input.IsAtEnd)
+                throw new ParseException($"Parse did not complete for format string '{script}'. Unparsed remainder: '{input.GetRemainder()}'");
+            return parseResult.Value;
+        }
 
         // TODO: Helper methods here to parse all the different dialects, in case the default is not wanted
     }

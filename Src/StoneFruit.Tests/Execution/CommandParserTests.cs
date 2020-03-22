@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
+using StoneFruit.Execution.Scripts.Formatting;
 
 namespace StoneFruit.Tests.Execution
 {
@@ -67,7 +68,13 @@ namespace StoneFruit.Tests.Execution
         }
 
         private CommandParser GetSimplifiedParser()
-            => new CommandParser(SimplifiedArgumentGrammar.GetParser());
+        {
+            var verbParser = VerbGrammar.GetParser();
+            var argParser = SimplifiedArgumentGrammar.GetParser();
+            var scriptParser = ScriptFormatGrammar.CreateParser(verbParser);
+
+            return new CommandParser(verbParser, argParser, scriptParser);
+        }
 
         [Test]
         public void ParseCommand_Simplified_Positional()
