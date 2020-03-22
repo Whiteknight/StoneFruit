@@ -8,7 +8,8 @@ using StoneFruit.Utility;
 
 namespace StoneFruit.Containers.Lamar
 {
-    public class LamarHandlerSource : IHandlerSource
+    public class LamarHandlerSource<TEnvironment> : IHandlerSource
+        where TEnvironment : class
     {
         private readonly IContainer _container;
         private readonly IReadOnlyDictionary<string, Type> _nameMap;
@@ -25,6 +26,8 @@ namespace StoneFruit.Containers.Lamar
             registry.Injectable<IHandlerSource>();
             registry.Injectable<Command>();
             registry.Injectable<CommandArguments>();
+            if (typeof(TEnvironment) != typeof(object))
+                registry.Injectable<TEnvironment>();
 
             var container = new Container(registry);
             //var scanned = container.WhatDidIScan();

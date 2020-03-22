@@ -103,6 +103,7 @@ namespace StoneFruit.Containers.Ninject
             context.BindInstance(Command);
             context.BindInstance(Command.Arguments);
 
+            // TODO: This doesn't work
             if (dispatcher.Environments.Current != null)
                 context.BindInstance(dispatcher.Environments.Current);
 

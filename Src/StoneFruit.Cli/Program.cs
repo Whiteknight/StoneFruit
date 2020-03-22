@@ -21,12 +21,12 @@ namespace StoneFruit.Cli
 
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
-                    .UseLamarHandlerSource()
+                    .UseLamarHandlerSource<object>()
                     //.UseNinjectHandlerSource()
                     //.UseStructureMapHandlerSource()
                     //.UseCommands(typeof(HelpCommand), typeof(ExitCommand))
                     //.UsePublicMethodsAsHandlers(new MyObject())
-                    //.Add("testf", (c, d) => d.Output.WriteLine("F"))
+                    .Add("testf", (c, d) => d.Output.WriteLine("F"))
                     .AddScript("testg", new [] { "echo test", "echo g" })
                     .AddScript("testh", new[] { "echo [0]", "echo ['a']" })
                 )
