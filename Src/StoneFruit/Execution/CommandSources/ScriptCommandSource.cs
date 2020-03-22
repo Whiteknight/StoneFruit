@@ -1,15 +1,22 @@
 ﻿using System.Linq;
+using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.Execution.CommandSources
 {
     public class ScriptCommandSource : ICommandSource
     {
-        private readonly string[] _script;
+        private readonly CommandObjectOrString[] _script;
         private int _index;
 
-        public ScriptCommandSource(EventScript script)
+        public ScriptCommandSource(EventScript script, CommandParser parser, params IArgument[] args)
+            :this (script, parser, new CommandArguments(args))
         {
-            _script = script.GetCommands().ToArray();
+            
+        }
+
+        public ScriptCommandSource(EventScript script, CommandParser parser, CommandArguments args)
+        {
+            _script = script.GetCommands(parser, args).ToArray();
         }
 
         public void Start()
@@ -17,7 +24,7 @@ namespace StoneFruit.Execution.CommandSources
             _index = 0;
         }
 
-        public string GetNextCommand()
+        public CommandObjectOrString GetNextCommand()
         {
             if (_index >= _script.Length)
                 return null;

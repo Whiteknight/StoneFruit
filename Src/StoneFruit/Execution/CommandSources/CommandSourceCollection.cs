@@ -24,7 +24,7 @@ namespace StoneFruit.Execution.CommandSources
             _sources.AddFirst(new Node(source));
         }
 
-        public string GetNextCommand()
+        public CommandObjectOrString GetNextCommand()
         {
             while (true)
             {
@@ -35,7 +35,7 @@ namespace StoneFruit.Execution.CommandSources
                 firstSource.Start();
 
                 var next = firstSource.Source.GetNextCommand();
-                if (!string.IsNullOrEmpty(next))
+                if (next != null)
                     return next;
 
                 _sources.RemoveFirst();

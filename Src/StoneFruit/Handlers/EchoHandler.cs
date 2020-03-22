@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.Handlers
@@ -19,9 +20,10 @@ namespace StoneFruit.Handlers
 
         public static string Description => "Writes a string of output to the console";
 
-        public static string Usage => @"echo [color=<color>] ...
+        public static string Usage => @"echo [color=<color>] [-nonewline] ...
 
-Writes each argument to the output as a new line. If color is specified, use that color
+Writes all positional arguments to the output. If color is specified, use that color.
+Appends a new-line to the end unless -nonewline is specified
 ";
 
         public void Execute()
@@ -34,8 +36,13 @@ Writes each argument to the output as a new line. If color is specified, use tha
                 output = output.Color(color);
             }
 
-            foreach (var arg in _args.GetAllPositionals())
-                output.WriteLine(arg.Value);
+            var strings = _args.GetAllPositionals().Where(p => p.Exists()).Select(p => p.AsString());
+            var line = string.Join(" ", strings);
+
+            if (_args.HasFlag("nonewline"))
+                output.Write(line);
+            else
+                output.WriteLine(line);
         }
     }
 }

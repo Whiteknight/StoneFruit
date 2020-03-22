@@ -64,9 +64,13 @@ To prompt the user for an environment only if one is not currently set, use the 
             var target = _args.Shift();
             if (target.Exists())
             {
-                if (!TrySetEnvironment(target.Value))
-                    throw new Exception($"Could not set environment {target.Value}");
-
+                var envName = target.AsString();
+                if (envName == _environments.CurrentName)
+                    return;
+                if (!TrySetEnvironment(envName))
+                    // TODO: Use a better exception type
+                    throw new Exception($"Could not set environment {envName}");
+                OnEnvironmentChanged();
                 return;
             }
 
@@ -75,7 +79,7 @@ To prompt the user for an environment only if one is not currently set, use the 
             if (environments.Count == 1)
             {
                 _environments.SetCurrent(1);
-                _state.Commands.Append(_state.EventCatalog.EnvironmentChanged.GetCommands());
+                OnEnvironmentChanged();
                 return;
             }
 
@@ -98,10 +102,17 @@ To prompt the user for an environment only if one is not currently set, use the 
                 var envIndex = _output.Prompt("", true, false);
                 if (TrySetEnvironment(envIndex))
                 {
-                    _state.Commands.Append(_state.EventCatalog.EnvironmentChanged.GetCommands());
+                    OnEnvironmentChanged();
                     break;
                 }
             }
+        }
+
+        private void OnEnvironmentChanged()
+        {
+            var script = _state.EventCatalog.EnvironmentChanged;
+            var args = new CommandArguments(new[] { new NamedArgument("environment", _environments.CurrentName) });
+            _state.Commands.Prepend(script.GetCommands(_dispatcher.Parser, args));
         }
 
         private bool TrySetEnvironment(string arg)

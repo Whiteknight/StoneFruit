@@ -35,6 +35,13 @@ namespace StoneFruit.Execution
                 _additionalCommands.AddFirst(CommandObjectOrString.FromString(list[i]));
         }
 
+        public void Prepend(IEnumerable<CommandObjectOrString> commands)
+        {
+            var list = commands.ToList();
+            for (int i = list.Count - 1; i >= 0; i--)
+                _additionalCommands.AddFirst(list[i]);
+        }
+
         public void Prepend(string command)
         {
             _additionalCommands.AddFirst(CommandObjectOrString.FromString(command));

@@ -14,7 +14,7 @@ namespace StoneFruit.Tests.Execution.CommandSources
                 "test1",
                 "test2"
             );
-            var target = new ScriptCommandSource(script);
+            var target = new ScriptCommandSource(script, CommandParser.GetDefault());
             target.Start();
             target.GetNextCommand().Should().Be("test1");
             target.GetNextCommand().Should().Be("test2");
@@ -25,7 +25,7 @@ namespace StoneFruit.Tests.Execution.CommandSources
         public void GetNextCommand_Empty()
         {
             var script = new EventScript();
-            var target = new ScriptCommandSource(script);
+            var target = new ScriptCommandSource(script, CommandParser.GetDefault());
             target.Start();
             target.GetNextCommand().Should().Be(null);
         }

@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using StoneFruit.Containers.Lamar;
-using StoneFruit.Containers.Ninject;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
-using StoneFruit.Containers.StructureMap;
 
 namespace StoneFruit.Cli
 {
@@ -30,7 +28,7 @@ namespace StoneFruit.Cli
                     .AddScript("testg", new [] { "echo test", "echo g" })
                     .AddScript("testh", new[] { "echo [0]", "echo ['a']" })
                 )
-                //.UseEnvironmentFactory(new MyEnvironmentFactory())
+                .SetupEnvironments(e => e.UseFactory(new MyEnvironmentFactory()))
                 .SetupEvents(e =>
                 {
                     //e.EngineStartInteractive.Add("help");

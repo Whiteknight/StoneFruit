@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace StoneFruit.Execution.CommandSources
+﻿namespace StoneFruit.Execution.CommandSources
 {
     public class PromptCommandSource : ICommandSource
     {
@@ -17,9 +15,10 @@ namespace StoneFruit.Execution.CommandSources
         {
         }
 
-        public string GetNextCommand()
+        public CommandObjectOrString GetNextCommand()
         {
-            return _output.Prompt($"{_environments.CurrentName}");
+            var str = _output.Prompt($"{_environments.CurrentName}");
+            return CommandObjectOrString.FromString(str);
         }
     }
 }

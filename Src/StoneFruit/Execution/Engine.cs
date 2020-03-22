@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.CommandSources;
 using StoneFruit.Handlers;
 using StoneFruit.Utility;
@@ -97,7 +98,8 @@ namespace StoneFruit.Execution
             // environment to run help
             if (commandLine == "help")
             {
-                sources.AddToEnd(new ScriptCommandSource(state.EventCatalog.HeadlessHelp));
+                var exitCodeArg = new NamedArgument("exitcode", Constants.ExitCodeHeadlessHelp.ToString());
+                sources.AddToEnd(new ScriptCommandSource(state.EventCatalog.HeadlessHelp, _parser, exitCodeArg));
                 return RunLoop(state, dispatcher, sources);
             }
 
@@ -115,11 +117,18 @@ namespace StoneFruit.Execution
                 }
             }
 
+            if (string.IsNullOrWhiteSpace(commandLine))
+            {
+                var exitCodeArg = new NamedArgument("exitcode", Constants.ExitCodeHeadlessNoVerb.ToString());
+                sources.AddToEnd(new ScriptCommandSource(state.EventCatalog.HeadlessNoArgs, _parser, exitCodeArg));
+                return RunLoop(state, dispatcher, sources);
+            }
+
             // Setup the Headless start script, the user command, and the headless stop script before
             // running the RunLoop
-            sources.AddToEnd(new ScriptCommandSource(state.EventCatalog.EngineStartHeadless));
+            sources.AddToEnd(new ScriptCommandSource(state.EventCatalog.EngineStartHeadless, _parser));
             sources.AddToEnd(new SingleCommandSource(commandLine));
-            sources.AddToEnd(new ScriptCommandSource(state.EventCatalog.EngineStopHeadless));
+            sources.AddToEnd(new ScriptCommandSource(state.EventCatalog.EngineStopHeadless, _parser));
             return RunLoop(state, dispatcher, sources);
         }
 
@@ -134,9 +143,9 @@ namespace StoneFruit.Execution
             var state = new EngineState(false, _eventCatalog);
             var dispatcher = new CommandDispatcher(_parser, _commandSource, _environments, state, _output);
             var source = new CommandSourceCollection();
-            source.AddToEnd(new ScriptCommandSource(state.EventCatalog.EngineStartInteractive));
+            source.AddToEnd(new ScriptCommandSource(state.EventCatalog.EngineStartInteractive, _parser));
             source.AddToEnd(new PromptCommandSource(_output, _environments));
-            source.AddToEnd(new ScriptCommandSource(state.EventCatalog.EngineStopInteractive));
+            source.AddToEnd(new ScriptCommandSource(state.EventCatalog.EngineStopInteractive, _parser));
             return RunLoop(state, dispatcher, source);
         }
 
@@ -152,9 +161,9 @@ namespace StoneFruit.Execution
             var dispatcher = new CommandDispatcher(_parser, _commandSource, _environments, state, _output);
             var source = new CommandSourceCollection();
             source.AddToEnd(new SingleCommandSource($"{EnvironmentChangeHandler.Name} {environment}"));
-            source.AddToEnd(new ScriptCommandSource(state.EventCatalog.EngineStartInteractive));
+            source.AddToEnd(new ScriptCommandSource(state.EventCatalog.EngineStartInteractive, _parser));
             source.AddToEnd(new PromptCommandSource(_output, _environments));
-            source.AddToEnd(new ScriptCommandSource(state.EventCatalog.EngineStopInteractive));
+            source.AddToEnd(new ScriptCommandSource(state.EventCatalog.EngineStopInteractive, _parser));
             return RunLoop(state, dispatcher, source);
         }
 
@@ -173,11 +182,12 @@ namespace StoneFruit.Execution
         // Each command is added to the command queue and the queue is drained. 
         private int RunLoop(EngineState state, CommandDispatcher dispatcher, CommandSourceCollection sources)
         {
+            // TODO: some kind of way to detect infinite loops?
             while (true)
             {
                 // Get a command. If we have one in the state use that. Otherwise try to get one from the
                 // sources.
-                var command = state.Commands.GetNext() ?? CommandObjectOrString.FromString(sources.GetNextCommand());
+                var command = state.Commands.GetNext() ?? sources.GetNextCommand();
                 if (command == null)
                     return Constants.ExitCodeOk;
 
@@ -192,11 +202,13 @@ namespace StoneFruit.Execution
                 }
                 catch (VerbNotFoundException vnf)
                 {
-                    HandleError(state, vnf, state.EventCatalog.VerbNotFound);
+                    var args = new CommandArguments(new[] { new NamedArgument("verb", vnf.Verb) });
+                    HandleError(state, vnf, state.EventCatalog.VerbNotFound, args);
                 }
                 catch (Exception e)
                 {
-                    HandleError(state, e, state.EventCatalog.EngineError);
+                    var args = new CommandArguments();
+                    HandleError(state, e, state.EventCatalog.EngineError, args);
                 }
 
                 // If exit is signaled, return. 
@@ -206,7 +218,7 @@ namespace StoneFruit.Execution
         }
 
         // Handle an error from the dispatcher.
-        private void HandleError(EngineState state, Exception e, EventScript script)
+        private void HandleError(EngineState state, Exception e, EventScript script, CommandArguments args)
         {
             // If we're in an error loop (throw an exception while handling a previous exception) show an
             // angry error message and signal for exit.
@@ -226,7 +238,7 @@ namespace StoneFruit.Execution
             // Otherwise add the error-handling script to the command queue so the queue loop can handle it.
             state.Metadata.Add(Constants.MetadataError, e, false);
             state.Commands.Prepend($"{MetadataRemoveHandler.Name} {Constants.MetadataError}");
-            state.Commands.Prepend(script.GetCommands());
+            state.Commands.Prepend(script.GetCommands(_parser, args));
         }
     }
 }

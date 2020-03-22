@@ -19,33 +19,42 @@ namespace StoneFruit.Execution
             EngineStartInteractive = new EventScript(
                 // Call the env-change command to make sure we have an environment set
                 $"{EnvironmentChangeHandler.NotSetName}",
-                // show the headless-preamble builtin message
-                $"{BuiltinMessageHandler.NameHeadlessPreamble}"
+
+                // Show a quick helpful message
+                $"{EchoHandler.Name} -nonewline Enter command ",
+                $"{EchoHandler.Name} -nonewline color=DarkGray \" ('help' for help, 'exit' to quit)\"",
+                $"{EchoHandler.Name} ':'"
             );
             EngineStopInteractive = new EventScript();
             
             // Event when the environment has been successfully changed
-            EnvironmentChanged = new EventScript();
+            // Has argument 'environment' with name of new environment
+            EnvironmentChanged = new EventScript(
+                $"{EchoHandler.Name} Environment changed to ['environment']"
+            );
 
             // We're executing basic help command headlessly
+            // Has argument 'exitcode' with the intended exit code 
             HeadlessHelp = new EventScript(
                 $"{HelpHandler.Name}",
+
                 // Call 'exit' explicitly so we can set the exit code
-                $"{ExitHandler.Name} {Constants.ExitCodeHeadlessHelp}"
+                $"{ExitHandler.Name} ['exitcode']"
             );
 
             // Attempt to enter headless mode without providing any arguments
+            // Has argument 'exitcode' with the intended exit code
             HeadlessNoArgs = new EventScript(
-                $"{EchoHandler.Name} 'Please provide a verb'",
+                $"{EchoHandler.Name} No command provided",
+
                 // Call 'exit' so we can set an explicit error exit code
-                $"{ExitHandler.Name} {Constants.ExitCodeHeadlessNoVerb}"
+                $"{ExitHandler.Name} ['exitcode']"
             );
 
-            // TODO: It would be nice to be able to pass the name of the unknown verb here, so we could
-            // make suggestions or give more insight
             // Attempt to execute an unknown verb
+            // Has argument 'verb' with the name of the verb
             VerbNotFound = new EventScript(
-                $"{EchoHandler.Name} 'Verb not found. Please check your spelling or help output and try again.'"
+                $"{EchoHandler.Name} Verb ['verb'] not found. Please check your spelling or help output and try again."
             );
         }
 

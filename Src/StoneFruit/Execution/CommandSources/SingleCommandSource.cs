@@ -17,11 +17,11 @@
             _queued = _command;
         }
 
-        public string GetNextCommand()
+        public CommandObjectOrString GetNextCommand()
         {
             var value = _queued;
             _queued = null;
-            return value;
+            return CommandObjectOrString.FromString(value);
         }
     }
 }

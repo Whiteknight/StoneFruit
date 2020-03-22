@@ -9,7 +9,7 @@
         {
         }
 
-        public string GetNextCommand()
+        public CommandObjectOrString GetNextCommand()
         {
             return null;
         }
