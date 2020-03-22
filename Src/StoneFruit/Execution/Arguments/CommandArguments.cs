@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace StoneFruit.Execution.Arguments
 {
@@ -78,20 +79,27 @@ namespace StoneFruit.Execution.Arguments
 
         public IArgument Get(int index)
         {
-            // TODO: Option to mark consumed
-            // TODO: Should filter out Consumed, like Get(name) and HasFlag(name) do
-            if (index >= _positionals.Count)
-                return new MissingArgument($"Cannot get argument at position {index}. Not enough arguments were provided");
+            if (index >= _positionals.Count || _positionals[index].Consumed)
+                return new MissingArgument($"Cannot get argument at position {index}. Not enough arguments were provided or argument is already consumed.");
             return _positionals[index];
         }
 
+        public IArgument Consume(int index) => Get(index).MarkConsumed();
+
         public IArgument Get(string name)
         {
-            // TODO: Option to mark consumed
             name = name.ToLowerInvariant();
             if (!_nameds.ContainsKey(name))
                 return new MissingArgument($"Cannot get argument named '{name}'");
-            return _nameds[name].FirstOrDefault(a => !a.Consumed) ?? (IArgument)new MissingArgument($"Cannot get argument named '{name}'");
+            return _nameds[name].FirstOrDefault(a => !a.Consumed) ?? (IArgument)new MissingArgument($"Cannot get argument named '{name}'.");
+        }
+
+        public IArgument Consume(string name) => Get(name).MarkConsumed();
+
+        public IEnumerable<IArgument> GetLike(string namePart)
+        {
+            namePart = namePart.ToLowerInvariant();
+            return GetAllNamed().Where(n => n.Name.Contains(namePart));
         }
 
         public IArgument GetFlag(string name)
@@ -102,27 +110,8 @@ namespace StoneFruit.Execution.Arguments
             return _flags[name];
         }
 
-        public IEnumerable<IArgument> GetAll(string name)
-        {
-            // TODO: Option to mark consumed
-            name = name.ToLowerInvariant();
-            if (!_nameds.ContainsKey(name))
-                return Enumerable.Empty<IArgument>();
-            return _nameds[name].Where(a => !a.Consumed);
-        }
+        public IArgument ConsumeFlag(string name) => GetFlag(name).MarkConsumed();
 
-        // TODO: GetLike(string part)
-        // TODO: GetAllPositionalValues (naming?) gets the values not the IARgument
-        // TODO: GetAllNamedValues (naming?) gets the values not the IArgument
-        // TODO: VerifyAllAreUsed() throws an exception for any unconsumed args
-
-        public IEnumerable<PositionalArgument> GetAllPositionals() => _positionals.Where(a => !a.Consumed);
-
-        public IEnumerable<NamedArgument> GetAllNamed() => _nameds.Values.SelectMany(n => n).Where(a => !a.Consumed);
-
-        public IEnumerable<FlagArgument> GetAllFlags() => _flags.Values.Where(a => !a.Consumed);
-
-        // TODO: GetFlag(name) which returns the IArgument
         public bool HasFlag(string name, bool markConsumed = false)
         {
             name = name.ToLowerInvariant();
@@ -134,6 +123,43 @@ namespace StoneFruit.Execution.Arguments
             if (markConsumed)
                 flag.MarkConsumed();
             return true;
+        }
+
+        public IEnumerable<IArgument> GetAll(string name)
+        {
+            name = name.ToLowerInvariant();
+            if (!_nameds.ContainsKey(name))
+                return Enumerable.Empty<IArgument>();
+            return _nameds[name].Where(a => !a.Consumed);
+        }
+
+        public IEnumerable<PositionalArgument> GetAllPositionals() => _positionals.Where(a => !a.Consumed);
+
+        public IEnumerable<NamedArgument> GetAllNamed() => _nameds.Values.SelectMany(n => n).Where(a => !a.Consumed);
+
+        public IEnumerable<FlagArgument> GetAllFlags() => _flags.Values.Where(a => !a.Consumed);
+
+        public void VerifyAllAreConsumed()
+        {
+            var unconsumed = GetAllArguments().ToList();
+            if (!unconsumed.Any())
+                return;
+            var sb = new StringBuilder();
+            sb.AppendLine("Arguments were provided which were not consumed.");
+            sb.AppendLine();
+            foreach (var u in unconsumed)
+            {
+                var str = u switch
+                {
+                    PositionalArgument p => p.AsString(),
+                    NamedArgument n => $"'{n.Name}' = {n.AsString()}",
+                    FlagArgument f => $"flag {f.Name}",
+                    _ => "Unknown"
+                };
+                sb.AppendLine(str);
+            }
+
+            throw new CommandArgumentException(sb.ToString());
         }
 
         // TODO: Method to create a sub-CommandArguments instance with some arguments added/removed
