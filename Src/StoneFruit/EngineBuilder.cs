@@ -6,6 +6,9 @@ using StoneFruit.Execution.Output;
 
 namespace StoneFruit
 {
+    /// <summary>
+    /// Used to setup all options and dependencies of the Engine.
+    /// </summary>
     public class EngineBuilder
     {
         private readonly HandlerSetup _handlers;

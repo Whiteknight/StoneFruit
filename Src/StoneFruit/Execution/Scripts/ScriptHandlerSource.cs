@@ -38,6 +38,8 @@ namespace StoneFruit.Execution.Scripts
 
         public int Count => _scripts.Count;
 
+        // This is going to stay a private child class because it has ugly mutable state
+        // and it's only used here.
         private class Script : IVerbInfo
         {
             private readonly IReadOnlyList<string> _lines;
@@ -72,6 +74,8 @@ namespace StoneFruit.Execution.Scripts
             }
         }
 
+        // We need to keep ScriptHandler private child class, so it doesn't get scooped up
+        // during DI container scan
         private class ScriptHandler : IHandler
         {
             private readonly CommandParser _parser;
