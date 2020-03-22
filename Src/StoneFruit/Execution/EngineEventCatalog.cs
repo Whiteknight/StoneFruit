@@ -8,7 +8,8 @@ namespace StoneFruit.Execution
         {
             // When there's an unhandled exception caught by the engine
             EngineError = new EventScript(
-                $"{ShowExceptionHandler.Name}"
+                $"{EchoHandler.Name} color=Red ['message']",
+                $"{EchoHandler.Name} ['stacktrace']"
             );
 
             // Events when the engine starts and then stops headless mode

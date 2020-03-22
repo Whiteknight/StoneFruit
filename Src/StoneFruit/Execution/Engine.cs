@@ -207,7 +207,10 @@ namespace StoneFruit.Execution
                 }
                 catch (Exception e)
                 {
-                    var args = new CommandArguments();
+                    var args = new CommandArguments(new [] { 
+                        new NamedArgument("message", e.Message),
+                        new NamedArgument("stacktrace", e.StackTrace)
+                    });
                     HandleError(state, e, state.EventCatalog.EngineError, args);
                 }
 
@@ -225,6 +228,8 @@ namespace StoneFruit.Execution
             var currentException = state.Metadata.Get(Constants.MetadataError);
             if (currentException != null)
             {
+                // This isn't scripted because it's critical error-handling code and we
+                // don't want the user to clear/override it
                 _output
                     .Color(ConsoleColor.Red)
                     .WriteLine("Received an exception while attempting to handle a previous exception")
