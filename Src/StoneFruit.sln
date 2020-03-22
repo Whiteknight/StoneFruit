@@ -15,15 +15,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Containers.Lamar
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Containers.Ninject", "StoneFruit.Containers.Ninject\StoneFruit.Containers.Ninject.csproj", "{FDCF1F6E-6BC6-4D84-8233-6D0141A626D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoneFruit.Containers.StructureMap.Tests", "StoneFruit.Containers.StructureMap.Tests\StoneFruit.Containers.StructureMap.Tests.csproj", "{110C4F3C-6CCA-475F-B7EE-687B82D4DBB5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Containers.StructureMap.Tests", "StoneFruit.Containers.StructureMap.Tests\StoneFruit.Containers.StructureMap.Tests.csproj", "{110C4F3C-6CCA-475F-B7EE-687B82D4DBB5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoneFruit.Containers.Lamar.Tests", "StoneFruit.Containers.Lamar.Tests\StoneFruit.Containers.Lamar.Tests.csproj", "{A1BCF0B5-2956-4B42-8FA1-C32914B5F7CB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Containers.Lamar.Tests", "StoneFruit.Containers.Lamar.Tests\StoneFruit.Containers.Lamar.Tests.csproj", "{A1BCF0B5-2956-4B42-8FA1-C32914B5F7CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoneFruit.Containers.Ninject.Tests", "StoneFruit.Containers.Ninject.Tests\StoneFruit.Containers.Ninject.Tests.csproj", "{DDF137B1-69AF-4A63-BDE1-BBFFC9EE5CA4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Containers.Ninject.Tests", "StoneFruit.Containers.Ninject.Tests\StoneFruit.Containers.Ninject.Tests.csproj", "{DDF137B1-69AF-4A63-BDE1-BBFFC9EE5CA4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utility", "Utility", "{9D2EB7CA-4C3D-4D2B-AC90-6F9DA5FA21B1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{7ECB8D3B-1ADA-4102-8AD0-0EF5229EF502}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestUtilities", "TestUtilities\TestUtilities.csproj", "{DE356F6C-E062-4BF1-B3F5-250E51C4BADE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,6 +69,10 @@ Global
 		{DDF137B1-69AF-4A63-BDE1-BBFFC9EE5CA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DDF137B1-69AF-4A63-BDE1-BBFFC9EE5CA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DDF137B1-69AF-4A63-BDE1-BBFFC9EE5CA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE356F6C-E062-4BF1-B3F5-250E51C4BADE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE356F6C-E062-4BF1-B3F5-250E51C4BADE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE356F6C-E062-4BF1-B3F5-250E51C4BADE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE356F6C-E062-4BF1-B3F5-250E51C4BADE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -77,6 +83,7 @@ Global
 		{110C4F3C-6CCA-475F-B7EE-687B82D4DBB5} = {7ECB8D3B-1ADA-4102-8AD0-0EF5229EF502}
 		{A1BCF0B5-2956-4B42-8FA1-C32914B5F7CB} = {7ECB8D3B-1ADA-4102-8AD0-0EF5229EF502}
 		{DDF137B1-69AF-4A63-BDE1-BBFFC9EE5CA4} = {7ECB8D3B-1ADA-4102-8AD0-0EF5229EF502}
+		{DE356F6C-E062-4BF1-B3F5-250E51C4BADE} = {7ECB8D3B-1ADA-4102-8AD0-0EF5229EF502}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1C3F9AD9-B506-4995-9D1A-F855E1B280FA}

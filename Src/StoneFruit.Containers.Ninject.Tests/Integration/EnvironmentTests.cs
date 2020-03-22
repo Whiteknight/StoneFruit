@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using TestUtilities;
 
-namespace StoneFruit.Containers.Lamar.Tests.Integration
+namespace StoneFruit.Containers.Ninject.Tests.Integration
 {
     public class EnvironmentTests
     {
@@ -11,7 +11,7 @@ namespace StoneFruit.Containers.Lamar.Tests.Integration
         {
             var output = new TestOutput();
             var engine = new EngineBuilder()
-                .SetupHandlers(h => h.UseLamarHandlerSource<TestEnvironment>())
+                .SetupHandlers(h => h.UseNinjectHandlerSource())
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEnvironments(e => e.UseInstance(new TestEnvironment("Single")))
                 .Build();

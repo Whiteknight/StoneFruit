@@ -2,7 +2,7 @@
 using FluentAssertions;
 using NUnit.Framework;
 using StoneFruit.Handlers;
-using StoneFruit.Tests.Helpers;
+using TestUtilities;
 
 namespace StoneFruit.Tests.Integration
 {

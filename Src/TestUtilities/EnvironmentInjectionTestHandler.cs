@@ -1,12 +1,14 @@
-namespace StoneFruit.Containers.Lamar.Tests
+using StoneFruit;
+
+namespace TestUtilities
 {
     [Verb("test-environment")]
-    public class LamarEnvironmentTestHandler : IHandler
+    public class EnvironmentInjectionTestHandler : IHandler
     {
         private readonly IOutput _output;
-        public LamarTestEnvironment Environment { get; }
+        public TestEnvironment Environment { get; }
 
-        public LamarEnvironmentTestHandler(LamarTestEnvironment environment, IOutput output)
+        public EnvironmentInjectionTestHandler(TestEnvironment environment, IOutput output)
         {
             _output = output;
             Environment = environment;

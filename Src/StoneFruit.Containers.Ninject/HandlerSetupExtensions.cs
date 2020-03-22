@@ -2,7 +2,7 @@
 
 namespace StoneFruit.Containers.Ninject
 {
-    public static class EngineBuilderExtensions
+    public static class HandlerSetupExtensions
     {
         public static IHandlerSetup UseNinjectHandlerSource(this IHandlerSetup handlers)
             => handlers.AddSource(new NinjectHandlerSource());

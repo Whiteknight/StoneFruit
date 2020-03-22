@@ -6,6 +6,7 @@ using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Environments;
 using StoneFruit.Execution.Output;
 using StoneFruit.Handlers;
+using TestUtilities;
 
 namespace StoneFruit.Containers.Lamar.Tests
 {
@@ -40,14 +41,14 @@ namespace StoneFruit.Containers.Lamar.Tests
         [Test]
         public void Environment_Test()
         {
-            var target = new LamarHandlerSource<LamarTestEnvironment>();
-            var environments = new InstanceEnvironmentCollection(new LamarTestEnvironment("test"));
+            var target = new LamarHandlerSource<TestEnvironment>();
+            var environments = new InstanceEnvironmentCollection(new TestEnvironment("test"));
             var dispatcher = new CommandDispatcher(CommandParser.GetDefault(), target, environments, new EngineState(true, null), new ConsoleOutput());
-            var result = target.GetInstance(new Command("test-environment", CommandArguments.Empty()), dispatcher) as LamarEnvironmentTestHandler;
+            var result = target.GetInstance(new Command("test-environment", CommandArguments.Empty()), dispatcher) as EnvironmentInjectionTestHandler;
 
             result.Should().NotBeNull();
             result.Environment.Should().NotBeNull();
-            result.Environment.Should().BeOfType<LamarTestEnvironment>();
+            result.Environment.Should().BeOfType<TestEnvironment>();
         }
     }
 }

@@ -105,7 +105,7 @@ namespace StoneFruit.Containers.Ninject
 
             // TODO: This doesn't work
             if (dispatcher.Environments.Current != null)
-                context.BindInstance(dispatcher.Environments.Current);
+                context.Bind(dispatcher.Environments.Current.GetType()).ToConstant(dispatcher.Environments.Current);
 
             var instance = context.Get(type);
             context.Dispose();

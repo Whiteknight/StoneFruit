@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using StoneFruit;
 
-namespace StoneFruit.Tests.Helpers
+namespace TestUtilities
 {
     public class TestOutput : IOutput
     {

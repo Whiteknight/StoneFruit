@@ -6,6 +6,7 @@ using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Environments;
 using StoneFruit.Execution.Output;
 using StoneFruit.Handlers;
+using TestUtilities;
 
 namespace StoneFruit.Containers.Ninject.Tests
 {
@@ -32,9 +33,21 @@ namespace StoneFruit.Containers.Ninject.Tests
         public void GetAll_Test()
         {
             var target = new NinjectHandlerSource();
-            var dispatcher = new CommandDispatcher(CommandParser.GetDefault(), target, new InstanceEnvironmentCollection(null), new EngineState(true, null), new ConsoleOutput());
             var result = target.GetAll().ToList();
             result.Count.Should().BeGreaterThan(1);
+        }
+
+        [Test]
+        public void Environment_Test()
+        {
+            var target = new NinjectHandlerSource();
+            var environments = new InstanceEnvironmentCollection(new TestEnvironment("test"));
+            var dispatcher = new CommandDispatcher(CommandParser.GetDefault(), target, environments, new EngineState(true, null), new ConsoleOutput());
+            var result = target.GetInstance(new Command("test-environment", CommandArguments.Empty()), dispatcher) as EnvironmentInjectionTestHandler;
+
+            result.Should().NotBeNull();
+            result.Environment.Should().NotBeNull();
+            result.Environment.Should().BeOfType<TestEnvironment>();
         }
     }
 }
