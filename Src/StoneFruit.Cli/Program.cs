@@ -41,6 +41,8 @@ namespace StoneFruit.Cli
         }
     }
 
+    // TODO: Turn all these cases into unit tests
+
     public class TestArgsA
     {
         [ArgumentIndex(0)]

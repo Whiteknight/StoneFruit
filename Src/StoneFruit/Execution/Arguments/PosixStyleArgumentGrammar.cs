@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ParserObjects;
 using ParserObjects.Parsers;
@@ -14,7 +15,11 @@ namespace StoneFruit.Execution.Arguments
     /// </summary>
     public class PosixStyleArgumentGrammar
     {
-        public static IParser<char, IArgument> GetParser()
+        private static readonly Lazy<IParser<char, IArgument>> _instance = new Lazy<IParser<char, IArgument>>(GetParserInternal);
+
+        public static IParser<char, IArgument> GetParser() => _instance.Value;
+
+        private static IParser<char, IArgument> GetParserInternal()
         {
             var doubleQuotedString = StrippedDoubleQuotedString();
 
