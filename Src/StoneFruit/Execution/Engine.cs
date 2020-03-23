@@ -112,7 +112,7 @@ namespace StoneFruit.Execution
                 var env = parts[0];
                 if (_environments.IsValid(env))
                 {
-                    sources.AddToEnd(new SingleCommandSource($"{EnvironmentChangeHandler.Name} '{env}'"));
+                    sources.AddToEnd(new QueueCommandSource($"{EnvironmentChangeHandler.Name} '{env}'"));
                     commandLine = parts[1];
                 }
             }
@@ -127,7 +127,7 @@ namespace StoneFruit.Execution
             // Setup the Headless start script, the user command, and the headless stop script before
             // running the RunLoop
             sources.AddToEnd(new ScriptCommandSource(state.EventCatalog.EngineStartHeadless, _parser));
-            sources.AddToEnd(new SingleCommandSource(commandLine));
+            sources.AddToEnd(new QueueCommandSource(commandLine));
             sources.AddToEnd(new ScriptCommandSource(state.EventCatalog.EngineStopHeadless, _parser));
             return RunLoop(state, dispatcher, sources);
         }
@@ -160,7 +160,7 @@ namespace StoneFruit.Execution
             var state = new EngineState(false, _eventCatalog);
             var dispatcher = new CommandDispatcher(_parser, _commandSource, _environments, state, _output);
             var source = new CommandSourceCollection();
-            source.AddToEnd(new SingleCommandSource($"{EnvironmentChangeHandler.Name} {environment}"));
+            source.AddToEnd(new QueueCommandSource($"{EnvironmentChangeHandler.Name} {environment}"));
             source.AddToEnd(new ScriptCommandSource(state.EventCatalog.EngineStartInteractive, _parser));
             source.AddToEnd(new PromptCommandSource(_output, _environments));
             source.AddToEnd(new ScriptCommandSource(state.EventCatalog.EngineStopInteractive, _parser));

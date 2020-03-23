@@ -9,9 +9,8 @@ namespace StoneFruit.Tests.Execution.CommandSources
         [Test]
         public void GetNextCommand_Test()
         {
-            var target = new SingleCommandSource("test");
-            target.Start();
-            target.GetNextCommand().Should().Be("test");
+            var target = new QueueCommandSource("test");
+            target.GetNextCommand().String.Should().Be("test");
             target.GetNextCommand().Should().Be(null);
         }
     }

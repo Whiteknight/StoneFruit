@@ -3,25 +3,30 @@
 namespace StoneFruit.Execution.CommandSources
 {
     /// <summary>
-    /// Ordered collection of ICommandSources
+    /// Ordered collection of ICommandSources. A source is drained and then removed from
+    /// the list.
     /// </summary>
     public class CommandSourceCollection 
     {
-        private readonly LinkedList<Node> _sources;
+        private readonly LinkedList<ICommandSource> _sources;
 
         public CommandSourceCollection()
         {
-            _sources = new LinkedList<Node>();
+            _sources = new LinkedList<ICommandSource>();
         }
 
         public void AddToEnd(ICommandSource source)
         {
-            _sources.AddLast(new Node(source));
+            if (source == null)
+                return;
+            _sources.AddLast(source);
         }
 
         public void AddToBeginning(ICommandSource source)
         {
-            _sources.AddFirst(new Node(source));
+            if (source == null)
+                return;
+            _sources.AddFirst(source);
         }
 
         public CommandObjectOrString GetNextCommand()
@@ -32,33 +37,12 @@ namespace StoneFruit.Execution.CommandSources
                     return null;
 
                 var firstSource = _sources.First.Value;
-                firstSource.Start();
 
-                var next = firstSource.Source.GetNextCommand();
+                var next = firstSource.GetNextCommand();
                 if (next != null)
                     return next;
 
                 _sources.RemoveFirst();
-            }
-        }
-
-        private class Node
-        {
-            private bool _isStarted;
-            public Node(ICommandSource source)
-            {
-                Source = source;
-                _isStarted = false;
-            }
-
-            public ICommandSource Source { get; }
-
-            public void Start()
-            {
-                if (_isStarted)
-                    return;
-                Source.Start();
-                _isStarted = true;
             }
         }
     }

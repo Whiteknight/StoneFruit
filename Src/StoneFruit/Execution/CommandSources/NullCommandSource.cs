@@ -5,13 +5,6 @@
     /// </summary>
     public class NullCommandSource : ICommandSource
     {
-        public void Start()
-        {
-        }
-
-        public CommandObjectOrString GetNextCommand()
-        {
-            return null;
-        }
+        public CommandObjectOrString GetNextCommand() => null;
     }
 }

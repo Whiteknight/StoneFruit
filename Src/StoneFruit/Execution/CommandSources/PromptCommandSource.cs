@@ -1,5 +1,8 @@
 ﻿namespace StoneFruit.Execution.CommandSources
 {
+    /// <summary>
+    /// prompts the user to input commands and exposes them to the runloop
+    /// </summary>
     public class PromptCommandSource : ICommandSource
     {
         private readonly IOutput _output;
@@ -9,10 +12,6 @@
         {
             _output = output;
             _environments = environments;
-        }
-
-        public void Start()
-        {
         }
 
         public CommandObjectOrString GetNextCommand()

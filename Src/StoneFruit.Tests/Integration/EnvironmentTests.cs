@@ -62,6 +62,7 @@ namespace StoneFruit.Tests.Integration
                     { "A", new TestEnvironment("A")},
                     { "B", new TestEnvironment("B")}
                 }))
+                .SetupEvents(e => { e.EnvironmentChanged.Clear(); })
                 .Build();
             engine.RunHeadless("B test");
             output.Lines.Count.Should().Be(1);
@@ -87,6 +88,7 @@ namespace StoneFruit.Tests.Integration
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(TestEnvironmentHandler), typeof(EnvironmentChangeHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEnvironments(e => e.UseFactory(new TestEnvironmentFactory()))
+                .SetupEvents(e => { e.EnvironmentChanged.Clear(); })
                 .Build();
             engine.RunHeadless("B test");
             output.Lines.Count.Should().Be(1);
@@ -104,6 +106,7 @@ namespace StoneFruit.Tests.Integration
                 // Clear out start/stop scripts so we don't have anything extra in output
                 .SetupEvents(c =>
                 {
+                    c.EnvironmentChanged.Clear();
                     c.EngineStartInteractive.Clear();
                     c.EngineStopInteractive.Clear();
                 })
