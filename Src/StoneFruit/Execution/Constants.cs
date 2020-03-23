@@ -8,5 +8,7 @@
         public const int ExitCodeCascadeError = 2;
 
         public const string MetadataError = "__CURRENT_EXCEPTION";
+
+        public const string EnvironmentNameDefault = "";
     }
 }

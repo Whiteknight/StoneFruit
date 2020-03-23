@@ -3,6 +3,9 @@ using System.Linq;
 
 namespace StoneFruit.Execution.Environments
 {
+    /// <summary>
+    /// Environment factory which can return entries from a dictionary
+    /// </summary>
     public class DictionaryEnvironmentFactory : IEnvironmentFactory
     {
         private readonly IReadOnlyDictionary<string, object> _environments;

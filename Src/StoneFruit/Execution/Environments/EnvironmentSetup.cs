@@ -3,18 +3,15 @@ using System.Collections.Generic;
 
 namespace StoneFruit.Execution.Environments
 {
+    /// <summary>
+    /// Sets up the environment mechanism
+    /// </summary>
     public class EnvironmentSetup : IEnvironmentSetup
     {
         private IEnvironmentCollection _environments;
 
         public IEnvironmentCollection Build() => _environments ?? new InstanceEnvironmentCollection(null);
 
-        /// <summary>
-        /// Specify a factory for available environments, if the user should be able to
-        /// select from multiple options
-        /// </summary>
-        /// <param name="factory"></param>
-        /// <returns></returns>
         public IEnvironmentSetup UseFactory(IEnvironmentFactory factory)
         {
             EnsureEnvironmentsNotSet();
@@ -22,12 +19,6 @@ namespace StoneFruit.Execution.Environments
             return this;
         }
 
-        /// <summary>
-        /// Specify a single environment to use. An environment may represent configuration
-        /// or execution-context information
-        /// </summary>
-        /// <param name="environment"></param>
-        /// <returns></returns>
         public IEnvironmentSetup UseInstance(object environment)
         {
             EnsureEnvironmentsNotSet();
@@ -42,10 +33,6 @@ namespace StoneFruit.Execution.Environments
             return this;
         }
 
-        /// <summary>
-        /// Specify that the application does not use an environment
-        /// </summary>
-        /// <returns></returns>
         public IEnvironmentSetup None() => UseInstance(null);
 
         private void EnsureEnvironmentsNotSet()

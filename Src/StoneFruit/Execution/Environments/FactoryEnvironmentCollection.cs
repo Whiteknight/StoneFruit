@@ -18,10 +18,12 @@ namespace StoneFruit.Execution.Environments
         {
             var environments = environmentFactory.ValidEnvironments;
             if (environments == null || environments.Count == 0)
-                environments = new[] { "" };
+                environments = new[] { Constants.EnvironmentNameDefault };
             _environmentFactory = environmentFactory;
             _namedCache = new Dictionary<string, object>();
-            _nameIndices = environments.Select((item, index) => new { Index = index + 1, Item = item }).ToDictionary(x => x.Index, x => x.Item);
+            _nameIndices = environments
+                .Select((item, index) => new { Index = index + 1, Item = item })
+                .ToDictionary(x => x.Index, x => x.Item);
             _validNames = new HashSet<string>(environments);
         }
 

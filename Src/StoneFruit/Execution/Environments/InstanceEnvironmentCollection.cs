@@ -13,9 +13,10 @@ namespace StoneFruit.Execution.Environments
             CurrentName = "";
         }
 
-        public IReadOnlyDictionary<int, string> GetNames() => new Dictionary<int, string> { { 0, "" } };
+        public IReadOnlyDictionary<int, string> GetNames() 
+            => new Dictionary<int, string> { { 0, Constants.EnvironmentNameDefault } };
 
-        public string GetName(int index) => "";
+        public string GetName(int index) => Constants.EnvironmentNameDefault;
 
         public void SetCurrent(string name)
         {
@@ -27,7 +28,7 @@ namespace StoneFruit.Execution.Environments
 
         public string CurrentName { get; }
 
-        public bool IsValid(string name) => name == "";
+        public bool IsValid(string name) => name == Constants.EnvironmentNameDefault;
 
         public bool IsValid(int index) => index == 1;
 

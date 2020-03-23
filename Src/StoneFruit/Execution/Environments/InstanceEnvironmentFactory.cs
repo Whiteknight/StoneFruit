@@ -14,11 +14,8 @@ namespace StoneFruit.Execution.Environments
             _instance = instance;
         }
 
-        public object Create(string name)
-        {
-            return _instance;
-        }
+        public object Create(string name) => _instance;
 
-        public IReadOnlyCollection<string> ValidEnvironments => new[] { "" };
+        public IReadOnlyCollection<string> ValidEnvironments => new[] { Constants.EnvironmentNameDefault };
     }
 }

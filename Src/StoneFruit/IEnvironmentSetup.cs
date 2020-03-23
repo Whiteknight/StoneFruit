@@ -2,6 +2,9 @@
 
 namespace StoneFruit
 {
+    /// <summary>
+    /// Sets up the environments mechanism
+    /// </summary>
     public interface IEnvironmentSetup
     {
         /// <summary>
