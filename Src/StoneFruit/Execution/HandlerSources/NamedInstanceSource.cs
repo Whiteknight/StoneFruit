@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace StoneFruit.Execution.HandlerSources
 {
+    /// <summary>
+    /// Handler source for manually-specified handler instances
+    /// </summary>
     public class NamedInstanceSource : IHandlerSource
     {
         // TODO: Unit tests
@@ -13,12 +16,13 @@ namespace StoneFruit.Execution.HandlerSources
             _verbs = new Dictionary<string, VerbInfo>();
         }
 
-        public void Add(string verb, IHandler handlerObject, string description = null, string help = null)
+        public void Add(string verb, IHandlerBase handlerObject, string description = null, string usage = null)
         {
             verb = verb.ToLowerInvariant();
             if (_verbs.ContainsKey(verb))
+                // TODO: Better exception type
                 throw new Exception("Cannot add verbs with duplicate names");
-            var info = new VerbInfo(verb, handlerObject, description, help);
+            var info = new VerbInfo(verb, handlerObject, description, usage);
             _verbs.Add(verb, info);
         }
 
@@ -27,11 +31,14 @@ namespace StoneFruit.Execution.HandlerSources
 
         public IEnumerable<IVerbInfo> GetAll() => _verbs.Values;
 
-        public IVerbInfo GetByName(string name) => _verbs.ContainsKey(name) ? _verbs[name] : null;
+        public IVerbInfo GetByName(string name) 
+            => _verbs.ContainsKey(name) ? _verbs[name] : null;
+
+        public int Count => _verbs.Count;
 
         private class VerbInfo : IVerbInfo
         {
-            public VerbInfo(string verb, IHandler handlerObject, string description, string help)
+            public VerbInfo(string verb, IHandlerBase handlerObject, string description, string help)
             {
                 Verb = verb;
                 HandlerObject = handlerObject;
@@ -39,7 +46,7 @@ namespace StoneFruit.Execution.HandlerSources
                 Usage = help;
             }
 
-            public IHandler HandlerObject { get; }
+            public IHandlerBase HandlerObject { get; }
             public string Verb { get; }
             public string Description { get; }
             public string Usage { get; }

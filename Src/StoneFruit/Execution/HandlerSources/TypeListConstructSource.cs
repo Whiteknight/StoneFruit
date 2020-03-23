@@ -6,7 +6,8 @@ using StoneFruit.Utility;
 namespace StoneFruit.Execution.HandlerSources
 {
     /// <summary>
-    /// A command source which takes a list of Type and attempts to construct one using built-in mechanisms
+    /// A command source which takes a list of Type and attempts to construct one using
+    /// built-in mechanisms
     /// </summary>
     public class TypeListConstructSource : IHandlerSource
     {
@@ -50,7 +51,8 @@ namespace StoneFruit.Execution.HandlerSources
             return commandVerb as IHandlerBase;
         }
 
-        public IEnumerable<IVerbInfo> GetAll() => _commands.Select(kvp => new VerbInfo(kvp.Key, kvp.Value));
+        public IEnumerable<IVerbInfo> GetAll() 
+            => _commands.Select(kvp => new VerbInfo(kvp.Key, kvp.Value));
 
         public IVerbInfo GetByName(string name)
             => _commands.ContainsKey(name) ? new VerbInfo(name, _commands[name]) : null;

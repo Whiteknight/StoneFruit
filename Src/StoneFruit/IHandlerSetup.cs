@@ -40,6 +40,16 @@ namespace StoneFruit
         IHandlerSetup AddAsync(string verb, Func<Command, CommandDispatcher, Task> handleAsync, string description = null, string usage = null);
 
         /// <summary>
+        /// Add a pre-existing handler instance with the given verb
+        /// </summary>
+        /// <param name="verb"></param>
+        /// <param name="handler"></param>
+        /// <param name="description"></param>
+        /// <param name="usage"></param>
+        /// <returns></returns>
+        IHandlerSetup Add(string verb, IHandlerBase handler, string description = null, string usage = null)
+
+        /// <summary>
         /// Add a script with a verb and zero or more commands to execute
         /// </summary>
         /// <param name="verb"></param>

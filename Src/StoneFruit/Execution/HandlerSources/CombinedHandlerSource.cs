@@ -32,9 +32,8 @@ namespace StoneFruit.Execution.HandlerSources
 
         public void Add(IHandlerSource source)
         {
-            if (source == null)
-                return;
-            _sources.Add(source);
+            if (source != null)
+                _sources.Add(source);
         }
 
         public IHandlerSource Simplify()

@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace StoneFruit.Execution.HandlerSources
 {
+    /// <summary>
+    /// Handler source for function delegates
+    /// </summary>
     public class DelegateHandlerSource : IHandlerSource
     {
         // TODO: Unit tests

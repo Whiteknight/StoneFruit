@@ -9,6 +9,9 @@ using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.HandlerSources
 {
+    /// <summary>
+    /// Handler source for public methods on a pre-defined object instance
+    /// </summary>
     public class InstanceMethodHandlerSource : IHandlerSource
     {
         // TODO: Unit tests
@@ -43,27 +46,23 @@ namespace StoneFruit.Execution.HandlerSources
 
         public IEnumerable<IVerbInfo> GetAll()
         {
-            return _methods.Select(kvp => new MethodInfoVerbInfo(kvp.Key, kvp.Value, _getDescription, _getUsage));
+            return _methods.Select(kvp => new MethodInfoVerbInfo(kvp.Key, _getDescription, _getUsage));
         }
 
         public IVerbInfo GetByName(string name)
         {
             name = name.ToLowerInvariant();
-            if (!_methods.ContainsKey(name))
-                return null;
-            return new MethodInfoVerbInfo(name, _methods[name], _getDescription, _getUsage);
+            return _methods.ContainsKey(name) ? new MethodInfoVerbInfo(name, _getDescription, _getUsage) : null;
         }
 
         private class MethodInfoVerbInfo : IVerbInfo
         {
-            private readonly MethodInfo _method;
             private readonly Func<string, string> _getDescription;
             private readonly Func<string, string> _getUsage;
 
-            public MethodInfoVerbInfo(string verb, MethodInfo method, Func<string, string> getDescription, Func<string, string> getUsage)
+            public MethodInfoVerbInfo(string verb, Func<string, string> getDescription, Func<string, string> getUsage)
             {
                 Verb = verb;
-                _method = method;
                 _getDescription = getDescription;
                 _getUsage = getUsage;
             }
