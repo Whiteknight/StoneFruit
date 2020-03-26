@@ -6,7 +6,7 @@ using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.Handlers
 {
-    [Verb("exec")]
+    [Verb("exec", showInHelp: false)]
     public class ExecuteScriptHandler : IHandler
     {
         private readonly CommandArguments _args;

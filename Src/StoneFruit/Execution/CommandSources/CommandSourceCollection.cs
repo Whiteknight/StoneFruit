@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.Execution.CommandSources
 {
@@ -21,6 +22,11 @@ namespace StoneFruit.Execution.CommandSources
                 return;
             _sources.AddLast(source);
         }
+
+        public void AddToEnd(params string[] commands) => AddToEnd(new QueueCommandSource(commands));
+
+        public void AddToEnd(EventScript script, CommandParser parser, params IArgument[] args)
+            => AddToEnd(new ScriptCommandSource(script, parser, args));
 
         public void AddToBeginning(ICommandSource source)
         {

@@ -95,7 +95,7 @@ namespace StoneFruit.Cli
             return new MyEnvironment(name);
         }
 
-        public IReadOnlyCollection<string> ValidEnvironments => new[] { "TEST1", "TEST2", "TEST3" };
+        public IReadOnlyCollection<string> ValidEnvironments => new[] { "TEST1" };
     }
 
     public class MyEnvironment

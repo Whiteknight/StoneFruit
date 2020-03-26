@@ -14,14 +14,14 @@ namespace StoneFruit.Execution.HandlerSources
         private readonly CombinedHandlerSource _sources;
         private readonly DelegateHandlerSource _delegates;
         private readonly ScriptHandlerSource _scripts;
-        private readonly NamedInstanceSource _instances;
+        private readonly NamedInstanceHandlerSource _instances;
 
         public HandlerSetup()
         {
             _sources = new CombinedHandlerSource();
             _delegates = new DelegateHandlerSource();
             _scripts = new ScriptHandlerSource();
-            _instances = new NamedInstanceSource();
+            _instances = new NamedInstanceHandlerSource();
         }
 
         public IHandlerSource Build()

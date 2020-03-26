@@ -37,7 +37,6 @@ namespace StoneFruit.Execution.Arguments
 
             var names = Identifier();
 
-            // TODO: Figure out what we want this syntax to be, it should be as simple and ceremony-free as possible
             // '-' <name>
             var flagArg = Rule(
                 Match('-'),

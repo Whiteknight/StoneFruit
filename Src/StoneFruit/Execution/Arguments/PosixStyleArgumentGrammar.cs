@@ -38,9 +38,8 @@ namespace StoneFruit.Execution.Arguments
                 unquotedValue
             );
 
-            // TODO: we can be more flexible here, because the "--" prefix demarcates the name unambiguously.
             // The name can be numbers or symbols or anything besides whitespace.
-            var name = Identifier();
+            var name = Match<char>(c => !char.IsWhiteSpace(c) && c != '=').ListCharToString(true);
 
             var singleDash = Match('-');
             var doubleDash = Match<char>("--");
@@ -51,7 +50,6 @@ namespace StoneFruit.Execution.Arguments
                 doubleDash,
                 name,
                 Match('='),
-                // TODO: Don't backtrack here.
                 value,
 
                 (s, n, e, v) => new [] { new NamedArgument(n, v) }
@@ -62,7 +60,6 @@ namespace StoneFruit.Execution.Arguments
                 doubleDash,
                 name,
                 whitespace,
-                // TODO: Don't backtrack here.
                 value,
 
                 (s, n, e, v) => new IArgument[] { new FlagArgument(n), new NamedArgument(n, v), new PositionalArgument(v) }

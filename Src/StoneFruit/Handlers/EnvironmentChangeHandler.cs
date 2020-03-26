@@ -48,9 +48,8 @@ To prompt the user for an environment only if one is not currently set, use the 
             // If we're executing as notset, only prompt the user if we don't have an environment set
             if (_command.Verb == NotSetName)
             {
-                if (_environments.Current == null)
-                    PromptUserForEnvironment();
-                return;
+                if (_environments.Current != null)
+                    return;
             }
 
             // Otherwise do the normal environment switching logic

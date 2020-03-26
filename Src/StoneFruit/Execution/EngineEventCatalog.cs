@@ -31,7 +31,7 @@ namespace StoneFruit.Execution
             // Event when the environment has been successfully changed
             // Has argument 'environment' with name of new environment
             EnvironmentChanged = new EventScript(
-                $"{EchoHandler.Name} Environment changed to ['environment']"
+                $"{EchoHandler.Name} -noheadless Environment changed to ['environment']"
             );
 
             // We're executing basic help command headlessly

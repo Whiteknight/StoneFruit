@@ -59,16 +59,13 @@ namespace StoneFruit.Execution.Scripts.Formatting
             );
 
             // TODO: Some ability to rename a flag?
-            // TODO: I don't like this syntax. Try to find a better one
             // Fetch a flag from the input and reproduce it on the output if it exists
-            // fetchFlagArg := '[' '-' <name> ']'
+            // fetchFlagArg := '?' <name>
             var fetchFlagArg = Rule(
-                Match('['),
-                Match('-'),
+                Match('?'),
                 names,
-                Match(']'),
 
-                (o, start, name, c) => new FetchFlagArgumentAccessor(name)
+                (q, name) => new FetchFlagArgumentAccessor(name)
             );
 
             // A literal named arg which is passed without modification

@@ -104,7 +104,7 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                    .AddScript("test", new[] { "argument-display [-x] [-y]" })
+                    .AddScript("test", new[] { "argument-display ?x ?y" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
@@ -120,7 +120,7 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                    .AddScript("test", new[] { "argument-display [-y] -*" })
+                    .AddScript("test", new[] { "argument-display ?y -*" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
@@ -141,7 +141,7 @@ namespace StoneFruit.Tests.Integration
                     .AddScript("test", new[]
                     {
                         "echo start",
-                        "argument-display [0] {b} [-d]",
+                        "argument-display [0] {b} ?d",
                         "echo stop"
                     })
                 )

@@ -44,7 +44,6 @@ namespace StoneFruit.Execution.Arguments
                 Match('/'),
                 name,
                 Match(':'),
-                // TODO: don't backtrack here
                 value,
 
                 (s, n, e, v) => new NamedArgument(n, v)

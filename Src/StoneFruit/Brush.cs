@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using StoneFruit.Utility;
 
 namespace StoneFruit
@@ -68,27 +69,36 @@ namespace StoneFruit
             throw new Exception("Value not in a correct format");
         }
 
-        // TODO: Use proper parsers
         public static bool TryParse(string s, out Brush palette)
         {
-            string[] parts;
+            // If length==2 it's a hex byte. Parse that out.
             if (s.Length == 2)
             {
-                byte byteValue = Byte.Parse(s, NumberStyles.HexNumber);
+                var byteValue = byte.Parse(s, NumberStyles.HexNumber);
                 palette = new Brush(byteValue);
                 return true;
             }
+
+            // If length==4 it might be a hex byte with "0x" prefix
             if (s.Length == 4 && s.StartsWith("0x"))
             {
-                byte byteValue = Byte.Parse(s.Substring(2), NumberStyles.HexNumber);
+                var byteValue = byte.Parse(s.Substring(2), NumberStyles.HexNumber);
                 palette = new Brush(byteValue);
                 return true;
             }
+
+            string[] parts = null;
+
+            // Format "ColorName on ColorName" split
             if (s.Contains(" on "))
-                parts = s.Split(new string[] { " on " }, StringSplitOptions.None);
+                parts = s.Split(new[] { " on " }, StringSplitOptions.None).Select(x => x.Trim()).ToArray();
+
+            // Format "ColorName,ColorName" split
             else if (s.Contains(","))
-                parts = s.Split(new string[] { "," }, StringSplitOptions.None);
-            else
+                parts = s.Split(new[] { "," }, StringSplitOptions.None).Select(x => x.Trim()).ToArray();
+
+            // Otherwise it's nothing we can deal with. Bail out.
+            if (parts == null || parts.Length != 2)
             {
                 palette = new Brush();
                 return false;

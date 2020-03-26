@@ -22,6 +22,7 @@ namespace StoneFruit.Execution
         }
 
         // TODO: Should be able to inject the overall command parser (go from verb-object to object-verb, etc)
+        // TODO: CommandParser needs to be abstracted?
 
         public IArgumentParserSetup UseVerbParser(IParser<char, string> verbParser)
         {

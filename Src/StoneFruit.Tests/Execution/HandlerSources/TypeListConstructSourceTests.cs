@@ -39,7 +39,7 @@ namespace StoneFruit.Tests.Execution.HandlerSources
             var args = new CommandArguments();
             var command = new Command("test", args);
             var parser = CommandParser.GetDefault();
-            var verbSource = new NamedInstanceSource();
+            var verbSource = new NamedInstanceHandlerSource();
             var environments = new InstanceEnvironmentCollection(null);
             var state = new EngineState(true, null);
             var output = new ConsoleOutput();

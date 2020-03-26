@@ -3,6 +3,7 @@ using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.Handlers
 {
+    [Verb("run", showInHelp: false)]
     public class RunHandler : IHandler
     {
         private readonly CommandArguments _args;
