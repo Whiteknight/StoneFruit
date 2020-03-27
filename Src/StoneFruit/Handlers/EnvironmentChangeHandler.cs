@@ -67,8 +67,7 @@ To prompt the user for an environment only if one is not currently set, use the 
                 if (envName == _environments.CurrentName)
                     return;
                 if (!TrySetEnvironment(envName))
-                    // TODO: Use a better exception type
-                    throw new Exception($"Could not set environment {envName}");
+                    throw new EngineBuildException($"Could not set environment {envName}");
                 OnEnvironmentChanged();
                 return;
             }
