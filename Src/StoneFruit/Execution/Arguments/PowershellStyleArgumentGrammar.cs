@@ -17,7 +17,6 @@ namespace StoneFruit.Execution.Arguments
     {
         private static readonly Lazy<IParser<char, IArgument>> _instance = new Lazy<IParser<char, IArgument>>(GetParserInternal);
 
-        // TODO: Unit tests
         public static IParser<char, IArgument> GetParser() => _instance.Value;
 
         private static IParser<char, IArgument> GetParserInternal()
@@ -46,6 +45,7 @@ namespace StoneFruit.Execution.Arguments
             // downstream we can access it however it makes sense (but if you .Consume() one, it breaks your
             // ability to access things a different way)
 
+            // TODO: Link these together so when one is marked consumed, they all are marked consumed
             // '-' <name> <whitespace> <value>
             var namedArg = Rule(
                 Match('-'),

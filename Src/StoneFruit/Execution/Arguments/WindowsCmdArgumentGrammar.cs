@@ -18,7 +18,6 @@ namespace StoneFruit.Execution.Arguments
 
         public static IParser<char, IArgument> GetParser() => _instance.Value;
 
-        // TODO: Unit tests
         private static IParser<char, IArgument> GetParserInternal()
         {
             var doubleQuotedString = StrippedDoubleQuotedString();
