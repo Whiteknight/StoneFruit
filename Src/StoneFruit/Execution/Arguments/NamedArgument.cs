@@ -3,9 +3,22 @@
     /// <summary>
     /// An argument defined by a name
     /// </summary>
-    public class NamedArgument : IArgument
+    public class NamedArgument : IParsedArgument
     {
         public NamedArgument(string name, string value)
+        {
+            Name = name.ToLowerInvariant();
+            Value = value;
+        }
+
+        public string Name { get; }
+
+        public string Value { get; }
+    }
+
+    public class NamedArgumentAccessor : INamedArgument
+    {
+        public NamedArgumentAccessor(string name, string value)
         {
             Name = name;
             Value = value;
@@ -14,7 +27,7 @@
         public string Name { get; }
 
         public string Value { get; }
-        
+
         public bool Consumed { get; private set; }
 
         public IArgument MarkConsumed(bool consumed = true)

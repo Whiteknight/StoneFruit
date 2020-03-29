@@ -18,9 +18,5 @@ namespace StoneFruit.Execution
         public string Raw { get; }
 
         public CommandArguments Arguments { get; }
-
-        // TODO: Should we keep track of other information? 
-        // Complete command string?
-        // Start time? / End time?
     }
 }

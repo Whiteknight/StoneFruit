@@ -15,7 +15,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
             foreach (var flag in flags)
             {
                 flag.MarkConsumed();
-                results.Add(new FlagArgument(flag.Name));
+                results.Add(new FlagArgumentAccessor(flag.Name));
             }
 
             return results;

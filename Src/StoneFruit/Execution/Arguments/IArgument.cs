@@ -3,16 +3,15 @@ using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Arguments
 {
+    public interface IParsedArgument
+    {
+    }
+
     /// <summary>
     /// Represents a single argument, either positional, named, or otherwise
     /// </summary>
     public interface IArgument
     {
-        /// <summary>
-        /// The raw string value of the argument
-        /// </summary>
-        string Value { get; }
-
         /// <summary>
         /// True if this value has already been consumed. A consumed argument cannot be retrieved again
         /// </summary>
@@ -23,6 +22,14 @@ namespace StoneFruit.Execution.Arguments
         /// </summary>
         /// <returns></returns>
         IArgument MarkConsumed(bool consumed = true);
+    }
+
+    public interface IValuedArgument : IArgument
+    {
+        /// <summary>
+        /// The raw string value of the argument
+        /// </summary>
+        string Value { get; }
 
         /// <summary>
         /// Get the value of the argument as a string, with a default value if the argument doesn't exist.
@@ -56,6 +63,20 @@ namespace StoneFruit.Execution.Arguments
         long AsLong(long defaultValue = 0L);
     }
 
+    public interface IPositionalArgument : IValuedArgument
+    {
+    }
+
+    public interface INamedArgument : IValuedArgument
+    {
+        string Name { get; }
+    }
+
+    public interface IFlagArgument : IArgument
+    {
+        string Name { get; }
+    }
+
     public static class ArgumentExtensions
     {
         /// <summary>
@@ -63,7 +84,8 @@ namespace StoneFruit.Execution.Arguments
         /// </summary>
         /// <param name="argument"></param>
         /// <returns></returns>
-        public static IArgument Require(this IArgument argument)
+        public static T Require<T>(this T argument)
+            where T : IArgument
         {
             Assert.ArgumentNotNull(argument, nameof(argument));
             (argument as MissingArgument)?.Throw();
@@ -87,7 +109,7 @@ namespace StoneFruit.Execution.Arguments
         /// <param name="transform"></param>
         /// <param name="defaultValue"></param>
         /// <returns></returns>
-        public static T As<T>(this IArgument argument, Func<string, T> transform, T defaultValue)
+        public static T As<T>(this IValuedArgument argument, Func<string, T> transform, T defaultValue)
         {
             if (argument is MissingArgument)
                 return defaultValue;

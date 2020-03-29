@@ -11,10 +11,10 @@ namespace StoneFruit.Execution
     public class CommandParser
     {
         private readonly IParser<char, string> _verbParser;
-        private readonly IParser<char, IArgument> _argsParser;
+        private readonly IParser<char, IParsedArgument> _argsParser;
         private readonly IParser<char, CommandFormat> _scriptParser;
 
-        public CommandParser(IParser<char, string> verbParser, IParser<char, IArgument> argParser, IParser<char, CommandFormat> scriptParser)
+        public CommandParser(IParser<char, string> verbParser, IParser<char, IParsedArgument> argParser, IParser<char, CommandFormat> scriptParser)
         {
             Assert.ArgumentNotNull(verbParser, nameof(verbParser));
             Assert.ArgumentNotNull(argParser, nameof(argParser));
@@ -33,7 +33,7 @@ namespace StoneFruit.Execution
             return new CommandParser(verbParser, argParser, scriptParser);
         }
 
-        public static Command ParseCommand(IParser<char, string> verbs, IParser<char, IArgument> args, string line)
+        public static Command ParseCommand(IParser<char, string> verbs, IParser<char, IParsedArgument> args, string line)
         {
             var sequence = new StringCharacterSequence(line);
             var verb = verbs.Parse(sequence).Value;

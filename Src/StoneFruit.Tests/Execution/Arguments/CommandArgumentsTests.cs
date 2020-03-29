@@ -48,7 +48,7 @@ namespace StoneFruit.Tests.Execution.Arguments
                 new NamedArgument("a", "1"),
                 new NamedArgument("a", "2")
             });
-            var result = target.GetAll("a").ToList();
+            var result = target.GetAll("a").Cast<INamedArgument>().ToList();
             result.Count.Should().Be(2);
             result[0].Value.Should().Be("1");
             result[1].Value.Should().Be("2");
@@ -81,7 +81,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         [Test]
         public void MapTo_Test()
         {
-            var target = new CommandArguments(new IArgument[]
+            var target = new CommandArguments(new IParsedArgument[]
             {
                 new PositionalArgument("test1"),
                 new NamedArgument("b", "test2"),

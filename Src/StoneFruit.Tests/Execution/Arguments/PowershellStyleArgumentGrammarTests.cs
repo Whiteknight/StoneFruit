@@ -35,13 +35,33 @@ namespace StoneFruit.Tests.Execution.Arguments
         }
 
         [Test]
-        public void FlagOrNamed_Test()
+        public void FlagOrNamed_ConsumeNamed()
         {
-            //  This production is ambiguous, so we return a flag, a named and a positional
+            // If we consume the named arg, it consumes the entire production
             var result = Parse("-abc xyz");
+            result.Consume("abc").Value.Should().Be("xyz");
+            result.HasFlag("abc").Should().BeFalse();
+            result.Get(0).Exists().Should().BeFalse();
+        }
+
+        [Test]
+        public void FlagOrNamed_ConsumePositional()
+        {
+            // If we consume the positional, it removes the named arg but keeps the flag available
+            var result = Parse("-abc xyz");
+            result.Consume(0).Value.Should().Be("xyz");
             result.HasFlag("abc").Should().BeTrue();
-            result.Get("abc").Value.Should().Be("xyz");
-            result.Get(0).Value.Should().Be("xyz");
+            result.Get("abc").Exists().Should().BeFalse();
+        }
+
+        [Test]
+        public void FlagOrNamed_ConsumeFlag()
+        {
+            // If we consume the flag it removes the named arg but keeps the positional available
+            var result = Parse("-abc xyz");
+            result.ConsumeFlag("abc").Exists().Should().BeTrue();
+            result.Get("abc").Exists().Should().BeFalse();
+            result.Get(0).Exists().Should().BeTrue();
         }
     }
 }

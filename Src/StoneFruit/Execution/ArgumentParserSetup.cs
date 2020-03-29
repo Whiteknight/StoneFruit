@@ -9,7 +9,7 @@ namespace StoneFruit.Execution
 {
     public class ArgumentParserSetup : IArgumentParserSetup
     {
-        private IParser<char, IArgument> _argParser;
+        private IParser<char, IParsedArgument> _argParser;
         private IParser<char, string> _verbParser;
         private IParser<char, CommandFormat> _scriptParser;
 
@@ -37,7 +37,7 @@ namespace StoneFruit.Execution
             return this;
         }
 
-        public IArgumentParserSetup UseArgumentParser(IParser<char, IArgument> argParser)
+        public IArgumentParserSetup UseArgumentParser(IParser<char, IParsedArgument> argParser)
         {
             if (argParser == null)
             {
@@ -50,9 +50,9 @@ namespace StoneFruit.Execution
             return this;
         }
 
-        public IArgumentParserSetup UseArgumentParser(IParser<char, IEnumerable<IArgument>> argParser)
+        public IArgumentParserSetup UseArgumentParser(IParser<char, IEnumerable<IParsedArgument>> argParser)
         {
-            var parser = argParser.Flatten<char, IEnumerable<IArgument>, IArgument>();
+            var parser = argParser.Flatten<char, IEnumerable<IParsedArgument>, IParsedArgument>();
             return UseArgumentParser(parser);
         }
 

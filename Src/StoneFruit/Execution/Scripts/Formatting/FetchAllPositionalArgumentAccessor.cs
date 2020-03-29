@@ -15,7 +15,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
             foreach (var positional in args.GetAllPositionals())
             {
                 positional.MarkConsumed();
-                results.Add(new PositionalArgument(positional.Value));
+                results.Add(new PositionalArgumentAccessor(positional.Value));
             }
             return results;
         }

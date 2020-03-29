@@ -14,11 +14,11 @@ namespace StoneFruit.Execution.Arguments
     /// </summary>
     public class SimplifiedArgumentGrammar
     {
-        private static readonly Lazy<IParser<char, IArgument>> _instance = new Lazy<IParser<char, IArgument>>(GetParserInternal);
+        private static readonly Lazy<IParser<char, IParsedArgument>> _instance = new Lazy<IParser<char, IParsedArgument>>(GetParserInternal);
 
-        public static IParser<char, IArgument> GetParser() => _instance.Value;
+        public static IParser<char, IParsedArgument> GetParser() => _instance.Value;
 
-        private static IParser<char, IArgument> GetParserInternal()
+        private static IParser<char, IParsedArgument> GetParserInternal()
         {
             var doubleQuotedString = StrippedDoubleQuotedString();
 
@@ -55,7 +55,7 @@ namespace StoneFruit.Execution.Arguments
             );
 
             // <flag> | <named> | <positional>
-            var args = First<char, IArgument>(
+            var args = First<char, IParsedArgument>(
                 flagArg,
                 namedArg,
                 values.Transform(v => new PositionalArgument(v) )

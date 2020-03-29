@@ -3,17 +3,24 @@
     /// <summary>
     /// A flag or switch argument with a name but no value
     /// </summary>
-    public class FlagArgument : IArgument
+    public class FlagArgument : IParsedArgument
     {
         public FlagArgument(string name)
         {
-            Name = name;
-            Value = "";
+            Name = name.ToLowerInvariant();
         }
 
         public string Name { get; }
+    }
 
-        public string Value { get; }
+    public class FlagArgumentAccessor : IFlagArgument
+    {
+        public FlagArgumentAccessor(string name)
+        {
+            Name = name;
+        }
+
+        public string Name { get; }
 
         public bool Consumed { get; private set; }
 

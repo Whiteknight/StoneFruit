@@ -22,18 +22,18 @@ namespace StoneFruit.Execution.Arguments
                 if (attr != null)
                 {
                     var index = attr.Index;
-                    var positionalArgument = args.Get(index);
+                    var positionalArgument = args.Consume(index);
                     AssignPropertyValue(positionalArgument, property, obj);
                     continue;
                 }
 
-                if ((property.PropertyType == typeof(bool) || property.PropertyType == typeof(bool?)) && args.HasFlag(property.Name))
+                if ((property.PropertyType == typeof(bool) || property.PropertyType == typeof(bool?)) && args.ConsumeFlag(property.Name).Exists())
                 {
                     property.SetValue(obj, true);
                     continue;
                 }
 
-                var namedArg = args.Get(property.Name);
+                var namedArg = args.Consume(property.Name);
                 if (namedArg.Exists())
                 {
                     AssignPropertyValue(namedArg, property, obj);
@@ -44,7 +44,7 @@ namespace StoneFruit.Execution.Arguments
             return obj;
         }
 
-        private static void AssignPropertyValue<T>(IArgument argument, PropertyInfo property, T obj)
+        private static void AssignPropertyValue<T>(IValuedArgument argument, PropertyInfo property, T obj)
         {
             if (!argument.Exists())
                 return;

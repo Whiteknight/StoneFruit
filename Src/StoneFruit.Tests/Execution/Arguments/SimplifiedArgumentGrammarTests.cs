@@ -7,7 +7,7 @@ namespace StoneFruit.Tests.Execution.Arguments
 {
     public class SimplifiedArgumentGrammarTests
     {
-        private static IParser<char, IArgument> GetParser() 
+        private static IParser<char, IParsedArgument> GetParser() 
             => SimplifiedArgumentGrammar.GetParser();
 
         [Test]
@@ -22,7 +22,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         public void Positionals_Tests()
         {
             var parser = GetParser();
-            var result = parser.Parse("testa").Value;
+            var result = parser.Parse("testa").Value as PositionalArgument;
             result.Value.Should().Be("testa");
         }
 
@@ -30,7 +30,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         public void Positionals_SingleQuotedString()
         {
             var parser = GetParser();
-            var result = parser.Parse("'test a'").Value;
+            var result = parser.Parse("'test a'").Value as PositionalArgument;
             result.Value.Should().Be("test a");
         }
 
@@ -38,7 +38,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         public void Positionals_DoubleQuotedString()
         {
             var parser = GetParser();
-            var result = parser.Parse("\"test a\"").Value;
+            var result = parser.Parse("\"test a\"").Value as PositionalArgument;
             result.Value.Should().Be("test a");
         }
 
@@ -46,7 +46,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         public void Positionals_LeadingWhitespace()
         {
             var parser = GetParser();
-            var result = parser.Parse("   testa").Value;
+            var result = parser.Parse("   testa").Value as PositionalArgument;
             result.Value.Should().Be("testa");
         }
 
@@ -92,7 +92,6 @@ namespace StoneFruit.Tests.Execution.Arguments
             var parser = GetParser();
             var result = parser.Parse("-testa").Value as FlagArgument;
             result.Name.Should().Be("testa");
-            result.Value.Should().Be("");
         }
     }
 }

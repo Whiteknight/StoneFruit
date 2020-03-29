@@ -6,7 +6,6 @@ using ParserObjects.Parsers;
 using static ParserObjects.Parsers.ParserMethods;
 using static ParserObjects.Parsers.Specialty.QuotedParserMethods;
 using static ParserObjects.Parsers.Specialty.WhitespaceParserMethods;
-using static ParserObjects.Parsers.Specialty.CStyleParserMethods;
 
 namespace StoneFruit.Execution.Arguments
 {
@@ -15,11 +14,11 @@ namespace StoneFruit.Execution.Arguments
     /// </summary>
     public class PosixStyleArgumentGrammar
     {
-        private static readonly Lazy<IParser<char, IArgument>> _instance = new Lazy<IParser<char, IArgument>>(GetParserInternal);
+        private static readonly Lazy<IParser<char, IParsedArgument>> _instance = new Lazy<IParser<char, IParsedArgument>>(GetParserInternal);
 
-        public static IParser<char, IArgument> GetParser() => _instance.Value;
+        public static IParser<char, IParsedArgument> GetParser() => _instance.Value;
 
-        private static IParser<char, IArgument> GetParserInternal()
+        private static IParser<char, IParsedArgument> GetParserInternal()
         {
             var doubleQuotedString = StrippedDoubleQuotedString();
 
@@ -52,7 +51,7 @@ namespace StoneFruit.Execution.Arguments
                 Match('='),
                 value,
 
-                (s, n, e, v) => new [] { new NamedArgument(n, v) }
+                (s, n, e, v) => new IParsedArgument[] { new NamedArgument(n, v) }
             );
 
             // '--' <name> <ws> <value>
@@ -62,7 +61,7 @@ namespace StoneFruit.Execution.Arguments
                 whitespace,
                 value,
 
-                (s, n, e, v) => new IArgument[] { new FlagArgument(n), new NamedArgument(n, v), new PositionalArgument(v) }
+                (s, n, e, v) => new IParsedArgument[] { new FlagPositionalOrNamedArgument(n, v) }
             );
 
             // '--' <name>
@@ -70,7 +69,7 @@ namespace StoneFruit.Execution.Arguments
                 doubleDash,
                 name,
 
-                (s, n) => new [] { new FlagArgument(n) }
+                (s, n) => new IParsedArgument[] { new FlagArgument(n) }
             );
 
             // We include this case because some short args with a positional following, are treated like
@@ -82,7 +81,7 @@ namespace StoneFruit.Execution.Arguments
                 whitespace,
                 value,
 
-                (dash, n, ws, v) => new IArgument[] { new FlagArgument(n), new NamedArgument(n, v), new PositionalArgument(v) }
+                (dash, n, ws, v) => new IParsedArgument[] { new FlagPositionalOrNamedArgument(n, v) }
             );
 
             // '-' <char>*
@@ -90,17 +89,19 @@ namespace StoneFruit.Execution.Arguments
                 singleDash,
                 singleIdChar.List(true),
 
-                (s, n) => n.Select(x =>  new FlagArgument(x.ToString()))
+                (s, n) => n.Select(x => new FlagArgument(x.ToString()))
             );
 
+            var positional = value.Transform(v => new IParsedArgument[] { new PositionalArgument(v) });
+
             // <named> | <longFlag> | <shortFlag> | <positional>
-            var args = First<char, IEnumerable<IArgument>>(
+            var args = First<char, IEnumerable<IParsedArgument>>(
                 longEqualsNamedArg,
                 longImpliedNamedArg,
                 longFlagArg,
                 shortImpliedNamedArg,
                 shortFlagArg,
-                value.Transform(v => new [] { new PositionalArgument(v) })
+                positional
             );
 
             var whitespaceAndArgs = Rule(
@@ -110,7 +111,7 @@ namespace StoneFruit.Execution.Arguments
                 (ws, arg) => arg
             );
 
-            return whitespaceAndArgs.Flatten<char, IEnumerable<IArgument>, IArgument>();
+            return whitespaceAndArgs.Flatten<char, IEnumerable<IParsedArgument>, IParsedArgument>();
         }
     }
 }

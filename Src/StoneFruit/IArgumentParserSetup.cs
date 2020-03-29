@@ -22,14 +22,14 @@ namespace StoneFruit
         /// </summary>
         /// <param name="argParser"></param>
         /// <returns></returns>
-        IArgumentParserSetup UseArgumentParser(IParser<char, IArgument> argParser);
+        IArgumentParserSetup UseArgumentParser(IParser<char, IParsedArgument> argParser);
 
         /// <summary>
         /// Specify an argument parser to use
         /// </summary>
         /// <param name="argParser"></param>
         /// <returns></returns>
-        IArgumentParserSetup UseArgumentParser(IParser<char, IEnumerable<IArgument>> argParser);
+        IArgumentParserSetup UseArgumentParser(IParser<char, IEnumerable<IParsedArgument>> argParser);
 
         IArgumentParserSetup UseScriptParser(IParser<char, CommandFormat> scriptParser);
     }

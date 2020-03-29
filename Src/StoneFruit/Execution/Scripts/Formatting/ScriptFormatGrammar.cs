@@ -145,7 +145,6 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 (o, s, c) => new FetchAllPositionalArgumentAccessor()
             );
 
-            // TODO: See if we can find a better syntax
             // Fetch all remaining unconsumed flag arguments
             // fetchAllFlagsArg := '-' '*'
             var fetchAllFlagsArg = Rule(

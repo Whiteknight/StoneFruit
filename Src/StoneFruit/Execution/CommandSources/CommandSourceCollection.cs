@@ -25,7 +25,7 @@ namespace StoneFruit.Execution.CommandSources
 
         public void AddToEnd(params string[] commands) => AddToEnd(new QueueCommandSource(commands));
 
-        public void AddToEnd(EventScript script, CommandParser parser, params IArgument[] args)
+        public void AddToEnd(EventScript script, CommandParser parser, params IParsedArgument[] args)
             => AddToEnd(new ScriptCommandSource(script, parser, args));
 
         public void AddToBeginning(ICommandSource source)

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using ParserObjects;
 using ParserObjects.Parsers;
@@ -15,11 +14,11 @@ namespace StoneFruit.Execution.Arguments
     /// </summary>
     public class PowershellStyleArgumentGrammar
     {
-        private static readonly Lazy<IParser<char, IArgument>> _instance = new Lazy<IParser<char, IArgument>>(GetParserInternal);
+        private static readonly Lazy<IParser<char, IParsedArgument>> _instance = new Lazy<IParser<char, IParsedArgument>>(GetParserInternal);
 
-        public static IParser<char, IArgument> GetParser() => _instance.Value;
+        public static IParser<char, IParsedArgument> GetParser() => _instance.Value;
 
-        private static IParser<char, IArgument> GetParserInternal()
+        private static IParser<char, IParsedArgument> GetParserInternal()
         {
             var doubleQuotedString = StrippedDoubleQuotedString();
 
@@ -41,11 +40,9 @@ namespace StoneFruit.Execution.Arguments
             var names = Identifier();
 
             // Powershell convention doesn't really have a clear way to specify that a switch/value is a
-            // named arg or just a switch followed by a positional. We'll return all three versions so
-            // downstream we can access it however it makes sense (but if you .Consume() one, it breaks your
-            // ability to access things a different way)
+            // named arg or just a switch followed by a positional. Return a combined argument which acts
+            // like all three and the user can consume it however they want
 
-            // TODO: Link these together so when one is marked consumed, they all are marked consumed
             // '-' <name> <whitespace> <value>
             var namedArg = Rule(
                 Match('-'),
@@ -53,7 +50,7 @@ namespace StoneFruit.Execution.Arguments
                 whitespace,
                 values,
 
-                (s, name, e, value) => new IArgument[] { new FlagArgument(name), new PositionalArgument(value), new NamedArgument(name, value)  }
+                (s, name, e, value) => new FlagPositionalOrNamedArgument(name, value)
             );
 
             // '-' <name>
@@ -61,14 +58,14 @@ namespace StoneFruit.Execution.Arguments
                 Match('-'),
                 names,
 
-                (s, name) => new[] { new FlagArgument(name) }
+                (s, name) => new FlagArgument(name)
             );
 
             // <named> | <longFlag> | <positional>
-            var args = First<char, IEnumerable<IArgument>>(
+            var args = First<char, IParsedArgument>(
                 namedArg,
                 longFlagArg,
-                values.Transform(v => new[] { new PositionalArgument(v) })
+                values.Transform(v => new PositionalArgument(v))
             );
 
             var whitespaceAndArgs = Rule(
@@ -78,7 +75,7 @@ namespace StoneFruit.Execution.Arguments
                 (ws, arg) => arg
             );
 
-            return whitespaceAndArgs.Flatten<char, IEnumerable<IArgument>, IArgument>();
+            return whitespaceAndArgs;
         }
     }
 }

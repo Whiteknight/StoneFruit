@@ -23,7 +23,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
             if (!arg.Exists())
                 return Enumerable.Empty<IArgument>();
             arg.MarkConsumed();
-            return new [] { new PositionalArgument(arg.AsString(string.Empty)) };
+            return new [] { new PositionalArgumentAccessor(arg.AsString(string.Empty)) };
         }
     }
 }
