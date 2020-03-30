@@ -38,7 +38,7 @@ namespace StoneFruit.Execution.Environments
         private void EnsureEnvironmentsNotSet()
         {
             if (_environments != null)
-                throw new Exception("Environments are already configured for this builder. You cannot set environments again");
+                throw new EngineBuildException("Environments are already configured for this builder. You cannot set environments again");
         }
     }
 }
