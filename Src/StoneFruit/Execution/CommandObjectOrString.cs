@@ -6,6 +6,8 @@
         public Command Object { get; private set; }
         public string String { get; private set; }
 
+        // TODO: We can clean up some code with some implicit cast operators
+
         public static CommandObjectOrString FromObject(Command command)
         {
             return new CommandObjectOrString { Object = command, String = null };
