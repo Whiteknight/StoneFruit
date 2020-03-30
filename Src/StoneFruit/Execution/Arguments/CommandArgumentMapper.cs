@@ -5,7 +5,6 @@ namespace StoneFruit.Execution.Arguments
 {
     public class CommandArgumentMapper
     {
-        // TODO: Increase unit test coverage
         public T Map<T>(CommandArguments args)
             where T : new()
         {

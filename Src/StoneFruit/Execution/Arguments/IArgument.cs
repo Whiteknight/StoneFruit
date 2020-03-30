@@ -3,6 +3,11 @@ using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Arguments
 {
+    /// <summary>
+    /// A raw argument value from the parser. The full understanding of what type of
+    /// argument this is might not be fully determined until an attempt is made to
+    /// access it.
+    /// </summary>
     public interface IParsedArgument
     {
     }
@@ -69,11 +74,17 @@ namespace StoneFruit.Execution.Arguments
 
     public interface INamedArgument : IValuedArgument
     {
+        /// <summary>
+        /// The name of the argument
+        /// </summary>
         string Name { get; }
     }
 
     public interface IFlagArgument : IArgument
     {
+        /// <summary>
+        /// The name flag
+        /// </summary>
         string Name { get; }
     }
 
