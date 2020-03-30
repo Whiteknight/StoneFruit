@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
 using StoneFruit.Execution;
+using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.CommandSources;
 
 namespace StoneFruit.Tests.Execution.CommandSources

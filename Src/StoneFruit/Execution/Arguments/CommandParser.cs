@@ -2,11 +2,10 @@
 using ParserObjects;
 using ParserObjects.Parsers;
 using ParserObjects.Sequences;
-using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Scripts.Formatting;
 using StoneFruit.Utility;
 
-namespace StoneFruit.Execution
+namespace StoneFruit.Execution.Arguments
 {
     public class CommandParser
     {

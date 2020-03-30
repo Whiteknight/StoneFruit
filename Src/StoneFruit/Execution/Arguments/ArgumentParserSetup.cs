@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using ParserObjects;
 using ParserObjects.Parsers;
-using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Scripts.Formatting;
 
-namespace StoneFruit.Execution
+namespace StoneFruit.Execution.Arguments
 {
     public class ArgumentParserSetup : IArgumentParserSetup
     {
