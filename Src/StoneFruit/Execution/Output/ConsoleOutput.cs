@@ -7,8 +7,11 @@ namespace StoneFruit.Execution.Output
     /// </summary>
     public class ConsoleOutput : IOutput
     {
-        public IOutput Color(Brush brush)
+        public IOutput Color(Func<Brush, Brush> changeBrush)
         {
+            if (changeBrush == null)
+                return this;
+            var brush = changeBrush(Brush.Current);
             if (brush.Equals(Brush.Current))
                 return this;
             return new ColoredOutputWrapper(brush, this);

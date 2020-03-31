@@ -13,8 +13,15 @@ namespace StoneFruit.Execution.Output
             _inner = inner;
         }
 
-        public IOutput Color(Brush brush) 
-            => brush.Equals(_color) ? this : new ColoredOutputWrapper(brush, _inner);
+        public IOutput Color(Func<Brush, Brush> changeBrush)
+        {
+            if (changeBrush == null)
+                return this;
+            var newBrush = changeBrush(_color);
+            if (newBrush == _color)
+                return this;
+            return new ColoredOutputWrapper(newBrush, _inner);
+        }
 
         public IOutput WriteLine() => WithBrush(() => _inner.WriteLine());
 

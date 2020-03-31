@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using StoneFruit;
 
@@ -16,7 +17,7 @@ namespace TestUtilities
 
         public List<string> Lines { get; }
 
-        public IOutput Color(Brush brush) => this;
+        public IOutput Color(Func<Brush, Brush> changeBrush) => this;
 
         public IOutput WriteLine()
         {

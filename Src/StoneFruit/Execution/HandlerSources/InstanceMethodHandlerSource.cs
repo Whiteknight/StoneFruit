@@ -14,7 +14,6 @@ namespace StoneFruit.Execution.HandlerSources
     /// </summary>
     public class InstanceMethodHandlerSource : IHandlerSource
     {
-        // TODO: Unit tests
         private readonly object _instance;
         private readonly Func<string, string> _getDescription;
         private readonly Func<string, string> _getUsage;

@@ -86,9 +86,6 @@ namespace StoneFruit.Containers.Ninject
 
         private IHandlerBase ResolveCommand(Command Command, CommandDispatcher dispatcher, Type type)
         {
-            // TODO: Some of these .With() instances are long-lived and probably can be registered
-            // into the container properly instead of treated transiently. I don't know if this is a
-            // necessary optimization
             var context = new ChildKernel(_kernel);
             
             // long-lived
@@ -103,7 +100,6 @@ namespace StoneFruit.Containers.Ninject
             context.BindInstance(Command);
             context.BindInstance(Command.Arguments);
 
-            // TODO: This doesn't work
             if (dispatcher.Environments.Current != null)
                 context.Bind(dispatcher.Environments.Current.GetType()).ToConstant(dispatcher.Environments.Current);
 

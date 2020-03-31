@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using StoneFruit.Utility;
 
@@ -15,11 +16,14 @@ namespace StoneFruit.Execution.Output
             _secondaries = secondaries.OrEmptyIfNull().ToList();
         }
 
-        public IOutput Color(Brush brush)
+        public IOutput Color(Func<Brush, Brush> changeBrush)
         {
-            if (_primary == null)
+            if (_primary == null || changeBrush == null)
                 return this;
-            return new CombinedOutput(_primary.Color(brush), _secondaries);
+            var newPrimary = _primary.Color(changeBrush);
+            if (!ReferenceEquals(newPrimary, _primary))
+                return new CombinedOutput(newPrimary, _secondaries);
+            return this;
         }
 
         public IOutput WriteLine()
@@ -46,9 +50,7 @@ namespace StoneFruit.Execution.Output
             return this;
         }
 
-        public string Prompt(string prompt, bool mustProvide = true, bool keepHistory = true)
-        {
-            return _primary?.Prompt(prompt, mustProvide, keepHistory) ?? string.Empty;
-        }
+        public string Prompt(string prompt, bool mustProvide = true, bool keepHistory = true) 
+            => _primary?.Prompt(prompt, mustProvide, keepHistory) ?? string.Empty;
     }
 }

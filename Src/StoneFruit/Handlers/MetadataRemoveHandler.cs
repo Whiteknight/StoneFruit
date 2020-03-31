@@ -21,8 +21,8 @@ namespace StoneFruit.Handlers
 
         public void Execute()
         {
-            var name = _args.Shift().Require().AsString();
-            _state.Metadata.Remove(name);
+            foreach (var name in _args.GetAllPositionals())
+                _state.Metadata.Remove(name.AsString());
         }
     }
 }

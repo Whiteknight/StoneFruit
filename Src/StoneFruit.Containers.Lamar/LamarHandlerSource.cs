@@ -76,9 +76,6 @@ namespace StoneFruit.Containers.Lamar
 
         private IHandlerBase ResolveCommand(Command Command, CommandDispatcher dispatcher, Type type)
         {
-            // TODO: Some of these .With() instances are long-lived and probably can be registered
-            // into the container properly instead of treated transiently. I don't know if this is a
-            // necessary optimization
             var context = _container.GetNestedContainer();
 
             // long-lived

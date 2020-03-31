@@ -8,6 +8,8 @@ namespace StoneFruit
     /// </summary>
     public interface IEnvironmentCollection
     {
+        // TODO: Can we slim down this interface at all?
+
         /// <summary>
         /// Gets a list of valid environment names and a relative position situations which
         /// want to refer to the environment by number

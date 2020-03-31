@@ -8,14 +8,13 @@ namespace StoneFruit
     /// </summary>
     public interface IOutput
     {
-        // TODO: Some kind of method/property to get the current color, or to adjust it?
         /// <summary>
         /// Get a new output using the given color palette. If the output does not support
         /// color this will be a no-op
         /// </summary>
-        /// <param name="brush"></param>
+        /// <param name="changeBrush"></param>
         /// <returns></returns>
-        IOutput Color(Brush brush);
+        IOutput Color(Func<Brush, Brush> changeBrush);
 
         /// <summary>
         /// Write a linebreak to the output
@@ -91,6 +90,8 @@ namespace StoneFruit
         /// <param name="output"></param>
         /// <param name="color"></param>
         /// <returns></returns>
-        public static IOutput Color(this IOutput output, ConsoleColor color) => output.Color((Brush) color);
+        public static IOutput Color(this IOutput output, ConsoleColor color) => output.Color(b => (Brush) color);
+
+        public static IOutput Color(this IOutput output, Brush brush) => output.Color(b => brush);
     }
 }
