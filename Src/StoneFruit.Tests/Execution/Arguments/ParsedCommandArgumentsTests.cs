@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
 using StoneFruit.Execution.Arguments;
@@ -10,7 +11,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         [Test]
         public void Get_Named_Consumed()
         {
-            var target = new ParsedCommandArguments(new[]
+            var target = new ParsedArguments(new[]
             {
                 new NamedArgument("a", "1"),
                 new NamedArgument("a", "2")
@@ -30,7 +31,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         [Test]
         public void Shift_Test()
         {
-            var target = new ParsedCommandArguments(new[]
+            var target = new ParsedArguments(new[]
             {
                 new PositionalArgument("a"),
                 new PositionalArgument("b")
@@ -43,7 +44,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         [Test]
         public void GetAll_Named_Test()
         {
-            var target = new ParsedCommandArguments(new[]
+            var target = new ParsedArguments(new[]
             {
                 new NamedArgument("a", "1"),
                 new NamedArgument("a", "2")
@@ -57,7 +58,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         [Test]
         public void GetAll_Named_Empty()
         {
-            var target = new ParsedCommandArguments(new[]
+            var target = new ParsedArguments(new[]
             {
                 new NamedArgument("a", "1"),
                 new NamedArgument("a", "2")
@@ -81,7 +82,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         [Test]
         public void MapTo_Test()
         {
-            var target = new ParsedCommandArguments(new IParsedArgument[]
+            var target = new ParsedArguments(new IParsedArgument[]
             {
                 new PositionalArgument("test1"),
                 new NamedArgument("b", "test2"),
@@ -92,6 +93,51 @@ namespace StoneFruit.Tests.Execution.Arguments
             result.B.Should().Be("test2");
             result.C.Should().BeTrue();
             result.D.Should().BeFalse();
+        }
+
+        [Test]
+        public void VerifyAllAreConsumed_NotConsumed()
+        {
+            var target = new ParsedArguments(new IParsedArgument[]
+            {
+                new PositionalArgument("test1"),
+                new NamedArgument("b", "test2"),
+                new FlagArgument("c")
+            });
+            Action act = () => target.VerifyAllAreConsumed();
+            act.Should().Throw<CommandArgumentException>();
+        }
+
+        [Test]
+        public void VerifyAllAreConsumed_NotConsumed_Accessed()
+        {
+            var target = new ParsedArguments(new IParsedArgument[]
+            {
+                new PositionalArgument("test1"),
+                new NamedArgument("b", "test2"),
+                new FlagArgument("c")
+            });
+            target.Get(0);
+            target.Get("b");
+            target.GetFlag("c");
+            Action act = () => target.VerifyAllAreConsumed();
+            act.Should().Throw<CommandArgumentException>();
+        }
+
+        [Test]
+        public void VerifyAllAreConsumed_Consumed()
+        {
+            var target = new ParsedArguments(new IParsedArgument[]
+            {
+                new PositionalArgument("test1"),
+                new NamedArgument("b", "test2"),
+                new FlagArgument("c")
+            });
+            target.Consume(0);
+            target.Consume("b");
+            target.ConsumeFlag("c");
+            Action act = () => target.VerifyAllAreConsumed();
+            act.Should().NotThrow();
         }
     }
 }

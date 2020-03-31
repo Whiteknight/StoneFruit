@@ -4,7 +4,7 @@
     {
         public FlagArgumentAccessor(string name)
         {
-            Name = name;
+            Name = name.ToLowerInvariant();
         }
 
         public string Name { get; }

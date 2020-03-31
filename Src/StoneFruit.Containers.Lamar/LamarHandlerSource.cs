@@ -25,7 +25,7 @@ namespace StoneFruit.Containers.Lamar
             registry.Injectable<CommandParser>();
             registry.Injectable<IHandlerSource>();
             registry.Injectable<Command>();
-            registry.Injectable<ICommandArguments>();
+            registry.Injectable<IArguments>();
             if (typeof(TEnvironment) != typeof(object))
                 registry.Injectable<TEnvironment>();
 

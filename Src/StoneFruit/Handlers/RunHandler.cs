@@ -6,10 +6,10 @@ namespace StoneFruit.Handlers
     [Verb("run", showInHelp: false)]
     public class RunHandler : IHandler
     {
-        private readonly ICommandArguments _args;
+        private readonly IArguments _args;
         private readonly EngineState _state;
 
-        public RunHandler(ICommandArguments args, EngineState state)
+        public RunHandler(IArguments args, EngineState state)
         {
             _args = args;
             _state = state;

@@ -15,9 +15,9 @@ namespace StoneFruit.Tests.Integration
         private class TestHandler : IHandler
         {
             private readonly IOutput _output;
-            private readonly ICommandArguments _args;
+            private readonly IArguments _args;
 
-            public TestHandler(IOutput output, ICommandArguments args)
+            public TestHandler(IOutput output, IArguments args)
             {
                 _output = output;
                 _args = args;

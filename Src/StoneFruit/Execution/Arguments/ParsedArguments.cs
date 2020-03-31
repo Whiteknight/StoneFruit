@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace StoneFruit.Execution.Arguments
 {
     /// <summary>
     /// Provides access to a list of IArgument objects but name or position.
     /// </summary>
-    public class ParsedCommandArguments : ICommandArguments
+    public class ParsedArguments : IArguments
     {
         private readonly List<IParsedArgument> _rawArguments;
         private readonly List<IPositionalArgument> _accessedPositionals;
@@ -18,7 +19,7 @@ namespace StoneFruit.Execution.Arguments
         // TODO: Would like to clean the _raw list of nulls regularly
 
         // Empty args object with no values in it
-        public ParsedCommandArguments()
+        public ParsedArguments()
         {
             Raw = string.Empty;
             _accessedPositionals = new List<IPositionalArgument>();
@@ -28,13 +29,13 @@ namespace StoneFruit.Execution.Arguments
         }
 
         // Args object built from parsed objects, which aren't accessed yet
-        public ParsedCommandArguments(IEnumerable<IParsedArgument> arguments)
+        public ParsedArguments(IEnumerable<IParsedArgument> arguments)
             : this(string.Empty, arguments)
         {
         }
 
         // Args object built from parsed objects, which aren't accessed yet
-        public ParsedCommandArguments(string rawArgs, IEnumerable<IParsedArgument> arguments)
+        public ParsedArguments(string rawArgs, IEnumerable<IParsedArgument> arguments)
         {
             Raw = rawArgs;
             _accessedPositionals = new List<IPositionalArgument>();
@@ -48,32 +49,42 @@ namespace StoneFruit.Execution.Arguments
         /// </summary>
         public string Raw { get; }
 
-        //public void VerifyAllAreConsumed()
-        //{
-        //    if (_rawArguments.Any())
+        public void VerifyAllAreConsumed()
+        {
+            var fromRaw = _rawArguments
+                .Where(a => a != null)
+                .Select(u => u switch
+                {
+                    PositionalArgument p => p.Value,
+                    NamedArgument n => $"'{n.Name}' = {n.Value}",
+                    FlagArgument f => $"flag {f.Name}",
+                    FlagPositionalOrNamedArgument fp => $"'{fp.Name}', {fp.Value}",
+                    _ => "Unknown"
+                });
 
-        //    var unconsumed = GetAllArguments().ToList();
-        //    if (!unconsumed.Any())
-        //        return;
-        //    var sb = new StringBuilder();
-        //    sb.AppendLine("Arguments were provided which were not consumed.");
-        //    sb.AppendLine();
-        //    foreach (var u in unconsumed)
-        //    {
-        //        var str = u switch
-        //        {
-        //            PositionalArgument p => p.AsString(),
-        //            NamedArgument n => $"'{n.Name}' = {n.AsString()}",
-        //            FlagArgument f => $"flag {f.Name}",
-        //            _ => "Unknown"
-        //        };
-        //        sb.AppendLine(str);
-        //    }
+            var fromAccessed = _accessedPositionals.Cast<IArgument>()
+                .Concat(_accessedNameds.SelectMany(kvp => kvp.Value))
+                .Concat(_accessedFlags.Values)
+                .Where(p => !p.Consumed)
+                .Select(u => u switch
+                {
+                    IPositionalArgument p => p.Value,
+                    INamedArgument n => $"'{n.Name}' = {n.Value}",
+                    IFlagArgument f => $"flag {f.Name}",
+                    _ => "Unknown"
+                });
 
-        //    throw new CommandArgumentException(sb.ToString());
-        //}
+            var fromAll = fromRaw.Concat(fromAccessed).ToList();
+            if (!fromAll.Any())
+                return;
 
-        // TODO: Method to create a sub-CommandArguments instance with some arguments added/removed
+            var sb = new StringBuilder();
+            sb.AppendLine("Arguments were provided which were not consumed.");
+            sb.AppendLine();
+            foreach (var line in fromAll)
+                sb.AppendLine(line);
+            throw new CommandArgumentException(sb.ToString());
+        }
 
         /// <summary>
         /// Resets the Consumed state of all arguments

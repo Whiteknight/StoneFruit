@@ -10,9 +10,9 @@ namespace StoneFruit.Handlers
         public const string Name = "exit";
 
         private readonly EngineState _state;
-        private readonly ICommandArguments _args;
+        private readonly IArguments _args;
 
-        public ExitHandler(EngineState state, ICommandArguments args)
+        public ExitHandler(EngineState state, IArguments args)
         {
             _state = state;
             _args = args;

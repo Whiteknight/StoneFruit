@@ -12,12 +12,12 @@ namespace StoneFruit.Execution.CommandSources
         private readonly CommandObjectOrString[] _script;
         private int _index;
 
-        public ScriptCommandSource(EventScript script, CommandParser parser, params IParsedArgument[] args)
-            : this (script, parser, new ParsedCommandArguments(args))
+        public ScriptCommandSource(EventScript script, CommandParser parser, params IArgument[] args)
+            : this (script, parser, new SyntheticArguments(args))
         {
         }
 
-        public ScriptCommandSource(EventScript script, CommandParser parser, ICommandArguments args)
+        public ScriptCommandSource(EventScript script, CommandParser parser, IArguments args)
         {
             _script = script.GetCommands(parser, args).ToArray();
             _index = 0;

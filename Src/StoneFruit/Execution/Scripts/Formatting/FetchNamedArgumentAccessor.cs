@@ -17,7 +17,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
             _name = name;
         }
 
-        public IEnumerable<IArgument> Access(ICommandArguments args)
+        public IEnumerable<IArgument> Access(IArguments args)
         {
             var arg = args.Get(_name);
             if (!arg.Exists())

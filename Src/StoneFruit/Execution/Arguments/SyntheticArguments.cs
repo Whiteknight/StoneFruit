@@ -1,19 +1,20 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace StoneFruit.Execution.Arguments
 {
     /// <summary>
     /// Args object built from pre-existing arguments which are unambiguous
     /// </summary>
-    public class SyntheticCommandArguments : ICommandArguments
+    public class SyntheticArguments : IArguments
     {
         private readonly IReadOnlyList<IPositionalArgument> _positionals;
         private readonly IReadOnlyDictionary<string, List<INamedArgument>> _nameds;
         private readonly IReadOnlyDictionary<string, IFlagArgument> _flags;
         private int _accessedShiftIndex;
 
-        public SyntheticCommandArguments(IReadOnlyList<IArgument> arguments)
+        public SyntheticArguments(IReadOnlyList<IArgument> arguments)
         {
             _positionals = arguments
                 .OfType<IPositionalArgument>()
@@ -35,40 +36,59 @@ namespace StoneFruit.Execution.Arguments
         /// </summary>
         public string Raw => string.Empty;
 
-        public static SyntheticCommandArguments Empty() => new SyntheticCommandArguments(new IArgument[0]);
+        public static SyntheticArguments Empty() => new SyntheticArguments(new IArgument[0]);
+
+        public static SyntheticArguments From(params (string, string)[] args)
+        {
+            var argsList = args
+                .Select(t => new NamedArgumentAccessor(t.Item1, t.Item2))
+                .ToList();
+            return new SyntheticArguments(argsList);
+        }
+
+        public static SyntheticArguments From(IReadOnlyDictionary<string, string> args)
+        {
+            var argsList = args
+                .Select(kvp => new NamedArgumentAccessor(kvp.Key, kvp.Value))
+                .ToList();
+            return new SyntheticArguments(argsList);
+        }
 
         /// <summary>
         /// An arguments object for a single value
         /// </summary>
         /// <param name="arg"></param>
         /// <returns></returns>
-        public static SyntheticCommandArguments Single(string arg)
-            => new SyntheticCommandArguments(new IArgument[] { new PositionalArgumentAccessor(arg) });
+        public static SyntheticArguments Single(string arg)
+            => new SyntheticArguments(new IArgument[] { new PositionalArgumentAccessor(arg) });
 
-        //public void VerifyAllAreConsumed()
-        //{
-        //    if (_rawArguments.Any())
+        public void VerifyAllAreConsumed()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("Arguments were provided which were not consumed.");
+            sb.AppendLine();
+            var unconsumed = _positionals.Where(p => !p.Consumed)
+                .Cast<IArgument>()
+                .Concat(_nameds.SelectMany(kvp => kvp.Value).Where(n => !n.Consumed))
+                .Concat(_flags.Values.Where(f => !f.Consumed))
+                .ToList();
+            if (unconsumed.Count == 0)
+                return;
 
-        //    var unconsumed = GetAllArguments().ToList();
-        //    if (!unconsumed.Any())
-        //        return;
-        //    var sb = new StringBuilder();
-        //    sb.AppendLine("Arguments were provided which were not consumed.");
-        //    sb.AppendLine();
-        //    foreach (var u in unconsumed)
-        //    {
-        //        var str = u switch
-        //        {
-        //            PositionalArgument p => p.AsString(),
-        //            NamedArgument n => $"'{n.Name}' = {n.AsString()}",
-        //            FlagArgument f => $"flag {f.Name}",
-        //            _ => "Unknown"
-        //        };
-        //        sb.AppendLine(str);
-        //    }
+            foreach (var u in unconsumed)
+            {
+                var str = u switch
+                {
+                    PositionalArgumentAccessor p => p.AsString(),
+                    NamedArgumentAccessor n => $"'{n.Name}' = {n.AsString()}",
+                    FlagArgumentAccessor f => $"flag {f.Name}",
+                    _ => "Unknown"
+                };
+                sb.AppendLine(str);
+            }
 
-        //    throw new CommandArgumentException(sb.ToString());
-        //}
+            throw new CommandArgumentException(sb.ToString());
+        }
 
         // TODO: Method to create a sub-CommandArguments instance with some arguments added/removed
 
@@ -113,7 +133,6 @@ namespace StoneFruit.Execution.Arguments
         public INamedArgument Get(string name)
         {
             name = name.ToLowerInvariant();
-
             if (!_nameds.ContainsKey(name))
                 return MissingArgument.NoneNamed(name);
 

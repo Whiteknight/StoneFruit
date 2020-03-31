@@ -97,8 +97,9 @@ namespace StoneFruit.Execution
             // require a valid environment to run help
             if (commandLine == "help")
             {
-                var exitCodeArg = new NamedArgument("exitcode", Constants.ExitCodeHeadlessHelp.ToString());
-                sources.AddToEnd(state.EventCatalog.HeadlessHelp, _parser, exitCodeArg);
+                sources.AddToEnd(state.EventCatalog.HeadlessHelp, _parser,
+                    ("exitcode", Constants.ExitCodeHeadlessHelp.ToString())
+                );
                 return RunLoop(state, dispatcher, sources);
             }
 
@@ -118,8 +119,9 @@ namespace StoneFruit.Execution
 
             if (string.IsNullOrWhiteSpace(commandLine))
             {
-                var exitCodeArg = new NamedArgument("exitcode", Constants.ExitCodeHeadlessNoVerb.ToString());
-                sources.AddToEnd(state.EventCatalog.HeadlessNoArgs, _parser, exitCodeArg);
+                sources.AddToEnd(state.EventCatalog.HeadlessNoArgs, _parser,
+                    ("exitcode", Constants.ExitCodeHeadlessNoVerb.ToString())
+                );
                 return RunLoop(state, dispatcher, sources);
             }
 
@@ -205,15 +207,15 @@ namespace StoneFruit.Execution
                 }
                 catch (VerbNotFoundException vnf)
                 {
-                    var args = new ParsedCommandArguments(new[] { new NamedArgument("verb", vnf.Verb) });
+                    var args = SyntheticArguments.From(("verb", vnf.Verb));
                     HandleError(state, vnf, state.EventCatalog.VerbNotFound, args);
                 }
                 catch (Exception e)
                 {
-                    var args = new ParsedCommandArguments(new [] { 
-                        new NamedArgument("message", e.Message),
-                        new NamedArgument("stacktrace", e.StackTrace)
-                    });
+                    var args = SyntheticArguments.From(
+                        ("message", e.Message),
+                        ("stacktrace", e.StackTrace)
+                    );
                     HandleError(state, e, state.EventCatalog.EngineError, args);
                 }
 
@@ -224,7 +226,7 @@ namespace StoneFruit.Execution
         }
 
         // Handle an error from the dispatcher.
-        private void HandleError(EngineState state, Exception e, EventScript script, ICommandArguments args)
+        private void HandleError(EngineState state, Exception e, EventScript script, IArguments args)
         {
             // If we're in an error loop (throw an exception while handling a previous
             // exception) show an angry error message and signal for exit.

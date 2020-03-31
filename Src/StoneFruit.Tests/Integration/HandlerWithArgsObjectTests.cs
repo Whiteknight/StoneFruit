@@ -39,7 +39,7 @@ namespace StoneFruit.Tests.Integration
             private readonly IOutput _output;
             private readonly TestArgs _args;
 
-            public TestHandler(ICommandArguments args, IOutput output)
+            public TestHandler(IArguments args, IOutput output)
             {
                 _output = output;
                 _args = args.MapTo<TestArgs>();

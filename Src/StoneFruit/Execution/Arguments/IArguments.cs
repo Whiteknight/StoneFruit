@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace StoneFruit.Execution.Arguments
 {
-    public interface ICommandArguments
+    public interface IArguments
     {
         /// <summary>
         /// The raw, unparsed argument string if available
@@ -29,17 +29,20 @@ namespace StoneFruit.Execution.Arguments
         INamedArgument Get(string name);
         IEnumerable<IArgument> GetAll(string name);
         IEnumerable<INamedArgument> GetAllNamed();
+
+
+        void VerifyAllAreConsumed();
     }
 
-    public static class CommandArgumentsExtensions
+    public static class ArgumentsExtensions
     {
-        public static IPositionalArgument Consume(this ICommandArguments args, int index) 
+        public static IPositionalArgument Consume(this IArguments args, int index) 
             => args.Get(index).MarkConsumed() as IPositionalArgument;
 
-        public static IFlagArgument ConsumeFlag(this ICommandArguments args, string name) 
+        public static IFlagArgument ConsumeFlag(this IArguments args, string name) 
             => args.GetFlag(name).MarkConsumed() as IFlagArgument;
 
-        public static INamedArgument Consume(this ICommandArguments args, string name) 
+        public static INamedArgument Consume(this IArguments args, string name) 
             => args.Get(name).MarkConsumed() as INamedArgument;
 
         /// <summary>
@@ -48,7 +51,7 @@ namespace StoneFruit.Execution.Arguments
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T MapTo<T>(this ICommandArguments args)
+        public static T MapTo<T>(this IArguments args)
             where T : new()
             => CommandArgumentMapper.Map<T>(args);
 
@@ -59,14 +62,14 @@ namespace StoneFruit.Execution.Arguments
         /// <typeparam name="T"></typeparam>
         /// <param name="args"></param>
         /// <param name="obj"></param>
-        public static void MapOnto<T>(this ICommandArguments args, T obj)
+        public static void MapOnto<T>(this IArguments args, T obj)
             => CommandArgumentMapper.MapOnto<T>(args, obj);
 
         /// <summary>
         /// Get a list of all argument objects
         /// </summary>
         /// <returns></returns>
-        public static IEnumerable<IArgument> GetAllArguments(this ICommandArguments args)
+        public static IEnumerable<IArgument> GetAllArguments(this IArguments args)
             => args.GetAllPositionals().Cast<IArgument>()
                 .Concat(args.GetAllNamed())
                 .Concat(args.GetAllFlags())

@@ -12,9 +12,9 @@ namespace StoneFruit.Handlers
 
         private readonly IOutput _output;
         private readonly IHandlerSource _commands;
-        private readonly ICommandArguments _args;
+        private readonly IArguments _args;
 
-        public HelpHandler(IOutput output, IHandlerSource commands, ICommandArguments args)
+        public HelpHandler(IOutput output, IHandlerSource commands, IArguments args)
         {
             _output = output;
             _commands = commands;

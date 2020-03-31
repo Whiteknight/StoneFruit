@@ -12,9 +12,9 @@ namespace StoneFruit.Handlers
 
         private readonly EngineState _state;
         private readonly IOutput _output;
-        private readonly ICommandArguments _args;
+        private readonly IArguments _args;
 
-        public EchoHandler(EngineState state, IOutput output, ICommandArguments args)
+        public EchoHandler(EngineState state, IOutput output, IArguments args)
         {
             _state = state;
             _output = output;

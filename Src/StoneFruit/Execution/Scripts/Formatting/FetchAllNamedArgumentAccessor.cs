@@ -9,7 +9,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
     /// </summary>
     public class FetchAllNamedArgumentAccessor : IArgumentAccessor
     {
-        public IEnumerable<IArgument> Access(ICommandArguments args)
+        public IEnumerable<IArgument> Access(IArguments args)
         {
             var results = new List<IArgument>();
             foreach (var named in args.GetAllNamed())

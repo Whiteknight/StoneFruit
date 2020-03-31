@@ -8,7 +8,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
     /// </summary>
     public class FetchAllFlagsArgumentAccessor : IArgumentAccessor
     {
-        public IEnumerable<IArgument> Access(ICommandArguments args)
+        public IEnumerable<IArgument> Access(IArguments args)
         {
             var results = new List<IArgument>();
             var flags = args.GetAllFlags();

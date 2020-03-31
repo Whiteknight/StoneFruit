@@ -4,7 +4,7 @@
     {
         public NamedArgumentAccessor(string name, string value)
         {
-            Name = name;
+            Name = name.ToLowerInvariant();
             Value = value;
         }
 

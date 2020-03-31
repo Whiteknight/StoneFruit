@@ -27,7 +27,7 @@ namespace StoneFruit.Execution
 
         public void Add(params string[] lines) => _lines.AddRange(lines);
 
-        public IEnumerable<CommandObjectOrString> GetCommands(CommandParser parser, ICommandArguments args)
+        public IEnumerable<CommandObjectOrString> GetCommands(CommandParser parser, IArguments args)
         {
             var commands = new List<CommandObjectOrString>();
             foreach (var line in _lines)

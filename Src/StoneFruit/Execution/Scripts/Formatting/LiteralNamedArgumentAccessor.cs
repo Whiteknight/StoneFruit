@@ -17,7 +17,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
             _value = value;
         }
 
-        public IEnumerable<IArgument> Access(ICommandArguments args) 
+        public IEnumerable<IArgument> Access(IArguments args) 
             => new [] { new NamedArgumentAccessor(_name, _value) };
     }
 }

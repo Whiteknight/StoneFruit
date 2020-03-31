@@ -9,11 +9,11 @@ namespace StoneFruit.Tests.Execution.Arguments
 {
     public class PosixStyleArgumentGrammarTests
     {
-        private static ParsedCommandArguments Parse(string args)
+        private static ParsedArguments Parse(string args)
         {
             var parser = PosixStyleArgumentGrammar.GetParser();
             var arguments = parser.List().Parse(args).Value.ToList();
-            return new ParsedCommandArguments(arguments);
+            return new ParsedArguments(arguments);
         }
 
         [Test]

@@ -15,10 +15,10 @@ namespace StoneFruit.Tests.Execution.HandlerSources
         {
             public IOutput Output { get; }
             public EngineState State { get; }
-            public ICommandArguments Args { get; }
+            public IArguments Args { get; }
             public CommandDispatcher Dispatcher { get; }
 
-            public TestCommandHandler(IOutput output, EngineState state, ICommandArguments args, CommandDispatcher dispatcher)
+            public TestCommandHandler(IOutput output, EngineState state, IArguments args, CommandDispatcher dispatcher)
             {
                 Output = output;
                 State = state;
@@ -36,7 +36,7 @@ namespace StoneFruit.Tests.Execution.HandlerSources
         public void GetInstance_Test()
         {
             var target = new TypeListConstructSource(new [] { typeof(TestCommandHandler) });
-            var args = new ParsedCommandArguments();
+            var args = new ParsedArguments();
             var command = Command.Create("test", args);
             var parser = CommandParser.GetDefault();
             var verbSource = new NamedInstanceHandlerSource();
