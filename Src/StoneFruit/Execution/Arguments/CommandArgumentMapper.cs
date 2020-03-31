@@ -9,6 +9,12 @@ namespace StoneFruit.Execution.Arguments
             where T : new()
         {
             var obj = new T();
+            MapOnto(args, obj);
+            return obj;
+        }
+
+        public void MapOnto<T>(CommandArguments args, T obj)
+        {
             var targetType = typeof(T);
             var publicProperties = targetType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(p => p.CanWrite && p.SetMethod != null)
@@ -39,8 +45,6 @@ namespace StoneFruit.Execution.Arguments
                     continue;
                 }
             }
-
-            return obj;
         }
 
         private static void AssignPropertyValue<T>(IValuedArgument argument, PropertyInfo property, T obj)

@@ -1,5 +1,4 @@
 ﻿# For V1
-* Command Aliases
 * Cleanup/optimize `CommandArguments`
 
 # For Later
