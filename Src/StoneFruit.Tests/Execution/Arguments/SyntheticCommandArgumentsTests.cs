@@ -5,15 +5,15 @@ using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.Tests.Execution.Arguments
 {
-    public class CommandArgumentsTests
+    public class SyntheticCommandArgumentsTests
     {
         [Test]
         public void Get_Named_Consumed()
         {
-            var target = new CommandArguments(new[]
+            var target = new SyntheticCommandArguments(new[]
             {
-                new NamedArgument("a", "1"),
-                new NamedArgument("a", "2")
+                new NamedArgumentAccessor("a", "1"),
+                new NamedArgumentAccessor("a", "2")
             });
             var result = target.Get("a");
             result.Value.Should().Be("1");
@@ -30,10 +30,10 @@ namespace StoneFruit.Tests.Execution.Arguments
         [Test]
         public void Shift_Test()
         {
-            var target = new CommandArguments(new[]
+            var target = new SyntheticCommandArguments(new[]
             {
-                new PositionalArgument("a"),
-                new PositionalArgument("b")
+                new PositionalArgumentAccessor("a"),
+                new PositionalArgumentAccessor("b")
             });
             target.Shift().Value.Should().Be("a");
             target.Shift().Value.Should().Be("b");
@@ -43,10 +43,10 @@ namespace StoneFruit.Tests.Execution.Arguments
         [Test]
         public void GetAll_Named_Test()
         {
-            var target = new CommandArguments(new[]
+            var target = new SyntheticCommandArguments(new[]
             {
-                new NamedArgument("a", "1"),
-                new NamedArgument("a", "2")
+                new NamedArgumentAccessor("a", "1"),
+                new NamedArgumentAccessor("a", "2")
             });
             var result = target.GetAll("a").Cast<INamedArgument>().ToList();
             result.Count.Should().Be(2);
@@ -57,10 +57,10 @@ namespace StoneFruit.Tests.Execution.Arguments
         [Test]
         public void GetAll_Named_Empty()
         {
-            var target = new CommandArguments(new[]
+            var target = new SyntheticCommandArguments(new[]
             {
-                new NamedArgument("a", "1"),
-                new NamedArgument("a", "2")
+                new NamedArgumentAccessor("a", "1"),
+                new NamedArgumentAccessor("a", "2")
             });
             var result = target.GetAll("XXX").ToList();
             result.Count.Should().Be(0);
@@ -81,11 +81,11 @@ namespace StoneFruit.Tests.Execution.Arguments
         [Test]
         public void MapTo_Test()
         {
-            var target = new CommandArguments(new IParsedArgument[]
+            var target = new SyntheticCommandArguments(new IArgument[]
             {
-                new PositionalArgument("test1"),
-                new NamedArgument("b", "test2"),
-                new FlagArgument("c")
+                new PositionalArgumentAccessor("test1"),
+                new NamedArgumentAccessor("b", "test2"),
+                new FlagArgumentAccessor("c")
             });
             var result = target.MapTo<TestArgs1>();
             result.A.Should().Be("test1");

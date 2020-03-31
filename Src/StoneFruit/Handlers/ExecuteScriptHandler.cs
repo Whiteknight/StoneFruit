@@ -9,10 +9,10 @@ namespace StoneFruit.Handlers
     [Verb("exec", showInHelp: false)]
     public class ExecuteScriptHandler : IHandler
     {
-        private readonly CommandArguments _args;
+        private readonly ICommandArguments _args;
         private readonly EngineState _state;
 
-        public ExecuteScriptHandler(CommandArguments args, EngineState state)
+        public ExecuteScriptHandler(ICommandArguments args, EngineState state)
         {
             _args = args;
             _state = state;

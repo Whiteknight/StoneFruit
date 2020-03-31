@@ -205,12 +205,12 @@ namespace StoneFruit.Execution
                 }
                 catch (VerbNotFoundException vnf)
                 {
-                    var args = new CommandArguments(new[] { new NamedArgument("verb", vnf.Verb) });
+                    var args = new ParsedCommandArguments(new[] { new NamedArgument("verb", vnf.Verb) });
                     HandleError(state, vnf, state.EventCatalog.VerbNotFound, args);
                 }
                 catch (Exception e)
                 {
-                    var args = new CommandArguments(new [] { 
+                    var args = new ParsedCommandArguments(new [] { 
                         new NamedArgument("message", e.Message),
                         new NamedArgument("stacktrace", e.StackTrace)
                     });
@@ -224,7 +224,7 @@ namespace StoneFruit.Execution
         }
 
         // Handle an error from the dispatcher.
-        private void HandleError(EngineState state, Exception e, EventScript script, CommandArguments args)
+        private void HandleError(EngineState state, Exception e, EventScript script, ICommandArguments args)
         {
             // If we're in an error loop (throw an exception while handling a previous
             // exception) show an angry error message and signal for exit.

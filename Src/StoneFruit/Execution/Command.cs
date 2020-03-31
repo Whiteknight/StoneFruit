@@ -11,7 +11,7 @@ namespace StoneFruit.Execution
         {
         }
 
-        public static Command Create(string verb, CommandArguments arguments)
+        public static Command Create(string verb, ICommandArguments arguments)
         {
             return new Command
             {
@@ -22,7 +22,7 @@ namespace StoneFruit.Execution
             };
         }
 
-        public static Command CreateFromParser(string verb, CommandArguments arguments, string raw)
+        public static Command CreateFromParser(string verb, ICommandArguments arguments, string raw)
         {
             return new Command
             {
@@ -37,7 +37,7 @@ namespace StoneFruit.Execution
         public string Alias { get; private set; }
         public string Raw { get; private set; }
 
-        public CommandArguments Arguments { get; private set; }
+        public ICommandArguments Arguments { get; private set; }
 
         public Command Rename(string newVerb)
         {

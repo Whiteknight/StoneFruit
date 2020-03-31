@@ -9,7 +9,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
     /// </summary>
     public class FetchAllPositionalArgumentAccessor : IArgumentAccessor
     {
-        public IEnumerable<IArgument> Access(CommandArguments args)
+        public IEnumerable<IArgument> Access(ICommandArguments args)
         {
             var results = new List<IArgument>();
             foreach (var positional in args.GetAllPositionals())

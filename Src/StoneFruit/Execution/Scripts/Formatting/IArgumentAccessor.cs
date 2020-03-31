@@ -11,6 +11,6 @@ namespace StoneFruit.Execution.Scripts.Formatting
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
-        IEnumerable<IArgument> Access(CommandArguments args);
+        IEnumerable<IArgument> Access(ICommandArguments args);
     }
 }

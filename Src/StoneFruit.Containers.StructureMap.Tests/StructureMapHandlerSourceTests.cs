@@ -24,7 +24,7 @@ namespace StoneFruit.Containers.StructureMap.Tests
         {
             var target = new StructureMapHandlerSource();
             var dispatcher = new CommandDispatcher(CommandParser.GetDefault(), target, new InstanceEnvironmentCollection(null), new EngineState(true, null), new ConsoleOutput());
-            var result = target.GetInstance(Command.Create("echo", CommandArguments.Empty()), dispatcher);
+            var result = target.GetInstance(Command.Create("echo", SyntheticCommandArguments.Empty()), dispatcher);
             result.Should().BeOfType<EchoHandler>();
         }
 

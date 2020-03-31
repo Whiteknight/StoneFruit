@@ -29,7 +29,7 @@ namespace StoneFruit.Utility
                 return _dispatcher.Parser;
             if (type == typeof(Command))
                 return _command;
-            if (type == typeof(CommandArguments))
+            if (type == typeof(ICommandArguments))
                 return _command.Arguments;
             if (_dispatcher.Environments?.Current?.GetType() != null && type == _dispatcher.Environments.Current.GetType())
                 return _dispatcher.Environments.Current;

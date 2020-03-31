@@ -5,10 +5,10 @@ namespace StoneFruit.Handlers
     [Verb("argument-display", false)]
     public class ArgumentDisplayHandler : IHandler
     {
-        private readonly CommandArguments _args;
+        private readonly ICommandArguments _args;
         private readonly IOutput _output;
 
-        public ArgumentDisplayHandler(CommandArguments args, IOutput output)
+        public ArgumentDisplayHandler(ICommandArguments args, IOutput output)
         {
             _args = args;
             _output = output;

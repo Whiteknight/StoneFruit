@@ -9,11 +9,11 @@ namespace StoneFruit.Tests.Execution.Arguments
 {
     public class WindowsCmdStyleArgumentGrammarTests
     {
-        private static CommandArguments Parse(string args)
+        private static ParsedCommandArguments Parse(string args)
         {
             var parser = WindowsCmdArgumentGrammar.GetParser();
             var arguments = parser.List().Parse(args).Value.ToList();
-            return new CommandArguments(arguments);
+            return new ParsedCommandArguments(arguments);
         }
 
         [Test]

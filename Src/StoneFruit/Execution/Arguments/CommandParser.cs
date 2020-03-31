@@ -44,13 +44,13 @@ namespace StoneFruit.Execution.Arguments
                 throw new ParseException($"Could not parse all arguments. '{remainder}' fails at {sequence.CurrentLocation}");
             }
 
-            var cmdArgs = new CommandArguments(rawArgs, argsList);
+            var cmdArgs = new ParsedCommandArguments(rawArgs, argsList);
             return Command.CreateFromParser(verb, cmdArgs, line);
         }
 
         public Command ParseCommand(string line) => ParseCommand(_verbParser, _argsParser, line);
 
-        public CommandArguments ParseArguments(string args) => _argsParser.ParseArguments(args);
+        public ICommandArguments ParseArguments(string args) => _argsParser.ParseArguments(args);
 
         public CommandFormat ParseScript(string script)
         {

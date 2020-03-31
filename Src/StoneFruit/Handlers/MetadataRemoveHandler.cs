@@ -11,9 +11,9 @@ namespace StoneFruit.Handlers
         public const string Name = "metadata-remove";
 
         private readonly EngineState _state;
-        private readonly CommandArguments _args;
+        private readonly ICommandArguments _args;
 
-        public MetadataRemoveHandler(EngineState state, CommandArguments args)
+        public MetadataRemoveHandler(EngineState state, ICommandArguments args)
         {
             _state = state;
             _args = args;

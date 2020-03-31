@@ -14,7 +14,7 @@ namespace StoneFruit.Handlers
 
         private readonly IOutput _output;
         private readonly Command _command;
-        private readonly CommandArguments _args;
+        private readonly ICommandArguments _args;
         private readonly EngineState _state;
         private readonly IEnvironmentCollection _environments;
         private readonly CommandDispatcher _dispatcher;
@@ -109,7 +109,7 @@ To prompt the user for an environment only if one is not currently set, use the 
         private void OnEnvironmentChanged()
         {
             var script = _state.EventCatalog.EnvironmentChanged;
-            var args = new CommandArguments(new[] { new NamedArgument("environment", _environments.CurrentName) });
+            var args = new ParsedCommandArguments(new[] { new NamedArgument("environment", _environments.CurrentName) });
             _state.Commands.Prepend(script.GetCommands(_dispatcher.Parser, args));
         }
 

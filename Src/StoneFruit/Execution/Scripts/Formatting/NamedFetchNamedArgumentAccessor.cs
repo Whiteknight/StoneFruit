@@ -19,7 +19,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
             _oldName = oldName;
         }
 
-        public IEnumerable<IArgument> Access(CommandArguments args)
+        public IEnumerable<IArgument> Access(ICommandArguments args)
         {
             var arg = args.Get(_oldName);
             if (!arg.Exists())

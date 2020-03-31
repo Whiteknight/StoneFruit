@@ -19,13 +19,13 @@ namespace StoneFruit.Execution.Scripts.Formatting
             _args = args;
         }
 
-        public Command Format(CommandArguments args)
+        public Command Format(ICommandArguments args)
         {
             var argsList = _args
                 .SelectMany(a => a.Access(args))
                 .Where(a => a != null)
                 .ToList();
-            var commandArguments = new CommandArguments(argsList);
+            var commandArguments = new SyntheticCommandArguments(argsList);
             return Command.Create(_verb, commandArguments);
         }
     }

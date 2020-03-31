@@ -3,9 +3,9 @@ using System.Reflection;
 
 namespace StoneFruit.Execution.Arguments
 {
-    public class CommandArgumentMapper
+    public static class CommandArgumentMapper
     {
-        public T Map<T>(CommandArguments args)
+        public static T Map<T>(ICommandArguments args)
             where T : new()
         {
             var obj = new T();
@@ -13,7 +13,7 @@ namespace StoneFruit.Execution.Arguments
             return obj;
         }
 
-        public void MapOnto<T>(CommandArguments args, T obj)
+        public static void MapOnto<T>(ICommandArguments args, T obj)
         {
             var targetType = typeof(T);
             var publicProperties = targetType.GetProperties(BindingFlags.Public | BindingFlags.Instance)

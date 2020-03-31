@@ -8,32 +8,32 @@ namespace StoneFruit.Execution.Arguments
 {
     public static class ParserExtensions
     {
-        public static CommandArguments ParseArguments(this IParser<char, IParsedArgument> parser, string argsString)
+        public static ICommandArguments ParseArguments(this IParser<char, IParsedArgument> parser, string argsString)
         {
             if (parser == null)
-                return new CommandArguments(argsString, new IParsedArgument[0]);
+                return new ParsedCommandArguments(argsString, new IParsedArgument[0]);
 
             var sequence = new StringCharacterSequence(argsString);
             var argsList = parser.List().Parse(sequence).Value.ToList();
-            return new CommandArguments(argsString, argsList);
+            return new ParsedCommandArguments(argsString, argsList);
         }
 
-        public static CommandArguments ParseArguments(this IParser<char, IParsedArgument> parser, IEnumerable<string> args)
+        public static ICommandArguments ParseArguments(this IParser<char, IParsedArgument> parser, IEnumerable<string> args)
         {
             var argsString = string.Join(" ", args);
             return ParseArguments(parser, argsString);
         }
 
-        public static CommandArguments ParseArguments(this IParser<char, IEnumerable<IParsedArgument>> parser, IEnumerable<string> args)
+        public static ICommandArguments ParseArguments(this IParser<char, IEnumerable<IParsedArgument>> parser, IEnumerable<string> args)
         {
             var argsString = string.Join(" ", args);
             return ParseArguments(parser, argsString);
         }
 
-        public static CommandArguments ParseArguments(this IParser<char, IEnumerable<IParsedArgument>> parser, string argsString)
+        public static ICommandArguments ParseArguments(this IParser<char, IEnumerable<IParsedArgument>> parser, string argsString)
         {
             if (parser == null)
-                return new CommandArguments(argsString, new IParsedArgument[0]);
+                return new ParsedCommandArguments(argsString, new IParsedArgument[0]);
 
             var newParser = parser.Flatten<char, IEnumerable<IParsedArgument>, IParsedArgument>();
             return ParseArguments(newParser, argsString);

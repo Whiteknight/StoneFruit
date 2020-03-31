@@ -13,11 +13,11 @@ namespace StoneFruit.Execution.CommandSources
         private int _index;
 
         public ScriptCommandSource(EventScript script, CommandParser parser, params IParsedArgument[] args)
-            : this (script, parser, new CommandArguments(args))
+            : this (script, parser, new ParsedCommandArguments(args))
         {
         }
 
-        public ScriptCommandSource(EventScript script, CommandParser parser, CommandArguments args)
+        public ScriptCommandSource(EventScript script, CommandParser parser, ICommandArguments args)
         {
             _script = script.GetCommands(parser, args).ToArray();
             _index = 0;
