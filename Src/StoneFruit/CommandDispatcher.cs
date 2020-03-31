@@ -45,8 +45,8 @@ namespace StoneFruit
         public void Execute(string verb, CommandArguments args, CancellationTokenSource tokenSource = null)
         {
             Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
-            var Command = new Command(verb, args);
-            Execute(Command, tokenSource);
+            var command = Command.Create(verb, args);
+            Execute(command, tokenSource);
         }
 
         private void Execute(Command command, CancellationTokenSource tokenSource = null)

@@ -25,7 +25,7 @@ namespace StoneFruit.Containers.Lamar.Tests
         {
             var target = new LamarHandlerSource<object>();
             var dispatcher = new CommandDispatcher(CommandParser.GetDefault(), target, new InstanceEnvironmentCollection(null), new EngineState(true, null), new ConsoleOutput());
-            var result = target.GetInstance(new Command("echo", CommandArguments.Empty()), dispatcher);
+            var result = target.GetInstance(Command.Create("echo", CommandArguments.Empty()), dispatcher);
             result.Should().BeOfType<EchoHandler>();
         }
 
@@ -44,7 +44,7 @@ namespace StoneFruit.Containers.Lamar.Tests
             var target = new LamarHandlerSource<TestEnvironment>();
             var environments = new InstanceEnvironmentCollection(new TestEnvironment("test"));
             var dispatcher = new CommandDispatcher(CommandParser.GetDefault(), target, environments, new EngineState(true, null), new ConsoleOutput());
-            var result = target.GetInstance(new Command("test-environment", CommandArguments.Empty()), dispatcher) as EnvironmentInjectionTestHandler;
+            var result = target.GetInstance(Command.Create("test-environment", CommandArguments.Empty()), dispatcher) as EnvironmentInjectionTestHandler;
 
             result.Should().NotBeNull();
             result.Environment.Should().NotBeNull();

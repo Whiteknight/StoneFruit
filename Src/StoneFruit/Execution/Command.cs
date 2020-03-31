@@ -7,20 +7,47 @@ namespace StoneFruit.Execution
     /// </summary>
     public class Command
     {
-        public Command(string verb, CommandArguments arguments, string alias = null, string raw = null)
+        private Command()
         {
-            Verb = verb;
-            Raw = raw;
-            Alias = alias;
-            Arguments = arguments ?? CommandArguments.Empty();
         }
 
-        public string Verb { get; }
-        public string Alias { get; }
-        public string Raw { get; }
+        public static Command Create(string verb, CommandArguments arguments)
+        {
+            return new Command
+            {
+                Verb = verb,
+                Alias = null,
+                Raw = null,
+                Arguments = arguments
+            };
+        }
 
-        public CommandArguments Arguments { get; }
+        public static Command CreateFromParser(string verb, CommandArguments arguments, string raw)
+        {
+            return new Command
+            {
+                Verb = verb,
+                Alias = null,
+                Raw = raw,
+                Arguments = arguments
+            };
+        }
 
-        public Command Rename(string newVerb) => new Command(newVerb, Arguments, Verb, Raw);
+        public string Verb { get; private set; }
+        public string Alias { get; private set; }
+        public string Raw { get; private set; }
+
+        public CommandArguments Arguments { get; private set; }
+
+        public Command Rename(string newVerb)
+        {
+            return new Command
+            {
+                Alias = Verb,
+                Verb = newVerb,
+                Arguments = Arguments,
+                Raw = Raw
+            };
+        }
     }
 }

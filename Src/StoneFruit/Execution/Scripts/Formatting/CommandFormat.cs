@@ -26,7 +26,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 .Where(a => a != null)
                 .ToList();
             var commandArguments = new CommandArguments(argsList);
-            return new Command(_verb, commandArguments);
+            return Command.Create(_verb, commandArguments);
         }
     }
 }

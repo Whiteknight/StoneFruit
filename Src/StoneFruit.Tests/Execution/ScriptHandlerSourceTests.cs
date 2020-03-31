@@ -11,7 +11,7 @@ namespace StoneFruit.Tests.Execution
         public void GetInstance_DoesNotExist()
         {
             var source = new ScriptHandlerSource();
-            var instance = source.GetInstance(new Command("X", null), null);
+            var instance = source.GetInstance(Command.Create("X", null), null);
             instance.Should().BeNull();
         }
 
@@ -20,7 +20,7 @@ namespace StoneFruit.Tests.Execution
         {
             var target = new ScriptHandlerSource();
             target.AddScript("test", new[] { "echo 'test'" });
-            var result = target.GetInstance(new Command("test", null), new CommandDispatcher(null, null, null, null, null));
+            var result = target.GetInstance(Command.Create("test", null), new CommandDispatcher(null, null, null, null, null));
             result.Should().NotBeNull();
         }
     }

@@ -37,7 +37,7 @@ namespace StoneFruit.Tests.Execution.HandlerSources
         {
             var target = new TypeListConstructSource(new [] { typeof(TestCommandHandler) });
             var args = new CommandArguments();
-            var command = new Command("test", args);
+            var command = Command.Create("test", args);
             var parser = CommandParser.GetDefault();
             var verbSource = new NamedInstanceHandlerSource();
             var environments = new InstanceEnvironmentCollection(null);
