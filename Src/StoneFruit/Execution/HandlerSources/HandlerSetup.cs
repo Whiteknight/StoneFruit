@@ -73,5 +73,12 @@ namespace StoneFruit.Execution.HandlerSources
             _scripts.AddScript(verb, lines, description, usage);
             return this;
         }
+
+        public IHandlerSetup AddAlias(string verb, params string[] aliases)
+        {
+            foreach (var alias in aliases)
+                _sources.AddAlias(verb, alias);
+            return this;
+        }
     }
 }

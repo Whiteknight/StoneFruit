@@ -9,7 +9,6 @@ namespace StoneFruit
 {
     public interface IHandlerSetup
     {
-        // TODO: Some kind of command alias mechanism? Would like alias translated to verb, but keep alias in the Command
         // TODO: Some kind of mechanism for a verb to invoke an external application
 
         /// <summary>
@@ -58,6 +57,14 @@ namespace StoneFruit
         /// <param name="usage"></param>
         /// <returns></returns>
         IHandlerSetup AddScript(string verb, IEnumerable<string> lines, string description = null, string usage = null);
+
+        /// <summary>
+        /// Adds one or more aliases for a verb
+        /// </summary>
+        /// <param name="verb"></param>
+        /// <param name="aliases"></param>
+        /// <returns></returns>
+        IHandlerSetup AddAlias(string verb, params string[] aliases);
     }
 
     public static class HandlerSetupExtensions

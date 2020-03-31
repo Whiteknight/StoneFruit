@@ -52,7 +52,6 @@ namespace StoneFruit
         private void Execute(Command command, CancellationTokenSource tokenSource = null)
         {
             Assert.ArgumentNotNull(command, nameof(command));
-            // TODO: Aliases. Lookup the verb in an alias list and create a new Command with updated verb
             var handler = Commands.GetInstance(command, this) ?? throw new VerbNotFoundException(command.Verb);
             var syncHandler = GetSynchronousHandler(tokenSource, handler);
             // TODO: If the handler has a second Execute() method with arguments, we should attempt to invoke

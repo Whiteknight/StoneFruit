@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.HandlerSources
 {
@@ -10,14 +11,23 @@ namespace StoneFruit.Execution.HandlerSources
     {
         // TODO: More unit test coverage
         private readonly List<IHandlerSource> _sources;
+        private readonly Dictionary<string, string> _aliases;
 
         public CombinedHandlerSource()
         {
             _sources = new List<IHandlerSource>();
+            _aliases = new Dictionary<string, string>();
         }
 
         public IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher)
         {
+            Assert.ArgumentNotNull(command, nameof(command));
+            if (_aliases.ContainsKey(command.Verb))
+            {
+                var newVerb = _aliases[command.Verb];
+                command = command.Rename(newVerb);
+            }
+
             return _sources
                 .Select(source => source.GetInstance(command, dispatcher))
                 .FirstOrDefault(commandVerb => commandVerb != null);
@@ -36,10 +46,19 @@ namespace StoneFruit.Execution.HandlerSources
                 _sources.Add(source);
         }
 
-        public IHandlerSource Simplify()
+        public void AddAlias(string verb, string alias)
         {
-            return _sources.Count == 1 ? _sources[0] : this;
+            if (string.IsNullOrEmpty(alias) || string.IsNullOrEmpty(verb))
+                return;
+            alias = alias.ToLowerInvariant();
+            if (_aliases.ContainsKey(alias))
+                return;
+            verb = verb.ToLowerInvariant();
+            _aliases.Add(alias, verb);
         }
+
+        public IHandlerSource Simplify() 
+            => (_aliases.Count == 0 && _sources.Count == 1) ? _sources[0] : this;
 
         public IVerbInfo GetByName(string name)
         {

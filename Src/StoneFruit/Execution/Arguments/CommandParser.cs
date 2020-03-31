@@ -45,7 +45,7 @@ namespace StoneFruit.Execution.Arguments
             }
 
             var cmdArgs = new CommandArguments(rawArgs, argsList);
-            return new Command(verb, cmdArgs, line);
+            return new Command(verb, cmdArgs, raw: line);
         }
 
         public Command ParseCommand(string line) => ParseCommand(_verbParser, _argsParser, line);
