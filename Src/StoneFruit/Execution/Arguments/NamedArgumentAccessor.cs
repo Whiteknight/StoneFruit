@@ -20,7 +20,7 @@
             return this;
         }
 
-        public string AsString(string defaultValue = null) => string.IsNullOrEmpty(Value) ? defaultValue : Value;
+        public string AsString(string defaultValue = null) => Value ?? defaultValue;
 
         public bool AsBool(bool defaultValue = false) => this.As(bool.Parse, defaultValue);
 
