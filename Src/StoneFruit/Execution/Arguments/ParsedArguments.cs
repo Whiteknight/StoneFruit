@@ -252,12 +252,11 @@ namespace StoneFruit.Execution.Arguments
 
         public bool HasFlag(string name, bool markConsumed = false)
         {
-            var flag = GetFlag(name);
-            if (!flag.Exists())
-                return false;
-            if (markConsumed)
-                flag.MarkConsumed();
-            return true;
+            name = name.ToLowerInvariant();
+            if (_accessedFlags.ContainsKey(name))
+                return true;
+            var arg = AccessFlagsUntil(n => n == name, () => true);
+            return arg.Exists();
         }
 
         public IEnumerable<IFlagArgument> GetAllFlags()

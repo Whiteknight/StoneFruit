@@ -165,15 +165,8 @@ namespace StoneFruit.Execution.Arguments
             return _flags[name].Consumed ? MissingArgument.FlagConsumed(name) : _flags[name];
         }
 
-        public bool HasFlag(string name, bool markConsumed = false)
-        {
-            var flag = GetFlag(name);
-            if (!flag.Exists())
-                return false;
-            if (markConsumed)
-                flag.MarkConsumed();
-            return true;
-        }
+        public bool HasFlag(string name, bool markConsumed = false) 
+            => _flags.ContainsKey(name.ToLowerInvariant());
 
         public IEnumerable<IFlagArgument> GetAllFlags() => _flags.Values.Where(a => !a.Consumed);
     }
