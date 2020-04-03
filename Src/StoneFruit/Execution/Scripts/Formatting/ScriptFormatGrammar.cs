@@ -84,7 +84,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 names,
                 Match('='),
                 Match('['),
-                quotedString,
+                values,
                 Match(']'),
                 (n, e, o, s, c) => new NamedFetchNamedArgumentAccessor(n, s)
             );

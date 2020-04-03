@@ -9,25 +9,27 @@ namespace StoneFruit.Execution.Arguments
     public interface IArguments
     {
         /// <summary>
-        /// The raw, unparsed argument string if available
+        /// The raw, unparsed argument string if available. This string is usually only
+        /// populated from the parser and is not usually available otherwise.
         /// </summary>
         string Raw { get; }
 
         /// <summary>
-        /// Resets the Consumed state of all arguments
+        /// Resets the Consumed state of all arguments. Useful if the arguments object is
+        /// going to be reused.
         /// </summary>
         void ResetAllArguments();
 
         /// <summary>
-        /// Get the next positional value in order. May return arguments which have already
-        /// been consumed.
+        /// Get the next positional value in order without regard to whether the argument
+        /// has been consumed.
         /// </summary>
         /// <returns></returns>
         IPositionalArgument Shift();
 
         /// <summary>
         /// Get the positional value at the given index. The first argument is at position
-        /// 0. May return arguments which have already been consumed.
+        /// 0. Returns the argument regardless of whether it has been consumed.
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>

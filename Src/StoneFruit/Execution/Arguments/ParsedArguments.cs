@@ -6,7 +6,10 @@ using System.Text;
 namespace StoneFruit.Execution.Arguments
 {
     /// <summary>
-    /// Provides access to a list of IArgument objects but name or position.
+    /// Provides access to a collection of IArgument objects by name or position. Arguments
+    /// from the parser are inherently ambiguous, so this collection keeps them in a raw
+    /// state until intent is determined by user access. At this point the arguments are
+    /// moved to an "accessed" state where they are known unambiguously.
     /// </summary>
     public class ParsedArguments : IArguments
     {
@@ -44,9 +47,6 @@ namespace StoneFruit.Execution.Arguments
             _rawArguments = arguments.ToList();
         }
 
-        /// <summary>
-        /// The raw, unparsed argument string if available
-        /// </summary>
         public string Raw { get; }
 
         public void VerifyAllAreConsumed()
@@ -86,9 +86,6 @@ namespace StoneFruit.Execution.Arguments
             throw new CommandArgumentException(sb.ToString());
         }
 
-        /// <summary>
-        /// Resets the Consumed state of all arguments
-        /// </summary>
         public void ResetAllArguments()
         {
             foreach (var p in _accessedPositionals)
@@ -99,10 +96,6 @@ namespace StoneFruit.Execution.Arguments
                 f.MarkConsumed(false);
         }
 
-        /// <summary>
-        /// Get the next positional value
-        /// </summary>
-        /// <returns></returns>
         public IPositionalArgument Shift() 
             => AccessPositionalsUntil(() => true) ?? MissingArgument.NoPositionals();
 

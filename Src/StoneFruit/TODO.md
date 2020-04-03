@@ -1,5 +1,6 @@
 ﻿# For V1
 * Cleanup/optimize `CommandArguments`
+* Documentation website for core usage
 
 # For Later
 * Invoke `.Execute()` with custom argument lists

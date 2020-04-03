@@ -219,6 +219,9 @@ namespace StoneFruit.Execution
                     HandleError(state, e, state.EventCatalog.EngineError, args);
                 }
 
+                // TODO: If we're in interactive mode, we need to make sure we execute the
+                // EngineStopInteractive script before returning
+
                 // If exit is signaled, return. 
                 if (state.ShouldExit)
                     return state.ExitCode;
