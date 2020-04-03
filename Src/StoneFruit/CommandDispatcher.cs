@@ -11,10 +11,29 @@ namespace StoneFruit
     /// </summary>
     public class CommandDispatcher
     {
+        /// <summary>
+        /// The parser to turn strings into Commands
+        /// </summary>
         public CommandParser Parser { get; }
+
+        /// <summary>
+        /// The source of handlers
+        /// </summary>
         public IHandlerSource Commands { get; }
+
+        /// <summary>
+        /// The current environment and collection of all possible environments
+        /// </summary>
         public IEnvironmentCollection Environments { get; }
+
+        /// <summary>
+        /// The execution state of the engine
+        /// </summary>
         public EngineState State { get; }
+
+        /// <summary>
+        /// The output
+        /// </summary>
         public IOutput Output { get; }
 
         public CommandDispatcher(CommandParser parser, IHandlerSource commands, IEnvironmentCollection environments, EngineState state, IOutput output)
@@ -26,6 +45,12 @@ namespace StoneFruit
             Output = output;
         }
 
+        /// <summary>
+        /// Find and execute the appropriate handler for the given command object or
+        /// unparsed command string
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="tokenSource"></param>
         public void Execute(CommandObjectOrString command, CancellationTokenSource tokenSource = null)
         {
             Assert.ArgumentNotNull(command, nameof(command));
@@ -35,6 +60,11 @@ namespace StoneFruit
                 Execute(command.String, tokenSource);
         }
 
+        /// <summary>
+        /// Find and execute the appropriate handler for the given unparsed command string
+        /// </summary>
+        /// <param name="commandString"></param>
+        /// <param name="tokenSource"></param>
         public void Execute(string commandString, CancellationTokenSource tokenSource = null)
         {
             Assert.ArgumentNotNullOrEmpty(commandString, nameof(commandString));
@@ -42,6 +72,12 @@ namespace StoneFruit
             Execute(Command, tokenSource);
         }
 
+        /// <summary>
+        /// Find and execute the appropriate handler for the given verb and arguments
+        /// </summary>
+        /// <param name="verb"></param>
+        /// <param name="args"></param>
+        /// <param name="tokenSource"></param>
         public void Execute(string verb, IArguments args, CancellationTokenSource tokenSource = null)
         {
             Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
@@ -49,7 +85,12 @@ namespace StoneFruit
             Execute(command, tokenSource);
         }
 
-        private void Execute(Command command, CancellationTokenSource tokenSource = null)
+        /// <summary>
+        /// Find and execute the appropriate handler for the given Command object
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="tokenSource"></param>
+        public void Execute(Command command, CancellationTokenSource tokenSource = null)
         {
             Assert.ArgumentNotNull(command, nameof(command));
             var handler = Commands.GetInstance(command, this) ?? throw new VerbNotFoundException(command.Verb);

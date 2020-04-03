@@ -92,6 +92,13 @@ namespace StoneFruit
         /// <returns></returns>
         public static IOutput Color(this IOutput output, ConsoleColor color) => output.Color(b => (Brush) color);
 
+        /// <summary>
+        /// Get a new output with the given brush for text and background color. If the
+        /// implementation does not support color this will be a no-op.
+        /// </summary>
+        /// <param name="output"></param>
+        /// <param name="brush"></param>
+        /// <returns></returns>
         public static IOutput Color(this IOutput output, Brush brush) => output.Color(b => brush);
     }
 }

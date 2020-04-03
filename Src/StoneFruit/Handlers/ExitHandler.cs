@@ -22,7 +22,7 @@ namespace StoneFruit.Handlers
 
         public void Execute()
         {
-            var exitCode = _args.Shift().AsInt();
+            var exitCode = _args.Shift().AsInt(Constants.ExitCodeOk);
             _state.Exit(exitCode);
         }
     }

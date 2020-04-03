@@ -31,6 +31,11 @@ namespace StoneFruit
         /// <returns></returns>
         IArgumentParserSetup UseArgumentParser(IParser<char, IEnumerable<IParsedArgument>> argParser);
 
+        /// <summary>
+        /// Specify a parser to use for scripts
+        /// </summary>
+        /// <param name="scriptParser"></param>
+        /// <returns></returns>
         IArgumentParserSetup UseScriptParser(IParser<char, CommandFormat> scriptParser);
     }
 

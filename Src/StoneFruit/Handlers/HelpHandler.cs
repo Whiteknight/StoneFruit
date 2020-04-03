@@ -91,7 +91,7 @@ To see all commands, use the -showall flag
             _output.WriteLine("Type 'help <command-name>' to get more information, if available.");
         }
 
-        private List<string> GetDescriptionLines(string desc, int max)
+        private static List<string> GetDescriptionLines(string desc, int max)
         {
             if (max <= 0 || string.IsNullOrEmpty(desc))
                 return new List<string>();
