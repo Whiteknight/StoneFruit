@@ -1,10 +1,9 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Utility;
 
-namespace StoneFruit
+namespace StoneFruit.Execution
 {
     /// <summary>
     /// Dispatches control to the appropriate handler for a given verb.

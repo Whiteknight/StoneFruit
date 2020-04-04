@@ -14,8 +14,14 @@ namespace StoneFruit.Execution.Environments
 
         public IEnvironmentSetup UseFactory(IEnvironmentFactory factory)
         {
+            if (factory == null)
+            {
+                _environments = null;
+                return this;
+            }
+
             EnsureEnvironmentsNotSet();
-            _environments = factory == null ? null : new FactoryEnvironmentCollection(factory);
+            _environments = new FactoryEnvironmentCollection(factory);
             return this;
         }
 
@@ -28,8 +34,14 @@ namespace StoneFruit.Execution.Environments
 
         public IEnvironmentSetup UseInstances(IReadOnlyDictionary<string, object> environments)
         {
+            if (environments == null)
+            {
+                _environments = null;
+                return this;
+            }
+
             EnsureEnvironmentsNotSet();
-            _environments = environments == null ? null : new FactoryEnvironmentCollection(new DictionaryEnvironmentFactory(environments));
+            _environments = new FactoryEnvironmentCollection(new DictionaryEnvironmentFactory(environments));
             return this;
         }
 

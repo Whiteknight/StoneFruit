@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace StoneFruit
+namespace StoneFruit.Execution
 {
     /// <summary>
     /// Exception thrown by the engine when a verb cannot be found. 

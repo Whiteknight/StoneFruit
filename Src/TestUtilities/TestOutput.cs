@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using StoneFruit;
+using StoneFruit.Execution.Output;
 
 namespace TestUtilities
 {

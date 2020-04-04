@@ -76,6 +76,8 @@ namespace StoneFruit.Execution.HandlerSources
 
         public IHandlerSetup AddAlias(string verb, params string[] aliases)
         {
+            Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
+            Assert.ArgumentNotNull(aliases, nameof(aliases));
             foreach (var alias in aliases)
                 _sources.AddAlias(verb, alias);
             return this;

@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Linq;
 using StoneFruit.Utility;
 
-namespace StoneFruit
+namespace StoneFruit.Execution.Output
 {
     /// <summary>
     /// Value to represent a foreground/background color combination for writing on the

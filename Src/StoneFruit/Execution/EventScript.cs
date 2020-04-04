@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using StoneFruit.Execution.Arguments;
+using StoneFruit.Utility;
 
 namespace StoneFruit.Execution
 {
@@ -25,19 +27,19 @@ namespace StoneFruit.Execution
 
         public void Clear() => _lines.Clear();
 
-        public void Add(params string[] lines) => _lines.AddRange(lines);
+        public void Add(params string[] lines)
+        {
+            Assert.ArgumentNotNull(lines, nameof(lines));
+            _lines.AddRange(lines);
+        }
 
         public IEnumerable<CommandObjectOrString> GetCommands(CommandParser parser, IArguments args)
         {
-            var commands = new List<CommandObjectOrString>();
-            foreach (var line in _lines)
-            {
-                var format = parser.ParseScript(line);
-                var command = format.Format(args);
-                commands.Add(CommandObjectOrString.FromObject(command));
-            }
-
-            return commands;
+            return _lines
+                .Where(l => !string.IsNullOrEmpty(l))
+                .Select(parser.ParseScript)
+                .Select(format => format.Format(args))
+                .Select(CommandObjectOrString.FromObject);
         }
 
         public override string ToString() => string.Join("\n", _lines);
