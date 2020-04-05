@@ -71,14 +71,14 @@ public class SayHandler : IHandler
 
 Aliases are only resolved once per command, so you cannot have one alias reference another alias. Notice you can also apply multiple `[Verb()]` attributes to a single handler, which will produce almost the same effect.
 
-## Script Handlers
+## Scripts
 
-A script handler is a collection of zero or more commands which are executed in response to a single input command. These are setup in the `EngineBuilder` and employ a sophisticated mechanism for translating arguments. You can setup scripts in the `EngineBuilder`, here is a simple example:
+A script is a collection of zero or more commands which are executed in response to a single input command. These are setup in the `EngineBuilder` and employ a sophisticated mechanism for translating arguments. Here is a simple example:
 
 ```csharp
 engineBuilder
     .SetupHandlers(handlers => handlers
-        .AddScript("my-verb", new [] { 
+        .AddScript("say-hello-world", new [] { 
             "echo hello", 
             "echo world" 
         })
@@ -88,31 +88,34 @@ engineBuilder
 
 ### Script Arguments
 
-Arguments in a script use the Simplified argument syntax (see the [Arguments])(arguments.md) page for more details) with extended placeholder syntax. 
+Arguments in a script use the Simplified argument syntax (see the [Arguments])(arguments.md) page for more details) with extended placeholder syntax. Names of flags and named arguments, in all cases, can be quoted with single or double quotes.
+
+#### Positional Arguments
 
 Positional arguments can be fetched from the input using the `[]` syntax. An integer index will fetch and consume the argument with that index, while a `[*]` will fetch all remaining unconsumed positional arguments. Positional arguments can also be gotten from the values of named input arguments using the `[]` syntax with a string integer of an integer argument. Literal positional values will be passed as-is:
 
-**Script**
-`test [1] [*] [x] z`
-**Command**
-`myscript a b c x=y`
-**Output**
-`test b a c y z`
+**Script**: `test [1] [*] [x] z`
+
+**Command**: `myscript a b c x=y`
+
+**Output**: `test b a c y z`
+
+#### Flag Arguments
 
 Flag arguments can be fetched and consumed from the input by name using the `?` syntax, or passed as literal flags with `-`
 
-**Script**
-`test ?a ?b -c`
-**Command**
-`myscript -a`
-**Output**
-`test -a -c`
+**Script**: `test ?a ?b -c`
+
+**Command**: `myscript -a`
+
+**Output**: `test -a -c`
+
+#### Named Arguments
 
 Named arguments can be fetched from the input in a few ways. They can be fetched and consumed with name and value using `{name}` syntax, all remaining named arguments can be fetched and consumed with `{*}` syntax, and values can fetched with literal names using `name=[]` syntax, where the argument can be an integer to get the value from a positional argument and a string to get the value of another named argument. Literal named values can be passed like normal.
 
-**Script**
-`test {a} b=['x'] c=[0] d=4 {*}`
-**Command**
-`myscript a=1 x=2 3 e=5`
-**Output**
-`test a=1 b=2 c=3 d=4 e=5`
+**Script**: `test {a} b=['x'] c=[0] d=4 {*}`
+
+**Command**: `myscript a=1 x=2 3 e=5`
+
+**Output**: `test a=1 b=2 c=3 d=4 e=5`

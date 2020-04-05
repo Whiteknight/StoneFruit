@@ -8,9 +8,9 @@ Git is a powerful development tool but typing "`git`" by itself at the prompt do
 
 ## Basic Terminology
 
-A **Verb** is a command which the user types at the commandline, which may have arguments and output effects. Verbs in StoneFruit are case-insensitive
+A **Verb** is the name of an action which the user types at the commandline, which may have arguments and output effects. Verbs in StoneFruit are case-insensitive
 
-A **Handler** is a class which is invoked by StoneFruit when a verb is input. A single Handler class may correspond to many different verbs.
+A **Handler** is a class which is invoked by StoneFruit when a verb is input. A single Handler class may correspond to one or more verbs.
 
 A **Command** is a combination of a Verb and all input arguments.
 
@@ -24,7 +24,8 @@ To get started, we need to create an `EngineBuilder`, configure it, and build an
 
 ```csharp
 var engineBuilder = new EngineBuilder();
-...
+    // Setup the builder here
+    // ...
 var engine = engineBuilder.Build();
 ```
 

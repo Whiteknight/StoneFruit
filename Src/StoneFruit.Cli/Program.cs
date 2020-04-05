@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using StoneFruit.Containers.Lamar;
-using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.Cli

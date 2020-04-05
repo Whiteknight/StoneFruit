@@ -4,7 +4,7 @@ The engine provides several methods to begin execution. You can select either in
 
 ## Interactive Mode
 
-if you call `engine.RunInteractively()` the engine will be started in interactive mode and will ignore any commands on the commandline. If you support environments and call `engine.RunInteractively(envName)` the engine will start interactive mode with the specified environment active. If your application supports multiple environments and you enter interactive mode without an environment set, the engine will prompt you to select an environment before showing you the prompt.
+If you call `engine.RunInteractively()` the engine will be started in interactive mode and will ignore any commands on the commandline. If you support environments and call `engine.RunInteractively(envName)` the engine will start interactive mode with the specified environment active. If your application supports multiple environments and you enter interactive mode without an environment set, the engine will prompt you to select an environment before showing you the prompt.
 
 If you `.Run()` your engine without command-line arguments, or if you support environments and specify only the name of an environment on the commandline, the engine will be started in interactive mode. You can enter commands at the prompt, and can type "exit" or "quit" to exit the loop. 
 
@@ -28,3 +28,7 @@ mystonefruitapp echo 'test'
 ### Scripting
 
 In headless ode, the Engine will first execute the `EngineStartHeadless` script, then it will execute the command from the commandline, and then it will execute the `EngineStopHeadless` script. See the page on [Scripting](scripting.md) for more details.
+
+### Headless Help
+
+If you call `engine.RunHeadless("help")` or `engine.RunHeadlessWithCommandLineArgs()` where `help` is the only commandline argument, StoneFruit will enter "headless help" mode. It will execute the `HeadlessHelp` script (see [Scripting](scripting.md) for more details) and will exit immediately. You can configure this behavior by modifying the contents of the `HeadlessHelp` script in the EngineBuilder.
