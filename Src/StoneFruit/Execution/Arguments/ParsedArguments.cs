@@ -18,8 +18,7 @@ namespace StoneFruit.Execution.Arguments
         private readonly Dictionary<string, List<INamedArgument>> _accessedNameds;
         private readonly Dictionary<string, IFlagArgument> _accessedFlags;
 
-        // TODO: Would like to do some book-keeping to avoid multiple traversals of the _raw list
-        // TODO: Would like to clean the _raw list of nulls regularly
+        private int _lastRawPositionalIndex;
 
         // Empty args object with no values in it
         public ParsedArguments()
@@ -29,6 +28,7 @@ namespace StoneFruit.Execution.Arguments
             _accessedNameds = new Dictionary<string, List<INamedArgument>>();
             _accessedFlags = new Dictionary<string, IFlagArgument>();
             _rawArguments = new List<IParsedArgument>();
+            _lastRawPositionalIndex = 0;
         }
 
         // Args object built from parsed objects, which aren't accessed yet
@@ -128,8 +128,9 @@ namespace StoneFruit.Execution.Arguments
         // When the condition is matched, return the current item.
         private IPositionalArgument AccessPositionalsUntil(Func<bool> match)
         {
-            for (int i = 0; i < _rawArguments.Count; i++)
+            for (; _lastRawPositionalIndex < _rawArguments.Count; _lastRawPositionalIndex++)
             {
+                var i = _lastRawPositionalIndex;
                 var arg = _rawArguments[i];
                 if (arg is PositionalArgument pa)
                 {

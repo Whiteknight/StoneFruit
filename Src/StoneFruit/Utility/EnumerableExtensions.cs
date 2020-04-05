@@ -49,18 +49,6 @@ namespace StoneFruit.Utility
         /// ToDictionary variant without key conflict errors. If the same key is encountered more than once,
         /// subsequent values are simply ignored.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <typeparam name="TKey"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="getKey"></param>
-        /// <returns></returns>
-        public static Dictionary<TKey, T> ToDictionaryUnique<T, TKey>(this IEnumerable<T> source, Func<T, TKey> getKey)
-            => ToDictionaryUnique(source, getKey, t => t);
-
-        /// <summary>
-        /// ToDictionary variant without key conflict errors. If the same key is encountered more than once,
-        /// subsequent values are simply ignored.
-        /// </summary>
         /// <typeparam name="TKey"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <param name="source"></param>

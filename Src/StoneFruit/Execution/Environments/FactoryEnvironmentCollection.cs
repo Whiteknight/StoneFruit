@@ -37,6 +37,8 @@ namespace StoneFruit.Execution.Environments
 
         public object Get(string name)
         {
+            if (name == null)
+                return default;
             if (_namedCache.ContainsKey(name))
                 return _namedCache[name];
             if (!_validNames.Contains(name))
@@ -48,12 +50,19 @@ namespace StoneFruit.Execution.Environments
 
         public object Get(int idx) => _nameIndices.ContainsKey(idx) ? Get(_nameIndices[idx]) : default;
 
-        public bool IsValid(string name) => _validNames.Contains(name);
+        public bool IsValid(string name)
+        {
+            if (name == null)
+                return false;
+            return _validNames.Contains(name);
+        }
 
         public bool IsValid(int index) => _nameIndices.ContainsKey(index);
 
         public void SetCurrent(string name)
         {
+            if (name == null)
+                return;
             CurrentName = name;
             Current = Get(name);
         }
