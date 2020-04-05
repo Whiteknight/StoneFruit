@@ -7,16 +7,19 @@
     {
         private readonly IOutput _output;
         private readonly IEnvironmentCollection _environments;
+        private readonly EngineState _state;
 
-        public PromptCommandSource(IOutput output, IEnvironmentCollection environments)
+        public PromptCommandSource(IOutput output, IEnvironmentCollection environments, EngineState state)
         {
             _output = output;
             _environments = environments;
+            _state = state;
         }
 
         public CommandObjectOrString GetNextCommand()
         {
             var str = _output.Prompt($"{_environments.CurrentName}");
+            _state.CommandCounter.ReceiveUserInput();
             return CommandObjectOrString.FromString(str);
         }
     }

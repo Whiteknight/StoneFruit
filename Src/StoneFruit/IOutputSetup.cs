@@ -7,7 +7,9 @@
     {
         /// <summary>
         /// Do not use a Console output. Console is the only output which supports color,
-        /// so removing it makes color operations into no-ops. 
+        /// so removing it makes color operations into no-ops. Without the console,
+        /// Interactive mode in the Engine will exit immediately. This is used mostly
+        /// for unit test scenarios.
         /// </summary>
         /// <returns></returns>
         IOutputSetup DoNotUseConsole();

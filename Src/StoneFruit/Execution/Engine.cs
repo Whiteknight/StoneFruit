@@ -16,10 +16,11 @@ namespace StoneFruit.Execution
         private readonly IEnvironmentCollection _environments;
         private readonly IHandlerSource _commandSource;
         private readonly EngineEventCatalog _eventCatalog;
+        private readonly EngineSettings _settings;
         private readonly IOutput _output;
         private readonly CommandParser _parser;
 
-        public Engine(IHandlerSource commands, IEnvironmentCollection environments, CommandParser parser, IOutput output, EngineEventCatalog eventCatalog)
+        public Engine(IHandlerSource commands, IEnvironmentCollection environments, CommandParser parser, IOutput output, EngineEventCatalog eventCatalog, EngineSettings settings)
         {
             Assert.ArgumentNotNull(commands, nameof(commands));
             Assert.ArgumentNotNull(environments, nameof(environments));
@@ -29,6 +30,7 @@ namespace StoneFruit.Execution
             
             _environments = environments;
             _eventCatalog = eventCatalog;
+            _settings = settings;
             _parser = parser;
             _output = output;
             _commandSource = commands;
@@ -89,7 +91,7 @@ namespace StoneFruit.Execution
         /// <returns></returns>
         public int RunHeadless(string commandLine)
         {
-            var state = new EngineState(true, _eventCatalog);
+            var state = new EngineState(true, _eventCatalog, _settings);
             var dispatcher = new CommandDispatcher(_parser, _commandSource, _environments, state, _output);
             var sources = new CommandSourceCollection();
 
@@ -141,11 +143,11 @@ namespace StoneFruit.Execution
         /// </summary>
         public int RunInteractively()
         {
-            var state = new EngineState(false, _eventCatalog);
+            var state = new EngineState(false, _eventCatalog, _settings);
             var dispatcher = new CommandDispatcher(_parser, _commandSource, _environments, state, _output);
             var source = new CommandSourceCollection();
             source.AddToEnd(state.EventCatalog.EngineStartInteractive, _parser);
-            source.AddToEnd(new PromptCommandSource(_output, _environments));
+            source.AddToEnd(new PromptCommandSource(_output, _environments, state));
             source.AddToEnd(state.EventCatalog.EngineStopInteractive, _parser);
             return RunLoop(state, dispatcher, source);
         }
@@ -159,12 +161,12 @@ namespace StoneFruit.Execution
         /// <param name="environment"></param>
         public int RunInteractively(string environment)
         {
-            var state = new EngineState(false, _eventCatalog);
+            var state = new EngineState(false, _eventCatalog, _settings);
             var dispatcher = new CommandDispatcher(_parser, _commandSource, _environments, state, _output);
             var source = new CommandSourceCollection();
             source.AddToEnd($"{EnvironmentChangeHandler.Name} {environment}");
             source.AddToEnd(state.EventCatalog.EngineStartInteractive, _parser);
-            source.AddToEnd(new PromptCommandSource(_output, _environments));
+            source.AddToEnd(new PromptCommandSource(_output, _environments, state));
             source.AddToEnd(state.EventCatalog.EngineStopInteractive, _parser);
             return RunLoop(state, dispatcher, source);
         }
@@ -187,7 +189,6 @@ namespace StoneFruit.Execution
         // is drained. 
         private int RunLoop(EngineState state, CommandDispatcher dispatcher, CommandSourceCollection sources)
         {
-            // TODO: some kind of way to detect infinite loops?
             while (true)
             {
                 // Get a command. If we have one in the state use that. Otherwise try to
@@ -196,6 +197,10 @@ namespace StoneFruit.Execution
                 if (command == null)
                     return Constants.ExitCodeOk;
 
+                var canExecute = state.CommandCounter.VerifyCanExecuteNextCommand(_parser, _output);
+                if (!canExecute)
+                    continue;
+                
                 // Dispatch the command to the handler, dealing with any errors
                 try
                 {

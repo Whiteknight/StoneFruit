@@ -6,6 +6,7 @@
         public const int ExitCodeHeadlessHelp = 0;
         public const int ExitCodeHeadlessNoVerb = 1;
         public const int ExitCodeCascadeError = 2;
+        public const int ExitCodeMaximumCommands = 3;
 
         public const string MetadataError = "__CURRENT_EXCEPTION";
 

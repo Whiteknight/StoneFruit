@@ -1,4 +1,6 @@
-﻿namespace StoneFruit.Execution
+﻿using StoneFruit.Utility;
+
+namespace StoneFruit.Execution
 {
     /// <summary>
     /// The runtime state of the engine. Controls the execution of the
@@ -6,14 +8,19 @@
     /// </summary>
     public class EngineState
     {
-        public EngineState(bool headless, EngineEventCatalog eventCatalog)
+        public EngineState(bool headless, EngineEventCatalog eventCatalog, EngineSettings settings)
         {
+            Assert.ArgumentNotNull(eventCatalog, nameof(eventCatalog));
+            Assert.ArgumentNotNull(settings, nameof(settings));
+
             Headless = headless;
             EventCatalog = eventCatalog;
             ShouldExit = false;
-            
+
+            Settings = settings;
             Commands = new EngineStateCommandQueue();
             Metadata = new EngineStateMetadataCache();
+            CommandCounter = Headless ? new HeadlessEngineStateCommandCounter(Commands, eventCatalog, Settings) : (IEngineStateCommandCounter)new InteractiveEngineStateCommandCounter(Commands, Settings);
         }
 
         public bool ShouldExit { get; private set; }
@@ -22,6 +29,8 @@
         public EngineEventCatalog EventCatalog { get; }
         public EngineStateCommandQueue Commands { get; }
         public EngineStateMetadataCache Metadata { get; }
+        public IEngineStateCommandCounter CommandCounter { get; set; }
+        public EngineSettings Settings { get; set; }
 
         // TODO: Some kind of global settings mechanism where the user can "set name value" and affect usage
 
@@ -30,7 +39,5 @@
             ShouldExit = true;
             ExitCode = exitCode;
         }
-
-        // TODO: Configurable loop limit so we don't keep adding commands to the queue in an endless loop
     }
 }

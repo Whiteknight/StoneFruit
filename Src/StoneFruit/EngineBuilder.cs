@@ -17,6 +17,7 @@ namespace StoneFruit
         private readonly EngineEventCatalog _eventCatalog;
         private readonly EnvironmentSetup _environments;
         private readonly ArgumentParserSetup _parsers;
+        private readonly EngineSettings _settings;
 
         public EngineBuilder()
         {
@@ -25,6 +26,7 @@ namespace StoneFruit
             _output = new OutputSetup();
             _environments = new EnvironmentSetup();
             _parsers = new ArgumentParserSetup();
+            _settings = new EngineSettings();
         }
 
         /// <summary>
@@ -82,6 +84,12 @@ namespace StoneFruit
             return this;
         }
 
+        public EngineBuilder SetupSettings(Action<EngineSettings> setup)
+        {
+            setup?.Invoke(_settings);
+            return this;
+        }
+
         /// <summary>
         /// Build the Engine using configured objects
         /// </summary>
@@ -92,7 +100,7 @@ namespace StoneFruit
             var environmentFactory = _environments.Build();
             var parser = _parsers.Build();
             var output = _output.Build();
-            return new Engine(commandSource, environmentFactory, parser, output, _eventCatalog);
+            return new Engine(commandSource, environmentFactory, parser, output, _eventCatalog, _settings);
         }
     }
 }

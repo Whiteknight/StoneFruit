@@ -26,16 +26,25 @@ namespace StoneFruit.Cli
                     .Add("testf", (c, d) => d.Output.WriteLine("F"))
                     .AddScript("testg", new [] { "echo test", "echo g" })
                     .AddScript("testh", new[] { "echo [0]", "echo ['a']" })
+                    .AddScript("testi", new [] {
+                        "echo 1",
+                        "echo 2",
+                        "echo 3",
+                        "echo 4"
+                    })
                 )
                 .SetupEnvironments(e => e.UseFactory(new MyEnvironmentFactory()))
                 .SetupEvents(e =>
                 {
-                    //e.EngineStartInteractive.Add("help");
+                    e.EngineStartInteractive.Clear();
                     //e.EngineStopInteractive.Add("echo 'goodbye'");
                     //e.EngineError.Add("echo 'you dun goofed'");
                 })
+                .SetupSettings(s => {
+                    s.MaxInputlessCommands = 3;
+                })
                 .Build();
-            Environment.ExitCode = engine.RunWithCommandLineArguments();
+            Environment.ExitCode = engine.RunInteractively();
             Console.ReadKey();
         }
     }

@@ -24,7 +24,8 @@ namespace StoneFruit.Containers.Lamar.Tests
         public void GetInstance_echo()
         {
             var target = new LamarHandlerSource<object>();
-            var dispatcher = new CommandDispatcher(CommandParser.GetDefault(), target, new InstanceEnvironmentCollection(null), new EngineState(true, null), new ConsoleOutput());
+            var state = new EngineState(true, new EngineEventCatalog(), new EngineSettings());
+            var dispatcher = new CommandDispatcher(CommandParser.GetDefault(), target, new InstanceEnvironmentCollection(null), state, new ConsoleOutput());
             var result = target.GetInstance(Command.Create("echo", SyntheticArguments.Empty()), dispatcher);
             result.Should().BeOfType<EchoHandler>();
         }
@@ -33,7 +34,6 @@ namespace StoneFruit.Containers.Lamar.Tests
         public void GetAll_Test()
         {
             var target = new LamarHandlerSource<object>();
-            var dispatcher = new CommandDispatcher(CommandParser.GetDefault(), target, new InstanceEnvironmentCollection(null), new EngineState(true, null), new ConsoleOutput());
             var result = target.GetAll().ToList();
             result.Count.Should().BeGreaterThan(1);
         }
@@ -43,7 +43,8 @@ namespace StoneFruit.Containers.Lamar.Tests
         {
             var target = new LamarHandlerSource<TestEnvironment>();
             var environments = new InstanceEnvironmentCollection(new TestEnvironment("test"));
-            var dispatcher = new CommandDispatcher(CommandParser.GetDefault(), target, environments, new EngineState(true, null), new ConsoleOutput());
+            var state = new EngineState(true, new EngineEventCatalog(), new EngineSettings());
+            var dispatcher = new CommandDispatcher(CommandParser.GetDefault(), target, environments, state, new ConsoleOutput());
             var result = target.GetInstance(Command.Create("test-environment", SyntheticArguments.Empty()), dispatcher) as EnvironmentInjectionTestHandler;
 
             result.Should().NotBeNull();

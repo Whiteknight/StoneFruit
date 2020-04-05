@@ -57,6 +57,11 @@ namespace StoneFruit.Execution
             VerbNotFound = new EventScript(
                 $"{EchoHandler.Name} Verb ['verb'] not found. Please check your spelling or help output and try again."
             );
+
+            MaximumHeadlessCommands = new EventScript(
+                $"{EchoHandler.Name} Maximum ['limit'] commands executed without user input. Terminating runloop",
+                $"{ExitHandler.Name} ['exitcode']"
+            );
         }
 
         /// <summary>
@@ -109,5 +114,7 @@ namespace StoneFruit.Execution
         /// internals or from within one of the handlers.
         /// </summary>
         public EventScript EngineError { get; }
+
+        public EventScript MaximumHeadlessCommands { get; }
     }
 }
