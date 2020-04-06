@@ -59,7 +59,7 @@ namespace StoneFruit.Execution
             );
 
             MaximumHeadlessCommands = new EventScript(
-                $"{EchoHandler.Name} Maximum ['limit'] commands executed without user input. Terminating runloop",
+                $"{EchoHandler.Name} Maximum ['limit'] commands executed without user input. Terminating runloop.",
                 $"{ExitHandler.Name} ['exitcode']"
             );
         }

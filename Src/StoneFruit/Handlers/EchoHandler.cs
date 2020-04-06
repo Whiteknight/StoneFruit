@@ -23,10 +23,11 @@ namespace StoneFruit.Handlers
 
         public static string Description => "Writes a string of output to the console";
 
-        public static string Usage => @"echo [color=<color>] [-nonewline] ...
+        public static string Usage => @"echo [color=<color>] [-nonewline] [-noheadless] ...
 
 Writes all positional arguments to the output. If color is specified, use that color.
 Appends a new-line to the end unless -nonewline is specified
+-noheadless causes the handler to not output any text in headless mode
 ";
 
         public void Execute()

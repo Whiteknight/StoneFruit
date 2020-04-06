@@ -2,36 +2,6 @@
 
 There are several methods of scripting in StoneFruit. These allow you to translate one command into one or more commands to execute in sequence, or to execute commands in response to specific events in the Engine.
 
-## EventScripts
-
-The StoneFruit `EngineState` contains a number of pre-defined scripts which are executed in response to various events.
-
-```csharp
-    .SetupEvents(e => ...);
-```
-
-Scripts are executed in the following scenarios:
-
-1. An unhandled exception is thrown by a handler (`EngineError`)
-1. Headless mode is entered or exited (`EngineStartHeadless`, `EngineStopHeadless`)
-1. Interactive mode is intered or exited (`EngineStartInteractive`, `EngineStopInteractive`)
-1. The current environment is changed
-1. Headless mode is entered without a valid command to execute
-1. A verb is specified which is not known to the system
-1. The single "help" argument is specified on the commandline in headless mode.
-
-You can examine or modify the contents of these scripts within the context of the `EngineBuilder.SetupEvents()` method. This gives a way to customize behavior by setting up data or showing helpful information to users. Notice that some of these events are important to the operation of the system and errors in these scripts can create a fatal condition which will cause the engine to terminate.
-
-For example, if you would like your application to display a custom message to the user when entering interactive mode, you can set it up like this:
-
-```csharp
-engineBuilder
-    .SetupEvents(scriptCatalog => {
-        scriptCatalog.EngineStartInteractive.Add("echo 'hello world!'");
-    })
-    ;
-```
-
 ## Verb Aliases
 
 Aliases allow you to invoke a single handler with multiple different verbs. An alias maps one verb to another one. When you use an alias, the verb is translated first, with the input alias and target verb both stored in the `Command` argument, before the handler is dispatched. You can setup aliases in your `EngineBuilder`:
@@ -119,3 +89,111 @@ Named arguments can be fetched from the input in a few ways. They can be fetched
 **Command**: `myscript a=1 x=2 3 e=5`
 
 **Output**: `test a=1 b=2 c=3 d=4 e=5`
+
+## EventScripts
+
+The StoneFruit `EngineState` contains a number of pre-defined scripts which are executed in response to various events. You can modify these scripts in the EngineBuilder to change the behavior of the application:
+
+```csharp
+    .SetupEvents(e => ...);
+```
+
+You can examine or modify the contents of these scripts within the context of the `EngineBuilder.SetupEvents()` method. This gives a way to customize behavior by setting up data or showing helpful information to users. Notice that some of these events are important to the operation of the system and errors in these scripts can create a fatal condition which will cause the engine to terminate.
+
+For example, if you would like your application to display a custom message to the user when entering interactive mode, you can set it up like this:
+
+```csharp
+engineBuilder
+    .SetupEvents(scriptCatalog => {
+        scriptCatalog.EngineStartInteractive.Add("echo 'hello world!'");
+    })
+    ;
+```
+
+Event scripts use the same argument formatting syntax as normal scripts (described above). Scripts are available for the following events:
+
+### Unhandled Errors
+
+When a Handler throws an exception or there's an error during operation of the engine, the `EngineError` script will be executed with arguments derived from the exception object. The default script for this is:
+
+```
+echo color=Red ['message']
+echo ['stacktrace']
+```
+
+If an exception is thrown while handling a previous exception, the Engine will show a message and exit to prevent infinite loops. Make sure you test your error-handling script to avoid abrupt exits like this.
+
+### Start and Stop Headless Mode
+
+A script is executed when the engine enters and exits headless mode. These scripts are `EngineStartHeadless` and `EngineStopHeadless` respectively. By default both these scripts are empty, but you can configure them to show helpful information to the user, to setup/cleanup contextual data, check credentials, or any number of other tasks.
+
+### Start Interactive Mode
+
+A script executes when the engine enters interactive mode, `EngineStartInteractive`. This script prompts the user for an environment if necessary and shows a brief welcome message. This is the default script:
+
+```
+env-change-notset
+echo -nonewline Enter command
+echo -nonewline color=DarkGray " ('help' for help, 'exit' to quit)"
+echo ':'
+```
+
+A common usage of this script is to show additional information or even full "help" output to the user, or to setup contextual data before the user begins executing commands.
+
+### Environment Changed
+
+When the current environment changes, the `EnvironmentChanged` script is executed with the name of the environment as an argument. The default script is:
+
+```
+echo -noheadless Environment changed to ['environment']
+```
+
+### Headless Help
+
+If the application is started in headless mode with just the "help" command, the `HeadlessHelp` script is executed. By default this script shows output of the help handler and then exits with the special headless-help error code:
+
+```
+help
+exit ['exitcode']
+```
+
+You can modify this script to show any helpful information you want.
+
+### HeadlessNoArgs
+
+If the engine enters headless mode with no arguments, the `HeadlessNoArgs` script is executed. By default this script shows a brief error message and exits with the special no-verb exit code:
+
+```
+echo No command provided
+exit ['exitcode']
+```
+
+Whatever you put in this script will be executed by default when no verbs are specified, so it's a good place to fill in some default commands (show help, etc). 
+
+### Verb Not Found
+
+If a verb is specified, in headless or interactive mode, the `VerbNotFound` script is executed. By defailt it shows a brief error message:
+
+```
+echo Verb ['verb'] not found. Please check your spelling or help output and try again.
+```
+
+### Maximum Headless Commands
+
+StoneFruit will only execute a limited number of commands without user input, to avoid infinite loops. This can occur in recursive situations when a script references itself (directly or through an alias) or when scripts themselves start to get too long. In Interactive mode a prompt will be shown to the user asking if execution should continue. In headless mode, the `MaximumHeadlessCommands` script is executed instead. By default this script shows an error message about maximum limit exceeded and exits with a special exit code.
+
+```
+echo Maximum ['limit'] commands executed without user input. Terminating runloop.
+exit ['exitcode']
+```
+
+The limit of commands to execute without user input can be set in the EngineBuilder. The default value is 20:
+
+```csharp
+engineBuilder
+    .SetupSettings(s => {
+        s.MaxInputlessCommands = 20;
+    })
+    ;
+```
+
