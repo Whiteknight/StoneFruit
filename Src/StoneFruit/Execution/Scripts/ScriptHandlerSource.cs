@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Scripts.Formatting;
 using StoneFruit.Utility;
 
@@ -59,7 +58,7 @@ namespace StoneFruit.Execution.Scripts
             public string Usage { get; }
             public bool ShouldShowInHelp => true;
 
-            public IEnumerable<CommandFormat> GetFormats(CommandParser parser)
+            public IEnumerable<CommandFormat> GetFormats(ICommandParser parser)
             {
                 if (_formats != null)
                     return _formats;
@@ -79,12 +78,12 @@ namespace StoneFruit.Execution.Scripts
         // during DI container scan
         private class ScriptHandler : IHandler
         {
-            private readonly CommandParser _parser;
+            private readonly ICommandParser _parser;
             private readonly Script _script;
             private readonly Command _command;
             private readonly EngineState _state;
 
-            public ScriptHandler(CommandParser parser, Script script, Command command, EngineState state)
+            public ScriptHandler(ICommandParser parser, Script script, Command command, EngineState state)
             {
                 _parser = parser;
                 _script = script;

@@ -15,7 +15,7 @@ namespace StoneFruit.Execution
         /// <summary>
         /// The parser to turn strings into Commands
         /// </summary>
-        public CommandParser Parser { get; }
+        public ICommandParser Parser { get; }
 
         /// <summary>
         /// The source of handlers
@@ -37,7 +37,7 @@ namespace StoneFruit.Execution
         /// </summary>
         public IOutput Output { get; }
 
-        public CommandDispatcher(CommandParser parser, IHandlerSource commands, IEnvironmentCollection environments, EngineState state, IOutput output)
+        public CommandDispatcher(ICommandParser parser, IHandlerSource commands, IEnvironmentCollection environments, EngineState state, IOutput output)
         {
             Parser = parser;
             Commands = commands;

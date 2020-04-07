@@ -33,7 +33,7 @@ namespace StoneFruit.Execution
             _lines.AddRange(lines);
         }
 
-        public IEnumerable<CommandObjectOrString> GetCommands(CommandParser parser, IArguments args)
+        public IEnumerable<CommandObjectOrString> GetCommands(ICommandParser parser, IArguments args)
         {
             return _lines
                 .Where(l => !string.IsNullOrEmpty(l))

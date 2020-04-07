@@ -18,9 +18,9 @@ namespace StoneFruit.Execution
         private readonly EngineEventCatalog _eventCatalog;
         private readonly EngineSettings _settings;
         private readonly IOutput _output;
-        private readonly CommandParser _parser;
+        private readonly ICommandParser _parser;
 
-        public Engine(IHandlerSource commands, IEnvironmentCollection environments, CommandParser parser, IOutput output, EngineEventCatalog eventCatalog, EngineSettings settings)
+        public Engine(IHandlerSource commands, IEnvironmentCollection environments, ICommandParser parser, IOutput output, EngineEventCatalog eventCatalog, EngineSettings settings)
         {
             Assert.ArgumentNotNull(commands, nameof(commands));
             Assert.ArgumentNotNull(environments, nameof(environments));

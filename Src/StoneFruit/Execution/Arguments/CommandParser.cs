@@ -7,7 +7,7 @@ using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Arguments
 {
-    public class CommandParser
+    public class CommandParser : ICommandParser
     {
         private readonly IParser<char, string> _verbParser;
         private readonly IParser<char, IParsedArgument> _argsParser;

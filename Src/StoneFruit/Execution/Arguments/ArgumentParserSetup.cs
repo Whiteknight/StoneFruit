@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using ParserObjects;
 using ParserObjects.Parsers;
 using StoneFruit.Execution.Scripts.Formatting;
@@ -12,16 +11,31 @@ namespace StoneFruit.Execution.Arguments
         private IParser<char, string> _verbParser;
         private IParser<char, CommandFormat> _scriptParser;
 
-        public CommandParser Build()
+        private ICommandParser _parser;
+
+        public ICommandParser Build()
         {
+            if (_parser != null)
+                return _parser;
+
             var argParser = _argParser ?? SimplifiedArgumentGrammar.GetParser();
             var verbParser = _verbParser ?? VerbGrammar.GetParser();
             var scriptParser = _scriptParser ?? ScriptFormatGrammar.CreateParser(verbParser);
             return new CommandParser(verbParser, argParser, scriptParser);
         }
 
-        // TODO: Should be able to inject the overall command parser (go from verb-object to object-verb, etc)
-        // TODO: CommandParser needs to be abstracted?
+        public IArgumentParserSetup UseParser(ICommandParser parser)
+        {
+            if (parser == null)
+            {
+                _parser = null;
+                return this;
+            }
+
+            EnsureCanSetCommandParser();
+            _parser = parser;
+            return this;
+        }
 
         public IArgumentParserSetup UseVerbParser(IParser<char, string> verbParser)
         {
@@ -31,7 +45,7 @@ namespace StoneFruit.Execution.Arguments
                 return this;
             }
 
-            EnsureVerbParserNotSet();
+            EnsureCanSetVerbParser();
             _verbParser = verbParser;
             return this;
         }
@@ -44,7 +58,7 @@ namespace StoneFruit.Execution.Arguments
                 return this;
             }
 
-            EnsureArgumentParserNotSet();
+            EnsureCanSetArgumentParser();
             _argParser = argParser;
             return this;
         }
@@ -63,27 +77,42 @@ namespace StoneFruit.Execution.Arguments
                 return this;
             }
 
-            EnsureScriptParserNotSet();
+            EnsureCanSetScriptParser();
             _scriptParser = scriptParser;
             return this;
         }
 
-        private void EnsureArgumentParserNotSet()
+        private void EnsureCanSetArgumentParser()
         {
             if (_argParser != null)
-                throw new Exception("Argument parser is already set for this builder. You cannot set a second argument parser.");
+                throw new EngineBuildException("Argument parser is already set for this builder. You cannot set a second argument parser.");
+            if (_parser != null)
+                throw new EngineBuildException("Command parser is already set for this builder. You cannot set an Argument parser and a Command parser at the same time.");
         }
 
-        private void EnsureVerbParserNotSet()
+        private void EnsureCanSetVerbParser()
         {
             if (_verbParser != null)
-                throw new Exception("Verb parser is already set for this builder. You cannot set a second verb parser.");
+                throw new EngineBuildException("Verb parser is already set for this builder. You cannot set a second verb parser.");
+            if (_parser != null)
+                throw new EngineBuildException("Command parser is already set for this builder. You cannot set a Verb parser and a Command parser at the same time.");
         }
 
-        private void EnsureScriptParserNotSet()
+        private void EnsureCanSetScriptParser()
         {
             if (_scriptParser != null)
-                throw new Exception("Script parser is already set for this builder. You cannot set a second script parser.");
+                throw new EngineBuildException("Script parser is already set for this builder. You cannot set a second script parser.");
+            if (_parser != null)
+                throw new EngineBuildException("Command parser is already set for this builder. You cannot set a Script parser and a Command parser at the same time.");
+        }
+
+
+        private void EnsureCanSetCommandParser()
+        {
+            if (_parser != null)
+                throw new EngineBuildException("Command parser is already set. You cannot set a second command parser.");
+            if (_argParser != null || _verbParser != null || _scriptParser != null)
+                throw new EngineBuildException("Cannot set Command parser if you have already set one of Verb/Argument/Script parsers");
         }
     }
 }

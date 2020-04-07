@@ -27,7 +27,7 @@ namespace StoneFruit.Execution
             _consecutiveCommands = -1;
         }
 
-        public bool VerifyCanExecuteNextCommand(CommandParser parser, IOutput output)
+        public bool VerifyCanExecuteNextCommand(ICommandParser parser, IOutput output)
         {
             var limit = _settings.MaxInputlessCommands;
             if (_consecutiveCommands < limit)

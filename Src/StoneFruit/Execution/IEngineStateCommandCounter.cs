@@ -5,6 +5,6 @@ namespace StoneFruit.Execution
     public interface IEngineStateCommandCounter
     {
         void ReceiveUserInput();
-        bool VerifyCanExecuteNextCommand(CommandParser parser, IOutput output);
+        bool VerifyCanExecuteNextCommand(ICommandParser parser, IOutput output);
     }
 }
