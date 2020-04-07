@@ -148,7 +148,7 @@ namespace StoneFruit.Execution
             var source = new CommandSourceCollection();
             source.AddToEnd(state.EventCatalog.EngineStartInteractive, _parser);
             source.AddToEnd(new PromptCommandSource(_output, _environments, state));
-            source.AddToEnd(state.EventCatalog.EngineStopInteractive, _parser);
+            //source.AddToEnd(state.EventCatalog.EngineStopInteractive, _parser);
             return RunLoop(state, dispatcher, source);
         }
 
@@ -167,7 +167,7 @@ namespace StoneFruit.Execution
             source.AddToEnd($"{EnvironmentChangeHandler.Name} {environment}");
             source.AddToEnd(state.EventCatalog.EngineStartInteractive, _parser);
             source.AddToEnd(new PromptCommandSource(_output, _environments, state));
-            source.AddToEnd(state.EventCatalog.EngineStopInteractive, _parser);
+            //source.AddToEnd(state.EventCatalog.EngineStopInteractive, _parser);
             return RunLoop(state, dispatcher, source);
         }
 
@@ -220,9 +220,6 @@ namespace StoneFruit.Execution
                     );
                     HandleError(state, e, state.EventCatalog.EngineError, args);
                 }
-
-                // TODO: If we're in interactive mode, we need to make sure we execute the
-                // EngineStopInteractive script before returning
 
                 // If exit is signaled, return. 
                 if (state.ShouldExit)

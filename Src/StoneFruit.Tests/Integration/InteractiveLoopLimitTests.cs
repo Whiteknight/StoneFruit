@@ -30,7 +30,7 @@ namespace StoneFruit.Tests.Integration
                 .SetupEvents(c =>
                 {
                     c.EngineStartInteractive.Clear();
-                    c.EngineStopInteractive.Clear();
+                    //c.EngineStopInteractive.Clear();
                 })
                 .Build();
             engine.RunInteractively();
@@ -62,7 +62,7 @@ namespace StoneFruit.Tests.Integration
                 .SetupEvents(c =>
                 {
                     c.EngineStartInteractive.Clear();
-                    c.EngineStopInteractive.Clear();
+                    //c.EngineStopInteractive.Clear();
                 })
                 .Build();
             engine.RunInteractively();

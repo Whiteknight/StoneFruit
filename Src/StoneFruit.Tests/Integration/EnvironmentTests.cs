@@ -108,7 +108,7 @@ namespace StoneFruit.Tests.Integration
                 {
                     c.EnvironmentChanged.Clear();
                     c.EngineStartInteractive.Clear();
-                    c.EngineStopInteractive.Clear();
+                    //c.EngineStopInteractive.Clear();
                 })
                 .Build();
             engine.RunInteractively("C");

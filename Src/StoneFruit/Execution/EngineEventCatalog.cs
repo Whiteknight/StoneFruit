@@ -26,7 +26,7 @@ namespace StoneFruit.Execution
                 $"{EchoHandler.Name} -nonewline color=DarkGray \" ('help' for help, 'exit' to quit)\"",
                 $"{EchoHandler.Name} ':'"
             );
-            EngineStopInteractive = new EventScript();
+            //EngineStopInteractive = new EventScript();
             
             // Event when the environment has been successfully changed
             // Has argument 'environment' with name of new environment
@@ -87,11 +87,11 @@ namespace StoneFruit.Execution
         /// </summary>
         public EventScript EngineStartInteractive { get; }
 
-        /// <summary>
-        /// The engine has ended interactive mode. This script will not usually be called because most of
-        /// the time the REPL will exit directly.
-        /// </summary>
-        public EventScript EngineStopInteractive { get; }
+        // /// <summary>
+        // /// The engine has ended interactive mode. This script will not usually be called because most of
+        // /// the time the REPL will exit directly.
+        // /// </summary>
+        //public EventScript EngineStopInteractive { get; }
         
         /// <summary>
         /// There is no handler for the specified verb.
