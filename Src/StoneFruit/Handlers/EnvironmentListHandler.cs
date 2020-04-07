@@ -22,17 +22,17 @@ namespace StoneFruit.Handlers
         public void Execute()
         {
             var highlight = new Brush(ConsoleColor.Black, ConsoleColor.Cyan);
-            foreach (var env in _environments.GetNames())
+            var envList = _environments.GetNames();
+            for (int i = 0; i < envList.Count; i++)
             {
-                _output
-                    .Color(ConsoleColor.White).Write(env.Key.ToString())
-                    .Color(ConsoleColor.DarkGray).Write(") ");
-                if (env.Value == _environments.CurrentName)
-                    _output.Color(highlight).Write(env.Value);
-                else
-                    _output.Color(ConsoleColor.Cyan).Write(env.Value);
+                var index = i + 1;
+                var env = envList[i];
 
-                _output.WriteLine();
+                _output
+                    .Color(ConsoleColor.White).Write(index.ToString())
+                    .Color(ConsoleColor.DarkGray).Write(") ")
+                    .Color(env == _environments.CurrentName ? highlight : ConsoleColor.Cyan).Write(env)
+                    .WriteLine();
             }
         }
     }

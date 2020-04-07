@@ -76,7 +76,7 @@ To prompt the user for an environment only if one is not currently set, use the 
             var environments = _environments.GetNames();
             if (environments.Count == 1)
             {
-                _environments.SetCurrent(1);
+                _environments.SetCurrent(0);
                 OnEnvironmentChanged();
                 return;
             }
@@ -122,7 +122,7 @@ To prompt the user for an environment only if one is not currently set, use the 
             // Argument is a number. Set the environment by index
             if (arg.All(char.IsDigit))
             {
-                var asInt = int.Parse(arg);
+                var asInt = int.Parse(arg) - 1;
                 if (_environments.IsValid(asInt))
                 {
                     _environments.SetCurrent(asInt);

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using StoneFruit.Utility;
 
 namespace StoneFruit
 {
@@ -8,33 +9,17 @@ namespace StoneFruit
     /// </summary>
     public interface IEnvironmentCollection
     {
-        // TODO: Can we slim down this interface at all?
-
         /// <summary>
-        /// Gets a list of valid environment names and a relative position situations which
-        /// want to refer to the environment by number
+        /// Gets a list of valid environment names
         /// </summary>
         /// <returns></returns>
-        IReadOnlyDictionary<int, string> GetNames();
-
-        /// <summary>
-        /// Get the name of the environment at the given position
-        /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        string GetName(int index);
+        IReadOnlyList<string> GetNames();
 
         /// <summary>
         /// Sets the current environment by name
         /// </summary>
         /// <param name="name"></param>
         void SetCurrent(string name);
-
-        /// <summary>
-        /// Sets the current environment by position
-        /// </summary>
-        /// <param name="index"></param>
-        void SetCurrent(int index);
 
         /// <summary>
         /// Returns the name of the current environment
@@ -49,29 +34,38 @@ namespace StoneFruit
         bool IsValid(string name);
 
         /// <summary>
-        /// Returns true if this is a valid environment position
-        /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        bool IsValid(int index);
-
-        /// <summary>
-        /// Gets the environment object for the environment of the given name
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        object Get(string name);
-
-        /// <summary>
-        /// Gets the environment object for the environment at the given position
-        /// </summary>
-        /// <param name="idx"></param>
-        /// <returns></returns>
-        object Get(int idx);
-
-        /// <summary>
         /// The current environment object, if any.
         /// </summary>
         object Current { get; }
+    }
+
+    public static class EnvironmentCollectionExtensions
+    {
+        /// <summary>
+        /// Sets the current environment by position
+        /// </summary>
+        /// <param name="environments"></param>
+        /// <param name="index"></param>
+        public static void SetCurrent(this IEnvironmentCollection environments, int index)
+        {
+            Assert.ArgumentNotNull(environments, nameof(environments));
+            var allEnvs = environments.GetNames();
+            if (index < 0 || index >= allEnvs.Count)
+                return;
+            environments.SetCurrent(allEnvs[index]);
+        }
+
+        /// <summary>
+        /// Returns true if this is a valid environment position
+        /// </summary>
+        /// <param name="environments"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public static bool IsValid(this IEnvironmentCollection environments, int index)
+        {
+            Assert.ArgumentNotNull(environments, nameof(environments));
+            var allEnvs = environments.GetNames();
+            return index >= 0 && index < allEnvs.Count;
+        }
     }
 }

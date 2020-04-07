@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Environments
 {
@@ -11,19 +12,18 @@ namespace StoneFruit.Execution.Environments
     {
         private readonly IEnvironmentFactory _environmentFactory;
         private readonly Dictionary<string, object> _namedCache;
-        private readonly Dictionary<int, string> _nameIndices;
+        private readonly IReadOnlyList<string> _nameList;
         private readonly HashSet<string> _validNames;
 
         public FactoryEnvironmentCollection(IEnvironmentFactory environmentFactory)
         {
+            Assert.ArgumentNotNull(environmentFactory, nameof(environmentFactory));
             var environments = environmentFactory.ValidEnvironments;
             if (environments == null || environments.Count == 0)
                 environments = new[] { Constants.EnvironmentNameDefault };
             _environmentFactory = environmentFactory;
             _namedCache = new Dictionary<string, object>();
-            _nameIndices = environments
-                .Select((item, index) => new { Index = index + 1, Item = item })
-                .ToDictionary(x => x.Index, x => x.Item);
+            _nameList = environments.ToList();
             _validNames = new HashSet<string>(environments);
         }
 
@@ -31,11 +31,24 @@ namespace StoneFruit.Execution.Environments
 
         public string CurrentName { get; private set; }
 
-        public IReadOnlyDictionary<int, string> GetNames() => _nameIndices;
+        public IReadOnlyList<string> GetNames() => _nameList;
 
-        public string GetName(int index) => _nameIndices.ContainsKey(index) ? _nameIndices[index] : null;
+        public bool IsValid(string name)
+        {
+            if (name == null)
+                return false;
+            return _validNames.Contains(name);
+        }
 
-        public object Get(string name)
+        public void SetCurrent(string name)
+        {
+            if (name == null)
+                return;
+            CurrentName = name;
+            Current = Get(name);
+        }
+
+        private object Get(string name)
         {
             if (name == null)
                 return default;
@@ -46,31 +59,6 @@ namespace StoneFruit.Execution.Environments
             var env = _environmentFactory.Create(name);
             _namedCache.Add(name, env);
             return env;
-        }
-
-        public object Get(int idx) => _nameIndices.ContainsKey(idx) ? Get(_nameIndices[idx]) : default;
-
-        public bool IsValid(string name)
-        {
-            if (name == null)
-                return false;
-            return _validNames.Contains(name);
-        }
-
-        public bool IsValid(int index) => _nameIndices.ContainsKey(index);
-
-        public void SetCurrent(string name)
-        {
-            if (name == null)
-                return;
-            CurrentName = name;
-            Current = Get(name);
-        }
-
-        public void SetCurrent(int index)
-        {
-            if (_nameIndices.ContainsKey(index))
-                SetCurrent(_nameIndices[index]);
         }
     }
 }

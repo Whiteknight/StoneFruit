@@ -107,7 +107,7 @@ namespace StoneFruit.Execution
 
             // Now see if the first argument is the name of an environment. If so, switch
             // to that environment and continue
-            var validEnvironments = _environments.GetNames().Values.ToList();
+            var validEnvironments = _environments.GetNames();
             if (validEnvironments.Count > 1)
             {
                 var parts = commandLine.Split(new[] { ' ' }, 2);
