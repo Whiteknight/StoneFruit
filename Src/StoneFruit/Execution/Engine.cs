@@ -204,11 +204,8 @@ namespace StoneFruit.Execution
                 // Dispatch the command to the handler, dealing with any errors
                 try
                 {
-                    // TODO: Figure out how to set this? I assume ctrl+c would break it, but we would need
-                    // to setup handlers for that throughout
-                    // TODO: Should we maybe set some kind of timeout?
-                    var tokenSource = new CancellationTokenSource();
-                    dispatcher.Execute(command, tokenSource);
+                    using var tokenSource = GetCancellation(state);
+                    dispatcher.Execute(command, tokenSource.Token);
                 }
                 catch (VerbNotFoundException vnf)
                 {
@@ -231,6 +228,15 @@ namespace StoneFruit.Execution
                 if (state.ShouldExit)
                     return state.ExitCode;
             }
+        }
+
+        private CancellationTokenSource GetCancellation(EngineState state)
+        {
+            var tokenSource = new CancellationTokenSource();
+            var timeout = state.Settings.MaxExecuteTimeout;
+            if (timeout < TimeSpan.MaxValue)
+                tokenSource.CancelAfter(timeout);
+            return tokenSource;
         }
 
         // Handle an error from the dispatcher.

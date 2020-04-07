@@ -6,7 +6,9 @@ using StoneFruit.Utility;
 namespace StoneFruit.Execution
 {
     /// <summary>
-    /// Dispatches control to the appropriate handler for a given verb.
+    /// Dispatches control to the appropriate handler for a given verb. Used by the engine
+    /// to dispatch commands and can be used from within a command to delegate to another
+    /// command without returning to the engine runloop first.
     /// </summary>
     public class CommandDispatcher
     {
@@ -49,26 +51,56 @@ namespace StoneFruit.Execution
         /// unparsed command string
         /// </summary>
         /// <param name="command"></param>
-        /// <param name="tokenSource"></param>
-        public void Execute(CommandObjectOrString command, CancellationTokenSource tokenSource = null)
+        /// <param name="token"></param>
+        public void Execute(CommandObjectOrString command, CancellationToken token = default)
         {
             Assert.ArgumentNotNull(command, nameof(command));
             if (command.Object != null)
-                Execute(command.Object, tokenSource);
+                Execute(command.Object, token);
             else if (!string.IsNullOrEmpty(command.String))
-                Execute(command.String, tokenSource);
+                Execute(command.String, token);
+        }
+
+        /// <summary>
+        /// Find and execute the appropriate handler for the given command object or
+        /// unparsed command string
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public Task ExecuteAsync(CommandObjectOrString command, CancellationToken token = default)
+        {
+            Assert.ArgumentNotNull(command, nameof(command));
+            if (command.Object != null)
+                return ExecuteAsync(command.Object, token);
+            if (!string.IsNullOrEmpty(command.String))
+                return ExecuteAsync(command.String, token);
+            return Task.CompletedTask;
         }
 
         /// <summary>
         /// Find and execute the appropriate handler for the given unparsed command string
         /// </summary>
         /// <param name="commandString"></param>
-        /// <param name="tokenSource"></param>
-        public void Execute(string commandString, CancellationTokenSource tokenSource = null)
+        /// <param name="token"></param>
+        public void Execute(string commandString, CancellationToken token = default)
         {
             Assert.ArgumentNotNullOrEmpty(commandString, nameof(commandString));
             var Command = Parser.ParseCommand(commandString);
-            Execute(Command, tokenSource);
+            Execute(Command, token);
+        }
+
+        /// <summary>
+        /// Parse the command string, find and dispatch the appropriate handler.
+        /// </summary>
+        /// <param name="commandString"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public Task ExecuteAsync(string commandString, CancellationToken token = default)
+        {
+            Assert.ArgumentNotNullOrEmpty(commandString, nameof(commandString));
+            var Command = Parser.ParseCommand(commandString);
+            return ExecuteAsync(Command, token);
         }
 
         /// <summary>
@@ -76,61 +108,75 @@ namespace StoneFruit.Execution
         /// </summary>
         /// <param name="verb"></param>
         /// <param name="args"></param>
-        /// <param name="tokenSource"></param>
-        public void Execute(string verb, IArguments args, CancellationTokenSource tokenSource = null)
+        /// <param name="token"></param>
+        public void Execute(string verb, IArguments args, CancellationToken token = default)
         {
             Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
             var command = Command.Create(verb, args);
-            Execute(command, tokenSource);
+            Execute(command, token);
+        }
+
+        /// <summary>
+        /// Find and execute the appropriate handler for the given verb and arguments
+        /// </summary>
+        /// <param name="verb"></param>
+        /// <param name="args"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public Task ExecuteAsync(string verb, IArguments args, CancellationToken token = default)
+        {
+            Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
+            var command = Command.Create(verb, args);
+            return ExecuteAsync(command, token);
+        }
+
+        // TODO: If the handler has a second Execute() method with arguments, we should attempt to invoke
+        // that version instead (converting named arguments to method arguments).
+
+        /// <summary>
+        /// Find and execute the appropriate handler for the given Command object
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="token"></param>
+        public void Execute(Command command, CancellationToken token = default)
+        {
+            Assert.ArgumentNotNull(command, nameof(command));
+            var handler = Commands.GetInstance(command, this) ?? throw new VerbNotFoundException(command.Verb);
+            if (handler is IHandler syncHandler)
+            {
+                syncHandler.Execute();
+                return;
+            }
+
+            if (handler is IAsyncHandler asyncHandler)
+            {
+                Task.Run(async () => await asyncHandler.ExecuteAsync(token), token)
+                    .ConfigureAwait(false)
+                    .GetAwaiter()
+                    .GetResult();
+            }
         }
 
         /// <summary>
         /// Find and execute the appropriate handler for the given Command object
         /// </summary>
         /// <param name="command"></param>
-        /// <param name="tokenSource"></param>
-        public void Execute(Command command, CancellationTokenSource tokenSource = null)
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public async Task ExecuteAsync(Command command, CancellationToken token = default)
         {
             Assert.ArgumentNotNull(command, nameof(command));
             var handler = Commands.GetInstance(command, this) ?? throw new VerbNotFoundException(command.Verb);
-            var syncHandler = GetSynchronousHandler(tokenSource, handler);
-            // TODO: If the handler has a second Execute() method with arguments, we should attempt to invoke
-            // that version instead (converting named arguments to method arguments).
-            syncHandler.Execute();
-        }
-
-        // TODO: Do it the other way around, convert IHandler->IAsyncHandler and invoke asynchronously
-        private static IHandler GetSynchronousHandler(CancellationTokenSource tokenSource, IHandlerBase verbObject)
-        {
-            if (verbObject is IHandler syncVerb)
-                return syncVerb;
-
-            if (verbObject is IAsyncHandler asyncHandler)
+            if (handler is IHandler syncHandler)
             {
-                tokenSource ??= new CancellationTokenSource();
-                return new AsyncDispatchHandler(asyncHandler, tokenSource);
+                syncHandler.Execute();
+                return;
             }
 
-            return null;
-        }
-
-        private class AsyncDispatchHandler : IHandler
-        {
-            private readonly IAsyncHandler _asyncHandler;
-            private readonly CancellationTokenSource _tokenSource;
-
-            public AsyncDispatchHandler(IAsyncHandler asyncHandler, CancellationTokenSource tokenSource)
+            if (handler is IAsyncHandler asyncHandler)
             {
-                _asyncHandler = asyncHandler;
-                _tokenSource = tokenSource;
-            }
-
-            public void Execute()
-            {
-                if (_asyncHandler == null)
-                    return;
-                var token = _tokenSource.Token;
-                Task.Run(async () => await _asyncHandler.ExecuteAsync(token), token).ConfigureAwait(false).GetAwaiter().GetResult();
+                await asyncHandler.ExecuteAsync(token);
+                return;
             }
         }
     }

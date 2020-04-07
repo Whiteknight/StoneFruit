@@ -42,6 +42,7 @@ namespace StoneFruit.Cli
                 })
                 .SetupSettings(s => {
                     s.MaxInputlessCommands = 3;
+                    s.MaxExecuteTimeout = TimeSpan.FromSeconds(5);
                 })
                 .Build();
             Environment.ExitCode = engine.RunInteractively();
@@ -87,10 +88,19 @@ namespace StoneFruit.Cli
 
     public class TestCHandler : IAsyncHandler
     {
-        public Task ExecuteAsync(CancellationToken cancellation)
+        public async Task ExecuteAsync(CancellationToken cancellation)
         {
-            Console.WriteLine("TESTC");
-            return Task.CompletedTask;
+            await Task.Run(() =>
+            {
+                while (!cancellation.IsCancellationRequested)
+                {
+
+                    Console.Write(".");
+                    Thread.Sleep(100);
+                }
+            });
+            Console.WriteLine("Cancelled!");
+            return;
         }
     }
 
