@@ -32,8 +32,6 @@ namespace StoneFruit.Execution
         public IEngineStateCommandCounter CommandCounter { get; set; }
         public EngineSettings Settings { get; set; }
 
-        // TODO: Some kind of global settings mechanism where the user can "set name value" and affect usage
-
         public void Exit(int exitCode = 0)
         {
             ShouldExit = true;

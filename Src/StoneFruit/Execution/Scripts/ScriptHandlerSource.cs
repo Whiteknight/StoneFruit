@@ -34,8 +34,6 @@ namespace StoneFruit.Execution.Scripts
             _scripts.Add(verb, script);
         }
 
-        // TODO: Ability to read in a script from a file
-
         public int Count => _scripts.Count;
 
         // This is going to stay a private child class because it has ugly mutable state

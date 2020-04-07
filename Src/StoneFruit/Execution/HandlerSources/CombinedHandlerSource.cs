@@ -9,7 +9,6 @@ namespace StoneFruit.Execution.HandlerSources
     /// </summary>
     public class CombinedHandlerSource : IHandlerSource
     {
-        // TODO: More unit test coverage
         private readonly List<IHandlerSource> _sources;
         private readonly Dictionary<string, string> _aliases;
 

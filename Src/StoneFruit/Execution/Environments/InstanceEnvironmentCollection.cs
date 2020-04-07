@@ -20,12 +20,10 @@ namespace StoneFruit.Execution.Environments
 
         public void SetCurrent(string name)
         {
-            // TODO: Throw something?
         }
 
         public void SetCurrent(int index)
         {
-            // TODO: Throw something?
         }
 
         public string CurrentName { get; }
