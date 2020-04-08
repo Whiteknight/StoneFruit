@@ -9,7 +9,7 @@ namespace StoneFruit
 {
     public interface IHandlerSetup
     {
-        // TODO: Some kind of mechanism for a verb to invoke an external application
+        // TODO V2: Some kind of mechanism for a verb to invoke an external application
 
         /// <summary>
         /// Add a handler source where handlers can be looked up

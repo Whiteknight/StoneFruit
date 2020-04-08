@@ -3,8 +3,6 @@ using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.Handlers
 {
-    // TODO: Additional commands to show a list of existing metadata keys and get the .ToString version of
-    // a single key
     [Verb(Name, false)]
     public class MetadataRemoveHandler : IHandler
     {

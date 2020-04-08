@@ -47,9 +47,7 @@ namespace StoneFruit
         /// <returns></returns>
         string Prompt(string prompt, bool mustProvide = true, bool keepHistory = true);
 
-        // TODO: We need some kind of mechanism to synchronize in case we have multiple threads
-        // writing complex multi-color or multi-line outputs without smashing each other. Some kind of
-        // transaction abstraction, or a global output lock, or something will help here.
+        // TODO V2: Synchronize across multiple outputting threads.
     }
 
     public static class OutputExtensions

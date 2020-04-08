@@ -32,7 +32,6 @@ Loads the contents of the file and treats each line as a separate command to exe
             if (!File.Exists(scriptName))
                 throw new Exception("File does not exist");
 
-            // TODO: Some kind of comment syntax? Maybe we can cover that in the command parser?
             var contents = File.ReadAllLines(scriptName)
                 .Where(s => !string.IsNullOrWhiteSpace(s))
                 .ToArray();

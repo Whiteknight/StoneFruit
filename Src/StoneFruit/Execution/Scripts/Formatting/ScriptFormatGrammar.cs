@@ -12,16 +12,8 @@ namespace StoneFruit.Execution.Scripts.Formatting
     {
         public static IParser<char, CommandFormat> CreateParser(IParser<char, string> verb)
         {
-            // We'll parse like simplified, with extensions as follows:
-            // test a b=c -d
-            // becomes:
-            // test [0] {b} <d>     (first positional, named "b", flag "d")
-            // test a b=["b"] -d    (literal "a", "b"= value of "b", literal "-d")
-            // test a b=c -d        (literal "a", literal "b=c", literal "-d")
-            // test [*] {*} <*>     (all unused positionals, all unused nameds, all unused flags)
-
-            // TODO: A way to either require an arg (and throw an error if it's not provided) and/or a way to provide a default value if the arg is missing
-            // postfix '!' syntax might work.
+            // TODO V2: A way to require an arg (and throw an error if it's not provided)
+            // TODO V2: A way to provide a default value if what we're looking for is missing
 
             var doubleQuotedString = StrippedDoubleQuotedString();
 
@@ -58,7 +50,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 (start, name) => new LiteralFlagArgumentAccessor(name)
             );
 
-            // TODO: Some ability to rename a flag?
+            // TODO V2: Some ability to rename a flag?
             // Fetch a flag from the input and reproduce it on the output if it exists
             // fetchFlagArg := '?' <name>
             var fetchFlagArg = Rule(

@@ -34,7 +34,7 @@ namespace StoneFruit.Utility
             if (_dispatcher.Environments?.Current?.GetType() != null && type == _dispatcher.Environments.Current.GetType())
                 return _dispatcher.Environments.Current;
 
-            // TODO: If we don't have it by name look it up by index
+            // TODO V2: If we don't have it by name look it up by index
             if (type == typeof(string))
                 return _command.Arguments.Get(name).AsString();
             if (type == typeof(int))
