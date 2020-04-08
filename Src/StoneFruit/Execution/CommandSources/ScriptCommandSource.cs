@@ -9,7 +9,7 @@ namespace StoneFruit.Execution.CommandSources
     /// </summary>
     public class ScriptCommandSource : ICommandSource
     {
-        private readonly CommandObjectOrString[] _script;
+        private readonly CommandOrString[] _script;
         private int _index;
 
         public ScriptCommandSource(EventScript script, ICommandParser parser, params IArgument[] args)
@@ -23,7 +23,7 @@ namespace StoneFruit.Execution.CommandSources
             _index = 0;
         }
 
-        public CommandObjectOrString GetNextCommand()
+        public CommandOrString GetNextCommand()
         {
             if (_index >= _script.Length)
                 return null;

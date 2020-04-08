@@ -90,8 +90,6 @@ namespace StoneFruit.Execution.Arguments
             throw new CommandArgumentException(sb.ToString());
         }
 
-        // TODO: Method to create a sub-CommandArguments instance with some arguments added/removed
-
         /// <summary>
         /// Resets the Consumed state of all arguments
         /// </summary>

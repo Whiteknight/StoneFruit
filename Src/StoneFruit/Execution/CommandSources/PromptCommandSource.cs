@@ -16,11 +16,11 @@
             _state = state;
         }
 
-        public CommandObjectOrString GetNextCommand()
+        public CommandOrString GetNextCommand()
         {
             var str = _output.Prompt($"{_environments.CurrentName}");
             _state.CommandCounter.ReceiveUserInput();
-            return CommandObjectOrString.FromString(str);
+            return str;
         }
     }
 }

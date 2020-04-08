@@ -5,21 +5,21 @@ namespace StoneFruit.Execution
 {
     public class EngineStateCommandQueue
     {
-        private readonly LinkedList<CommandObjectOrString> _additionalCommands;
+        private readonly LinkedList<CommandOrString> _additionalCommands;
 
         public EngineStateCommandQueue()
         {
-            _additionalCommands = new LinkedList<CommandObjectOrString>();
+            _additionalCommands = new LinkedList<CommandOrString>();
         }
 
         public void Append(string command)
         {
-            _additionalCommands.AddLast(CommandObjectOrString.FromString(command));
+            _additionalCommands.AddLast(command);
         }
 
         public void Append(Command command)
         {
-            _additionalCommands.AddLast(CommandObjectOrString.FromObject(command));
+            _additionalCommands.AddLast(command);
         }
 
         public void Append(IEnumerable<string> commands)
@@ -32,10 +32,10 @@ namespace StoneFruit.Execution
         {
             var list = commands.ToList();
             for (int i = list.Count - 1; i >= 0; i--)
-                _additionalCommands.AddFirst(CommandObjectOrString.FromString(list[i]));
+                _additionalCommands.AddFirst(list[i]);
         }
 
-        public void Prepend(IEnumerable<CommandObjectOrString> commands)
+        public void Prepend(IEnumerable<CommandOrString> commands)
         {
             var list = commands.ToList();
             for (int i = list.Count - 1; i >= 0; i--)
@@ -44,15 +44,15 @@ namespace StoneFruit.Execution
 
         public void Prepend(string command)
         {
-            _additionalCommands.AddFirst(CommandObjectOrString.FromString(command));
+            _additionalCommands.AddFirst(command);
         }
 
         public void Prepend(Command command)
         {
-            _additionalCommands.AddFirst(CommandObjectOrString.FromObject(command));
+            _additionalCommands.AddFirst(command);
         }
 
-        public CommandObjectOrString GetNext()
+        public CommandOrString GetNext()
         {
             if (_additionalCommands.Count == 0)
                 return null;

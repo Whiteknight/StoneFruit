@@ -24,7 +24,5 @@
         /// Whether or not to show the verb in the list when executing "help"
         /// </summary>
         bool ShouldShowInHelp { get; }
-
-        // TODO: Should we show more info here, such as the nature of the handler or the type of the source?
     }
 }

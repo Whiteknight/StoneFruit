@@ -52,7 +52,7 @@ namespace StoneFruit.Execution
         /// </summary>
         /// <param name="command"></param>
         /// <param name="token"></param>
-        public void Execute(CommandObjectOrString command, CancellationToken token = default)
+        public void Execute(CommandOrString command, CancellationToken token = default)
         {
             Assert.ArgumentNotNull(command, nameof(command));
             if (command.Object != null)
@@ -68,7 +68,7 @@ namespace StoneFruit.Execution
         /// <param name="command"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        public Task ExecuteAsync(CommandObjectOrString command, CancellationToken token = default)
+        public Task ExecuteAsync(CommandOrString command, CancellationToken token = default)
         {
             Assert.ArgumentNotNull(command, nameof(command));
             if (command.Object != null)
@@ -130,7 +130,7 @@ namespace StoneFruit.Execution
             return ExecuteAsync(command, token);
         }
 
-        // TODO: If the handler has a second Execute() method with arguments, we should attempt to invoke
+        // TODO V2: If the handler has a second Execute() method with arguments, we should attempt to invoke
         // that version instead (converting named arguments to method arguments).
 
         /// <summary>

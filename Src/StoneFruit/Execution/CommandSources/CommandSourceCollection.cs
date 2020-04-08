@@ -45,7 +45,7 @@ namespace StoneFruit.Execution.CommandSources
             _sources.AddFirst(source);
         }
 
-        public CommandObjectOrString GetNextCommand()
+        public CommandOrString GetNextCommand()
         {
             while (true)
             {
