@@ -21,6 +21,8 @@ namespace StoneFruit.Execution
 
         public string String { get; }
 
+        public bool IsValid => !string.IsNullOrEmpty(String) || Object != null;
+
         public static implicit operator CommandOrString(string s) 
             => new CommandOrString(s);
 

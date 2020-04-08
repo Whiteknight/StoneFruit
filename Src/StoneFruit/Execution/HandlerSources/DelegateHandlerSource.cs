@@ -10,7 +10,6 @@ namespace StoneFruit.Execution.HandlerSources
     /// </summary>
     public class DelegateHandlerSource : IHandlerSource
     {
-        // TODO: Unit tests
         private readonly Dictionary<string, HandlerFactory> _handlers;
 
         public DelegateHandlerSource()

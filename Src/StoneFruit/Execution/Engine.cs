@@ -194,7 +194,7 @@ namespace StoneFruit.Execution
                 // Get a command. If we have one in the state use that. Otherwise try to
                 // get one from the sources.
                 var command = state.Commands.GetNext() ?? sources.GetNextCommand();
-                if (command == null)
+                if (command == null || !command.IsValid)
                     return Constants.ExitCodeOk;
 
                 var canExecute = state.CommandCounter.VerifyCanExecuteNextCommand(_parser, _output);
