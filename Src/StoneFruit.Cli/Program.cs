@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using StoneFruit.Containers.Lamar;
+using StoneFruit.Containers.Ninject;
+using StoneFruit.Containers.StructureMap;
 using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.Cli
@@ -18,9 +20,9 @@ namespace StoneFruit.Cli
 
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
-                    .UseLamarHandlerSource<object>()
+                    //.UseLamarHandlerSource<object>()
                     //.UseNinjectHandlerSource()
-                    //.UseStructureMapHandlerSource()
+                    .UseStructureMapHandlerSource()
                     //.UseCommands(typeof(HelpCommand), typeof(ExitCommand))
                     .UsePublicMethodsAsHandlers(new MyObject())
                     .Add("testf", (c, d) => d.Output.WriteLine("F"))
@@ -66,7 +68,7 @@ namespace StoneFruit.Cli
     {
         private readonly TestArgsA _args;
 
-        public TestAHandler(CommandParser parser)
+        public TestAHandler(ICommandParser parser)
         {
             _args = parser.ParseArguments("x y z").MapTo<TestArgsA>();
         }

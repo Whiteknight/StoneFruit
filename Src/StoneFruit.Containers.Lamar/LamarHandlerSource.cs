@@ -22,7 +22,7 @@ namespace StoneFruit.Containers.Lamar
             registry.Injectable<IEnvironmentCollection>();
             registry.Injectable<EngineState>();
             registry.Injectable<IOutput>();
-            registry.Injectable<CommandParser>();
+            registry.Injectable<ICommandParser>();
             registry.Injectable<IHandlerSource>();
             registry.Injectable<Command>();
             registry.Injectable<IArguments>();

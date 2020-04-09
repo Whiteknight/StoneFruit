@@ -41,12 +41,11 @@ namespace StoneFruit.Utility
                     .Distinct();
             }
 
-            // TODO: Would like to convert CamelCase to spinal-case
             var name = type.Name
-                .ToLowerInvariant()
                 .RemoveSuffix("verb")
                 .RemoveSuffix("command")
                 .RemoveSuffix("handler")
+                .CamelCaseToSpinalCase()
                 ;
             return new[] { name };
         }
