@@ -5,7 +5,9 @@ using System.Text;
 namespace StoneFruit.Execution.Arguments
 {
     /// <summary>
-    /// Args object built from pre-existing arguments which are unambiguous
+    /// Args object built from pre-existing arguments which are unambiguous. This is an
+    /// optimization over the ParsedArguments because we don't have to keep track of
+    /// ambiguous cases.
     /// </summary>
     public class SyntheticArguments : IArguments
     {
@@ -36,20 +38,34 @@ namespace StoneFruit.Execution.Arguments
         /// </summary>
         public string Raw => string.Empty;
 
+        /// <summary>
+        /// Create an empty arguments object
+        /// </summary>
+        /// <returns></returns>
         public static SyntheticArguments Empty() => new SyntheticArguments(new IArgument[0]);
 
+        /// <summary>
+        /// Create named arguments from a list of name/value tuples
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static SyntheticArguments From(params (string, string)[] args)
         {
             var argsList = args
-                .Select(t => new NamedArgumentAccessor(t.Item1, t.Item2))
+                .Select(t => new NamedArgument(t.Item1, t.Item2))
                 .ToList();
             return new SyntheticArguments(argsList);
         }
 
+        /// <summary>
+        /// Create named arguments from a dictionary of name/value pairs
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static SyntheticArguments From(IReadOnlyDictionary<string, string> args)
         {
             var argsList = args
-                .Select(kvp => new NamedArgumentAccessor(kvp.Key, kvp.Value))
+                .Select(kvp => new NamedArgument(kvp.Key, kvp.Value))
                 .ToList();
             return new SyntheticArguments(argsList);
         }
@@ -60,7 +76,7 @@ namespace StoneFruit.Execution.Arguments
         /// <param name="arg"></param>
         /// <returns></returns>
         public static SyntheticArguments Single(string arg)
-            => new SyntheticArguments(new IArgument[] { new PositionalArgumentAccessor(arg) });
+            => new SyntheticArguments(new IArgument[] { new PositionalArgument(arg) });
 
         public void VerifyAllAreConsumed()
         {
@@ -79,9 +95,9 @@ namespace StoneFruit.Execution.Arguments
             {
                 var str = u switch
                 {
-                    PositionalArgumentAccessor p => p.AsString(),
-                    NamedArgumentAccessor n => $"'{n.Name}' = {n.AsString()}",
-                    FlagArgumentAccessor f => $"flag {f.Name}",
+                    PositionalArgument p => p.AsString(),
+                    NamedArgument n => $"'{n.Name}' = {n.AsString()}",
+                    FlagArgument f => $"flag {f.Name}",
                     _ => "Unknown"
                 };
                 sb.AppendLine(str);
@@ -90,9 +106,6 @@ namespace StoneFruit.Execution.Arguments
             throw new CommandArgumentException(sb.ToString());
         }
 
-        /// <summary>
-        /// Resets the Consumed state of all arguments
-        /// </summary>
         public void ResetAllArguments()
         {
             foreach (var p in _positionals)
@@ -103,10 +116,6 @@ namespace StoneFruit.Execution.Arguments
                 f.MarkConsumed(false);
         }
 
-        /// <summary>
-        /// Get the next positional value
-        /// </summary>
-        /// <returns></returns>
         public IPositionalArgument Shift()
         {
             if (_positionals.Count <= _accessedShiftIndex)

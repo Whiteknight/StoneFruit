@@ -22,7 +22,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
             if (!flag.Exists())
                 return Enumerable.Empty<IArgument>();
             flag.MarkConsumed();
-            return new [] { new FlagArgumentAccessor(_name) };
+            return new [] { new FlagArgument(_name) };
         }
     }
 }

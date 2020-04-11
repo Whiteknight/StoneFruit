@@ -50,7 +50,7 @@ namespace StoneFruit.Execution.Arguments
                 whitespace,
                 values,
 
-                (s, name, e, value) => new FlagPositionalOrNamedArgument(name, value)
+                (s, name, e, value) => new ParsedFlagPositionalOrNamedArgument(name, value)
             );
 
             // '-' <name>
@@ -58,14 +58,16 @@ namespace StoneFruit.Execution.Arguments
                 Match('-'),
                 names,
 
-                (s, name) => new FlagArgument(name)
+                (s, name) => new ParsedFlagArgument(name)
             );
+
+            // TODO: Some powershell commandlets also seem to support "'--' <name>" for flags and named args
 
             // <named> | <longFlag> | <positional>
             var args = First<char, IParsedArgument>(
                 namedArg,
                 longFlagArg,
-                values.Transform(v => new PositionalArgument(v))
+                values.Transform(v => new ParsedPositionalArgument(v))
             );
 
             var whitespaceAndArgs = Rule(

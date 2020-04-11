@@ -25,7 +25,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
             if (!arg.Exists())
                 return Enumerable.Empty<IArgument>();
             arg.MarkConsumed();
-            return new [] { new NamedArgumentAccessor(_newName, arg.AsString(string.Empty)),  };
+            return new [] { new NamedArgument(_newName, arg.AsString(string.Empty)),  };
         }
     }
 }

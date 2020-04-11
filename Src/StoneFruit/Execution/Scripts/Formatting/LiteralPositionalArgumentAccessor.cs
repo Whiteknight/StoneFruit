@@ -16,6 +16,6 @@ namespace StoneFruit.Execution.Scripts.Formatting
         }
 
         public IEnumerable<IArgument> Access(IArguments args) 
-            => new [] { new PositionalArgumentAccessor(_value) };
+            => new [] { new PositionalArgument(_value) };
     }
 }

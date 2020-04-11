@@ -45,22 +45,24 @@ namespace StoneFruit.Execution.Arguments
                 Match(':'),
                 value,
 
-                (s, n, e, v) => new NamedArgument(n, v)
+                (s, n, e, v) => new ParsedNamedArgument(n, v)
             );
+
+            // TODO: We also have "'/' <name> <ws> <value>" as possibly representing a named case
 
             // '/' <name>
             var flagArg = Rule(
                 Match('/'),
                 name,
 
-                (s, n) => new FlagArgument(n)
+                (s, n) => new ParsedFlagArgument(n)
             );
 
             // <named> | <flag> | <positional>
             var args = First<char, IParsedArgument>(
                 namedArg,
                 flagArg,
-                value.Transform(v => new PositionalArgument(v))
+                value.Transform(v => new ParsedPositionalArgument(v))
             );
 
             return Rule(

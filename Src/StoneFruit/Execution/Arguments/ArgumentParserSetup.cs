@@ -5,6 +5,9 @@ using StoneFruit.Execution.Scripts.Formatting;
 
 namespace StoneFruit.Execution.Arguments
 {
+    /// <summary>
+    /// Sets up the parsers
+    /// </summary>
     public class ArgumentParserSetup : IArgumentParserSetup
     {
         private IParser<char, IParsedArgument> _argParser;

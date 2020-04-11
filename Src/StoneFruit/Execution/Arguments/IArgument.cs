@@ -29,6 +29,9 @@ namespace StoneFruit.Execution.Arguments
         IArgument MarkConsumed(bool consumed = true);
     }
 
+    /// <summary>
+    /// Represents an argument with a value
+    /// </summary>
     public interface IValuedArgument : IArgument
     {
         /// <summary>
@@ -68,10 +71,16 @@ namespace StoneFruit.Execution.Arguments
         long AsLong(long defaultValue = 0L);
     }
 
+    /// <summary>
+    /// A positional argument is a value argument with no name
+    /// </summary>
     public interface IPositionalArgument : IValuedArgument
     {
     }
 
+    /// <summary>
+    /// A named argument is a value argument with a name
+    /// </summary>
     public interface INamedArgument : IValuedArgument
     {
         /// <summary>
@@ -80,6 +89,9 @@ namespace StoneFruit.Execution.Arguments
         string Name { get; }
     }
 
+    /// <summary>
+    /// A flag argument is an argument with a name but no value
+    /// </summary>
     public interface IFlagArgument : IArgument
     {
         /// <summary>

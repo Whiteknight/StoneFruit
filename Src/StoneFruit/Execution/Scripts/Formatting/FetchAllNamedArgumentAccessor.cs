@@ -15,7 +15,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
             foreach (var named in args.GetAllNamed())
             {
                 named.MarkConsumed();
-                results.Add(new NamedArgumentAccessor(named.Name, named.Value));
+                results.Add(new NamedArgument(named.Name, named.Value));
             }
 
             return results;

@@ -7,6 +7,10 @@ using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Arguments
 {
+    /// <summary>
+    /// Default ICommandParser implementation which controls parsing commands, arguments
+    /// and scripts
+    /// </summary>
     public class CommandParser : ICommandParser
     {
         private readonly IParser<char, string> _verbParser;
@@ -24,6 +28,10 @@ namespace StoneFruit.Execution.Arguments
             _scriptParser = scriptParser;
         }
 
+        /// <summary>
+        /// Get the default CommandParser instance with default parser objects configured
+        /// </summary>
+        /// <returns></returns>
         public static CommandParser GetDefault()
         {
             var verbParser = VerbGrammar.GetParser();
@@ -32,6 +40,13 @@ namespace StoneFruit.Execution.Arguments
             return new CommandParser(verbParser, argParser, scriptParser);
         }
 
+        /// <summary>
+        /// Parse a Command from a line of text using the given parser objects
+        /// </summary>
+        /// <param name="verbs"></param>
+        /// <param name="args"></param>
+        /// <param name="line"></param>
+        /// <returns></returns>
         public static Command ParseCommand(IParser<char, string> verbs, IParser<char, IParsedArgument> args, string line)
         {
             var sequence = new StringCharacterSequence(line);
@@ -50,7 +65,15 @@ namespace StoneFruit.Execution.Arguments
 
         public Command ParseCommand(string line) => ParseCommand(_verbParser, _argsParser, line);
 
-        public IArguments ParseArguments(string args) => _argsParser.ParseArguments(args);
+        public IArguments ParseArguments(string args)
+        {
+            if (string.IsNullOrEmpty(args))
+                return SyntheticArguments.Empty();
+
+            var sequence = new StringCharacterSequence(args);
+            var argsList = _argsParser.List().Parse(sequence).Value.ToList();
+            return new ParsedArguments(args, argsList);
+        }
 
         public CommandFormat ParseScript(string script)
         {

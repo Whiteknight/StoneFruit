@@ -55,10 +55,10 @@ namespace StoneFruit.Execution.Arguments
                 .Where(a => a != null)
                 .Select(u => u switch
                 {
-                    PositionalArgument p => p.Value,
-                    NamedArgument n => $"'{n.Name}' = {n.Value}",
-                    FlagArgument f => $"flag {f.Name}",
-                    FlagPositionalOrNamedArgument fp => $"'{fp.Name}', {fp.Value}",
+                    ParsedPositionalArgument p => p.Value,
+                    ParsedNamedArgument n => $"'{n.Name}' = {n.Value}",
+                    ParsedFlagArgument f => $"flag {f.Name}",
+                    ParsedFlagPositionalOrNamedArgument fp => $"'{fp.Name}', {fp.Value}",
                     _ => "Unknown"
                 });
 
@@ -132,21 +132,21 @@ namespace StoneFruit.Execution.Arguments
             {
                 var i = _lastRawPositionalIndex;
                 var arg = _rawArguments[i];
-                if (arg is PositionalArgument pa)
+                if (arg is ParsedPositionalArgument pa)
                 {
-                    var accessor = new PositionalArgumentAccessor(pa.Value);
+                    var accessor = new PositionalArgument(pa.Value);
                     _rawArguments[i] = null;
                     _accessedPositionals.Add(accessor);
                     if (match())
                         return accessor;
                 }
 
-                if (arg is FlagPositionalOrNamedArgument fp)
+                if (arg is ParsedFlagPositionalOrNamedArgument fp)
                 {
-                    var accessor = new PositionalArgumentAccessor(fp.Value);
+                    var accessor = new PositionalArgument(fp.Value);
                     _accessedPositionals.Add(accessor);
                     // Replace the Flag+Positional arg with just a flag, the positional is consumed
-                    var flag = new FlagArgument(fp.Name);
+                    var flag = new ParsedFlagArgument(fp.Name);
                     _rawArguments[i] = flag;
                     if (match())
                         return accessor;
@@ -197,22 +197,22 @@ namespace StoneFruit.Execution.Arguments
             for (int i = 0; i < _rawArguments.Count; i++)
             {
                 var arg = _rawArguments[i];
-                if (arg is NamedArgument n)
+                if (arg is ParsedNamedArgument n)
                 {
                     if (!shouldAccess(n.Name))
                         continue;
-                    var accessor = new NamedArgumentAccessor(n.Name, n.Value);
+                    var accessor = new NamedArgument(n.Name, n.Value);
                     _rawArguments[i] = null;
                     AccessNamed(accessor);
                     if (isComplete())
                         return accessor;
                 }
 
-                if (arg is FlagPositionalOrNamedArgument n2)
+                if (arg is ParsedFlagPositionalOrNamedArgument n2)
                 {
                     if (!shouldAccess(n2.Name))
                         continue;
-                    var accessor = new NamedArgumentAccessor(n2.Name, n2.Value);
+                    var accessor = new NamedArgument(n2.Name, n2.Value);
                     _rawArguments[i] = null;
                     AccessNamed(accessor);
                     if (isComplete())
@@ -223,7 +223,7 @@ namespace StoneFruit.Execution.Arguments
             return null;
         }
 
-        private void AccessNamed(NamedArgumentAccessor n)
+        private void AccessNamed(NamedArgument n)
         {
             if (!_accessedNameds.ContainsKey(n.Name))
                 _accessedNameds.Add(n.Name, new List<INamedArgument>());
@@ -264,24 +264,24 @@ namespace StoneFruit.Execution.Arguments
             for (int i = 0; i < _rawArguments.Count; i++)
             {
                 var arg = _rawArguments[i];
-                if (arg is FlagArgument f)
+                if (arg is ParsedFlagArgument f)
                 {
                     if (!isMatch(f.Name))
                         continue;
-                    var accessor = new FlagArgumentAccessor(f.Name);
+                    var accessor = new FlagArgument(f.Name);
                     _rawArguments[i] = null;
                     _accessedFlags.Add(f.Name, accessor);
                     if (isComplete())
                         return accessor;
                 }
 
-                if (arg is FlagPositionalOrNamedArgument fp)
+                if (arg is ParsedFlagPositionalOrNamedArgument fp)
                 {
                     if (!isMatch(fp.Name))
                         continue;
-                    var accessor = new FlagArgumentAccessor(fp.Name);
+                    var accessor = new FlagArgument(fp.Name);
                     _accessedFlags.Add(fp.Name, accessor);
-                    _rawArguments[i] = new PositionalArgument(fp.Value);
+                    _rawArguments[i] = new ParsedPositionalArgument(fp.Value);
                     if (isComplete())
                         return accessor;
                 }

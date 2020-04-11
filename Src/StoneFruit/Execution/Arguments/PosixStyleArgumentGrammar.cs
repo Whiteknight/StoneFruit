@@ -51,7 +51,7 @@ namespace StoneFruit.Execution.Arguments
                 Match('='),
                 value,
 
-                (s, n, e, v) => new IParsedArgument[] { new NamedArgument(n, v) }
+                (s, n, e, v) => new IParsedArgument[] { new ParsedNamedArgument(n, v) }
             );
 
             // '--' <name> <ws> <value>
@@ -61,7 +61,7 @@ namespace StoneFruit.Execution.Arguments
                 whitespace,
                 value,
 
-                (s, n, e, v) => new IParsedArgument[] { new FlagPositionalOrNamedArgument(n, v) }
+                (s, n, e, v) => new IParsedArgument[] { new ParsedFlagPositionalOrNamedArgument(n, v) }
             );
 
             // '--' <name>
@@ -69,7 +69,7 @@ namespace StoneFruit.Execution.Arguments
                 doubleDash,
                 name,
 
-                (s, n) => new IParsedArgument[] { new FlagArgument(n) }
+                (s, n) => new IParsedArgument[] { new ParsedFlagArgument(n) }
             );
 
             // We include this case because some short args with a positional following, are treated like
@@ -81,7 +81,7 @@ namespace StoneFruit.Execution.Arguments
                 whitespace,
                 value,
 
-                (dash, n, ws, v) => new IParsedArgument[] { new FlagPositionalOrNamedArgument(n, v) }
+                (dash, n, ws, v) => new IParsedArgument[] { new ParsedFlagPositionalOrNamedArgument(n, v) }
             );
 
             // '-' <char>*
@@ -89,10 +89,10 @@ namespace StoneFruit.Execution.Arguments
                 singleDash,
                 singleIdChar.List(true),
 
-                (s, n) => n.Select(x => new FlagArgument(x.ToString()))
+                (s, n) => n.Select(x => new ParsedFlagArgument(x.ToString()))
             );
 
-            var positional = value.Transform(v => new IParsedArgument[] { new PositionalArgument(v) });
+            var positional = value.Transform(v => new IParsedArgument[] { new ParsedPositionalArgument(v) });
 
             // <named> | <longFlag> | <shortFlag> | <positional>
             var args = First<char, IEnumerable<IParsedArgument>>(

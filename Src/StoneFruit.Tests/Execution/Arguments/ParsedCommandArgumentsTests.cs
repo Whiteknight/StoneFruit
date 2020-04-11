@@ -13,8 +13,8 @@ namespace StoneFruit.Tests.Execution.Arguments
         {
             var target = new ParsedArguments(new[]
             {
-                new NamedArgument("a", "1"),
-                new NamedArgument("a", "2")
+                new ParsedNamedArgument("a", "1"),
+                new ParsedNamedArgument("a", "2")
             });
             var result = target.Get("a");
             result.Value.Should().Be("1");
@@ -33,8 +33,8 @@ namespace StoneFruit.Tests.Execution.Arguments
         {
             var target = new ParsedArguments(new[]
             {
-                new PositionalArgument("a"),
-                new PositionalArgument("b")
+                new ParsedPositionalArgument("a"),
+                new ParsedPositionalArgument("b")
             });
             target.Shift().Value.Should().Be("a");
             target.Shift().Value.Should().Be("b");
@@ -46,8 +46,8 @@ namespace StoneFruit.Tests.Execution.Arguments
         {
             var target = new ParsedArguments(new[]
             {
-                new NamedArgument("a", "1"),
-                new NamedArgument("a", "2")
+                new ParsedNamedArgument("a", "1"),
+                new ParsedNamedArgument("a", "2")
             });
             var result = target.GetAll("a").Cast<INamedArgument>().ToList();
             result.Count.Should().Be(2);
@@ -60,8 +60,8 @@ namespace StoneFruit.Tests.Execution.Arguments
         {
             var target = new ParsedArguments(new[]
             {
-                new NamedArgument("a", "1"),
-                new NamedArgument("a", "2")
+                new ParsedNamedArgument("a", "1"),
+                new ParsedNamedArgument("a", "2")
             });
             var result = target.GetAll("XXX").ToList();
             result.Count.Should().Be(0);
@@ -84,9 +84,9 @@ namespace StoneFruit.Tests.Execution.Arguments
         {
             var target = new ParsedArguments(new IParsedArgument[]
             {
-                new PositionalArgument("test1"),
-                new NamedArgument("b", "test2"),
-                new FlagArgument("c")
+                new ParsedPositionalArgument("test1"),
+                new ParsedNamedArgument("b", "test2"),
+                new ParsedFlagArgument("c")
             });
             var result = target.MapTo<TestArgs1>();
             result.A.Should().Be("test1");
@@ -100,9 +100,9 @@ namespace StoneFruit.Tests.Execution.Arguments
         {
             var target = new ParsedArguments(new IParsedArgument[]
             {
-                new PositionalArgument("test1"),
-                new NamedArgument("b", "test2"),
-                new FlagArgument("c")
+                new ParsedPositionalArgument("test1"),
+                new ParsedNamedArgument("b", "test2"),
+                new ParsedFlagArgument("c")
             });
             Action act = () => target.VerifyAllAreConsumed();
             act.Should().Throw<CommandArgumentException>();
@@ -113,9 +113,9 @@ namespace StoneFruit.Tests.Execution.Arguments
         {
             var target = new ParsedArguments(new IParsedArgument[]
             {
-                new PositionalArgument("test1"),
-                new NamedArgument("b", "test2"),
-                new FlagArgument("c")
+                new ParsedPositionalArgument("test1"),
+                new ParsedNamedArgument("b", "test2"),
+                new ParsedFlagArgument("c")
             });
             target.Get(0);
             target.Get("b");
@@ -129,9 +129,9 @@ namespace StoneFruit.Tests.Execution.Arguments
         {
             var target = new ParsedArguments(new IParsedArgument[]
             {
-                new PositionalArgument("test1"),
-                new NamedArgument("b", "test2"),
-                new FlagArgument("c")
+                new ParsedPositionalArgument("test1"),
+                new ParsedNamedArgument("b", "test2"),
+                new ParsedFlagArgument("c")
             });
             target.Consume(0);
             target.Consume("b");

@@ -22,7 +22,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         public void Positionals_Tests()
         {
             var parser = GetParser();
-            var result = parser.Parse("testa").Value as PositionalArgument;
+            var result = parser.Parse("testa").Value as ParsedPositionalArgument;
             result.Value.Should().Be("testa");
         }
 
@@ -30,7 +30,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         public void Positionals_SingleQuotedString()
         {
             var parser = GetParser();
-            var result = parser.Parse("'test a'").Value as PositionalArgument;
+            var result = parser.Parse("'test a'").Value as ParsedPositionalArgument;
             result.Value.Should().Be("test a");
         }
 
@@ -38,7 +38,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         public void Positionals_DoubleQuotedString()
         {
             var parser = GetParser();
-            var result = parser.Parse("\"test a\"").Value as PositionalArgument;
+            var result = parser.Parse("\"test a\"").Value as ParsedPositionalArgument;
             result.Value.Should().Be("test a");
         }
 
@@ -46,7 +46,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         public void Positionals_LeadingWhitespace()
         {
             var parser = GetParser();
-            var result = parser.Parse("   testa").Value as PositionalArgument;
+            var result = parser.Parse("   testa").Value as ParsedPositionalArgument;
             result.Value.Should().Be("testa");
         }
 
@@ -54,7 +54,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         public void Named_Tests()
         {
             var parser = GetParser();
-            var result = parser.Parse("name1=value1").Value as NamedArgument;
+            var result = parser.Parse("name1=value1").Value as ParsedNamedArgument;
             result.Name.Should().Be("name1");
             result.Value.Should().Be("value1");
         }
@@ -63,7 +63,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         public void Named_LeadingWhitespace()
         {
             var parser = GetParser();
-            var result = parser.Parse("    name1=value1").Value as NamedArgument;
+            var result = parser.Parse("    name1=value1").Value as ParsedNamedArgument;
             result.Name.Should().Be("name1");
             result.Value.Should().Be("value1");
         }
@@ -72,7 +72,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         public void Named_SingleQuotedValue()
         {
             var parser = GetParser();
-            var result = parser.Parse("name1='value1'").Value as NamedArgument;
+            var result = parser.Parse("name1='value1'").Value as ParsedNamedArgument;
             result.Name.Should().Be("name1");
             result.Value.Should().Be("value1");
         }
@@ -81,7 +81,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         public void Named_DoubleQuotedValue()
         {
             var parser = GetParser();
-            var result = parser.Parse("name1=\"value1\"").Value as NamedArgument;
+            var result = parser.Parse("name1=\"value1\"").Value as ParsedNamedArgument;
             result.Name.Should().Be("name1");
             result.Value.Should().Be("value1");
         }
@@ -90,7 +90,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         public void Flags_Tests()
         {
             var parser = GetParser();
-            var result = parser.Parse("-testa").Value as FlagArgument;
+            var result = parser.Parse("-testa").Value as ParsedFlagArgument;
             result.Name.Should().Be("testa");
         }
     }

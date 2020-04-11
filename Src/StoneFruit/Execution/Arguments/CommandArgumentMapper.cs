@@ -3,8 +3,18 @@ using System.Reflection;
 
 namespace StoneFruit.Execution.Arguments
 {
+    /// <summary>
+    /// Map argument values onto the public properties of an object by name
+    /// </summary>
     public static class CommandArgumentMapper
     {
+        /// <summary>
+        /// Construct a new object instance and map public property values from the
+        /// provided arguments
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static T Map<T>(IArguments args)
             where T : new()
         {
@@ -13,6 +23,13 @@ namespace StoneFruit.Execution.Arguments
             return obj;
         }
 
+        /// <summary>
+        /// Map from the provided arguments onto the public properties of an existing
+        /// object
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="args"></param>
+        /// <param name="obj"></param>
         public static void MapOnto<T>(IArguments args, T obj)
         {
             var targetType = typeof(T);

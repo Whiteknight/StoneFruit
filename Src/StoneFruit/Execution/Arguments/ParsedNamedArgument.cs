@@ -1,14 +1,18 @@
 ﻿namespace StoneFruit.Execution.Arguments
 {
-    public class FlagPositionalOrNamedArgument : IParsedArgument
+    /// <summary>
+    /// An argument defined by a name
+    /// </summary>
+    public class ParsedNamedArgument : IParsedArgument
     {
-        public FlagPositionalOrNamedArgument(string name, string value)
+        public ParsedNamedArgument(string name, string value)
         {
             Name = name.ToLowerInvariant();
             Value = value;
         }
 
         public string Name { get; }
+
         public string Value { get; }
     }
 }

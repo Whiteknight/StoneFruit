@@ -42,7 +42,7 @@ namespace StoneFruit.Execution.Arguments
                 Match('-'),
                 names,
 
-                (start, name) => new FlagArgument(name)
+                (start, name) => new ParsedFlagArgument(name)
             );
 
             // <name> '=' <value>
@@ -51,14 +51,14 @@ namespace StoneFruit.Execution.Arguments
                 Match('='),
                 values,
 
-                (name, equals, value) => new NamedArgument(name, value) 
+                (name, equals, value) => new ParsedNamedArgument(name, value) 
             );
 
             // <flag> | <named> | <positional>
             var args = First<char, IParsedArgument>(
                 flagArg,
                 namedArg,
-                values.Transform(v => new PositionalArgument(v) )
+                values.Transform(v => new ParsedPositionalArgument(v) )
             );
 
             var whitespace = Whitespace();

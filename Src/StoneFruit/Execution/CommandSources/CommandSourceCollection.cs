@@ -34,7 +34,7 @@ namespace StoneFruit.Execution.CommandSources
 
         public void AddToEnd(EventScript script, ICommandParser parser, params (string, string)[] args)
         {
-            var argsList = args.Select(t => new NamedArgumentAccessor(t.Item1, t.Item2)).Cast<IArgument>().ToArray();
+            var argsList = args.Select(t => new NamedArgument(t.Item1, t.Item2)).Cast<IArgument>().ToArray();
             AddToEnd(new ScriptCommandSource(script, parser, argsList));
         }
 
