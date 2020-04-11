@@ -7,6 +7,23 @@ using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.Cli
 {
+    public class MyFirstHandler : IHandler
+    {
+        private readonly IOutput _output;
+
+        public MyFirstHandler(IOutput output)
+        {
+            _output = output;
+        }
+
+        public void Execute()
+        {
+            _output.WriteLine("Starting the job...");
+            // .. Do work here ..
+            _output.WriteLine("Done.");
+        }
+    }
+
     class Program
     {
         static void Main(string[] args)
@@ -22,26 +39,26 @@ namespace StoneFruit.Cli
                     //.UseNinjectHandlerSource()
                     .UseStructureMapHandlerSource()
                     //.UseCommands(typeof(HelpCommand), typeof(ExitCommand))
-                    .UsePublicMethodsAsHandlers(new MyObject())
-                    .Add("testf", (c, d) => d.Output.WriteLine("F"))
-                    .AddScript("testg", new [] { "echo test", "echo g" })
-                    .AddScript("testh", new[] { "echo [0]", "echo ['a']" })
-                    .AddScript("testi", new [] {
-                        "echo 1",
-                        "echo 2",
-                        "echo 3",
-                        "echo 4"
-                    })
+                    //.UsePublicMethodsAsHandlers(new MyObject())
+                    //.Add("testf", (c, d) => d.Output.WriteLine("F"))
+                    //.AddScript("testg", new [] { "echo test", "echo g" })
+                    //.AddScript("testh", new[] { "echo [0]", "echo ['a']" })
+                    //.AddScript("testi", new [] {
+                    //    "echo 1",
+                    //    "echo 2",
+                    //    "echo 3",
+                    //    "echo 4"
+                    //})
                 )
                 .SetupEnvironments(e => e.UseFactory(new MyEnvironmentFactory()))
                 .SetupEvents(e =>
                 {
-                    e.EngineStartInteractive.Clear();
+                    //e.EngineStartInteractive.Clear();
                     //e.EngineStopInteractive.Add("echo 'goodbye'");
                     //e.EngineError.Add("echo 'you dun goofed'");
                 })
                 .SetupSettings(s => {
-                    s.MaxInputlessCommands = 3;
+                    //s.MaxInputlessCommands = 3;
                     s.MaxExecuteTimeout = TimeSpan.FromSeconds(5);
                 })
                 .Build();
@@ -111,7 +128,7 @@ namespace StoneFruit.Cli
             return new MyEnvironment(name);
         }
 
-        public IReadOnlyCollection<string> ValidEnvironments => new[] { "TEST1" };
+        public IReadOnlyCollection<string> ValidEnvironments => new[] { "Local", "Testing", "Production" };
     }
 
     public class MyEnvironment

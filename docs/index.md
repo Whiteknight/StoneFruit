@@ -1,6 +1,6 @@
 # StoneFruit
 
-**StoneFruit** is a commandlet host and execution engine. It allows you to rapidly develop new command-line utility routines without having to create a new application for each one. StoneFruit is designed from the ground-up to be pluggable and flexible, and to easily integrate with your existing code, including DI/IoC containers if desired.
+**StoneFruit** is a commandlet host and execution engine. It allows you to rapidly develop new command-line utility routines without having to create a new application for each one. StoneFruit is designed from the ground-up to be configurable, pluggable and flexible, and to easily integrate with your existing code. This includes DI/IoC containers if desired.
 
 ## Quick Example: Git
 
@@ -36,3 +36,4 @@ var engine = engineBuilder.Build();
 * [DI Containers](containers.md)
 * [Execution](execution.md)
 * [Scripting](scripting.md)
+* [Simple Example](example1.md)

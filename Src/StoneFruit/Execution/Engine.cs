@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.CommandSources;
 using StoneFruit.Handlers;
@@ -12,11 +11,9 @@ namespace StoneFruit.Execution
     /// </summary>
     public class Engine
     {
-        private readonly IEnvironmentCollection _environments;
         private readonly IHandlerSource _commandSource;
         private readonly EngineEventCatalog _eventCatalog;
         private readonly EngineSettings _settings;
-        private readonly IOutput _output;
         private readonly ICommandParser _parser;
 
         public Engine(IHandlerSource commands, IEnvironmentCollection environments, ICommandParser parser, IOutput output, EngineEventCatalog eventCatalog, EngineSettings settings)
@@ -27,13 +24,23 @@ namespace StoneFruit.Execution
             Assert.ArgumentNotNull(output, nameof(output));
             Assert.ArgumentNotNull(eventCatalog, nameof(eventCatalog));
             
-            _environments = environments;
+            Environments = environments;
             _eventCatalog = eventCatalog;
             _settings = settings;
             _parser = parser;
-            _output = output;
+            Output = output;
             _commandSource = commands;
         }
+
+        /// <summary>
+        /// The set of configured environments
+        /// </summary>
+        public IEnvironmentCollection Environments { get; }
+
+        /// <summary>
+        /// The configured output channel
+        /// </summary>
+        public IOutput Output { get; }
 
         /// <summary>
         /// Selects the appropriate run mode and executes it based on the raw command line
@@ -62,7 +69,7 @@ namespace StoneFruit.Execution
 
             // if there is exactly one argument and it's the name of a valid environment,
             // start interactive mode setting that environment first.
-            if (_environments.IsValid(commandLine))
+            if (Environments.IsValid(commandLine))
                 return RunInteractively(commandLine);
 
             // Otherwise run in headless mode and figure it out from there.
@@ -88,7 +95,7 @@ namespace StoneFruit.Execution
         public int RunHeadless(string commandLine)
         {
             var state = new EngineState(true, _eventCatalog, _settings);
-            var dispatcher = new CommandDispatcher(_parser, _commandSource, _environments, state, _output);
+            var dispatcher = new CommandDispatcher(_parser, _commandSource, Environments, state, Output);
             var sources = new CommandSourceCollection();
 
             // If we have a single argument "help", run the help script and exit. We don't
@@ -145,7 +152,7 @@ namespace StoneFruit.Execution
         public int RunInteractively(string environment)
         {
             var state = new EngineState(false, _eventCatalog, _settings);
-            var dispatcher = new CommandDispatcher(_parser, _commandSource, _environments, state, _output);
+            var dispatcher = new CommandDispatcher(_parser, _commandSource, Environments, state, Output);
             var source = new CommandSourceCollection();
 
             // Change the environment if necessary. Otherwise the EngineStartInteractive
@@ -154,7 +161,7 @@ namespace StoneFruit.Execution
                 source.AddToEnd($"{EnvironmentChangeHandler.Name} {environment}");
 
             source.AddToEnd(state.EventCatalog.EngineStartInteractive, _parser);
-            source.AddToEnd(new PromptCommandSource(_output, _environments, state));
+            source.AddToEnd(new PromptCommandSource(Output, Environments, state));
             
             return RunLoop(state, dispatcher, source);
         }
@@ -177,13 +184,13 @@ namespace StoneFruit.Execution
         // commandline.
         private (string startingEnvironment, string commandLine) GetStartingEnvironment(string commandLine)
         {
-            var validEnvironments = _environments.GetNames();
+            var validEnvironments = Environments.GetNames();
             if (validEnvironments.Count <= 1)
                 return (null, commandLine);
 
             var parts = commandLine.Split(new[] { ' ' }, 2);
             var env = parts[0];
-            return _environments.IsValid(env) ? (env, parts[1]) : (null, commandLine);
+            return Environments.IsValid(env) ? (env, parts[1]) : (null, commandLine);
         }
 
         // Pulls commands from the command source until the source is empty or an exit
@@ -202,7 +209,7 @@ namespace StoneFruit.Execution
                 // Check the counter to make sure that we are not in a runaway loop
                 // If we are in a loop, the counter will setup the command queue to handle
                 // it
-                var canExecute = state.CommandCounter.VerifyCanExecuteNextCommand(_parser, _output);
+                var canExecute = state.CommandCounter.VerifyCanExecuteNextCommand(_parser, Output);
                 if (!canExecute)
                     continue;
                 
@@ -246,7 +253,7 @@ namespace StoneFruit.Execution
             {
                 // This isn't scripted because it's critical error-handling code and we
                 // don't want the user to clear/override it
-                _output
+                Output
                     .Color(ConsoleColor.Red)
                     .WriteLine("Received an exception while attempting to handle a previous exception")
                     .WriteLine("This is a fatal condition and the engine will exit")
