@@ -2,6 +2,9 @@
 
 namespace StoneFruit.Execution
 {
+    /// <summary>
+    /// Metadata storage for the EngineState
+    /// </summary>
     public class EngineStateMetadataCache
     {
         private readonly Dictionary<string, object> _metadata;

@@ -1,6 +1,4 @@
-﻿using StoneFruit.Execution.Arguments;
-
-namespace StoneFruit.Execution
+﻿namespace StoneFruit.Execution
 {
     /// <summary>
     /// Keep track of how many commands have been executed without user input and show

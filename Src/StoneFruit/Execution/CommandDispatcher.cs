@@ -12,6 +12,15 @@ namespace StoneFruit.Execution
     /// </summary>
     public class CommandDispatcher
     {
+        public CommandDispatcher(ICommandParser parser, IHandlerSource commands, IEnvironmentCollection environments, EngineState state, IOutput output)
+        {
+            Parser = parser;
+            Commands = commands;
+            Environments = environments;
+            State = state;
+            Output = output;
+        }
+
         /// <summary>
         /// The parser to turn strings into Commands
         /// </summary>
@@ -36,15 +45,6 @@ namespace StoneFruit.Execution
         /// The output
         /// </summary>
         public IOutput Output { get; }
-
-        public CommandDispatcher(ICommandParser parser, IHandlerSource commands, IEnvironmentCollection environments, EngineState state, IOutput output)
-        {
-            Parser = parser;
-            Commands = commands;
-            Environments = environments;
-            State = state;
-            Output = output;
-        }
 
         /// <summary>
         /// Find and execute the appropriate handler for the given command object or

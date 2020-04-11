@@ -3,6 +3,9 @@ using System.Linq;
 
 namespace StoneFruit.Execution
 {
+    /// <summary>
+    /// Queue of prepared commands for the engine to execute
+    /// </summary>
     public class EngineStateCommandQueue
     {
         private readonly LinkedList<CommandOrString> _additionalCommands;

@@ -1,7 +1,9 @@
-﻿using StoneFruit.Execution.Arguments;
-
-namespace StoneFruit.Execution
+﻿namespace StoneFruit.Execution
 {
+    /// <summary>
+    /// Counter for commands executed since last user input. Serves as protection against
+    /// runaway recursion and infinite loops in the engine.
+    /// </summary>
     public interface IEngineStateCommandCounter
     {
         void ReceiveUserInput();

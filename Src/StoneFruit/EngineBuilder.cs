@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Environments;
@@ -97,9 +98,13 @@ namespace StoneFruit
         public Engine Build()
         {
             var commandSource = _handlers.Build();
+            if (!commandSource.GetAll().Any())
+                throw EngineBuildException.NoHandlers();
+
             var environmentFactory = _environments.Build();
             var parser = _parsers.Build();
             var output = _output.Build();
+            
             return new Engine(commandSource, environmentFactory, parser, output, _eventCatalog, _settings);
         }
     }

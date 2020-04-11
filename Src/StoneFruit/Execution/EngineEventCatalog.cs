@@ -2,6 +2,9 @@
 
 namespace StoneFruit.Execution
 {
+    /// <summary>
+    /// Catalog of scripts to run in response to various Engine events.
+    /// </summary>
     public class EngineEventCatalog
     {
         public EngineEventCatalog()
@@ -76,14 +79,14 @@ namespace StoneFruit.Execution
         public EventScript EngineStartHeadless { get; }
 
         /// <summary>
-        /// The engine has stopped headless mode. This script is executed after EngineStartHeadless script
-        /// and the user command.
+        /// The engine has stopped headless mode. This script is executed after
+        /// EngineStartHeadless script and the user command.
         /// </summary>
         public EventScript EngineStopHeadless { get; }
 
         /// <summary>
-        /// The engine has started in interactive mode. This script will execute, then the user will be
-        /// shown a REPL prompt.
+        /// The engine has started in interactive mode. This script will execute, then the
+        /// user will be shown a REPL prompt.
         /// </summary>
         public EventScript EngineStartInteractive { get; }
 
@@ -104,17 +107,21 @@ namespace StoneFruit.Execution
         public EventScript EnvironmentChanged { get; }
 
         /// <summary>
-        /// "help" has been executed in headless mode. Can be used to show more detail than a simple help
-        /// handle. Notice that this script may be run without a valid environment set.
+        /// "help" has been executed in headless mode. Can be used to show more detail than
+        /// a simple help handle. Notice that this script may be run without a valid
+        /// environment set.
         /// </summary>
         public EventScript HeadlessHelp { get; }
 
         /// <summary>
-        /// An unhandled exception has been received by the engine. The exception may have come from engine
-        /// internals or from within one of the handlers.
+        /// An unhandled exception has been received by the engine. The exception may have
+        /// come from engine internals or from within one of the handlers.
         /// </summary>
         public EventScript EngineError { get; }
 
+        /// <summary>
+        /// A maximum number of commands have been executed without user input. 
+        /// </summary>
         public EventScript MaximumHeadlessCommands { get; }
     }
 }

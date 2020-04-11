@@ -9,15 +9,7 @@ namespace StoneFruit.Execution
     [Serializable]
     public class EngineBuildException : Exception
     {
-        public EngineBuildException()
-        {
-        }
-
         public EngineBuildException(string message) : base(message)
-        {
-        }
-
-        public EngineBuildException(string message, Exception inner) : base(message, inner)
         {
         }
 
@@ -25,6 +17,13 @@ namespace StoneFruit.Execution
             SerializationInfo info,
             StreamingContext context) : base(info, context)
         {
+        }
+
+        public static EngineBuildException NoHandlers()
+        {
+            return new EngineBuildException(@"No Handlers configured.
+
+You must have at least one handler configured in order to start the engine.");
         }
     }
 }

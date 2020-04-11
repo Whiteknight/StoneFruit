@@ -1,10 +1,12 @@
-﻿using StoneFruit.Utility;
+﻿using System;
+using System.Threading;
+using StoneFruit.Utility;
 
 namespace StoneFruit.Execution
 {
     /// <summary>
-    /// The runtime state of the engine. Controls the execution of the
-    /// engine and contains data which persists between command executions
+    /// The runtime state of the engine. Controls the execution of the engine and contains
+    /// data which persists between command executions.
     /// </summary>
     public class EngineState
     {
@@ -20,7 +22,9 @@ namespace StoneFruit.Execution
             Settings = settings;
             Commands = new EngineStateCommandQueue();
             Metadata = new EngineStateMetadataCache();
-            CommandCounter = Headless ? new HeadlessEngineStateCommandCounter(Commands, eventCatalog, Settings) : (IEngineStateCommandCounter)new InteractiveEngineStateCommandCounter(Commands, Settings);
+            CommandCounter = Headless ? 
+                new HeadlessEngineStateCommandCounter(Commands, eventCatalog, Settings) : 
+                (IEngineStateCommandCounter)new InteractiveEngineStateCommandCounter(Commands, Settings);
         }
 
         public bool ShouldExit { get; private set; }
@@ -32,10 +36,28 @@ namespace StoneFruit.Execution
         public IEngineStateCommandCounter CommandCounter { get; set; }
         public EngineSettings Settings { get; set; }
 
-        public void Exit(int exitCode = 0)
+        /// <summary>
+        /// Signal the runloop that it should exit immediately and stop executing commands.
+        /// </summary>
+        /// <param name="exitCode"></param>
+        public void Exit(int exitCode = Constants.ExitCodeOk)
         {
             ShouldExit = true;
             ExitCode = exitCode;
+        }
+
+        /// <summary>
+        /// Gets a CancellationTokenSource configured with settings values, to use for
+        /// dispatching commands
+        /// </summary>
+        /// <returns></returns>
+        public CancellationTokenSource GetConfiguredCancellationSource()
+        {
+            var tokenSource = new CancellationTokenSource();
+            var timeout = Settings.MaxExecuteTimeout;
+            if (timeout < TimeSpan.MaxValue)
+                tokenSource.CancelAfter(timeout);
+            return tokenSource;
         }
     }
 }
