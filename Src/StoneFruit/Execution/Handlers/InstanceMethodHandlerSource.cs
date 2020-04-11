@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using StoneFruit.Utility;
 
-namespace StoneFruit.Execution.HandlerSources
+namespace StoneFruit.Execution.Handlers
 {
     /// <summary>
     /// Handler source for public methods on a pre-defined object instance
@@ -21,6 +21,7 @@ namespace StoneFruit.Execution.HandlerSources
 
         public InstanceMethodHandlerSource(object instance, Func<string, string> getDescription, Func<string, string> getUsage)
         {
+            Assert.ArgumentNotNull(instance, nameof(instance));
             _instance = instance;
             _getDescription = getDescription ?? (s => string.Empty);
             _getUsage = getUsage ?? (s => string.Empty);

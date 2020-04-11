@@ -9,22 +9,22 @@ namespace StoneFruit.Containers.StructureMap
 {
     public class StructureMapHandlerSource : IHandlerSource
     {
+        private readonly ITypeVerbExtractor _verbExtractor;
         private readonly IContainer _container;
         private readonly IReadOnlyDictionary<string, Type> _nameMap;
 
-        public StructureMapHandlerSource()
+        public StructureMapHandlerSource(IContainer container, ITypeVerbExtractor verbExtractor)
         {
-            var container = new Container();
-            container.Configure(c => c.ScanForCommandVerbs());
-            //var scanned = container.WhatDidIScan();
-            //var have = container.WhatDoIHave();
-            _container = container;
-            _nameMap = SetupNameMapping();
-        }
+            if (container == null)
+            {
+                container = new Container();
+                container.Configure(c => c.ScanForCommandVerbs());
+                //var scanned = container.WhatDidIScan();
+                //var have = container.WhatDoIHave();
+            }
 
-        public StructureMapHandlerSource(IContainer container)
-        {
             _container = container;
+            _verbExtractor = verbExtractor ?? TypeVerbExtractor.DefaultInstance;
             _nameMap = SetupNameMapping();
         }
 
@@ -37,8 +37,8 @@ namespace StoneFruit.Containers.StructureMap
 
             return commandTypes
                 .OrEmptyIfNull()
-                .SelectMany(commandType => commandType
-                    .GetVerbs()
+                .SelectMany(commandType => 
+                    _verbExtractor.GetVerbs(commandType)
                     .Select(verb => (verb, commandType))
                 )
                 .ToDictionaryUnique();

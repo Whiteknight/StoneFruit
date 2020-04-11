@@ -15,7 +15,7 @@ namespace StoneFruit.Containers.Ninject.Tests
         [Test]
         public void GetByName_echo()
         {
-            var target = new NinjectHandlerSource();
+            var target = new NinjectHandlerSource(null, null);
             var result = target.GetByName("echo");
             result.Verb.Should().Be("echo");
         }
@@ -23,7 +23,7 @@ namespace StoneFruit.Containers.Ninject.Tests
         [Test]
         public void GetInstance_echo()
         {
-            var target = new NinjectHandlerSource();
+            var target = new NinjectHandlerSource(null, null);
             var state = new EngineState(true, new EngineEventCatalog(), new EngineSettings());
             var dispatcher = new CommandDispatcher(CommandParser.GetDefault(), target, new InstanceEnvironmentCollection(null), state, new ConsoleOutput());
             var result = target.GetInstance(Command.Create("echo", SyntheticArguments.Empty()), dispatcher);
@@ -33,7 +33,7 @@ namespace StoneFruit.Containers.Ninject.Tests
         [Test]
         public void GetAll_Test()
         {
-            var target = new NinjectHandlerSource();
+            var target = new NinjectHandlerSource(null, null);
             var result = target.GetAll().ToList();
             result.Count.Should().BeGreaterThan(1);
         }
@@ -41,7 +41,7 @@ namespace StoneFruit.Containers.Ninject.Tests
         [Test]
         public void Environment_Test()
         {
-            var target = new NinjectHandlerSource();
+            var target = new NinjectHandlerSource(null, null);
             var environments = new InstanceEnvironmentCollection(new TestEnvironment("test"));
             var state = new EngineState(true, new EngineEventCatalog(), new EngineSettings());
             var dispatcher = new CommandDispatcher(CommandParser.GetDefault(), target, environments, state, new ConsoleOutput());

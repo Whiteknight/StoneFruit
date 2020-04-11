@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -22,33 +21,6 @@ namespace StoneFruit.Utility
         /// <returns></returns>
         public static string GetUsage(this Type type) 
             => GetPublicStaticStringPropertyValue(type, "Usage") ?? GetDescription(type);
-
-        /// <summary>
-        /// Attempt to get the list of verbs for an IHandlerBase class
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public static IEnumerable<string> GetVerbs(this Type type)
-        {
-            if (!typeof(IHandlerBase).IsAssignableFrom(type))
-                return Enumerable.Empty<string>();
-
-            var attrs = type.GetCustomAttributes<VerbAttribute>().ToList();
-            if (attrs.Any())
-            {
-                return attrs
-                    .Select(a => a.CommandName.ToLowerInvariant())
-                    .Distinct();
-            }
-
-            var name = type.Name
-                .RemoveSuffix("verb")
-                .RemoveSuffix("command")
-                .RemoveSuffix("handler")
-                .CamelCaseToSpinalCase()
-                ;
-            return new[] { name };
-        }
 
         private static string GetPublicStaticStringPropertyValue(Type type, string name)
         {

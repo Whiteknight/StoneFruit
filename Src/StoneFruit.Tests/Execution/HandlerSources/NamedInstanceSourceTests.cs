@@ -2,7 +2,7 @@
 using FluentAssertions;
 using NUnit.Framework;
 using StoneFruit.Execution;
-using StoneFruit.Execution.HandlerSources;
+using StoneFruit.Execution.Handlers;
 
 namespace StoneFruit.Tests.Execution.HandlerSources
 {

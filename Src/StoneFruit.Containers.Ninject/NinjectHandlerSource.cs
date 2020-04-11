@@ -16,30 +16,30 @@ namespace StoneFruit.Containers.Ninject
 {
     public class NinjectHandlerSource : IHandlerSource
     {
+        private readonly ITypeVerbExtractor _verbExtractor;
         private readonly IKernel _kernel;
         private readonly IReadOnlyDictionary<string, Type> _nameMap;
 
-        public NinjectHandlerSource()
+        public NinjectHandlerSource(IKernel kernel, ITypeVerbExtractor verbExtractor)
         {
-            var kernel = new StandardKernel();
-            kernel.Bind(x =>
+            if (kernel == null)
             {
-                x.FromAssemblyContaining<IHandlerBase>()
-                    .SelectAllTypes()
-                    .InheritedFrom<IHandlerBase>()
-                    .BindAllInterfaces();
-                x.FromAssembliesInPath(".")
-                    .SelectAllTypes()
-                    .InheritedFrom<IHandlerBase>()
-                    .BindAllInterfaces();
-            });
-            _kernel = kernel;
-            _nameMap = SetupNameMapping();
-        }
+                kernel = new StandardKernel();
+                kernel.Bind(x =>
+                {
+                    x.FromAssemblyContaining<IHandlerBase>()
+                        .SelectAllTypes()
+                        .InheritedFrom<IHandlerBase>()
+                        .BindAllInterfaces();
+                    x.FromAssembliesInPath(".")
+                        .SelectAllTypes()
+                        .InheritedFrom<IHandlerBase>()
+                        .BindAllInterfaces();
+                });
+            }
 
-        public NinjectHandlerSource(IKernel kernel)
-        {
             _kernel = kernel;
+            _verbExtractor = verbExtractor ?? TypeVerbExtractor.DefaultInstance;
             _nameMap = SetupNameMapping();
         }
 
@@ -61,8 +61,8 @@ namespace StoneFruit.Containers.Ninject
 
             return commandTypes
                 .OrEmptyIfNull()
-                .SelectMany(commandType => commandType
-                    .GetVerbs()
+                .SelectMany(commandType => 
+                    _verbExtractor.GetVerbs(commandType)
                     .Select(verb => (verb, commandType))
                 )
                 .ToDictionaryUnique();

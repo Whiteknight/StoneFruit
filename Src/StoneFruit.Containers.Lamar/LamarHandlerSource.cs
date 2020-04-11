@@ -11,34 +11,34 @@ namespace StoneFruit.Containers.Lamar
     public class LamarHandlerSource<TEnvironment> : IHandlerSource
         where TEnvironment : class
     {
+        private readonly ITypeVerbExtractor _verbExtractor;
         private readonly IContainer _container;
         private readonly IReadOnlyDictionary<string, Type> _nameMap;
 
-        public LamarHandlerSource()
+        public LamarHandlerSource(IContainer container, ITypeVerbExtractor verbExtractor)
         {
-            var registry = new ServiceRegistry();
-            registry.Scan(s => s.ScanForCommandVerbs());
-            registry.Injectable<CommandDispatcher>();
-            registry.Injectable<IEnvironmentCollection>();
-            registry.Injectable<EngineState>();
-            registry.Injectable<IOutput>();
-            registry.Injectable<ICommandParser>();
-            registry.Injectable<IHandlerSource>();
-            registry.Injectable<Command>();
-            registry.Injectable<IArguments>();
-            if (typeof(TEnvironment) != typeof(object))
-                registry.Injectable<TEnvironment>();
+            if (container == null)
+            {
+                var registry = new ServiceRegistry();
+                registry.Scan(s => s.ScanForCommandVerbs());
+                registry.Injectable<CommandDispatcher>();
+                registry.Injectable<IEnvironmentCollection>();
+                registry.Injectable<EngineState>();
+                registry.Injectable<IOutput>();
+                registry.Injectable<ICommandParser>();
+                registry.Injectable<IHandlerSource>();
+                registry.Injectable<Command>();
+                registry.Injectable<IArguments>();
+                if (typeof(TEnvironment) != typeof(object))
+                    registry.Injectable<TEnvironment>();
 
-            var container = new Container(registry);
+                container = new Container(registry);
+            }
+
             //var scanned = container.WhatDidIScan();
             //var have = container.WhatDoIHave();
             _container = container;
-            _nameMap = SetupNameMapping();
-        }
-
-        public LamarHandlerSource(IContainer container)
-        {
-            _container = container;
+            _verbExtractor = verbExtractor ?? TypeVerbExtractor.DefaultInstance;
             _nameMap = SetupNameMapping();
         }
 
@@ -51,8 +51,8 @@ namespace StoneFruit.Containers.Lamar
 
             return commandTypes
                 .OrEmptyIfNull()
-                .SelectMany(commandType => commandType
-                    .GetVerbs()
+                .SelectMany(commandType =>
+                    _verbExtractor.GetVerbs(commandType)
                     .Select(verb => (verb, commandType))
                 )
                 .ToDictionaryUnique();

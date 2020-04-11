@@ -2,7 +2,7 @@
 using System.Linq;
 using StoneFruit.Utility;
 
-namespace StoneFruit.Execution.HandlerSources
+namespace StoneFruit.Execution.Handlers
 {
     /// <summary>
     /// Combines multiple ICommandSource implementations together in priorty order.

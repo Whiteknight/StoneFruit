@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace StoneFruit.Execution.HandlerSources
+namespace StoneFruit.Execution.Handlers
 {
     /// <summary>
     /// Handler source for manually-specified handler instances

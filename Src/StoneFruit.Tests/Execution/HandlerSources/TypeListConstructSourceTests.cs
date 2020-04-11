@@ -4,7 +4,7 @@ using NUnit.Framework;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Environments;
-using StoneFruit.Execution.HandlerSources;
+using StoneFruit.Execution.Handlers;
 using StoneFruit.Execution.Output;
 
 namespace StoneFruit.Tests.Execution.HandlerSources
@@ -35,7 +35,7 @@ namespace StoneFruit.Tests.Execution.HandlerSources
         [Test]
         public void GetInstance_Test()
         {
-            var target = new TypeListConstructSource(new [] { typeof(TestCommandHandler) });
+            var target = new TypeListConstructSource(new [] { typeof(TestCommandHandler) }, null);
             var args = new ParsedArguments();
             var command = Command.Create("test", args);
             var parser = CommandParser.GetDefault();

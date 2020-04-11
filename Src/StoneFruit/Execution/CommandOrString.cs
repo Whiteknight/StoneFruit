@@ -1,8 +1,8 @@
-﻿using StoneFruit.Execution.CommandSources;
-
-namespace StoneFruit.Execution
+﻿namespace StoneFruit.Execution
 {
-    // simple discriminated union type, sometimes commands come pre-parsed
+    /// <summary>
+    /// Discriminated union for unparsed command strings or pre-parsed Command objects
+    /// </summary>
     public class CommandOrString
     {
         private CommandOrString(string s)

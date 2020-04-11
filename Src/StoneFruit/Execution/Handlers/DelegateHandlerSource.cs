@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace StoneFruit.Execution.HandlerSources
+namespace StoneFruit.Execution.Handlers
 {
     /// <summary>
     /// Handler source for function delegates

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using StoneFruit.Utility;
 
-namespace StoneFruit.Execution.HandlerSources
+namespace StoneFruit.Execution.Handlers
 {
     /// <summary>
     /// A command source which takes a list of Type and attempts to construct one using
@@ -13,12 +13,13 @@ namespace StoneFruit.Execution.HandlerSources
     {
         private readonly IReadOnlyDictionary<string, Type> _commands;
 
-        public TypeListConstructSource(IEnumerable<Type> commandTypes)
+        public TypeListConstructSource(IEnumerable<Type> commandTypes, ITypeVerbExtractor verbExtractor)
         {
+            verbExtractor ??= TypeVerbExtractor.DefaultInstance;
             _commands = commandTypes
                 .OrEmptyIfNull()
-                .SelectMany(commandType => commandType
-                    .GetVerbs()
+                .SelectMany(commandType =>
+                    verbExtractor.GetVerbs(commandType)
                     .Select(verb => (verb, commandType))
                 )
                 .ToDictionaryUnique();

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using StoneFruit.Execution.Scripts;
 using StoneFruit.Utility;
 
-namespace StoneFruit.Execution.HandlerSources
+namespace StoneFruit.Execution.Handlers
 {
     /// <summary>
     /// Setup handlers and handler sources

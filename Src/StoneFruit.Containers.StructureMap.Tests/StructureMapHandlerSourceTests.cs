@@ -14,7 +14,7 @@ namespace StoneFruit.Containers.StructureMap.Tests
         [Test]
         public void GetByName_echo()
         {
-            var target = new StructureMapHandlerSource();
+            var target = new StructureMapHandlerSource(null, null);
             var result = target.GetByName("echo");
             result.Verb.Should().Be("echo");
         }
@@ -22,7 +22,7 @@ namespace StoneFruit.Containers.StructureMap.Tests
         [Test]
         public void GetInstance_echo()
         {
-            var target = new StructureMapHandlerSource();
+            var target = new StructureMapHandlerSource(null, null);
             var state = new EngineState(true, new EngineEventCatalog(), new EngineSettings());
             var dispatcher = new CommandDispatcher(CommandParser.GetDefault(), target, new InstanceEnvironmentCollection(null), state, new ConsoleOutput());
             var result = target.GetInstance(Command.Create("echo", SyntheticArguments.Empty()), dispatcher);
@@ -32,7 +32,7 @@ namespace StoneFruit.Containers.StructureMap.Tests
         [Test]
         public void GetAll_Test()
         {
-            var target = new StructureMapHandlerSource();
+            var target = new StructureMapHandlerSource(null, null);
             var result = target.GetAll().ToList();
             result.Count.Should().BeGreaterThan(1);
         }

@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using StoneFruit.Containers.Lamar;
-using StoneFruit.Containers.Ninject;
 using StoneFruit.Containers.StructureMap;
 using StoneFruit.Execution.Arguments;
 

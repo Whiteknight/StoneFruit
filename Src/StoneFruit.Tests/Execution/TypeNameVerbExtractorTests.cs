@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
-using StoneFruit.Utility;
+using StoneFruit.Execution;
+using StoneFruit.Execution.Handlers;
 
 namespace StoneFruit.Tests.Utility
 {
-    public class TypeExtensionsTests
+    public class TypeNameVerbExtractorTests
     {
         private class FirstTestHandler : IHandlerBase
         {
@@ -17,7 +15,8 @@ namespace StoneFruit.Tests.Utility
         [Test]
         public void GetVerbs_CamelCaseToSpinalCase()
         {
-            var result = typeof(FirstTestHandler).GetVerbs().ToList();
+            var target = new CamelToSpinalNameVerbExtractor();
+            var result = target.GetVerbs(typeof(FirstTestHandler)).ToList();
             result.Should().Contain("first-test");
         }
     }

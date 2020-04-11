@@ -15,7 +15,7 @@ namespace StoneFruit.Containers.Lamar.Tests
         [Test]
         public void GetByName_echo()
         {
-            var target = new LamarHandlerSource<object>();
+            var target = new LamarHandlerSource<object>(null, null);
             var result = target.GetByName("echo");
             result.Verb.Should().Be("echo");
         }
@@ -23,7 +23,7 @@ namespace StoneFruit.Containers.Lamar.Tests
         [Test]
         public void GetInstance_echo()
         {
-            var target = new LamarHandlerSource<object>();
+            var target = new LamarHandlerSource<object>(null, null);
             var state = new EngineState(true, new EngineEventCatalog(), new EngineSettings());
             var dispatcher = new CommandDispatcher(CommandParser.GetDefault(), target, new InstanceEnvironmentCollection(null), state, new ConsoleOutput());
             var result = target.GetInstance(Command.Create("echo", SyntheticArguments.Empty()), dispatcher);
@@ -33,7 +33,7 @@ namespace StoneFruit.Containers.Lamar.Tests
         [Test]
         public void GetAll_Test()
         {
-            var target = new LamarHandlerSource<object>();
+            var target = new LamarHandlerSource<object>(null, null);
             var result = target.GetAll().ToList();
             result.Count.Should().BeGreaterThan(1);
         }
@@ -41,7 +41,7 @@ namespace StoneFruit.Containers.Lamar.Tests
         [Test]
         public void Environment_Test()
         {
-            var target = new LamarHandlerSource<TestEnvironment>();
+            var target = new LamarHandlerSource<TestEnvironment>(null, null);
             var environments = new InstanceEnvironmentCollection(new TestEnvironment("test"));
             var state = new EngineState(true, new EngineEventCatalog(), new EngineSettings());
             var dispatcher = new CommandDispatcher(CommandParser.GetDefault(), target, environments, state, new ConsoleOutput());
