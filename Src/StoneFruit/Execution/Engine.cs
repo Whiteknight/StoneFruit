@@ -267,6 +267,8 @@ namespace StoneFruit.Execution
             // Add the current exception to state metadata so we can keep track of loops,
             // then prepend the error-handling script and a command to remove the exception
             // from metadata (prepends happen in reverse order from how they're executed)
+            // We can't remove metadata in the script, because users might change the script
+            // and inadvertantly break loop detection.
             state.Metadata.Add(Constants.MetadataError, e, false);
             state.Commands.Prepend($"{MetadataRemoveHandler.Name} {Constants.MetadataError}");
             state.Commands.Prepend(script.GetCommands(_parser, args));

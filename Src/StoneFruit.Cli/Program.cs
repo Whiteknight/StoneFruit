@@ -34,10 +34,10 @@ namespace StoneFruit.Cli
             //var w = PowershellStyleArgumentGrammar.GetParser().ParseArguments(args).MapTo<TestArgsA>();
 
             var engine = new EngineBuilder()
-                .SetupHandlers(h => h
+                //.SetupHandlers(h => h
                     //.UseLamarHandlerSource<object>()
                     //.UseNinjectHandlerSource()
-                    .UseStructureMapHandlerSource()
+                    //.UseStructureMapHandlerSource()
                     //.UseCommands(typeof(HelpCommand), typeof(ExitCommand))
                     //.UsePublicMethodsAsHandlers(new MyObject())
                     //.Add("testf", (c, d) => d.Output.WriteLine("F"))
@@ -49,7 +49,7 @@ namespace StoneFruit.Cli
                     //    "echo 3",
                     //    "echo 4"
                     //})
-                )
+                //)
                 .SetupEnvironments(e => e.UseFactory(new MyEnvironmentFactory()))
                 .SetupEvents(e =>
                 {

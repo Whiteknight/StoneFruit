@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using StoneFruit.Execution.Scripts;
+using StoneFruit.Handlers;
 using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Handlers
@@ -32,6 +33,19 @@ namespace StoneFruit.Execution.Handlers
                 _sources.Add(_scripts);
             if (_instances.Count > 0)
                 _sources.Add(_instances);
+
+            // Add some core handlers which are necessary for scripts. These might be already
+            // included elsewhere, but we absolutely need to make sure we have them no
+            // matter what.
+            _sources.Add(new TypeListConstructSource(new[]
+            {
+                typeof(EchoHandler),
+                typeof(EnvironmentChangeHandler),
+                typeof(EnvironmentListHandler),
+                typeof(ExitHandler),
+                typeof(HelpHandler),
+                typeof(MetadataRemoveHandler),
+            }, null));
             return _sources.Simplify();
         }
 
