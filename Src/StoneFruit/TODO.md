@@ -1,7 +1,4 @@
-﻿# For V1
-* Documentation website for core usage
-
-# For Later
+﻿# For Post-V1
 * Invoke `.Execute()` with custom argument lists
 * fully async with CancellationToken timer/break-keys
 * Inject the complete `CommandParser` with abstraction

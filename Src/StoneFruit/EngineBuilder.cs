@@ -85,6 +85,11 @@ namespace StoneFruit
             return this;
         }
 
+        /// <summary>
+        /// Setup the settings for the engine
+        /// </summary>
+        /// <param name="setup"></param>
+        /// <returns></returns>
         public EngineBuilder SetupSettings(Action<EngineSettings> setup)
         {
             setup?.Invoke(_settings);
