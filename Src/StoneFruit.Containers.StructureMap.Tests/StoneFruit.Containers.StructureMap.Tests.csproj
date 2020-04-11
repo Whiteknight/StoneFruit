@@ -16,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\StoneFruit.Containers.StructureMap\StoneFruit.Containers.StructureMap.csproj" />
     <ProjectReference Include="..\StoneFruit\StoneFruit.csproj" />
+    <ProjectReference Include="..\TestUtilities\TestUtilities.csproj" />
   </ItemGroup>
 
 </Project>

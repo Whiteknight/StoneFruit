@@ -4,7 +4,7 @@ namespace StoneFruit.Containers.Lamar
 {
     public static class AssemblyScannerExtensions
     {
-        public static void ScanForCommandVerbs(this IAssemblyScanner scanner)
+        public static void ScanForHandlers(this IAssemblyScanner scanner)
         {
             scanner.TheCallingAssembly();
             scanner.AssemblyContainingType<IHandlerBase>();

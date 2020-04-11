@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
-using StoneFruit.Handlers;
 using TestUtilities;
 
 namespace StoneFruit.Tests.Integration

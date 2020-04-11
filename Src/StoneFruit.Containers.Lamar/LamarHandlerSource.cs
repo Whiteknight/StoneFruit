@@ -20,20 +20,12 @@ namespace StoneFruit.Containers.Lamar
             if (container == null)
             {
                 var registry = new ServiceRegistry();
-                registry.Scan(s => s.ScanForCommandVerbs());
-                registry.Injectable<CommandDispatcher>();
-                registry.Injectable<IEnvironmentCollection>();
-                registry.Injectable<EngineState>();
-                registry.Injectable<IOutput>();
-                registry.Injectable<ICommandParser>();
-                registry.Injectable<IHandlerSource>();
-                registry.Injectable<Command>();
-                registry.Injectable<IArguments>();
-                if (typeof(TEnvironment) != typeof(object))
-                    registry.Injectable<TEnvironment>();
-
+                registry.Scan(s => s.ScanForHandlers());
+                registry.SetupInjectableServices<TEnvironment>();
                 container = new Container(registry);
             }
+
+            var child = container.GetNestedContainer();
 
             //var scanned = container.WhatDidIScan();
             //var have = container.WhatDoIHave();

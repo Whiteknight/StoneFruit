@@ -5,7 +5,6 @@ using Ninject;
 using Ninject.Activation;
 using Ninject.Activation.Caching;
 using Ninject.Extensions.ChildKernel;
-using Ninject.Extensions.Conventions;
 using Ninject.Parameters;
 using Ninject.Planning;
 using Ninject.Planning.Bindings;
@@ -25,17 +24,7 @@ namespace StoneFruit.Containers.Ninject
             if (kernel == null)
             {
                 kernel = new StandardKernel();
-                kernel.Bind(x =>
-                {
-                    x.FromAssemblyContaining<IHandlerBase>()
-                        .SelectAllTypes()
-                        .InheritedFrom<IHandlerBase>()
-                        .BindAllInterfaces();
-                    x.FromAssembliesInPath(".")
-                        .SelectAllTypes()
-                        .InheritedFrom<IHandlerBase>()
-                        .BindAllInterfaces();
-                });
+                kernel.ScanForHandlers();
             }
 
             _kernel = kernel;
