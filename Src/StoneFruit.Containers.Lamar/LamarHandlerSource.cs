@@ -20,6 +20,8 @@ namespace StoneFruit.Containers.Lamar
             //var have = container.WhatDoIHave();
             //_container = new Lazy<IContainer>(getContainer ?? GetDefaultContainer);
             _container = provider as IContainer;
+            if (_container == null)
+                throw new ArgumentException("Expected a Lamar Container", nameof(provider));
             _verbExtractor = verbExtractor ?? TypeVerbExtractor.DefaultInstance;
             _nameMap = new Lazy<IReadOnlyDictionary<string, Type>>(SetupNameMapping);
         }
