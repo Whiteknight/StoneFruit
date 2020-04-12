@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Environments;
@@ -110,7 +111,31 @@ namespace StoneFruit
             var parser = _parsers.Build();
             var output = _output.Build();
             
-            return new Engine(commandSource, environmentFactory, parser, output, _eventCatalog, _settings);
+            //return new Engine(commandSource, environmentFactory, parser, output, _eventCatalog, _settings);
+            return null;
         }
+
+        //public Engine BuildTo(IServiceCollection services)
+        //{
+        //    var commandSource = _handlers.Build();
+        //    if (!commandSource.GetAll().Any())
+        //        throw EngineBuildException.NoHandlers();
+
+        //    var environmentFactory = _environments.Build();
+        //    var parser = _parsers.Build();
+        //    var output = _output.Build();
+
+        //    services.AddSingleton(commandSource);
+        //    services.AddSingleton(environmentFactory);
+        //    services.AddSingleton(parser);
+        //    services.AddSingleton(output);
+
+        //    //var engine = new Engine(commandSource, environmentFactory, parser, output, _eventCatalog, _settings);
+
+        //    services.AddTransient(provider => engine.GetCurrentState());
+        //    services.AddTransient(provider => engine.GetCurrentDispatcher());
+
+        //    return engine;
+        //}
     }
 }

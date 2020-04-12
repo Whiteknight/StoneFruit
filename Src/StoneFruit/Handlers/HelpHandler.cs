@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using StoneFruit.Execution.Arguments;
+using StoneFruit.Execution.Handlers;
 
 namespace StoneFruit.Handlers
 {
@@ -11,10 +12,10 @@ namespace StoneFruit.Handlers
         public const string Name = "help";
 
         private readonly IOutput _output;
-        private readonly IHandlerSource _commands;
+        private readonly IHandlers _commands;
         private readonly IArguments _args;
 
-        public HelpHandler(IOutput output, IHandlerSource commands, IArguments args)
+        public HelpHandler(IOutput output, IHandlers commands, IArguments args)
         {
             _output = output;
             _commands = commands;

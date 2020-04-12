@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using StoneFruit.Execution.Arguments;
+using StoneFruit.Execution.Handlers;
 using StoneFruit.Utility;
 
 namespace StoneFruit.Execution
@@ -12,10 +13,10 @@ namespace StoneFruit.Execution
     /// </summary>
     public class CommandDispatcher
     {
-        public CommandDispatcher(ICommandParser parser, IHandlerSource commands, IEnvironmentCollection environments, EngineState state, IOutput output)
+        public CommandDispatcher(ICommandParser parser, HandlerSourceCollection handlers, IEnvironmentCollection environments, EngineState state, IOutput output)
         {
             Parser = parser;
-            Commands = commands;
+            Commands = handlers;
             Environments = environments;
             State = state;
             Output = output;
@@ -29,7 +30,7 @@ namespace StoneFruit.Execution
         /// <summary>
         /// The source of handlers
         /// </summary>
-        public IHandlerSource Commands { get; }
+        public HandlerSourceCollection Commands { get; }
 
         /// <summary>
         /// The current environment and collection of all possible environments

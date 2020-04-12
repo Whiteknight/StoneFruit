@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Lamar;
 using StoneFruit.Execution;
-using StoneFruit.Execution.Arguments;
 using StoneFruit.Utility;
 
 namespace StoneFruit.Containers.Lamar
@@ -13,25 +12,24 @@ namespace StoneFruit.Containers.Lamar
     {
         private readonly ITypeVerbExtractor _verbExtractor;
         private readonly IContainer _container;
-        private readonly IReadOnlyDictionary<string, Type> _nameMap;
+        private readonly Lazy<IReadOnlyDictionary<string, Type>> _nameMap;
 
-        public LamarHandlerSource(IContainer container, ITypeVerbExtractor verbExtractor)
+        public LamarHandlerSource(IServiceProvider provider, ITypeVerbExtractor verbExtractor)
         {
-            if (container == null)
-            {
-                var registry = new ServiceRegistry();
-                registry.Scan(s => s.ScanForHandlers());
-                registry.SetupInjectableServices<TEnvironment>();
-                container = new Container(registry);
-            }
-
-            var child = container.GetNestedContainer();
-
             //var scanned = container.WhatDidIScan();
             //var have = container.WhatDoIHave();
-            _container = container;
+            //_container = new Lazy<IContainer>(getContainer ?? GetDefaultContainer);
+            _container = provider as IContainer;
             _verbExtractor = verbExtractor ?? TypeVerbExtractor.DefaultInstance;
-            _nameMap = SetupNameMapping();
+            _nameMap = new Lazy<IReadOnlyDictionary<string, Type>>(SetupNameMapping);
+        }
+
+        private static IContainer GetDefaultContainer()
+        {
+            var registry = new ServiceRegistry();
+            registry.Scan(s => s.ScanForHandlers());
+            registry.SetupInjectableServices<TEnvironment>();
+            return new Container(registry);
         }
 
         private IReadOnlyDictionary<string, Type> SetupNameMapping()
@@ -53,7 +51,7 @@ namespace StoneFruit.Containers.Lamar
         public IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher)
         {
             var verb = command.Verb.ToLowerInvariant();
-            var type = _nameMap.ContainsKey(verb) ? _nameMap[verb] : null;
+            var type = _nameMap.Value.ContainsKey(verb) ? _nameMap.Value[verb] : null;
             return type == null ? null : ResolveCommand(command, dispatcher, type);
         }
 
@@ -61,10 +59,10 @@ namespace StoneFruit.Containers.Lamar
             where TCommand : class, IHandlerBase
             => ResolveCommand(Command, dispatcher, typeof(TCommand));
 
-        public IEnumerable<IVerbInfo> GetAll() => _nameMap.Select(kvp => new VerbInfo(kvp.Key, kvp.Value));
+        public IEnumerable<IVerbInfo> GetAll() => _nameMap.Value.Select(kvp => new VerbInfo(kvp.Key, kvp.Value));
 
         public IVerbInfo GetByName(string name)
-            => _nameMap.ContainsKey(name) ? new VerbInfo(name, _nameMap[name]) : null;
+            => _nameMap.Value.ContainsKey(name) ? new VerbInfo(name, _nameMap.Value[name]) : null;
 
         private IHandlerBase ResolveCommand(Command Command, CommandDispatcher dispatcher, Type type)
         {

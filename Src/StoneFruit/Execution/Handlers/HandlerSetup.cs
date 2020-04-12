@@ -12,14 +12,14 @@ namespace StoneFruit.Execution.Handlers
     /// </summary>
     public class HandlerSetup : IHandlerSetup
     {
-        private readonly CombinedHandlerSource _sources;
+        private readonly HandlerSourceCollection _sources;
         private readonly DelegateHandlerSource _delegates;
         private readonly ScriptHandlerSource _scripts;
         private readonly NamedInstanceHandlerSource _instances;
 
         public HandlerSetup()
         {
-            _sources = new CombinedHandlerSource();
+            //_sources = new HandlerSourceCollection();
             _delegates = new DelegateHandlerSource();
             _scripts = new ScriptHandlerSource();
             _instances = new NamedInstanceHandlerSource();
@@ -27,32 +27,25 @@ namespace StoneFruit.Execution.Handlers
 
         public IHandlerSource Build()
         {
-            if (_delegates.Count > 0)
-                _sources.Add(_delegates);
-            if (_scripts.Count > 0)
-                _sources.Add(_scripts);
-            if (_instances.Count > 0)
-                _sources.Add(_instances);
+            //if (_delegates.Count > 0)
+            //    _sources.Add(_delegates);
+            //if (_scripts.Count > 0)
+            //    _sources.Add(_scripts);
+            //if (_instances.Count > 0)
+            //    _sources.Add(_instances);
 
-            // Add some core handlers which are necessary for scripts. These might be already
-            // included elsewhere, but we absolutely need to make sure we have them no
-            // matter what.
-            _sources.Add(new TypeListConstructSource(new[]
-            {
-                typeof(EchoHandler),
-                typeof(EnvironmentChangeHandler),
-                typeof(EnvironmentListHandler),
-                typeof(ExitHandler),
-                typeof(HelpHandler),
-                typeof(MetadataRemoveHandler),
-            }, null));
-            return _sources.Simplify();
+            //// Add some core handlers which are necessary for scripts. These might be already
+            //// included elsewhere, but we absolutely need to make sure we have them no
+            //// matter what.
+            //_sources.Add();
+            //return _sources.Simplify();
+            return null;
         }
 
         public IHandlerSetup AddSource(IHandlerSource source)
         {
             Assert.ArgumentNotNull(source, nameof(source));
-            _sources.Add(source);
+            //_sources.Add(source);
             return this;
         }
 
@@ -92,8 +85,8 @@ namespace StoneFruit.Execution.Handlers
         {
             Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
             Assert.ArgumentNotNull(aliases, nameof(aliases));
-            foreach (var alias in aliases)
-                _sources.AddAlias(verb, alias);
+            //foreach (var alias in aliases)
+            //    _sources.AddAlias(verb, alias);
             return this;
         }
     }

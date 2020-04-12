@@ -18,8 +18,9 @@ namespace StoneFruit.Containers.Lamar
             where TEnvironment : class
         {
             Assert.ArgumentNotNull(handlers, nameof(handlers));
-            var source = new LamarHandlerSource<TEnvironment>(container, verbExtractor);
-            return handlers.AddSource(source);
+            //var source = new LamarHandlerSource<TEnvironment>(container, verbExtractor);
+            //return handlers.AddSource(source);
+            return handlers;
         }
     }
 }
