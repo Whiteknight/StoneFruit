@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace StoneFruit.Execution.Environments
 {
@@ -10,7 +11,11 @@ namespace StoneFruit.Execution.Environments
     {
         private IEnvironmentCollection _environments;
 
-        public IEnvironmentCollection Build() => _environments ?? new InstanceEnvironmentCollection(null);
+        public void BuildUp(IServiceCollection services)
+        {
+            var environments = _environments ?? new InstanceEnvironmentCollection(null);
+            services.AddSingleton<IEnvironmentCollection>(environments);
+        }
 
         public IEnvironmentSetup UseFactory(IEnvironmentFactory factory)
         {

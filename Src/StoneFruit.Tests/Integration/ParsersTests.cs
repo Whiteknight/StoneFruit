@@ -31,68 +31,68 @@ namespace StoneFruit.Tests.Integration
             }
         }
 
-        [Test]
-        public void UseSimplifiedArgumentParser_Test()
-        {
-            var output = new TestOutput();
-            var engine = new EngineBuilder()
-                .SetupHandlers(h => h.UseHandlerTypes(typeof(EchoHandler), typeof(TestHandler)))
-                .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .SetupArguments(a => a.UseSimplifiedArgumentParser())
-                .Build();
-            engine.RunHeadless("test a b=x -c");
-            output.Lines.Count.Should().Be(3);
-            output.Lines[0].Should().Be("a");
-            output.Lines[1].Should().Be("x");
-            output.Lines[2].Should().Be("True");
-        }
+        //[Test]
+        //public void UseSimplifiedArgumentParser_Test()
+        //{
+        //    var output = new TestOutput();
+        //    var engine = new EngineBuilder()
+        //        .SetupHandlers(h => h.UseHandlerTypes(typeof(EchoHandler), typeof(TestHandler)))
+        //        .SetupOutput(o => o.DoNotUseConsole().Add(output))
+        //        .SetupArguments(a => a.UseSimplifiedArgumentParser())
+        //        .Build();
+        //    engine.RunHeadless("test a b=x -c");
+        //    output.Lines.Count.Should().Be(3);
+        //    output.Lines[0].Should().Be("a");
+        //    output.Lines[1].Should().Be("x");
+        //    output.Lines[2].Should().Be("True");
+        //}
 
-        [Test]
-        public void UsePosixStyleArgumentParser_Test()
-        {
-            var output = new TestOutput();
-            var engine = new EngineBuilder()
-                .SetupHandlers(h => h.UseHandlerTypes(typeof(EchoHandler), typeof(TestHandler)))
-                .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .SetupArguments(a => a.UsePosixStyleArgumentParser())
-                .Build();
-            engine.RunHeadless("test a --b x -c");
-            output.Lines.Count.Should().Be(3);
-            output.Lines[0].Should().Be("a");
-            output.Lines[1].Should().Be("x");
-            output.Lines[2].Should().Be("True");
-        }
+        //[Test]
+        //public void UsePosixStyleArgumentParser_Test()
+        //{
+        //    var output = new TestOutput();
+        //    var engine = new EngineBuilder()
+        //        .SetupHandlers(h => h.UseHandlerTypes(typeof(EchoHandler), typeof(TestHandler)))
+        //        .SetupOutput(o => o.DoNotUseConsole().Add(output))
+        //        .SetupArguments(a => a.UsePosixStyleArgumentParser())
+        //        .Build();
+        //    engine.RunHeadless("test a --b x -c");
+        //    output.Lines.Count.Should().Be(3);
+        //    output.Lines[0].Should().Be("a");
+        //    output.Lines[1].Should().Be("x");
+        //    output.Lines[2].Should().Be("True");
+        //}
 
-        [Test]
-        public void UsePowershellArgumentParser_Test()
-        {
-            var output = new TestOutput();
-            var engine = new EngineBuilder()
-                .SetupHandlers(h => h.UseHandlerTypes(typeof(EchoHandler), typeof(TestHandler)))
-                .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .SetupArguments(a => a.UsePowershellStyleArgumentParser())
-                .Build();
-            engine.RunHeadless("test a -b x -c");
-            //output.Lines.Count.Should().Be(3);
-            output.Lines[0].Should().Be("a");
-            output.Lines[1].Should().Be("x");
-            output.Lines[2].Should().Be("True");
-        }
+        //[Test]
+        //public void UsePowershellArgumentParser_Test()
+        //{
+        //    var output = new TestOutput();
+        //    var engine = new EngineBuilder()
+        //        .SetupHandlers(h => h.UseHandlerTypes(typeof(EchoHandler), typeof(TestHandler)))
+        //        .SetupOutput(o => o.DoNotUseConsole().Add(output))
+        //        .SetupArguments(a => a.UsePowershellStyleArgumentParser())
+        //        .Build();
+        //    engine.RunHeadless("test a -b x -c");
+        //    //output.Lines.Count.Should().Be(3);
+        //    output.Lines[0].Should().Be("a");
+        //    output.Lines[1].Should().Be("x");
+        //    output.Lines[2].Should().Be("True");
+        //}
 
-        [Test]
-        public void UseWindowsCmdArgumentParser_Test()
-        {
-            var output = new TestOutput();
-            var engine = new EngineBuilder()
-                .SetupHandlers(h => h.UseHandlerTypes(typeof(EchoHandler), typeof(TestHandler)))
-                .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .SetupArguments(a => a.UseWindowsCmdArgumentParser())
-                .Build();
-            engine.RunHeadless("test a /b:x /c");
-            //output.Lines.Count.Should().Be(3);
-            output.Lines[0].Should().Be("a");
-            output.Lines[1].Should().Be("x");
-            output.Lines[2].Should().Be("True");
-        }
+        //[Test]
+        //public void UseWindowsCmdArgumentParser_Test()
+        //{
+        //    var output = new TestOutput();
+        //    var engine = new EngineBuilder()
+        //        .SetupHandlers(h => h.UseHandlerTypes(typeof(EchoHandler), typeof(TestHandler)))
+        //        .SetupOutput(o => o.DoNotUseConsole().Add(output))
+        //        .SetupArguments(a => a.UseWindowsCmdArgumentParser())
+        //        .Build();
+        //    engine.RunHeadless("test a /b:x /c");
+        //    //output.Lines.Count.Should().Be(3);
+        //    output.Lines[0].Should().Be("a");
+        //    output.Lines[1].Should().Be("x");
+        //    output.Lines[2].Should().Be("True");
+        //}
     }
 }

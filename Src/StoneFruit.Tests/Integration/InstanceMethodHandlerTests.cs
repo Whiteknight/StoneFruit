@@ -26,40 +26,40 @@ namespace StoneFruit.Tests.Integration
             }
         }
 
-        [Test]
-        public void A_Test()
-        {
-            var output = new TestOutput();
-            var engine = new EngineBuilder()
-                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject()))
-                .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .Build();
-            engine.RunHeadless("testa");
-            output.Lines[0].Should().Be("A");
-        }
+        //[Test]
+        //public void A_Test()
+        //{
+        //    var output = new TestOutput();
+        //    var engine = new EngineBuilder()
+        //        .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject()))
+        //        .SetupOutput(o => o.DoNotUseConsole().Add(output))
+        //        .Build();
+        //    engine.RunHeadless("testa");
+        //    output.Lines[0].Should().Be("A");
+        //}
 
-        [Test]
-        public void B_Test()
-        {
-            var output = new TestOutput();
-            var engine = new EngineBuilder()
-                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject()))
-                .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .Build();
-            engine.RunHeadless("testb name=x");
-            output.Lines[0].Should().Be("B: x");
-        }
+        //[Test]
+        //public void B_Test()
+        //{
+        //    var output = new TestOutput();
+        //    var engine = new EngineBuilder()
+        //        .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject()))
+        //        .SetupOutput(o => o.DoNotUseConsole().Add(output))
+        //        .Build();
+        //    engine.RunHeadless("testb name=x");
+        //    output.Lines[0].Should().Be("B: x");
+        //}
 
-        [Test]
-        public void C_Test()
-        {
-            var output = new TestOutput();
-            var engine = new EngineBuilder()
-                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject()))
-                .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .Build();
-            engine.RunHeadless("testc");
-            output.Lines[0].Should().Be("C");
-        }
+        //[Test]
+        //public void C_Test()
+        //{
+        //    var output = new TestOutput();
+        //    var engine = new EngineBuilder()
+        //        .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject()))
+        //        .SetupOutput(o => o.DoNotUseConsole().Add(output))
+        //        .Build();
+        //    engine.RunHeadless("testc");
+        //    output.Lines[0].Should().Be("C");
+        //}
     }
 }

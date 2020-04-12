@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
@@ -101,41 +100,14 @@ namespace StoneFruit
         /// Build the Engine using configured objects
         /// </summary>
         /// <returns></returns>
-        public Engine Build()
+        public void BuildUp(IServiceCollection services)
         {
-            var commandSource = _handlers.Build();
-            if (!commandSource.GetAll().Any())
-                throw EngineBuildException.NoHandlers();
-
-            var environmentFactory = _environments.Build();
-            var parser = _parsers.Build();
-            var output = _output.Build();
-            
-            //return new Engine(commandSource, environmentFactory, parser, output, _eventCatalog, _settings);
-            return null;
+            _handlers.BuildUp(services);
+            services.AddSingleton(_eventCatalog);
+            services.AddSingleton(_settings);
+            _environments.BuildUp(services);
+            _parsers.BuildUp(services);
+            _output.BuildUp(services);
         }
-
-        //public Engine BuildTo(IServiceCollection services)
-        //{
-        //    var commandSource = _handlers.Build();
-        //    if (!commandSource.GetAll().Any())
-        //        throw EngineBuildException.NoHandlers();
-
-        //    var environmentFactory = _environments.Build();
-        //    var parser = _parsers.Build();
-        //    var output = _output.Build();
-
-        //    services.AddSingleton(commandSource);
-        //    services.AddSingleton(environmentFactory);
-        //    services.AddSingleton(parser);
-        //    services.AddSingleton(output);
-
-        //    //var engine = new Engine(commandSource, environmentFactory, parser, output, _eventCatalog, _settings);
-
-        //    services.AddTransient(provider => engine.GetCurrentState());
-        //    services.AddTransient(provider => engine.GetCurrentDispatcher());
-
-        //    return engine;
-        //}
     }
 }

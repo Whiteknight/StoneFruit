@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using ParserObjects;
 using ParserObjects.Parsers;
 using StoneFruit.Execution.Scripts.Formatting;
@@ -16,7 +17,13 @@ namespace StoneFruit.Execution.Arguments
 
         private ICommandParser _parser;
 
-        public ICommandParser Build()
+        public void BuildUp(IServiceCollection services)
+        {
+            var parser = GetParserInstance();
+            services.AddSingleton(parser);
+        }
+
+        private ICommandParser GetParserInstance()
         {
             if (_parser != null)
                 return _parser;

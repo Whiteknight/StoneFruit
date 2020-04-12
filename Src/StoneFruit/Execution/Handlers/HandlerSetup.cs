@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Execution.Scripts;
-using StoneFruit.Handlers;
 using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Handlers
@@ -12,40 +12,44 @@ namespace StoneFruit.Execution.Handlers
     /// </summary>
     public class HandlerSetup : IHandlerSetup
     {
-        private readonly HandlerSourceCollection _sources;
+        private readonly List<IHandlerSource> _sources;
         private readonly DelegateHandlerSource _delegates;
         private readonly ScriptHandlerSource _scripts;
         private readonly NamedInstanceHandlerSource _instances;
+        private readonly AliasMap _aliases;
 
         public HandlerSetup()
         {
-            //_sources = new HandlerSourceCollection();
+            _sources = new List<IHandlerSource>();
             _delegates = new DelegateHandlerSource();
             _scripts = new ScriptHandlerSource();
             _instances = new NamedInstanceHandlerSource();
+            _aliases = new AliasMap();
         }
 
-        public IHandlerSource Build()
+        public void BuildUp(IServiceCollection services)
         {
-            //if (_delegates.Count > 0)
-            //    _sources.Add(_delegates);
-            //if (_scripts.Count > 0)
-            //    _sources.Add(_scripts);
-            //if (_instances.Count > 0)
-            //    _sources.Add(_instances);
-
-            //// Add some core handlers which are necessary for scripts. These might be already
-            //// included elsewhere, but we absolutely need to make sure we have them no
-            //// matter what.
-            //_sources.Add();
-            //return _sources.Simplify();
-            return null;
+            services.AddSingleton(_aliases);
+            if (_delegates.Count > 0)
+                services.AddSingleton<IHandlerSource>(_delegates);
+            if (_scripts.Count > 0)
+                services.AddSingleton<IHandlerSource>(_scripts);
+            if (_instances.Count > 0)
+                services.AddSingleton<IHandlerSource>(_instances);
+            foreach (var source in _sources)
+                services.AddSingleton(source);
+            services.AddSingleton<IHandlers>(provider =>
+            {
+                var sources = provider.GetServices<IHandlerSource>();
+                var aliases = provider.GetService<AliasMap>();
+                return new HandlerSourceCollection(sources, aliases);
+            });
         }
 
         public IHandlerSetup AddSource(IHandlerSource source)
         {
             Assert.ArgumentNotNull(source, nameof(source));
-            //_sources.Add(source);
+            _sources.Add(source);
             return this;
         }
 
@@ -85,8 +89,8 @@ namespace StoneFruit.Execution.Handlers
         {
             Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
             Assert.ArgumentNotNull(aliases, nameof(aliases));
-            //foreach (var alias in aliases)
-            //    _sources.AddAlias(verb, alias);
+            foreach (var alias in aliases)
+                _aliases.AddAlias(verb, alias);
             return this;
         }
     }

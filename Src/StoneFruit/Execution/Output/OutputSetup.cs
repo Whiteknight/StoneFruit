@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace StoneFruit.Execution.Output
 {
@@ -27,7 +28,13 @@ namespace StoneFruit.Execution.Output
             return this;
         }
 
-        public IOutput Build()
+        public void BuildUp(IServiceCollection services)
+        {
+            var output = GetConfiguredOutput();
+            services.AddSingleton(output);
+        }
+
+        private IOutput GetConfiguredOutput()
         {
             if (_useConsole == false)
             {

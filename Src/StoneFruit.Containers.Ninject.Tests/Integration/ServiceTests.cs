@@ -55,33 +55,33 @@ namespace StoneFruit.Containers.Ninject.Tests.Integration
             }
         }
 
-        [Test]
-        public void Test()
-        {
-            var kernel = new StandardKernel();
-            kernel.Bind<MyService>().ToSelf().InTransientScope();
-            kernel.Bind<IHandlerBase>().To<TestHandler>().InTransientScope();
+        //[Test]
+        //public void Test()
+        //{
+        //    var kernel = new StandardKernel();
+        //    kernel.Bind<MyService>().ToSelf().InTransientScope();
+        //    kernel.Bind<IHandlerBase>().To<TestHandler>().InTransientScope();
 
-            var output = new TestOutput();
+        //    var output = new TestOutput();
 
-            var engine = new EngineBuilder()
-                .SetupHandlers(h => h.UseNinjectHandlerSource(kernel))
-                .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .SetupEnvironments(e => e.UseFactory(new MyEnvironmentFactory()))
-                .SetupEvents(e =>
-                {
-                    e.EnvironmentChanged.Clear();
-                })
-                .Build();
+        //    var engine = new EngineBuilder()
+        //        .SetupHandlers(h => h.UseNinjectHandlerSource(kernel))
+        //        .SetupOutput(o => o.DoNotUseConsole().Add(output))
+        //        .SetupEnvironments(e => e.UseFactory(new MyEnvironmentFactory()))
+        //        .SetupEvents(e =>
+        //        {
+        //            e.EnvironmentChanged.Clear();
+        //        })
+        //        .Build();
 
-            kernel
-                .Bind<MyEnvironment>()
-                .ToMethod(c => (MyEnvironment) engine.Environments.Current)
-                .InTransientScope();
+        //    kernel
+        //        .Bind<MyEnvironment>()
+        //        .ToMethod(c => (MyEnvironment) engine.Environments.Current)
+        //        .InTransientScope();
             
-            engine.RunHeadless("A test");
-            output.Lines.Count.Should().Be(1);
-            output.Lines[0].Should().Be("A");
-        }
+        //    engine.RunHeadless("A test");
+        //    output.Lines.Count.Should().Be(1);
+        //    output.Lines[0].Should().Be("A");
+        //}
     }
 }

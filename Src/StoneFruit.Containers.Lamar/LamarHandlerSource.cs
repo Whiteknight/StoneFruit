@@ -24,14 +24,6 @@ namespace StoneFruit.Containers.Lamar
             _nameMap = new Lazy<IReadOnlyDictionary<string, Type>>(SetupNameMapping);
         }
 
-        private static IContainer GetDefaultContainer()
-        {
-            var registry = new ServiceRegistry();
-            registry.Scan(s => s.ScanForHandlers());
-            registry.SetupInjectableServices<TEnvironment>();
-            return new Container(registry);
-        }
-
         private IReadOnlyDictionary<string, Type> SetupNameMapping()
         {
             var commandTypes = _container.Model.AllInstances
@@ -52,34 +44,24 @@ namespace StoneFruit.Containers.Lamar
         {
             var verb = command.Verb.ToLowerInvariant();
             var type = _nameMap.Value.ContainsKey(verb) ? _nameMap.Value[verb] : null;
-            return type == null ? null : ResolveCommand(command, dispatcher, type);
+            return type == null ? null : ResolveHandler(command, dispatcher, type);
         }
 
-        public IHandlerBase GetInstance<TCommand>(Command Command, CommandDispatcher dispatcher)
+        public IHandlerBase GetInstance<TCommand>(Command command, CommandDispatcher dispatcher)
             where TCommand : class, IHandlerBase
-            => ResolveCommand(Command, dispatcher, typeof(TCommand));
+            => ResolveHandler(command, dispatcher, typeof(TCommand));
 
         public IEnumerable<IVerbInfo> GetAll() => _nameMap.Value.Select(kvp => new VerbInfo(kvp.Key, kvp.Value));
 
         public IVerbInfo GetByName(string name)
             => _nameMap.Value.ContainsKey(name) ? new VerbInfo(name, _nameMap.Value[name]) : null;
 
-        private IHandlerBase ResolveCommand(Command Command, CommandDispatcher dispatcher, Type type)
+        private IHandlerBase ResolveHandler(Command command, CommandDispatcher dispatcher, Type type)
         {
             var context = _container.GetNestedContainer();
 
-            // long-lived
-            context.Inject(dispatcher);
-            context.Inject(dispatcher.Environments);
-            context.Inject(dispatcher.State);
-            context.Inject(dispatcher.Output);
-            context.Inject(dispatcher.Parser);
-            context.Inject(dispatcher.Commands);
-
-            // transient
-            context.Inject(Command);
-            context.Inject(Command.Arguments);
-
+            context.Inject(command);
+            context.Inject(command.Arguments);
             if (dispatcher.Environments.Current != null)
                 context.Inject(dispatcher.Environments.Current.GetType(), dispatcher.Environments.Current, true);
 

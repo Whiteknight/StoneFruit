@@ -7,6 +7,16 @@ using StoneFruit.Utility;
 
 namespace StoneFruit.Execution
 {
+    public class EngineAccessor
+    {
+        public Engine Engine { get; private set; }
+
+        public void SetEngine(Engine engine)
+        {
+            Engine = engine;
+        }
+    }
+
     /// <summary>
     /// The execution core. Provides a run loop to receive user commands and execute them
     /// </summary>
@@ -37,8 +47,16 @@ namespace StoneFruit.Execution
 
         private void SetupState(bool headless)
         {
+            if (_state != null)
+                throw new Exception("Cannot Run while the engine is already running.");
             _state = new EngineState(headless, _eventCatalog, _settings);
             _dispatcher = new CommandDispatcher(_parser, _handlers, Environments, _state, Output);
+        }
+
+        private void ClearState()
+        {
+            _state = null;
+            _dispatcher = null;
         }
 
         public EngineState GetCurrentState() => _state;
@@ -208,6 +226,18 @@ namespace StoneFruit.Execution
         // signal is received. Each command is added to the command queue and the queue
         // is drained. 
         private int RunLoop(CommandSourceCollection sources)
+        {
+            try
+            {
+                return RunLoopInternal(sources);
+            }
+            finally
+            {
+                ClearState();
+            }
+        }
+
+        private int RunLoopInternal(CommandSourceCollection sources)
         {
             while (true)
             {
