@@ -1,19 +1,20 @@
-﻿using StructureMap;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
+using StructureMap;
 
 namespace StoneFruit.Containers.StructureMap
 {
     public static class ContainerExtensions
     {
-        public static ConfigurationExpression ScanForCommandVerbs(this ConfigurationExpression config)
+        public static void SetupEngine(this IContainer container, Action<IEngineBuilder> build)
         {
-            config.Scan(s =>
-            {
-                s.AssemblyContainingType<IHandlerBase>();
-                s.AssembliesFromApplicationBaseDirectory();
-                s.AddAllTypesOf<IHandlerBase>();
-                s.WithDefaultConventions();
-            });
-            return config;
+            var services = new StructureMapServiceCollection();
+            EngineBuilder.SetupEngineRegistrations(services, build);
+
+            services.AddSingleton<IHandlerSource>(provider => new StructureMapHandlerSource(provider, TypeVerbExtractor.DefaultInstance));
+            container.Configure(c => c.ScanForCommandVerbs());
+            container.Populate(services);
+            //var have = container.WhatDoIHave();
         }
     }
 }

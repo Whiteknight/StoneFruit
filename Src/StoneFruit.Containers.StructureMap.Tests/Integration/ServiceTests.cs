@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using FluentAssertions;
 using NUnit.Framework;
+using StoneFruit.Execution;
 using StructureMap;
 using TestUtilities;
 
@@ -8,7 +9,7 @@ namespace StoneFruit.Containers.StructureMap.Tests.Integration
 {
     public class ServiceTests
     {
-        private class MyEnvironment
+        public class MyEnvironment
         {
             public string Name { get; }
 
@@ -25,7 +26,7 @@ namespace StoneFruit.Containers.StructureMap.Tests.Integration
             public IReadOnlyCollection<string> ValidEnvironments => new[] { "A", "B", "C" };
         }
 
-        private class MyService
+        public class MyService
         {
             private readonly MyEnvironment _env;
 
@@ -37,8 +38,8 @@ namespace StoneFruit.Containers.StructureMap.Tests.Integration
             public string GetEnvironmentName() => _env.Name;
         }
 
-        [Verb("test")]
-        private class TestHandler : IHandler
+        [Verb("test-service")]
+        public class TestHandler : IHandler
         {
             private readonly MyService _service;
             private readonly IOutput _output;
@@ -55,31 +56,25 @@ namespace StoneFruit.Containers.StructureMap.Tests.Integration
             }
         }
 
-        //[Test]
-        //public void Test()
-        //{
-        //    Execution.Engine engine = null;
-        //    var container = new Container(s =>
-        //    {
-        //        s.For<IHandlerBase>().Add<TestHandler>().Transient();
-        //        s.For<MyEnvironment>().Use(c => (MyEnvironment) engine.Environments.Current).Transient();
-        //    });
+        [Test]
+        public void Test()
+        {
+            var output = new TestOutput();
+            var container = new Container();
+            container.SetupEngine(builder => builder
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .SetupEnvironments(e => e.UseFactory(new MyEnvironmentFactory()))
+                .SetupEvents(e =>
+                {
+                    e.EnvironmentChanged.Clear();
+                })
+            );
 
-        //    var output = new TestOutput();
+            var engine = container.GetInstance<Engine>();
 
-        //    engine = new EngineBuilder()
-        //        .SetupHandlers(h => h.UseStructureMapHandlerSource(container))
-        //        .SetupOutput(o => o.DoNotUseConsole().Add(output))
-        //        .SetupEnvironments(e => e.UseFactory(new MyEnvironmentFactory()))
-        //        .SetupEvents(e =>
-        //        {
-        //            e.EnvironmentChanged.Clear();
-        //        })
-        //        .Build();
-
-        //    engine.RunHeadless("A test");
-        //    output.Lines.Count.Should().Be(1);
-        //    output.Lines[0].Should().Be("A");
-        //}
+            engine.RunHeadless("A test-service");
+            output.Lines.Count.Should().Be(1);
+            output.Lines[0].Should().Be("A");
+        }
     }
 }

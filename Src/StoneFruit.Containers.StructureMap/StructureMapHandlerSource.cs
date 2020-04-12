@@ -13,17 +13,14 @@ namespace StoneFruit.Containers.StructureMap
         private readonly IContainer _container;
         private readonly IReadOnlyDictionary<string, Type> _nameMap;
 
-        public StructureMapHandlerSource(IContainer container, ITypeVerbExtractor verbExtractor)
+        public StructureMapHandlerSource(IServiceProvider serviceProvider, ITypeVerbExtractor verbExtractor)
         {
-            if (container == null)
-            {
-                container = new Container();
-                container.Configure(c => c.ScanForCommandVerbs());
-                //var scanned = container.WhatDidIScan();
-                //var have = container.WhatDoIHave();
-            }
+            Assert.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
 
-            _container = container;
+            _container = (serviceProvider as StructureMapServiceProvider)?.Container;
+            if (_container == null)
+                throw new ArgumentException("Expected StructureMap Container", nameof(serviceProvider));
+
             _verbExtractor = verbExtractor ?? TypeVerbExtractor.DefaultInstance;
             _nameMap = SetupNameMapping();
         }
@@ -63,18 +60,8 @@ namespace StoneFruit.Containers.StructureMap
         private IHandlerBase ResolveCommand(Command Command, CommandDispatcher dispatcher, Type type)
         {
             var context = _container
-                // long-lived
-                .With(dispatcher)
-                .With(dispatcher.Environments)
-                .With(dispatcher.State)
-                .With(dispatcher.Output)
-                .With(dispatcher.Parser)
-                .With(dispatcher.Commands)
-
-                // transient
                 .With(Command)
-                .With(Command.Arguments)
-                ;
+                .With(Command.Arguments);
             if (dispatcher.Environments.Current != null)
                 context = context.With(dispatcher.Environments.Current.GetType(), dispatcher.Environments.Current);
 

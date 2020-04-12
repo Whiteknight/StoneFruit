@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <PackageReference Include="structuremap" Version="4.7.0" />
+    <PackageReference Include="StructureMap.Microsoft.DependencyInjection" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>

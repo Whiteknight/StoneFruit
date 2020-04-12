@@ -13,7 +13,7 @@ namespace StoneFruit.Execution
     /// </summary>
     public class CommandDispatcher
     {
-        public CommandDispatcher(ICommandParser parser, HandlerSourceCollection handlers, IEnvironmentCollection environments, EngineState state, IOutput output)
+        public CommandDispatcher(ICommandParser parser, IHandlers handlers, IEnvironmentCollection environments, EngineState state, IOutput output)
         {
             Parser = parser;
             Commands = handlers;
@@ -30,7 +30,7 @@ namespace StoneFruit.Execution
         /// <summary>
         /// The source of handlers
         /// </summary>
-        public HandlerSourceCollection Commands { get; }
+        public IHandlers Commands { get; }
 
         /// <summary>
         /// The current environment and collection of all possible environments

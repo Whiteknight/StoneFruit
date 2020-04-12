@@ -22,7 +22,7 @@ namespace StoneFruit.Execution
     /// </summary>
     public class Engine
     {
-        private readonly HandlerSourceCollection _handlers;
+        private readonly IHandlers _handlers;
         private readonly EngineEventCatalog _eventCatalog;
         private readonly EngineSettings _settings;
         private readonly ICommandParser _parser;
@@ -30,8 +30,9 @@ namespace StoneFruit.Execution
         private EngineState _state;
         private CommandDispatcher _dispatcher;
 
-        public Engine(HandlerSourceCollection handlers, IEnvironmentCollection environments, ICommandParser parser, IOutput output, EngineEventCatalog eventCatalog, EngineSettings settings)
+        public Engine(IHandlers handlers, IEnvironmentCollection environments, ICommandParser parser, IOutput output, EngineEventCatalog eventCatalog, EngineSettings settings)
         {
+            Assert.ArgumentNotNull(handlers, nameof(handlers));
             Assert.ArgumentNotNull(environments, nameof(environments));
             Assert.ArgumentNotNull(parser, nameof(parser));
             Assert.ArgumentNotNull(output, nameof(output));

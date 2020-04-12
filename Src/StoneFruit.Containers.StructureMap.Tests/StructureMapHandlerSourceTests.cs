@@ -11,13 +11,13 @@ namespace StoneFruit.Containers.StructureMap.Tests
 {
     public class StructureMapHandlerSourceTests
     {
-        [Test]
-        public void GetByName_echo()
-        {
-            var target = new StructureMapHandlerSource(null, null);
-            var result = target.GetByName("echo");
-            result.Verb.Should().Be("echo");
-        }
+        //[Test]
+        //public void GetByName_echo()
+        //{
+        //    var target = new StructureMapHandlerSource(null, null);
+        //    var result = target.GetByName("echo");
+        //    result.Verb.Should().Be("echo");
+        //}
 
         //[Test]
         //public void GetInstance_echo()
@@ -29,12 +29,12 @@ namespace StoneFruit.Containers.StructureMap.Tests
         //    result.Should().BeOfType<EchoHandler>();
         //}
 
-        [Test]
-        public void GetAll_Test()
-        {
-            var target = new StructureMapHandlerSource(null, null);
-            var result = target.GetAll().ToList();
-            result.Count.Should().BeGreaterThan(1);
-        }
+        //[Test]
+        //public void GetAll_Test()
+        //{
+        //    var target = new StructureMapHandlerSource(null, null);
+        //    var result = target.GetAll().ToList();
+        //    result.Count.Should().BeGreaterThan(1);
+        //}
     }
 }
