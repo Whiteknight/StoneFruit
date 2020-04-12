@@ -87,8 +87,8 @@ namespace StoneFruit.Execution
         public void Execute(string commandString, CancellationToken token = default)
         {
             Assert.ArgumentNotNullOrEmpty(commandString, nameof(commandString));
-            var Command = Parser.ParseCommand(commandString);
-            Execute(Command, token);
+            var command = Parser.ParseCommand(commandString);
+            Execute(command, token);
         }
 
         /// <summary>
@@ -100,8 +100,8 @@ namespace StoneFruit.Execution
         public Task ExecuteAsync(string commandString, CancellationToken token = default)
         {
             Assert.ArgumentNotNullOrEmpty(commandString, nameof(commandString));
-            var Command = Parser.ParseCommand(commandString);
-            return ExecuteAsync(Command, token);
+            var command = Parser.ParseCommand(commandString);
+            return ExecuteAsync(command, token);
         }
 
         /// <summary>
@@ -142,10 +142,12 @@ namespace StoneFruit.Execution
         public void Execute(Command command, CancellationToken token = default)
         {
             Assert.ArgumentNotNull(command, nameof(command));
+            State.CurrentCommand = command;
             var handler = Commands.GetInstance(command, this) ?? throw new VerbNotFoundException(command.Verb);
             if (handler is IHandler syncHandler)
             {
                 syncHandler.Execute();
+                State.CurrentCommand = null;
                 return;
             }
 
@@ -155,6 +157,8 @@ namespace StoneFruit.Execution
                     .ConfigureAwait(false)
                     .GetAwaiter()
                     .GetResult();
+                State.CurrentCommand = null;
+                return;
             }
         }
 
@@ -167,16 +171,19 @@ namespace StoneFruit.Execution
         public async Task ExecuteAsync(Command command, CancellationToken token = default)
         {
             Assert.ArgumentNotNull(command, nameof(command));
+            State.CurrentCommand = command;
             var handler = Commands.GetInstance(command, this) ?? throw new VerbNotFoundException(command.Verb);
             if (handler is IHandler syncHandler)
             {
                 syncHandler.Execute();
+                State.CurrentCommand = null;
                 return;
             }
 
             if (handler is IAsyncHandler asyncHandler)
             {
                 await asyncHandler.ExecuteAsync(token);
+                State.CurrentCommand = null;
                 return;
             }
         }

@@ -178,6 +178,8 @@ namespace StoneFruit
             });
             services.AddTransient(provider => provider.GetService<EngineAccessor>().Engine.GetCurrentState());
             services.AddTransient(provider => provider.GetService<EngineAccessor>().Engine.GetCurrentDispatcher());
+            services.AddTransient(provider => provider.GetService<EngineState>().CurrentCommand);
+            services.AddTransient(provider => provider.GetService<EngineState>().CurrentCommand?.Arguments);
 
             // Add an additional handler source for critical built-in handlers so we don't
             // have to worry that the user forgot to register them

@@ -15,10 +15,8 @@ namespace StoneFruit.Containers.Lamar
 
             services.Scan(s => s.ScanForHandlers());
             services.AddSingleton<IHandlerSource>(provider => new LamarHandlerSource<TEnvironment>(provider, TypeVerbExtractor.DefaultInstance));
-            services.Injectable<Command>();
-            services.Injectable<IArguments>();
-            if (typeof(TEnvironment) != typeof(object))
-                services.Injectable<TEnvironment>();
+            services.AddTransient<TEnvironment>(provider => provider.GetService<IEnvironmentCollection>().Current as TEnvironment);
+            
             return services;
         }
     }

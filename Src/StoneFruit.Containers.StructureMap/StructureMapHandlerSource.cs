@@ -45,29 +45,20 @@ namespace StoneFruit.Containers.StructureMap
         {
             var verb = command.Verb.ToLowerInvariant();
             var type = _nameMap.ContainsKey(verb) ? _nameMap[verb] : null;
-            return type == null ? null : ResolveCommand(command, dispatcher, type);
+            return type == null ? null : ResolveCommand(type);
         }
 
-        public IHandlerBase GetInstance<TCommand>(Command Command, CommandDispatcher dispatcher) 
+        public IHandlerBase GetInstance<TCommand>() 
             where TCommand : class, IHandlerBase
-            => ResolveCommand(Command, dispatcher, typeof(TCommand));
+            => ResolveCommand(typeof(TCommand));
 
         public IEnumerable<IVerbInfo> GetAll() => _nameMap.Select(kvp => new VerbInfo(kvp.Key, kvp.Value));
 
         public IVerbInfo GetByName(string name)
             => _nameMap.ContainsKey(name) ? new VerbInfo(name, _nameMap[name]) : null;
 
-        private IHandlerBase ResolveCommand(Command Command, CommandDispatcher dispatcher, Type type)
-        {
-            var context = _container
-                .With(Command)
-                .With(Command.Arguments);
-            if (dispatcher.Environments.Current != null)
-                context = context.With(dispatcher.Environments.Current.GetType(), dispatcher.Environments.Current);
-
-            var instance = context.GetInstance(type);
-            return instance as IHandlerBase;
-        }
+        private IHandlerBase ResolveCommand(Type type) 
+            => _container.GetInstance(type) as IHandlerBase;
 
         private class VerbInfo : IVerbInfo
         {

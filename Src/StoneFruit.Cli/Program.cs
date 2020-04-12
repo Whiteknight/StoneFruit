@@ -41,7 +41,7 @@ namespace StoneFruit.Cli
         private static int StructureMapMain()
         {
             var container = new StructureMap.Container();
-            container.SetupEngine(builder => builder
+            container.SetupEngine<MyEnvironment>(builder => builder
                 .SetupHandlers(h => h
                     .UsePublicMethodsAsHandlers(new MyObject())
                     .Add("testf", (c, d) => d.Output.WriteLine("F"))

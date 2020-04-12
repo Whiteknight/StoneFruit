@@ -46,28 +46,21 @@ namespace StoneFruit.Containers.Lamar
         {
             var verb = command.Verb.ToLowerInvariant();
             var type = _nameMap.Value.ContainsKey(verb) ? _nameMap.Value[verb] : null;
-            return type == null ? null : ResolveHandler(command, dispatcher, type);
+            return type == null ? null : ResolveHandler(type);
         }
 
         public IHandlerBase GetInstance<TCommand>(Command command, CommandDispatcher dispatcher)
             where TCommand : class, IHandlerBase
-            => ResolveHandler(command, dispatcher, typeof(TCommand));
+            => ResolveHandler(typeof(TCommand));
 
         public IEnumerable<IVerbInfo> GetAll() => _nameMap.Value.Select(kvp => new VerbInfo(kvp.Key, kvp.Value));
 
         public IVerbInfo GetByName(string name)
             => _nameMap.Value.ContainsKey(name) ? new VerbInfo(name, _nameMap.Value[name]) : null;
 
-        private IHandlerBase ResolveHandler(Command command, CommandDispatcher dispatcher, Type type)
+        private IHandlerBase ResolveHandler(Type type)
         {
-            var context = _container.GetNestedContainer();
-
-            context.Inject(command);
-            context.Inject(command.Arguments);
-            if (dispatcher.Environments.Current != null)
-                context.Inject(dispatcher.Environments.Current.GetType(), dispatcher.Environments.Current, true);
-
-            var instance = context.GetInstance(type);
+            var instance = _container.GetInstance(type);
             return instance as IHandlerBase;
         }
 
