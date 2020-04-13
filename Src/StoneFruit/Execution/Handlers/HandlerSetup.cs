@@ -38,12 +38,29 @@ namespace StoneFruit.Execution.Handlers
                 services.AddSingleton<IHandlerSource>(_instances);
             foreach (var source in _sources)
                 services.AddSingleton(source);
+            services.AddSingleton<IHandlerSource>(HandlerSource.GetBuiltinHandlerSource());
             services.AddSingleton<IHandlers>(provider =>
             {
                 var sources = provider.GetServices<IHandlerSource>();
                 var aliases = provider.GetService<AliasMap>();
                 return new HandlerSourceCollection(sources, aliases);
             });
+        }
+
+        public IHandlers Build()
+        {
+            var sources = new List<IHandlerSource>();
+            
+            if (_delegates.Count > 0)
+                sources.Add(_delegates);
+            if (_scripts.Count > 0)
+                sources.Add(_scripts);
+            if (_instances.Count > 0)
+                sources.Add(_instances);
+            foreach (var source in _sources)
+                sources.Add(source);
+            sources.Add(HandlerSource.GetBuiltinHandlerSource());
+            return new HandlerSourceCollection(sources, _aliases);
         }
 
         public IHandlerSetup AddSource(IHandlerSource source)

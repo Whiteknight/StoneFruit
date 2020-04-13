@@ -83,7 +83,7 @@ namespace StoneFruit.Containers.Ninject
             context.BindInstance(dispatcher.State);
             context.BindInstance(dispatcher.Output);
             context.BindInstance(dispatcher.Parser);
-            context.BindInstance(dispatcher.Commands);
+            context.BindInstance(dispatcher.Handlers);
 
             // transient
             context.BindInstance(Command);

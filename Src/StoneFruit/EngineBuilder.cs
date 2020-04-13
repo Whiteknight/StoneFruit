@@ -180,10 +180,16 @@ namespace StoneFruit
             services.AddTransient(provider => provider.GetService<EngineAccessor>().Engine.GetCurrentDispatcher());
             services.AddTransient(provider => provider.GetService<EngineState>().CurrentCommand);
             services.AddTransient(provider => provider.GetService<EngineState>().CurrentCommand?.Arguments);
+        }
 
-            // Add an additional handler source for critical built-in handlers so we don't
-            // have to worry that the user forgot to register them
-            services.AddSingleton<IHandlerSource>(HandlerSource.GetBuiltinHandlerSource());
+        public Engine Build()
+        {
+            var handlers = _handlers.Build();
+            var environments = _environments.Build();
+            var parser = _parsers.Build();
+            var output = _output.Build();
+
+            return new Engine(handlers, environments, parser, output, _eventCatalog, _settings);
         }
     }
 }

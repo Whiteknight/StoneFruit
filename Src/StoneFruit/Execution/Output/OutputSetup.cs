@@ -30,11 +30,11 @@ namespace StoneFruit.Execution.Output
 
         public void BuildUp(IServiceCollection services)
         {
-            var output = GetConfiguredOutput();
+            var output = Build();
             services.AddSingleton(output);
         }
 
-        private IOutput GetConfiguredOutput()
+        public IOutput Build()
         {
             if (_useConsole == false)
             {

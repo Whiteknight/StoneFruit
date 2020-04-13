@@ -19,11 +19,11 @@ namespace StoneFruit.Execution.Arguments
 
         public void BuildUp(IServiceCollection services)
         {
-            var parser = GetParserInstance();
+            var parser = Build();
             services.AddSingleton(parser);
         }
 
-        private ICommandParser GetParserInstance()
+        public ICommandParser Build()
         {
             if (_parser != null)
                 return _parser;

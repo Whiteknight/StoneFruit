@@ -13,9 +13,12 @@ namespace StoneFruit.Execution.Environments
 
         public void BuildUp(IServiceCollection services)
         {
-            var environments = _environments ?? new InstanceEnvironmentCollection(null);
+            var environments = Build();
             services.AddSingleton<IEnvironmentCollection>(environments);
         }
+
+        public IEnvironmentCollection Build()
+            => _environments ?? new InstanceEnvironmentCollection(null);
 
         public IEnvironmentSetup UseFactory(IEnvironmentFactory factory)
         {

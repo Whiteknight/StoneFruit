@@ -16,7 +16,7 @@ namespace StoneFruit.Execution
         public CommandDispatcher(ICommandParser parser, IHandlers handlers, IEnvironmentCollection environments, EngineState state, IOutput output)
         {
             Parser = parser;
-            Commands = handlers;
+            Handlers = handlers;
             Environments = environments;
             State = state;
             Output = output;
@@ -30,7 +30,7 @@ namespace StoneFruit.Execution
         /// <summary>
         /// The source of handlers
         /// </summary>
-        public IHandlers Commands { get; }
+        public IHandlers Handlers { get; }
 
         /// <summary>
         /// The current environment and collection of all possible environments
@@ -143,7 +143,7 @@ namespace StoneFruit.Execution
         {
             Assert.ArgumentNotNull(command, nameof(command));
             State.CurrentCommand = command;
-            var handler = Commands.GetInstance(command, this) ?? throw new VerbNotFoundException(command.Verb);
+            var handler = Handlers.GetInstance(command, this) ?? throw new VerbNotFoundException(command.Verb);
             if (handler is IHandler syncHandler)
             {
                 syncHandler.Execute();
@@ -172,7 +172,7 @@ namespace StoneFruit.Execution
         {
             Assert.ArgumentNotNull(command, nameof(command));
             State.CurrentCommand = command;
-            var handler = Commands.GetInstance(command, this) ?? throw new VerbNotFoundException(command.Verb);
+            var handler = Handlers.GetInstance(command, this) ?? throw new VerbNotFoundException(command.Verb);
             if (handler is IHandler syncHandler)
             {
                 syncHandler.Execute();

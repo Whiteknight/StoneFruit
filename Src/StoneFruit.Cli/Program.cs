@@ -32,16 +32,17 @@ namespace StoneFruit.Cli
     {
         static void Main(string[] args)
         {
-            Environment.ExitCode = StructureMapMain();
-            //Environment.ExitCode = LamarMain();
+            var engine = NoneMain();
+            //var engine = StructureMapMain();
+            //var engine = LamarMain();
+            Environment.ExitCode = engine.RunWithCommandLineArguments();
 
             Console.ReadKey();
         }
 
-        private static int StructureMapMain()
+        private static void Build(IEngineBuilder builder)
         {
-            var container = new StructureMap.Container();
-            container.SetupEngine<MyEnvironment>(builder => builder
+            builder
                 .SetupHandlers(h => h
                     .UsePublicMethodsAsHandlers(new MyObject())
                     .Add("testf", (c, d) => d.Output.WriteLine("F"))
@@ -66,47 +67,31 @@ namespace StoneFruit.Cli
                 {
                     //s.MaxInputlessCommands = 3;
                     s.MaxExecuteTimeout = TimeSpan.FromSeconds(5);
-                })
-            );
-
-            var engine = container.GetInstance<Engine>();
-            return engine.RunInteractively();
+                });
         }
 
-        private static int LamarMain()
+        private static Engine NoneMain()
+        {
+            var builder = new EngineBuilder();
+            Build(builder);
+            return builder.Build();
+        }
+
+        private static Engine StructureMapMain()
+        {
+            var container = new StructureMap.Container();
+            container.SetupEngine<MyEnvironment>(Build);
+
+            return container.GetInstance<Engine>();
+        }
+
+        private static Engine LamarMain()
         {
             var serviceCollection = new ServiceRegistry()
-                .SetupEngine<MyEnvironment>(builder => builder
-                    .SetupHandlers(h => h
-                        .UsePublicMethodsAsHandlers(new MyObject())
-                        .Add("testf", (c, d) => d.Output.WriteLine("F"))
-                        .AddScript("testg", new[] { "echo test", "echo g" })
-                        .AddScript("testh", new[] { "echo [0]", "echo ['a']" })
-                        .AddScript("testi", new[]
-                        {
-                            "echo 1",
-                            "echo 2",
-                            "echo 3",
-                            "echo 4"
-                        })
-                    )
-                    .SetupEnvironments(e => e.UseFactory(new MyEnvironmentFactory()))
-                    .SetupEvents(e =>
-                    {
-                        //e.EngineStartInteractive.Clear();
-                        //e.EngineStopInteractive.Add("echo 'goodbye'");
-                        //e.EngineError.Add("echo 'you dun goofed'");
-                    })
-                    .SetupSettings(s =>
-                    {
-                        //s.MaxInputlessCommands = 3;
-                        s.MaxExecuteTimeout = TimeSpan.FromSeconds(5);
-                    })
-                );
+                .SetupEngine<MyEnvironment>(Build);
 
             var container = new Container(serviceCollection);
-            var engine = container.GetService<Engine>();
-            return engine.RunInteractively();
+            return container.GetService<Engine>();
         }
     }
 

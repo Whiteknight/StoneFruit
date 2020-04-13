@@ -42,12 +42,12 @@ namespace StoneFruit.Execution.Handlers
                 dispatcher.State,
                 dispatcher.Output,
                 dispatcher.Parser,
+                dispatcher.Handlers,
 
                 // transient objects
                 dispatcher.Environments.Current,
                 command,
-                command.Arguments,
-                this
+                command.Arguments
             });
             return commandVerb as IHandlerBase;
         }
