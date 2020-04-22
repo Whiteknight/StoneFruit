@@ -6,7 +6,8 @@ using StoneFruit.Utility;
 namespace StoneFruit.Execution
 {
     /// <summary>
-    /// A script of commands which will be executed in sequence, in response to different Engine events.
+    /// A script of commands which will be executed in sequence, in response to different
+    /// Engine events.
     /// </summary>
     public class EventScript
     {

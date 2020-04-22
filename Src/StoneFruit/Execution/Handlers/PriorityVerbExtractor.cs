@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 namespace StoneFruit.Execution.Handlers
 {
+    /// <summary>
+    /// Takes an array of type verb extractors and attempts to invoke each one in sequence
+    /// until a verb is successfully found.
+    /// </summary>
     public class PriorityVerbExtractor : ITypeVerbExtractor
     {
         private readonly ITypeVerbExtractor[] _extractors;
