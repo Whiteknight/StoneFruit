@@ -8,17 +8,17 @@ namespace StoneFruit.Tests.Integration
 {
     public class AsyncHandlerTests
     {
-        //[Test]
-        //public void Test()
-        //{
-        //    var output = new TestOutput();
-        //    var engine = new EngineBuilder()
-        //        .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHandler)))
-        //        .SetupOutput(o => o.DoNotUseConsole().Add(output))
-        //        .Build();
-        //    engine.RunHeadless("test");
-        //    output.Lines[0].Should().Be("TEST");
-        //}
+        [Test]
+        public void Test()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHandler)))
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .Build();
+            engine.RunHeadless("test");
+            output.Lines[0].Should().Be("TEST");
+        }
 
         public class TestHandler : IAsyncHandler
         {

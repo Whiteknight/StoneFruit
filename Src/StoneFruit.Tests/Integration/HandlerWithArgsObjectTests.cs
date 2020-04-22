@@ -7,20 +7,20 @@ namespace StoneFruit.Tests.Integration
 {
     public class HandlerWithArgsObjectTests
     {
-        //[Test]
-        //public void Test()
-        //{
-        //    var output = new TestOutput();
-        //    var engine = new EngineBuilder()
-        //        .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHandler)))
-        //        .SetupOutput(o => o.DoNotUseConsole().Add(output))
-        //        .Build();
-        //    engine.RunHeadless("test x y z");
-        //    output.Lines.Count.Should().Be(3);
-        //    output.Lines[0].Should().Be("x");
-        //    output.Lines[1].Should().Be("y");
-        //    output.Lines[2].Should().Be("z");
-        //}
+        [Test]
+        public void Test()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHandler)))
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .Build();
+            engine.RunHeadless("test x y z");
+            output.Lines.Count.Should().Be(3);
+            output.Lines[0].Should().Be("x");
+            output.Lines[1].Should().Be("y");
+            output.Lines[2].Should().Be("z");
+        }
 
         public class TestArgs
         {
