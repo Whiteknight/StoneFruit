@@ -32,9 +32,9 @@ namespace StoneFruit.Cli
     {
         static void Main(string[] args)
         {
-            var engine = NoneMain();
+            //var engine = NoneMain();
             //var engine = StructureMapMain();
-            //var engine = LamarMain();
+            var engine = LamarMain();
             Environment.ExitCode = engine.RunWithCommandLineArguments();
 
             Console.ReadKey();

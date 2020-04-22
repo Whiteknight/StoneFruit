@@ -20,14 +20,12 @@ A **Command** is a combination of a Verb and all input arguments.
 
 ## Quick Start
 
-To get started, we need to create an `EngineBuilder`, configure it, and build an `Engine`:
+To get started, we need to create an `EngineBuilder`, configure it, and build an `Engine`. This is done in slightly different ways depending on whether you're using a DI container or not, and which one.
 
-```csharp
-var engineBuilder = new EngineBuilder();
-    // Setup the builder here
-    // ...
-var engine = engineBuilder.Build();
-```
+* [Lamar Quick Start](start_lamar.md)
+* [StructureMap Quick Start](start_structuremap.md)
+* [Ninject Quick Start](start_ninject.md)
+* [No DI Quick Start](start_basic.md)
 
 ## Pages
 

@@ -21,7 +21,7 @@ public class MyFirstHandler : IHandler
 }
 ```
 
-Now in our entrypoint, we can setup and run the engine. For the sake of argument we're going to use the Ninject handler source from the `StoneFruit.Containers.Ninject` package, though any of the DI containers will work the same way in this example:
+Now in our entry point, we can setup and run the engine. For the sake of argument we're going to use the Lamar handler source from the `StoneFruit.Containers.Lamar` package, though you can choose another supported DI container with only minor changes:
 
 ```csharp
 using StoneFruit;
@@ -29,9 +29,12 @@ using StoneFruit.Containers.Ninject;
 
 public static void Main(string[] args)
 {
-    var engine = new EngineBuilder()
-        .SetupHandlers(h => h.UseNinjectHandlerSource())
-        .Build();
+    var services = new ServiceRegistry();
+    services.SetupEngine<MyEnvironment>(engineBuilder => {
+
+    });
+    var container = new Container(services);
+    var engine = container.GetService<Engine>();
     engine.RunInteractive();
 }
 ```
@@ -114,9 +117,10 @@ Type 'help <command-name>' to get more information, if available.
 
 ## Environments
 
-The work that we need to do can be done in different environments. We have, for example, our local environment, a pre-production Testing environment and a Production environment. Each one of these environments has specific configurations, such as a connection string for a database. Each environment is going to have a config file with the name of that environment. We will have a configuration object and an environment factory to create instances for us from the list of files (You'll need to add these config files to your solution and set them to copy to the output directory on build):
+The work that we need to do can be done in different environments. We have, for example, our local environment, a pre-production Testing environment and a Production environment. Each one of these environments has specific configurations, such as a connection string for a database. There are many ways we could configure these separate environments. For ease, we're going to use a named config file for each, which our system will detect and load. We will have a configuration object and an environment factory to create instances for us from the list of files (You'll need to add these config files to your solution and set them to copy to the output directory on build):
 
 ```csharp
+// The environment class which will contain the current configs
 public class MyEnvironment
 {
     private readonly IConfigurationRoot _config;
@@ -132,6 +136,7 @@ public class MyEnvironment
     public string DatabaseConnectionString => _config.GetSections("ConnectionStrings")["MyDatabase"];
 }
 
+// The environment factory which creates environment objects on demand
 public class MyEnvironmentFactory : IEnvironmentFactory
 {
     private readonly IReadOnlyList<string> _environments;
@@ -139,6 +144,8 @@ public class MyEnvironmentFactory : IEnvironmentFactory
     public MyEnvironmentFactory()
     {
         var baseDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+        // Get a list of config files in the directory.
+        // Each file corresponds to a separate environment
         _environments = Directory.EnumerateFiles($"{baseDir}\\Configs\\")
             .Where(s => s.EndsWith(".json"))
             .Select(Path.GetFileName)
@@ -155,11 +162,18 @@ public class MyEnvironmentFactory : IEnvironmentFactory
 We upgrade our EngineBuilder to account for environments:
 
 ```csharp
-var engine = new EngineBuilder()
-        .SetupHandlers(h => h.UseNinjectHandlerSource())
-        .SetupEnvironments(e => e.UseFactory(new MyEnvironmentFactory()))
-        .Build();
+public static void Main(string[] args)
+{
+    var services = new ServiceRegistry();
+    services.SetupEngine<MyEnvironment>(engineBuilder => engineBuilder
+        .SetupEnvironments(e => e
+            .UseFactory(new MyEnvironmentFactory())
+        )
+    );
+    var container = new Container(services);
+    var engine = container.GetService<Engine>();
     engine.RunInteractive();
+}
 ```
 
 Now when we execute the application and enter the prompt, we are asked to select an environment before continuing:
@@ -175,7 +189,9 @@ Enter command ('help' for help, 'exit' to quit):
 Local>
 ```
 
-Now, we can update our handler to take the environment object and get the connection string:
+(you can select the environment at the prompt by name or number)
+
+Now, we can update our handler to take the environment object in the constructor (through the magic of the DI container) and get the connection string:
 
 ```csharp
 public class MyFirstHandler : IHandler
@@ -202,4 +218,5 @@ public class MyFirstHandler : IHandler
 ## Tips To Keep Going
 
 1. Create your EntityFramework `DbContext` or other DB access objects inside your environment object, so it's always available when you need it
+1. Or better yet, inject your current environment object into your `DbContext` to get the connection string directly, and inject the `DbContext` into your handler
 1. Add your program to your `%PATH%` (or `$PATH` on Linux) so you can easily access it from your terminal of choice
