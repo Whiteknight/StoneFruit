@@ -40,5 +40,12 @@ namespace StoneFruit.Tests.Execution.Arguments
             var result = Parse("/a:test");
             result.Get("a").Value.Should().Be("test");
         }
+
+        [Test]
+        public void Flags_MaybeNamed()
+        {
+            var result = Parse("/a test");
+            result.Get("a").Value.Should().Be("test");
+        }
     }
 }

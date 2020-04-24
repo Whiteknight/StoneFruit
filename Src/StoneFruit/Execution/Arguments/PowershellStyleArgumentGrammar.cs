@@ -30,6 +30,12 @@ namespace StoneFruit.Execution.Arguments
 
             var whitespace = OptionalWhitespace();
 
+            // '--' | '-'
+            var nameStart = First(
+                Match<char>("--").Transform(c => '-'),
+                Match('-')
+            );
+
             // <doubleQuotedString> | <singleQuotedString> | <unquotedValue>
             var values = First(
                 doubleQuotedString,
@@ -43,9 +49,9 @@ namespace StoneFruit.Execution.Arguments
             // named arg or just a switch followed by a positional. Return a combined argument which acts
             // like all three and the user can consume it however they want
 
-            // '-' <name> <whitespace> <value>
+            // <nameStart> <name> <whitespace> <value>
             var namedArg = Rule(
-                Match('-'),
+                nameStart,
                 names,
                 whitespace,
                 values,
@@ -53,15 +59,13 @@ namespace StoneFruit.Execution.Arguments
                 (s, name, e, value) => new ParsedFlagPositionalOrNamedArgument(name, value)
             );
 
-            // '-' <name>
+            // <nameStart> <name>
             var longFlagArg = Rule(
-                Match('-'),
+                nameStart,
                 names,
 
                 (s, name) => new ParsedFlagArgument(name)
             );
-
-            // TODO: Some powershell commandlets also seem to support "'--' <name>" for flags and named args
 
             // <named> | <longFlag> | <positional>
             var args = First<char, IParsedArgument>(
