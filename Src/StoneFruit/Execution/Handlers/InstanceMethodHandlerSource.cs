@@ -55,6 +55,20 @@ namespace StoneFruit.Execution.Handlers
             return _methods.ContainsKey(name) ? new MethodInfoVerbInfo(name, _getDescription, _getUsage) : null;
         }
 
+        // TODO: V2 Abstract this so we can inject a different implementation
+        private static object InvokeMethod(object instance, MethodInfo method, ParameterInfo[] parameters, Command command, CommandDispatcher dispatcher, CancellationToken token)
+        {
+            var args = new object[parameters.Length];
+            var fetcher = new ArgumentValueFetcher(command, dispatcher, token);
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                var parameter = parameters[i];
+                args[i] = fetcher.GetValue(parameter.ParameterType, parameter.Name, i);
+            }
+
+            return method.Invoke(instance, args);
+        }
+
         private class MethodInfoVerbInfo : IVerbInfo
         {
             private readonly Func<string, string> _getDescription;
@@ -97,15 +111,7 @@ namespace StoneFruit.Execution.Handlers
                     return;
                 }
 
-                var args = new object[parameters.Length];
-                var fetcher = new ArgumentValueFetcher(_command, _dispatcher);
-                for (int i = 0; i < parameters.Length; i++)
-                {
-                    var parameter = parameters[i];
-                    args[i] = fetcher.GetValue(parameter.ParameterType, parameter.Name, i);
-                }
-
-                _method.Invoke(_instance, args);
+                InvokeMethod(_instance, _method, parameters, _command, _dispatcher, CancellationToken.None);
             }
         }
 
@@ -131,15 +137,7 @@ namespace StoneFruit.Execution.Handlers
                 if (parameters.Length == 0)
                     return _method.Invoke(_instance, new object[0]) as Task;
 
-                var args = new object[parameters.Length];
-                var fetcher = new ArgumentValueFetcher(_command, _dispatcher);
-                for (int i = 0; i < parameters.Length; i++)
-                {
-                    var parameter = parameters[i];
-                    args[i] = fetcher.GetValue(parameter.ParameterType, parameter.Name, i);
-                }
-
-                return _method.Invoke(_instance, args) as Task;
+                return InvokeMethod(_instance, _method, parameters, _command, _dispatcher, cancellation) as Task;
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 
@@ -8,15 +9,19 @@ namespace StoneFruit.Utility
     {
         private readonly Command _command;
         private readonly CommandDispatcher _dispatcher;
+        private readonly CancellationToken _token;
 
-        public ArgumentValueFetcher(Command command, CommandDispatcher dispatcher)
+        public ArgumentValueFetcher(Command command, CommandDispatcher dispatcher, CancellationToken token)
         {
             _command = command;
             _dispatcher = dispatcher;
+            _token = token;
         }
 
         public object GetValue(Type type, string name, int index)
         {
+            if (type == typeof(CancellationToken))
+                return _token;
             if (type == typeof(CommandDispatcher))
                 return _dispatcher;
             if (type == typeof(IEnvironmentCollection))

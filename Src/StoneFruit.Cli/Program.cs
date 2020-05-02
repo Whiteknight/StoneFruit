@@ -178,7 +178,7 @@ namespace StoneFruit.Cli
             output.WriteLine($"{name}: D");
         }
 
-        public Task TestE(IOutput output)
+        public Task TestE(IOutput output, CancellationToken token)
         {
             output.WriteLine("E");
             return Task.CompletedTask;
