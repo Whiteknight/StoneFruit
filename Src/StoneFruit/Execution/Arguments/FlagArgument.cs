@@ -12,13 +12,7 @@
 
         public string Name { get; }
 
-        public bool Consumed { get; private set; }
-
-        public IArgument MarkConsumed(bool consumed = true)
-        {
-            Consumed = consumed;
-            return this;
-        }
+        public bool Consumed { get; set; }
 
         public string AsString(string defaultValue = null) => true.ToString();
 

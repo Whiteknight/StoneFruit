@@ -32,7 +32,11 @@
 
         public string Name => null;
 
-        public bool Consumed => true;
+        public bool Consumed
+        {
+            get => true;
+            set { }
+        }
 
         public IArgument MarkConsumed(bool consumed = true) => this;
 

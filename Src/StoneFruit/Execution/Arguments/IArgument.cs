@@ -20,13 +20,7 @@ namespace StoneFruit.Execution.Arguments
         /// <summary>
         /// True if this value has already been consumed. A consumed argument cannot be retrieved again
         /// </summary>
-        bool Consumed { get; }
-
-        /// <summary>
-        /// Mark the value as being consumed
-        /// </summary>
-        /// <returns></returns>
-        IArgument MarkConsumed(bool consumed = true);
+        bool Consumed { get; set; }
     }
 
     /// <summary>
@@ -112,6 +106,18 @@ namespace StoneFruit.Execution.Arguments
         {
             Assert.ArgumentNotNull(argument, nameof(argument));
             (argument as MissingArgument)?.Throw();
+            return argument;
+        }
+
+        /// <summary>
+        /// Mark the value as being consumed
+        /// </summary>
+        /// <returns></returns>
+        public static T MarkConsumed<T>(this T argument, bool consumed = true)
+            where T : IArgument
+        {
+            Assert.ArgumentNotNull(argument, nameof(argument));
+            argument.Consumed = consumed;
             return argument;
         }
 

@@ -12,9 +12,7 @@ namespace StoneFruit.Containers.Lamar
     /// are resolved using the container. All handlers should be registered with the container prior to
     /// constructing an instance of this type.
     /// </summary>
-    /// <typeparam name="TEnvironment"></typeparam>
-    public class LamarHandlerSource<TEnvironment> : IHandlerSource
-        where TEnvironment : class
+    public class LamarHandlerSource : IHandlerSource
     {
         // TODO: V2 should be able to handle registrations made AFTER .SetupEngine()
         private readonly ITypeVerbExtractor _verbExtractor;
