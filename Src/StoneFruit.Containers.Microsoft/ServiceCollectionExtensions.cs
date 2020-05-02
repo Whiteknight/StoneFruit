@@ -7,14 +7,17 @@ namespace StoneFruit.Containers.Microsoft
     public static class ServiceCollectionExtensions
     {
         /// <summary>
-        /// Setup the engine registration in the DI container. 
+        /// Setup the engine registrations in the DI container. This method will automatically scan the
+        /// assemblies in your solution for handler types. Any handler types which are not found during the
+        /// scan should be manually registered in the ServiceCollection before calling this method.
         /// </summary>
         /// <typeparam name="TEnvironment"></typeparam>
         /// <param name="services"></param>
         /// <param name="build"></param>
         /// <param name="getProvider"></param>
         /// <returns></returns>
-        public static IServiceCollection SetupEngine<TEnvironment>(this IServiceCollection services, Action<IEngineBuilder> build, Func<IServiceProvider> getProvider) where TEnvironment : class
+        public static IServiceCollection SetupEngine<TEnvironment>(this IServiceCollection services, Action<IEngineBuilder> build, Func<IServiceProvider> getProvider) 
+            where TEnvironment : class
         {
             // Setup a custom resolver for manually-specified types
             var resolver = new MicrosoftTypeInstanceResolver(getProvider);

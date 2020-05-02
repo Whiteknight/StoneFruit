@@ -7,6 +7,11 @@ using StoneFruit.Utility;
 
 namespace StoneFruit.Containers.Microsoft
 {
+    /// <summary>
+    /// Handler source for the Microsoft DI container which finds types registered with the ServiceCollection
+    /// and resolves them using the ServiceProvider. All handler types should be registered with the
+    /// ServiceCollection before constructing an instance of this type.
+    /// </summary>
     public class MicrosoftRegisteredHandlerSource : IHandlerSource
     {
         private readonly Func<IServiceProvider> _getProvider;

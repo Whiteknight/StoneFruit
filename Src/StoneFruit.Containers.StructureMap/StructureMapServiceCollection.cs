@@ -4,6 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace StoneFruit.Containers.StructureMap
 {
+    /// <summary>
+    /// A simple, dummy IServiceCollection implementation for feeding into the StructureMap DI container
+    /// </summary>
     public class StructureMapServiceCollection : IServiceCollection
     {
         private readonly List<ServiceDescriptor> _services;

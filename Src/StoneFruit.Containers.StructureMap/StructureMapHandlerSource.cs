@@ -7,6 +7,11 @@ using StructureMap;
 
 namespace StoneFruit.Containers.StructureMap
 {
+    /// <summary>
+    /// Handler source to use the StructureMap DI Container to resolve instances of registered handler types.
+    /// All handler types should be registered with the container prior to constructing an instance of this
+    /// type.
+    /// </summary>
     public class StructureMapHandlerSource : IHandlerSource
     {
         private readonly ITypeVerbExtractor _verbExtractor;

@@ -7,9 +7,16 @@ using StoneFruit.Utility;
 
 namespace StoneFruit.Containers.Lamar
 {
+    /// <summary>
+    /// Lamar Container-based handler source. Available handlers are read from the container and handlers
+    /// are resolved using the container. All handlers should be registered with the container prior to
+    /// constructing an instance of this type.
+    /// </summary>
+    /// <typeparam name="TEnvironment"></typeparam>
     public class LamarHandlerSource<TEnvironment> : IHandlerSource
         where TEnvironment : class
     {
+        // TODO: V2 should be able to handle registrations made AFTER .SetupEngine()
         private readonly ITypeVerbExtractor _verbExtractor;
         private readonly IContainer _container;
         private readonly Lazy<IReadOnlyDictionary<string, Type>> _nameMap;
@@ -19,9 +26,7 @@ namespace StoneFruit.Containers.Lamar
             //var scanned = container.WhatDidIScan();
             //var have = container.WhatDoIHave();
             //_container = new Lazy<IContainer>(getContainer ?? GetDefaultContainer);
-            _container = provider as IContainer;
-            if (_container == null)
-                throw new ArgumentException("Expected a Lamar Container", nameof(provider));
+            _container = provider as IContainer ?? throw new ArgumentException("Expected a Lamar Container", nameof(provider));
             _verbExtractor = verbExtractor ?? TypeVerbExtractor.DefaultInstance;
             _nameMap = new Lazy<IReadOnlyDictionary<string, Type>>(SetupNameMapping);
         }
@@ -30,7 +35,9 @@ namespace StoneFruit.Containers.Lamar
         {
             var commandTypes = _container.Model.AllInstances
                 .Where(i => typeof(IHandlerBase).IsAssignableFrom(i.ImplementationType))
-                .Select(i => i.ImplementationType)
+                .Select(i => i.ImplementationType ?? i.ServiceType)
+                .Where(t => t != null && t.IsClass && !t.IsAbstract)
+                .Distinct()
                 .ToList();
 
             return commandTypes

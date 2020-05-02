@@ -13,6 +13,10 @@ using StoneFruit.Utility;
 
 namespace StoneFruit.Containers.Ninject
 {
+    /// <summary>
+    /// Handler source for the Ninject DI container. Uses Ninject to resolve instances of handler types.
+    /// All relevant types should be registered in the Kernel before constructing an instance of this type.
+    /// </summary>
     public class NinjectHandlerSource : IHandlerSource
     {
         private readonly ITypeVerbExtractor _verbExtractor;

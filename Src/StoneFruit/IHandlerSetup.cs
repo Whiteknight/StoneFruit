@@ -67,10 +67,27 @@ namespace StoneFruit
         /// <returns></returns>
         IHandlerSetup AddAlias(string verb, params string[] aliases);
 
+        /// <summary>
+        /// Specify an explicit list of handler types to register with the Engine. Notice that these types
+        /// may not be constructed using your DI container of choice. If you are using a DI container, you
+        /// should try to register types with the container instead.
+        /// </summary>
+        /// <param name="commandTypes"></param>
+        /// <param name="resolver"></param>
+        /// <param name="verbExtractor"></param>
+        /// <returns></returns>
         IHandlerSetup UseHandlerTypes(IEnumerable<Type> commandTypes, TypeInstanceResolver resolver = null, ITypeVerbExtractor verbExtractor = null);
         
-
+        /// <summary>
+        /// Build up registrations in the provided service collection
+        /// </summary>
+        /// <param name="services"></param>
         void BuildUp(IServiceCollection services);
+
+        /// <summary>
+        /// Build the IHandlers instance directly
+        /// </summary>
+        /// <returns></returns>
         IHandlers Build();
     }
 
