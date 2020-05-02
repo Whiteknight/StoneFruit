@@ -1,8 +1,6 @@
 ﻿using System;
 using Lamar;
 using Microsoft.Extensions.DependencyInjection;
-using StoneFruit.Execution;
-using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.Containers.Lamar
 {
@@ -11,6 +9,8 @@ namespace StoneFruit.Containers.Lamar
         public static ServiceRegistry SetupEngine<TEnvironment>(this ServiceRegistry services, Action<IEngineBuilder> build)
             where TEnvironment : class
         {
+            // TODO: Setup a custom type resolver
+
             EngineBuilder.SetupEngineRegistrations(services, build);
 
             services.Scan(s => s.ScanForHandlers());

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using ParserObjects;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Scripts.Formatting;
@@ -9,7 +10,7 @@ namespace StoneFruit
     /// <summary>
     /// Setup argument parsing
     /// </summary>
-    public interface IArgumentParserSetup
+    public interface IParserSetup
     {
         /// <summary>
         /// Set the Command parser instance. Notice that you may not set a Command parser
@@ -17,7 +18,7 @@ namespace StoneFruit
         /// </summary>
         /// <param name="parser"></param>
         /// <returns></returns>
-        IArgumentParserSetup UseParser(ICommandParser parser);
+        IParserSetup UseParser(ICommandParser parser);
 
         /// <summary>
         /// Specify a parser to use for verbs. Notice that you cannot set a Verb parser
@@ -25,7 +26,7 @@ namespace StoneFruit
         /// </summary>
         /// <param name="verbParser"></param>
         /// <returns></returns>
-        IArgumentParserSetup UseVerbParser(IParser<char, string> verbParser);
+        IParserSetup UseVerbParser(IParser<char, string> verbParser);
 
         /// <summary>
         /// Specify an argument parser to use. Notice that you cannot set an Argument
@@ -33,7 +34,7 @@ namespace StoneFruit
         /// </summary>
         /// <param name="argParser"></param>
         /// <returns></returns>
-        IArgumentParserSetup UseArgumentParser(IParser<char, IParsedArgument> argParser);
+        IParserSetup UseArgumentParser(IParser<char, IParsedArgument> argParser);
 
         /// <summary>
         /// Specify an argument parser to use. Notice that you cannot set an Argument
@@ -41,7 +42,7 @@ namespace StoneFruit
         /// </summary>
         /// <param name="argParser"></param>
         /// <returns></returns>
-        IArgumentParserSetup UseArgumentParser(IParser<char, IEnumerable<IParsedArgument>> argParser);
+        IParserSetup UseArgumentParser(IParser<char, IEnumerable<IParsedArgument>> argParser);
 
         /// <summary>
         /// Specify a parser to use for scripts. Notice that you cannot set a Script
@@ -49,7 +50,10 @@ namespace StoneFruit
         /// </summary>
         /// <param name="scriptParser"></param>
         /// <returns></returns>
-        IArgumentParserSetup UseScriptParser(IParser<char, CommandFormat> scriptParser);
+        IParserSetup UseScriptParser(IParser<char, CommandFormat> scriptParser);
+
+        void BuildUp(IServiceCollection services);
+        ICommandParser Build();
     }
 
     public static class ParserSetupExtensions
@@ -59,7 +63,7 @@ namespace StoneFruit
         /// </summary>
         /// <param name="setup"></param>
         /// <returns></returns>
-        public static IArgumentParserSetup UseSimplifiedArgumentParser(this IArgumentParserSetup setup)
+        public static IParserSetup UseSimplifiedArgumentParser(this IParserSetup setup)
         {
             Assert.ArgumentNotNull(setup, nameof(setup));
             return setup.UseArgumentParser(SimplifiedArgumentGrammar.GetParser());
@@ -70,7 +74,7 @@ namespace StoneFruit
         /// </summary>
         /// <param name="setup"></param>
         /// <returns></returns>
-        public static IArgumentParserSetup UsePosixStyleArgumentParser(this IArgumentParserSetup setup)
+        public static IParserSetup UsePosixStyleArgumentParser(this IParserSetup setup)
         {
             Assert.ArgumentNotNull(setup, nameof(setup));
             return setup.UseArgumentParser(PosixStyleArgumentGrammar.GetParser());
@@ -81,7 +85,7 @@ namespace StoneFruit
         /// </summary>
         /// <param name="setup"></param>
         /// <returns></returns>
-        public static IArgumentParserSetup UsePowershellStyleArgumentParser(this IArgumentParserSetup setup)
+        public static IParserSetup UsePowershellStyleArgumentParser(this IParserSetup setup)
         {
             Assert.ArgumentNotNull(setup, nameof(setup));
             return setup.UseArgumentParser(PowershellStyleArgumentGrammar.GetParser());
@@ -92,7 +96,7 @@ namespace StoneFruit
         /// </summary>
         /// <param name="setup"></param>
         /// <returns></returns>
-        public static IArgumentParserSetup UseWindowsCmdArgumentParser(this IArgumentParserSetup setup)
+        public static IParserSetup UseWindowsCmdArgumentParser(this IParserSetup setup)
         {
             Assert.ArgumentNotNull(setup, nameof(setup));
             return setup.UseArgumentParser(WindowsCmdArgumentGrammar.GetParser());

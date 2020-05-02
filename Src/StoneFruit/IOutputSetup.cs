@@ -1,4 +1,6 @@
-﻿namespace StoneFruit
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace StoneFruit
 {
     /// <summary>
     /// Setup the output streams
@@ -21,5 +23,8 @@
         /// <param name="output"></param>
         /// <returns></returns>
         IOutputSetup Add(IOutput output);
+
+        void BuildUp(IServiceCollection services);
+        IOutput Build();
     }
 }

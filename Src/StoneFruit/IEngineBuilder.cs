@@ -24,7 +24,7 @@ namespace StoneFruit
         /// </summary>
         /// <param name="setup"></param>
         /// <returns></returns>
-        EngineBuilder SetupArguments(Action<IArgumentParserSetup> setup);
+        EngineBuilder SetupArguments(Action<IParserSetup> setup);
 
         /// <summary>
         /// Setup output

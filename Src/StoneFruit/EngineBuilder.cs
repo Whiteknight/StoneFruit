@@ -13,21 +13,21 @@ namespace StoneFruit
     /// </summary>
     public class EngineBuilder : IEngineBuilder
     {
-        private readonly HandlerSetup _handlers;
-        private readonly OutputSetup _output;
+        private readonly IHandlerSetup _handlers;
+        private readonly IOutputSetup _output;
         private readonly EngineEventCatalog _eventCatalog;
-        private readonly EnvironmentSetup _environments;
-        private readonly ArgumentParserSetup _parsers;
+        private readonly IEnvironmentSetup _environments;
+        private readonly IParserSetup _parsers;
         private readonly EngineSettings _settings;
 
-        public EngineBuilder()
+        public EngineBuilder(IHandlerSetup handlers = null, IOutputSetup output = null, IEnvironmentSetup environments = null, IParserSetup parsers = null, EngineEventCatalog events = null, EngineSettings settings = null)
         {
-            _handlers = new HandlerSetup();
-            _eventCatalog = new EngineEventCatalog();
-            _output = new OutputSetup();
-            _environments = new EnvironmentSetup();
-            _parsers = new ArgumentParserSetup();
-            _settings = new EngineSettings();
+            _handlers = handlers ?? new HandlerSetup();
+            _eventCatalog = events ?? new EngineEventCatalog();
+            _output = output ?? new OutputSetup();
+            _environments = environments ?? new EnvironmentSetup();
+            _parsers = parsers ?? new ParserSetup();
+            _settings = settings ?? new EngineSettings();
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace StoneFruit
         /// </summary>
         /// <param name="setup"></param>
         /// <returns></returns>
-        public EngineBuilder SetupArguments(Action<IArgumentParserSetup> setup)
+        public EngineBuilder SetupArguments(Action<IParserSetup> setup)
         {
             setup?.Invoke(_parsers);
             return this;
@@ -113,8 +113,13 @@ namespace StoneFruit
         public static void SetupEngineRegistrations(IServiceCollection services, Action<EngineBuilder> build)
         {
             var builder = new EngineBuilder();
+            SetupEngineRegistrations(builder, services, build);
+        }
+
+        public static void SetupEngineRegistrations(EngineBuilder builder, IServiceCollection services, Action<EngineBuilder> build)
+        {
             build?.Invoke(builder);
-            builder.BuildUp(services);
+            builder?.BuildUp(services);
 
             // Register the Engine and the things that the Engine provides
             services.AddSingleton(provider => new EngineAccessor());

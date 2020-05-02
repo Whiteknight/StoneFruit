@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Handlers;
 using StoneFruit.Utility;
@@ -65,6 +66,12 @@ namespace StoneFruit
         /// <param name="aliases"></param>
         /// <returns></returns>
         IHandlerSetup AddAlias(string verb, params string[] aliases);
+
+        IHandlerSetup UseHandlerTypes(IEnumerable<Type> commandTypes, TypeInstanceResolver resolver = null, ITypeVerbExtractor verbExtractor = null);
+        
+
+        void BuildUp(IServiceCollection services);
+        IHandlers Build();
     }
 
     public static class HandlerSetupExtensions
@@ -83,22 +90,8 @@ namespace StoneFruit
         }
 
         /// <summary>
-        /// Specify a literal list of handler types to use
-        /// </summary>
-        /// <param name="handlers"></param>
-        /// <param name="commandTypes"></param>
-        /// <param name="verbExtractor"></param>
-        /// <returns></returns>
-        public static IHandlerSetup UseHandlerTypes(this IHandlerSetup handlers, IEnumerable<Type> commandTypes, ITypeVerbExtractor verbExtractor = null)
-        {
-            Assert.ArgumentNotNull(handlers, nameof(handlers));
-            Assert.ArgumentNotNull(commandTypes, nameof(commandTypes));
-            var source = new TypeListConstructSource(commandTypes, verbExtractor);
-            return handlers.AddSource(source);
-        }
-
-        /// <summary>
-        /// Specify a literal list of handler types to use
+        /// Use the specified list of handler types, with the default instance resolver and
+        /// default verb extractor
         /// </summary>
         /// <param name="handlers"></param>
         /// <param name="commandTypes"></param>
@@ -107,7 +100,7 @@ namespace StoneFruit
         {
             Assert.ArgumentNotNull(handlers, nameof(handlers));
             Assert.ArgumentNotNull(commandTypes, nameof(commandTypes));
-            return handlers.AddSource(new TypeListConstructSource(commandTypes, null));
+            return handlers.UseHandlerTypes(commandTypes);
         }
     }
 }

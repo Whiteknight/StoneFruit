@@ -10,6 +10,7 @@ namespace StoneFruit.Containers.StructureMap
             where TEnvironment : class
         {
             var services = new StructureMapServiceCollection();
+            // TODO: Setup a custom type resolver
             EngineBuilder.SetupEngineRegistrations(services, build);
 
             services.AddSingleton<IHandlerSource>(provider => new StructureMapHandlerSource(provider, TypeVerbExtractor.DefaultInstance));

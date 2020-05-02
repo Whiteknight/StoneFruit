@@ -9,7 +9,7 @@ namespace StoneFruit.Execution.Arguments
     /// <summary>
     /// Sets up the parsers
     /// </summary>
-    public class ArgumentParserSetup : IArgumentParserSetup
+    public class ParserSetup : IParserSetup
     {
         private IParser<char, IParsedArgument> _argParser;
         private IParser<char, string> _verbParser;
@@ -34,7 +34,7 @@ namespace StoneFruit.Execution.Arguments
             return new CommandParser(verbParser, argParser, scriptParser);
         }
 
-        public IArgumentParserSetup UseParser(ICommandParser parser)
+        public IParserSetup UseParser(ICommandParser parser)
         {
             if (parser == null)
             {
@@ -47,7 +47,7 @@ namespace StoneFruit.Execution.Arguments
             return this;
         }
 
-        public IArgumentParserSetup UseVerbParser(IParser<char, string> verbParser)
+        public IParserSetup UseVerbParser(IParser<char, string> verbParser)
         {
             if (verbParser == null)
             {
@@ -60,7 +60,7 @@ namespace StoneFruit.Execution.Arguments
             return this;
         }
 
-        public IArgumentParserSetup UseArgumentParser(IParser<char, IParsedArgument> argParser)
+        public IParserSetup UseArgumentParser(IParser<char, IParsedArgument> argParser)
         {
             if (argParser == null)
             {
@@ -73,13 +73,13 @@ namespace StoneFruit.Execution.Arguments
             return this;
         }
 
-        public IArgumentParserSetup UseArgumentParser(IParser<char, IEnumerable<IParsedArgument>> argParser)
+        public IParserSetup UseArgumentParser(IParser<char, IEnumerable<IParsedArgument>> argParser)
         {
             var parser = argParser.Flatten<char, IEnumerable<IParsedArgument>, IParsedArgument>();
             return UseArgumentParser(parser);
         }
 
-        public IArgumentParserSetup UseScriptParser(IParser<char, CommandFormat> scriptParser)
+        public IParserSetup UseScriptParser(IParser<char, CommandFormat> scriptParser)
         {
             if (scriptParser == null)
             {

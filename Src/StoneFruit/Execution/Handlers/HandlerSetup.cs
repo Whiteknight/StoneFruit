@@ -12,14 +12,16 @@ namespace StoneFruit.Execution.Handlers
     /// </summary>
     public class HandlerSetup : IHandlerSetup
     {
+        private readonly TypeInstanceResolver _defaultResolver;
         private readonly List<IHandlerSource> _sources;
         private readonly DelegateHandlerSource _delegates;
         private readonly ScriptHandlerSource _scripts;
         private readonly NamedInstanceHandlerSource _instances;
         private readonly AliasMap _aliases;
 
-        public HandlerSetup()
+        public HandlerSetup(TypeInstanceResolver defaultResolver = null)
         {
+            _defaultResolver = defaultResolver;
             _sources = new List<IHandlerSource>();
             _delegates = new DelegateHandlerSource();
             _scripts = new ScriptHandlerSource();
@@ -92,6 +94,13 @@ namespace StoneFruit.Execution.Handlers
             Assert.ArgumentNotNull(handler, nameof(handler));
             _instances.Add(verb, handler, description, usage);
             return this;
+        }
+
+        public IHandlerSetup UseHandlerTypes(IEnumerable<Type> commandTypes, TypeInstanceResolver resolver = null, ITypeVerbExtractor verbExtractor = null)
+        {
+            Assert.ArgumentNotNull(commandTypes, nameof(commandTypes));
+            var source = new TypeListConstructSource(commandTypes, resolver ?? _defaultResolver, verbExtractor);
+            return AddSource(source);
         }
 
         public IHandlerSetup AddScript(string verb, IEnumerable<string> lines, string description = null, string usage = null)

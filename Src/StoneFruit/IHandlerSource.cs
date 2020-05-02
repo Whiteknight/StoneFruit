@@ -39,7 +39,7 @@ namespace StoneFruit
     {
         public static IHandlerSource GetBuiltinHandlerSource()
         {
-            return new TypeListConstructSource(new[]
+            var requiredHandlers = new[]
             {
                 typeof(EchoHandler),
                 typeof(EnvironmentChangeHandler),
@@ -47,7 +47,8 @@ namespace StoneFruit
                 typeof(ExitHandler),
                 typeof(HelpHandler),
                 typeof(MetadataRemoveHandler),
-            }, null);
+            };
+            return new TypeListConstructSource(requiredHandlers, null, null);
         }
     }
 }

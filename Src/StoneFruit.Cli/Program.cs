@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Lamar;
 using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Containers.Lamar;
+using StoneFruit.Containers.Microsoft;
 using StoneFruit.Containers.StructureMap;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
@@ -34,7 +35,8 @@ namespace StoneFruit.Cli
         {
             //var engine = NoneMain();
             //var engine = StructureMapMain();
-            var engine = LamarMain();
+            //var engine = LamarMain();
+            var engine = MicrosoftMain();
             Environment.ExitCode = engine.RunWithCommandLineArguments();
 
             Console.ReadKey();
@@ -68,6 +70,15 @@ namespace StoneFruit.Cli
                     //s.MaxInputlessCommands = 3;
                     s.MaxExecuteTimeout = TimeSpan.FromSeconds(5);
                 });
+        }
+
+        private static Engine MicrosoftMain()
+        {
+            IServiceProvider provider = null;
+            var services = new ServiceCollection();
+            services.SetupEngine<MyEnvironment>(Build, () => provider);
+            provider = services.BuildServiceProvider();
+            return provider.GetService<Engine>();
         }
 
         private static Engine NoneMain()
