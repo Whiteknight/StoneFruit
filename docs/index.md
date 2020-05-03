@@ -25,6 +25,7 @@ To get started, we need to create an `EngineBuilder`, configure it, and build an
 * [Lamar Quick Start](start_lamar.md)
 * [StructureMap Quick Start](start_structuremap.md)
 * [Ninject Quick Start](start_ninject.md)
+* [Microsoft DI Quick Start](start_microsoft.md)
 * [No DI Quick Start](start_basic.md)
 
 ## Pages
