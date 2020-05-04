@@ -48,6 +48,6 @@
 
         public long AsLong(long defaultValue = 0) => defaultValue;
 
-        public void Throw() => throw new CommandArgumentException(Message);
+        public void Throw(string errorMessage) => throw new CommandArgumentException(string.IsNullOrEmpty(errorMessage) ? Message : errorMessage);
     }
 }

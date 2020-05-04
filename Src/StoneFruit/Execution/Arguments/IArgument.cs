@@ -101,11 +101,11 @@ namespace StoneFruit.Execution.Arguments
         /// </summary>
         /// <param name="argument"></param>
         /// <returns></returns>
-        public static T Require<T>(this T argument)
+        public static T Require<T>(this T argument, string errorMessage = null)
             where T : IArgument
         {
             Assert.ArgumentNotNull(argument, nameof(argument));
-            (argument as MissingArgument)?.Throw();
+            (argument as MissingArgument)?.Throw(errorMessage);
             return argument;
         }
 
