@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -9,7 +9,7 @@
     <Version>0.12.0</Version>
     <Authors>Andrew F. Whitworth</Authors>
     <Company />
-    <Description>CLI Commendlet host and execution engine, StructureMap container bindings</Description>
+    <Description>CLI Commandlet host and execution engine, StructureMap container bindings</Description>
     <Copyright>Copyright 2020</Copyright>
     <PackageProjectUrl>https://github.com/Whiteknight/StoneFruit</PackageProjectUrl>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
