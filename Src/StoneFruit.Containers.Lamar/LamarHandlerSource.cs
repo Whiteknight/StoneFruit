@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Lamar;
+using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Execution;
 using StoneFruit.Utility;
 
@@ -65,7 +66,8 @@ namespace StoneFruit.Containers.Lamar
 
         private IHandlerBase ResolveHandler(Type type)
         {
-            var instance = _container.GetInstance(type);
+            var scope = _container.CreateScope();
+            var instance = scope.ServiceProvider.GetService(type);
             return instance as IHandlerBase;
         }
 

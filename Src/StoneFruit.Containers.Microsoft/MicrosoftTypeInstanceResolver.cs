@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Execution;
 
 namespace StoneFruit.Containers.Microsoft
@@ -17,7 +18,8 @@ namespace StoneFruit.Containers.Microsoft
 
         public object Resolve(Type handlerType, Command command, CommandDispatcher dispatcher)
         {
-            return _getProvider().GetService(handlerType);
+            var scope = _getProvider().CreateScope();
+            return scope.ServiceProvider.GetService(handlerType);
         }
     }
 }

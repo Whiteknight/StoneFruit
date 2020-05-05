@@ -61,7 +61,8 @@ namespace StoneFruit.Containers.Microsoft
             if (!_verbs.ContainsKey(command.Verb))
                 return null;
             var serviceType = _verbs[command.Verb].Type;
-            return _getProvider().GetService(serviceType) as IHandlerBase;
+            var scope = _getProvider().CreateScope();
+            return scope.ServiceProvider.GetService(serviceType) as IHandlerBase;
         }
 
         public IEnumerable<IVerbInfo> GetAll() => _verbs.Values;
