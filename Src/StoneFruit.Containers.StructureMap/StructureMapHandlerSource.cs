@@ -64,7 +64,7 @@ namespace StoneFruit.Containers.StructureMap
 
         private IHandlerBase ResolveHandler(Type type)
         {
-            var scope = _container.CreateChildContainer();
+            using var scope = _container.CreateChildContainer();
             return scope.GetInstance(type) as IHandlerBase;
         }
 

@@ -66,7 +66,7 @@ namespace StoneFruit.Containers.Lamar
 
         private IHandlerBase ResolveHandler(Type type)
         {
-            var scope = _container.CreateScope();
+            using var scope = _container.CreateScope();
             var instance = scope.ServiceProvider.GetService(type);
             return instance as IHandlerBase;
         }

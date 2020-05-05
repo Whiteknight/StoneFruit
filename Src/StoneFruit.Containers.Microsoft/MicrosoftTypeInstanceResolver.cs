@@ -18,7 +18,7 @@ namespace StoneFruit.Containers.Microsoft
 
         public object Resolve(Type handlerType, Command command, CommandDispatcher dispatcher)
         {
-            var scope = _getProvider().CreateScope();
+            using var scope = _getProvider().CreateScope();
             return scope.ServiceProvider.GetService(handlerType);
         }
     }
