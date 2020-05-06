@@ -35,9 +35,21 @@ namespace StoneFruit.Containers.Lamar
         /// <returns></returns>
         public static ServiceRegistry SetupEngine(this ServiceRegistry services, Action<IEngineBuilder> build)
         {
-            EngineBuilder.SetupEngineRegistrations(services, build);
-
             services.Scan(s => s.ScanForHandlers());
+            return SetupEngineScannerless(services, build);
+        }
+
+        public static ServiceRegistry SetupEngineScannerless<TEnvironment>(ServiceRegistry services, Action<IEngineBuilder> build)
+            where TEnvironment : class
+        {
+            SetupEngineScannerless(services, build);
+            EngineBuilder.SetupExplicitEnvironmentRegistration<TEnvironment>(services);
+            return services;
+        }
+
+        public static ServiceRegistry SetupEngineScannerless(ServiceRegistry services, Action<IEngineBuilder> build)
+        {
+            EngineBuilder.SetupEngineRegistrations(services, build);
             services.AddSingleton<IHandlerSource>(provider => new LamarHandlerSource(provider, TypeVerbExtractor.DefaultInstance));
 
             return services;
