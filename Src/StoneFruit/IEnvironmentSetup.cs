@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
-using StoneFruit.Execution.Handlers;
 
 namespace StoneFruit
 {

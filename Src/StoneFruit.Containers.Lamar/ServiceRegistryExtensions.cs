@@ -19,12 +19,8 @@ namespace StoneFruit.Containers.Lamar
         public static ServiceRegistry SetupEngine<TEnvironment>(this ServiceRegistry services, Action<IEngineBuilder> build)
             where TEnvironment : class
         {
-            EngineBuilder.SetupEngineRegistrations(services, build);
-
-            services.Scan(s => s.ScanForHandlers());
-            services.AddSingleton<IHandlerSource>(provider => new LamarHandlerSource(provider, TypeVerbExtractor.DefaultInstance));
-            services.AddTransient<TEnvironment>(provider => provider.GetService<IEnvironmentCollection>().Current as TEnvironment);
-            
+            SetupEngine(services, build);
+            EngineBuilder.SetupExplicitEnvironmentRegistration<TEnvironment>(services);
             return services;
         }
 

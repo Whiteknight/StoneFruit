@@ -41,7 +41,7 @@ namespace StoneFruit.Containers.StructureMap
                 .OrEmptyIfNull()
                 .SelectMany(commandType => 
                     _verbExtractor.GetVerbs(commandType)
-                    .Select(verb => (verb, commandType))
+                        .Select(verb => (verb, commandType))
                 )
                 .ToDictionaryUnique();
         }

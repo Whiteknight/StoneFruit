@@ -19,12 +19,12 @@ namespace StoneFruit.Containers.StructureMap
         {
             var services = new StructureMapServiceCollection();
             EngineBuilder.SetupEngineRegistrations(services, build);
+            EngineBuilder.SetupExplicitEnvironmentRegistration<TEnvironment>(services);
 
             services.AddSingleton<IHandlerSource>(provider => new StructureMapHandlerSource(provider, TypeVerbExtractor.DefaultInstance));
             container.Configure(c =>
             {
                 c.ScanForCommandVerbs();
-                c.For<TEnvironment>().Add(c => c.GetInstance<IEnvironmentCollection>().Current as TEnvironment);
             });
             container.Populate(services);
             //var have = container.WhatDoIHave();

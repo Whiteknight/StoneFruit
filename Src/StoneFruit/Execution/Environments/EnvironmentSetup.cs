@@ -14,7 +14,7 @@ namespace StoneFruit.Execution.Environments
         public void BuildUp(IServiceCollection services)
         {
             var environments = Build();
-            services.AddSingleton<IEnvironmentCollection>(environments);
+            services.AddSingleton(environments);
         }
 
         public IEnvironmentCollection Build()

@@ -110,17 +110,26 @@ namespace StoneFruit
             _output.BuildUp(services);
         }
 
+        /// <summary>
+        /// Setup all dependencies and container registrations to create and execute the
+        /// Engine, using the EngineBuilder.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="build"></param>
         public static void SetupEngineRegistrations(IServiceCollection services, Action<EngineBuilder> build)
         {
             var builder = new EngineBuilder();
-            SetupEngineRegistrations(builder, services, build);
+            build?.Invoke(builder);
+            SetupEngineRegistrations(services);
+            builder.BuildUp(services);
         }
 
-        public static void SetupEngineRegistrations(EngineBuilder builder, IServiceCollection services, Action<EngineBuilder> build)
+        /// <summary>
+        /// Setup type registrations necessary to create and execute the Engine
+        /// </summary>
+        /// <param name="services"></param>
+        public static void SetupEngineRegistrations(IServiceCollection services)
         {
-            build?.Invoke(builder);
-            builder?.BuildUp(services);
-
             // Register the Engine and the things that the Engine provides
             services.AddSingleton(provider => new EngineAccessor());
             services.AddSingleton(provider =>
@@ -136,10 +145,16 @@ namespace StoneFruit
                 accessor.SetEngine(e);
                 return e;
             });
-            services.AddTransient(provider => provider.GetService<EngineAccessor>().Engine.GetCurrentState());
-            services.AddTransient(provider => provider.GetService<EngineAccessor>().Engine.GetCurrentDispatcher());
-            services.AddTransient(provider => provider.GetService<EngineState>().CurrentCommand);
-            services.AddTransient(provider => provider.GetService<EngineState>().CurrentCommand?.Arguments);
+            services.AddScoped(provider => provider.GetService<EngineAccessor>().Engine.GetCurrentState());
+            services.AddScoped(provider => provider.GetService<EngineAccessor>().Engine.GetCurrentDispatcher());
+            services.AddScoped(provider => provider.GetService<EngineState>().CurrentCommand);
+            services.AddScoped(provider => provider.GetService<EngineState>().CurrentCommand?.Arguments);
+        }
+
+        public static void SetupExplicitEnvironmentRegistration<TEnvironment>(IServiceCollection services)
+            where TEnvironment : class
+        {
+            services.AddScoped<TEnvironment>(provider => provider.GetService<IEnvironmentCollection>().Current as TEnvironment);
         }
 
         public Engine Build()
