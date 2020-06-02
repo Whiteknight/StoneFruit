@@ -53,6 +53,35 @@ namespace StoneFruit
     public static class OutputExtensions
     {
         /// <summary>
+        /// Write the string representation of the object to the output
+        /// </summary>
+        /// <param name="output"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static IOutput Write(this IOutput output, object obj)
+        {
+            Assert.ArgumentNotNull(output, nameof(output));
+            if (obj == null)
+                return output;
+            return output.Write(obj.ToString());
+        }
+
+        /// <summary>
+        /// Write the string representation of the object to the output, with trailing
+        /// newline.
+        /// </summary>
+        /// <param name="output"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static IOutput WriteLine(this IOutput output, object obj)
+        {
+            Assert.ArgumentNotNull(output, nameof(output));
+            if (obj == null)
+                return output;
+            return output.WriteLine(obj.ToString());
+        }
+
+        /// <summary>
         /// WriteLine with a format string and arguments
         /// </summary>
         /// <param name="output"></param>
