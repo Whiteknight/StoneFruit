@@ -1,8 +1,8 @@
-﻿using System;
+﻿using StoneFruit.Execution.Arguments;
+using StoneFruit.Execution.Handlers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using StoneFruit.Execution.Arguments;
-using StoneFruit.Execution.Handlers;
 
 namespace StoneFruit.Handlers
 {
@@ -37,6 +37,9 @@ Get detailed help information for the given verb. The verb Command class must im
 The help command by default hides some internal commands which are not necessary for normal user interaction.
 To see all commands, use the -showall flag
 ";
+
+        // TODO: Add a "static string Group" property to include a group name, so we can organize
+        // commands by grouping for prettier output
 
         public void Execute()
         {
