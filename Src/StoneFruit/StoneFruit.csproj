@@ -13,6 +13,7 @@
     <Copyright>Copyright 2020</Copyright>
     <PackageProjectUrl>https://github.com/Whiteknight/StoneFruit</PackageProjectUrl>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <DebugType>full</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
