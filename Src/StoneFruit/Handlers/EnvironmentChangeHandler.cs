@@ -1,7 +1,7 @@
-﻿using System;
-using System.Linq;
-using StoneFruit.Execution;
+﻿using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
+using System;
+using System.Linq;
 
 namespace StoneFruit.Handlers
 {
@@ -46,11 +46,8 @@ To prompt the user for an environment only if one is not currently set, use the 
         public void Execute()
         {
             // If we're executing as notset, only prompt the user if we don't have an environment set
-            if (_command.Verb == NotSetName)
-            {
-                if (_environments.Current != null)
-                    return;
-            }
+            if (_command.Verb == NotSetName && _environments.Current != null)
+                return;
 
             // Otherwise do the normal environment switching logic
             ChangeEnvironment();

@@ -1,8 +1,8 @@
-﻿using System;
+﻿using ParserObjects;
+using ParserObjects.Parsers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using ParserObjects;
-using ParserObjects.Parsers;
 using static ParserObjects.Parsers.ParserMethods;
 using static ParserObjects.Parsers.Specialty.QuotedParserMethods;
 using static ParserObjects.Parsers.Specialty.WhitespaceParserMethods;
@@ -12,7 +12,7 @@ namespace StoneFruit.Execution.Arguments
     /// <summary>
     /// A grammar for posix-style arguments
     /// </summary>
-    public class PosixStyleArgumentGrammar
+    public static class PosixStyleArgumentGrammar
     {
         private static readonly Lazy<IParser<char, IParsedArgument>> _instance = new Lazy<IParser<char, IParsedArgument>>(GetParserInternal);
 

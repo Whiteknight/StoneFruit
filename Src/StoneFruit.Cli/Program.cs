@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using Lamar;
+﻿using Lamar;
 using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Containers.Lamar;
 using StoneFruit.Containers.Microsoft;
 using StoneFruit.Containers.StructureMap;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace StoneFruit.Cli
 {
@@ -29,7 +29,7 @@ namespace StoneFruit.Cli
         }
     }
 
-    class Program
+    static class Program
     {
         static void Main(string[] args)
         {

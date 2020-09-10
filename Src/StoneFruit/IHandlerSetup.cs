@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Handlers;
 using StoneFruit.Utility;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace StoneFruit
 {
@@ -30,16 +30,6 @@ namespace StoneFruit
         IHandlerSetup Add(string verb, Action<Command, CommandDispatcher> handle, string description = null, string usage = null);
 
         /// <summary>
-        /// Add a function delegate as a handler for asynchronous invokation
-        /// </summary>
-        /// <param name="verb"></param>
-        /// <param name="handleAsync"></param>
-        /// <param name="description"></param>
-        /// <param name="usage"></param>
-        /// <returns></returns>
-        IHandlerSetup AddAsync(string verb, Func<Command, CommandDispatcher, Task> handleAsync, string description = null, string usage = null);
-
-        /// <summary>
         /// Add a pre-existing handler instance with the given verb
         /// </summary>
         /// <param name="verb"></param>
@@ -48,6 +38,16 @@ namespace StoneFruit
         /// <param name="usage"></param>
         /// <returns></returns>
         IHandlerSetup Add(string verb, IHandlerBase handler, string description = null, string usage = null);
+
+        /// <summary>
+        /// Add a function delegate as a handler for asynchronous invokation
+        /// </summary>
+        /// <param name="verb"></param>
+        /// <param name="handleAsync"></param>
+        /// <param name="description"></param>
+        /// <param name="usage"></param>
+        /// <returns></returns>
+        IHandlerSetup AddAsync(string verb, Func<Command, CommandDispatcher, Task> handleAsync, string description = null, string usage = null);
 
         /// <summary>
         /// Add a script with a verb and zero or more commands to execute
@@ -77,7 +77,7 @@ namespace StoneFruit
         /// <param name="verbExtractor"></param>
         /// <returns></returns>
         IHandlerSetup UseHandlerTypes(IEnumerable<Type> commandTypes, TypeInstanceResolver resolver = null, ITypeVerbExtractor verbExtractor = null);
-        
+
         /// <summary>
         /// Build up registrations in the provided service collection
         /// </summary>

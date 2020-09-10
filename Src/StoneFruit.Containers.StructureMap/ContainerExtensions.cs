@@ -1,6 +1,6 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using StructureMap;
+using System;
 
 namespace StoneFruit.Containers.StructureMap
 {
@@ -27,7 +27,6 @@ namespace StoneFruit.Containers.StructureMap
                 c.ScanForCommandVerbs();
             });
             container.Populate(services);
-            //var have = container.WhatDoIHave();
         }
     }
 }

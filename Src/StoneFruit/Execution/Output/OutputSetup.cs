@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace StoneFruit.Execution.Output
 {
@@ -36,7 +36,7 @@ namespace StoneFruit.Execution.Output
 
         public IOutput Build()
         {
-            if (_useConsole == false)
+            if (!_useConsole)
             {
                 // This seems like a problem
                 if (_secondaries.Count == 0)

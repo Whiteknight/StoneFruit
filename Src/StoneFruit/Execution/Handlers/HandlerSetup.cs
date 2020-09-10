@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Execution.Scripts;
 using StoneFruit.Utility;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace StoneFruit.Execution.Handlers
 {
@@ -52,7 +52,7 @@ namespace StoneFruit.Execution.Handlers
         public IHandlers Build()
         {
             var sources = new List<IHandlerSource>();
-            
+
             if (_delegates.Count > 0)
                 sources.Add(_delegates);
             if (_scripts.Count > 0)
@@ -80,19 +80,19 @@ namespace StoneFruit.Execution.Handlers
             return this;
         }
 
-        public IHandlerSetup AddAsync(string verb, Func<Command, CommandDispatcher, Task> handleAsync, string description = null, string usage = null)
-        {
-            Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
-            Assert.ArgumentNotNull(handleAsync, nameof(handleAsync));
-            _delegates.AddAsync(verb, handleAsync, description, usage);
-            return this;
-        }
-
         public IHandlerSetup Add(string verb, IHandlerBase handler, string description = null, string usage = null)
         {
             Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
             Assert.ArgumentNotNull(handler, nameof(handler));
             _instances.Add(verb, handler, description, usage);
+            return this;
+        }
+
+        public IHandlerSetup AddAsync(string verb, Func<Command, CommandDispatcher, Task> handleAsync, string description = null, string usage = null)
+        {
+            Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
+            Assert.ArgumentNotNull(handleAsync, nameof(handleAsync));
+            _delegates.AddAsync(verb, handleAsync, description, usage);
             return this;
         }
 

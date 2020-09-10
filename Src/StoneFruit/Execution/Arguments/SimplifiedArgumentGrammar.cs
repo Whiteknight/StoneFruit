@@ -1,18 +1,18 @@
-﻿using System;
-using System.Linq;
-using ParserObjects;
+﻿using ParserObjects;
 using ParserObjects.Parsers;
+using System;
+using System.Linq;
 using static ParserObjects.Parsers.ParserMethods;
+using static ParserObjects.Parsers.Specialty.CStyleParserMethods;
 using static ParserObjects.Parsers.Specialty.QuotedParserMethods;
 using static ParserObjects.Parsers.Specialty.WhitespaceParserMethods;
-using static ParserObjects.Parsers.Specialty.CStyleParserMethods;
 
 namespace StoneFruit.Execution.Arguments
 {
     /// <summary>
     /// A grammar for simplified arguments
     /// </summary>
-    public class SimplifiedArgumentGrammar
+    public static class SimplifiedArgumentGrammar
     {
         private static readonly Lazy<IParser<char, IParsedArgument>> _instance = new Lazy<IParser<char, IParsedArgument>>(GetParserInternal);
 
@@ -51,14 +51,14 @@ namespace StoneFruit.Execution.Arguments
                 Match('='),
                 values,
 
-                (name, equals, value) => new ParsedNamedArgument(name, value) 
+                (name, equals, value) => new ParsedNamedArgument(name, value)
             );
 
             // <flag> | <named> | <positional>
             var args = First<char, IParsedArgument>(
                 flagArg,
                 namedArg,
-                values.Transform(v => new ParsedPositionalArgument(v) )
+                values.Transform(v => new ParsedPositionalArgument(v))
             );
 
             var whitespace = Whitespace();

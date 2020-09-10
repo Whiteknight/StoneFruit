@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using StoneFruit.Utility;
+using System.Collections.Generic;
 using System.Linq;
-using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Arguments
 {
@@ -37,6 +37,13 @@ namespace StoneFruit.Execution.Arguments
         IPositionalArgument Get(int index);
 
         /// <summary>
+        /// Get the unconsumed named argument with the given name.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        INamedArgument Get(string name);
+
+        /// <summary>
         /// Get all remaining unconsumed positional arguments. Arguments which are
         /// ambiguous will be treated as positionals during iteration.
         /// </summary>
@@ -66,13 +73,6 @@ namespace StoneFruit.Execution.Arguments
         /// </summary>
         /// <returns></returns>
         IEnumerable<IFlagArgument> GetAllFlags();
-
-        /// <summary>
-        /// Get the unconsumed named argument with the given name.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        INamedArgument Get(string name);
 
         /// <summary>
         /// Get all remaining unconsumed arguments of all types. Arguments which are
@@ -106,19 +106,7 @@ namespace StoneFruit.Execution.Arguments
         public static IPositionalArgument Consume(this IArguments args, int index)
         {
             Assert.ArgumentNotNull(args, nameof(args));
-            return args.Get(index).MarkConsumed() as IPositionalArgument;
-        }
-
-        /// <summary>
-        /// Get the named argument with the given name and mark it consumed
-        /// </summary>
-        /// <param name="args"></param>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public static IFlagArgument ConsumeFlag(this IArguments args, string name)
-        {
-            Assert.ArgumentNotNull(args, nameof(args));
-            return args.GetFlag(name).MarkConsumed() as IFlagArgument;
+            return args.Get(index).MarkConsumed();
         }
 
         /// <summary>
@@ -130,7 +118,19 @@ namespace StoneFruit.Execution.Arguments
         public static INamedArgument Consume(this IArguments args, string name)
         {
             Assert.ArgumentNotNull(args, nameof(args));
-            return args.Get(name).MarkConsumed() as INamedArgument;
+            return args.Get(name).MarkConsumed();
+        }
+
+        /// <summary>
+        /// Get the named argument with the given name and mark it consumed
+        /// </summary>
+        /// <param name="args"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static IFlagArgument ConsumeFlag(this IArguments args, string name)
+        {
+            Assert.ArgumentNotNull(args, nameof(args));
+            return args.GetFlag(name).MarkConsumed();
         }
 
         /// <summary>

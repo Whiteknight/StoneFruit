@@ -4,7 +4,7 @@ namespace StoneFruit.Execution.Output
 {
     public class NullOutput : IOutput
     {
-        public IOutput Color(Func<Brush, Brush> brush) => this;
+        public IOutput Color(Func<Brush, Brush> changeBrush) => this;
 
         public IOutput WriteLine() => this;
 

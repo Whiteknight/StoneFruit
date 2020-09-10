@@ -1,7 +1,7 @@
-﻿using System;
+﻿using StoneFruit.Utility;
+using System;
 using System.Globalization;
 using System.Linq;
-using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Output
 {
@@ -27,10 +27,10 @@ namespace StoneFruit.Execution.Output
 
         public static Brush Default => new Brush(ConsoleColor.Gray, ConsoleColor.Black);
 
-        public static Brush Current 
+        public static Brush Current
             => new Brush(Console.ForegroundColor, Console.BackgroundColor);
 
-        public static implicit operator Brush(ConsoleColor color) 
+        public static implicit operator Brush(ConsoleColor color)
             => new Brush(color, Console.BackgroundColor);
 
         public readonly void Set()
@@ -62,23 +62,23 @@ namespace StoneFruit.Execution.Output
 
         public readonly Brush Invert() => new Brush(Foreground.Invert(), Background.Invert());
 
-        public override bool Equals(object obj) 
+        public override bool Equals(object obj)
             => obj is Brush other && Equals(other);
+
+        public readonly bool Equals(Brush other)
+            => Foreground == other.Foreground && Background == other.Background;
 
         public override int GetHashCode()
         {
             unchecked
             {
-                return ((int) Foreground * 397) ^ (int) Background;
+                return ((int)Foreground * 397) ^ (int)Background;
             }
         }
 
         public static bool operator ==(Brush a, Brush b) => a.Equals(b);
 
         public static bool operator !=(Brush a, Brush b) => !a.Equals(b);
-
-        public readonly bool Equals(Brush other) 
-            => Foreground == other.Foreground && Background == other.Background;
 
         public static Brush Parse(string s)
         {

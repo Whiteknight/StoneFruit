@@ -134,9 +134,6 @@ namespace StoneFruit.Execution.Arguments
             return _positionals[index];
         }
 
-        public IEnumerable<IPositionalArgument> GetAllPositionals() 
-            => _positionals.Where(a => !a.Consumed);
-
         public INamedArgument Get(string name)
         {
             name = name.ToLowerInvariant();
@@ -150,6 +147,9 @@ namespace StoneFruit.Execution.Arguments
             return firstAvailable;
         }
 
+        public IEnumerable<IPositionalArgument> GetAllPositionals()
+            => _positionals.Where(a => !a.Consumed);
+
         public IEnumerable<IArgument> GetAll(string name)
         {
             name = name.ToLowerInvariant();
@@ -159,7 +159,7 @@ namespace StoneFruit.Execution.Arguments
             return _nameds[name].Where(a => !a.Consumed);
         }
 
-        public IEnumerable<INamedArgument> GetAllNamed() 
+        public IEnumerable<INamedArgument> GetAllNamed()
             => _nameds.Values
                 .SelectMany(n => n)
                 .Where(a => !a.Consumed);
@@ -172,7 +172,7 @@ namespace StoneFruit.Execution.Arguments
             return _flags[name].Consumed ? MissingArgument.FlagConsumed(name) : _flags[name];
         }
 
-        public bool HasFlag(string name, bool markConsumed = false) 
+        public bool HasFlag(string name, bool markConsumed = false)
             => _flags.ContainsKey(name.ToLowerInvariant());
 
         public IEnumerable<IFlagArgument> GetAllFlags() => _flags.Values.Where(a => !a.Consumed);

@@ -13,11 +13,12 @@ namespace StoneFruit.Execution.Environments
         public DictionaryEnvironmentFactory(IReadOnlyDictionary<string, object> environments)
         {
             _environments = environments;
+            ValidEnvironments = _environments.Keys.ToList();
         }
 
-        public object Create(string name) 
+        public object Create(string name)
             => _environments.ContainsKey(name) ? _environments[name] : null;
 
-        public IReadOnlyCollection<string> ValidEnvironments => _environments.Keys.ToList();
+        public IReadOnlyCollection<string> ValidEnvironments { get; }
     }
 }

@@ -22,9 +22,6 @@ namespace StoneFruit.Containers.Lamar
 
         public LamarHandlerSource(IServiceProvider provider, ITypeVerbExtractor verbExtractor)
         {
-            //var scanned = container.WhatDidIScan();
-            //var have = container.WhatDoIHave();
-            //_container = new Lazy<IContainer>(getContainer ?? GetDefaultContainer);
             _container = provider as IContainer ?? throw new ArgumentException("Expected a Lamar Container", nameof(provider));
             _verbExtractor = verbExtractor ?? TypeVerbExtractor.DefaultInstance;
             _nameMap = new Lazy<IReadOnlyDictionary<string, Type>>(SetupNameMapping);

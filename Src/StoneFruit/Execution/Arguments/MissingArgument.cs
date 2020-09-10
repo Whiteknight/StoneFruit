@@ -35,7 +35,10 @@
         public bool Consumed
         {
             get => true;
-            set { }
+            set
+            {
+                // Do nothing here, there's nothing to consume
+            }
         }
 
         public IArgument MarkConsumed(bool consumed = true) => this;

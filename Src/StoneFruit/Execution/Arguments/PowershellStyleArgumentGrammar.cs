@@ -1,18 +1,18 @@
-﻿using System;
-using System.Linq;
-using ParserObjects;
+﻿using ParserObjects;
 using ParserObjects.Parsers;
+using System;
+using System.Linq;
 using static ParserObjects.Parsers.ParserMethods;
+using static ParserObjects.Parsers.Specialty.CStyleParserMethods;
 using static ParserObjects.Parsers.Specialty.QuotedParserMethods;
 using static ParserObjects.Parsers.Specialty.WhitespaceParserMethods;
-using static ParserObjects.Parsers.Specialty.CStyleParserMethods;
 
 namespace StoneFruit.Execution.Arguments
 {
     /// <summary>
     /// A grammar for Powershell-style arguments
     /// </summary>
-    public class PowershellStyleArgumentGrammar
+    public static class PowershellStyleArgumentGrammar
     {
         private static readonly Lazy<IParser<char, IParsedArgument>> _instance = new Lazy<IParser<char, IParsedArgument>>(GetParserInternal);
 

@@ -14,7 +14,6 @@ namespace StoneFruit.Containers.Lamar
             scanner.AssemblyContainingType<IHandlerBase>();
             scanner.AssembliesFromApplicationBaseDirectory();
             scanner.AddAllTypesOf<IHandlerBase>();
-            //scanner.WithDefaultConventions();
         }
     }
 }

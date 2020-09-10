@@ -13,10 +13,11 @@ namespace StoneFruit.Execution.Environments
             CurrentName = "";
         }
 
-        public IReadOnlyList<string> GetNames() => new [] { Constants.EnvironmentNameDefault };
+        public IReadOnlyList<string> GetNames() => new[] { Constants.EnvironmentNameDefault };
 
         public void SetCurrent(string name)
         {
+            // This collection represents a singleton instance, there's nothing to set
         }
 
         public string CurrentName { get; }

@@ -1,8 +1,8 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using StoneFruit.Execution.Arguments;
+﻿using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Handlers;
 using StoneFruit.Utility;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace StoneFruit.Execution
 {
@@ -63,23 +63,6 @@ namespace StoneFruit.Execution
         }
 
         /// <summary>
-        /// Find and execute the appropriate handler for the given command object or
-        /// unparsed command string
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        public Task ExecuteAsync(CommandOrString command, CancellationToken token = default)
-        {
-            Assert.ArgumentNotNull(command, nameof(command));
-            if (command.Object != null)
-                return ExecuteAsync(command.Object, token);
-            if (!string.IsNullOrEmpty(command.String))
-                return ExecuteAsync(command.String, token);
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
         /// Find and execute the appropriate handler for the given unparsed command string
         /// </summary>
         /// <param name="commandString"></param>
@@ -89,19 +72,6 @@ namespace StoneFruit.Execution
             Assert.ArgumentNotNullOrEmpty(commandString, nameof(commandString));
             var command = Parser.ParseCommand(commandString);
             Execute(command, token);
-        }
-
-        /// <summary>
-        /// Parse the command string, find and dispatch the appropriate handler.
-        /// </summary>
-        /// <param name="commandString"></param>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        public Task ExecuteAsync(string commandString, CancellationToken token = default)
-        {
-            Assert.ArgumentNotNullOrEmpty(commandString, nameof(commandString));
-            var command = Parser.ParseCommand(commandString);
-            return ExecuteAsync(command, token);
         }
 
         /// <summary>
@@ -116,23 +86,6 @@ namespace StoneFruit.Execution
             var command = Command.Create(verb, args);
             Execute(command, token);
         }
-
-        /// <summary>
-        /// Find and execute the appropriate handler for the given verb and arguments
-        /// </summary>
-        /// <param name="verb"></param>
-        /// <param name="args"></param>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        public Task ExecuteAsync(string verb, IArguments args, CancellationToken token = default)
-        {
-            Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
-            var command = Command.Create(verb, args);
-            return ExecuteAsync(command, token);
-        }
-
-        // TODO V2: If the handler has a second Execute() method with arguments, we should attempt to invoke
-        // that version instead (converting named arguments to method arguments).
 
         /// <summary>
         /// Find and execute the appropriate handler for the given Command object
@@ -158,9 +111,55 @@ namespace StoneFruit.Execution
                     .GetAwaiter()
                     .GetResult();
                 State.CurrentCommand = null;
-                return;
             }
         }
+
+        /// <summary>
+        /// Find and execute the appropriate handler for the given command object or
+        /// unparsed command string
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public Task ExecuteAsync(CommandOrString command, CancellationToken token = default)
+        {
+            Assert.ArgumentNotNull(command, nameof(command));
+            if (command.Object != null)
+                return ExecuteAsync(command.Object, token);
+            if (!string.IsNullOrEmpty(command.String))
+                return ExecuteAsync(command.String, token);
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Parse the command string, find and dispatch the appropriate handler.
+        /// </summary>
+        /// <param name="commandString"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public Task ExecuteAsync(string commandString, CancellationToken token = default)
+        {
+            Assert.ArgumentNotNullOrEmpty(commandString, nameof(commandString));
+            var command = Parser.ParseCommand(commandString);
+            return ExecuteAsync(command, token);
+        }
+
+        /// <summary>
+        /// Find and execute the appropriate handler for the given verb and arguments
+        /// </summary>
+        /// <param name="verb"></param>
+        /// <param name="args"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public Task ExecuteAsync(string verb, IArguments args, CancellationToken token = default)
+        {
+            Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
+            var command = Command.Create(verb, args);
+            return ExecuteAsync(command, token);
+        }
+
+        // TODO V2: If the handler has a second Execute() method with arguments, we should attempt to invoke
+        // that version instead (converting named arguments to method arguments).
 
         /// <summary>
         /// Find and execute the appropriate handler for the given Command object
@@ -184,7 +183,6 @@ namespace StoneFruit.Execution
             {
                 await asyncHandler.ExecuteAsync(token);
                 State.CurrentCommand = null;
-                return;
             }
         }
     }

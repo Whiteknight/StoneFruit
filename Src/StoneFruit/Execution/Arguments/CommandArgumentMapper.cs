@@ -57,10 +57,7 @@ namespace StoneFruit.Execution.Arguments
 
                 var namedArg = args.Consume(property.Name);
                 if (namedArg.Exists())
-                {
                     AssignPropertyValue(namedArg, property, obj);
-                    continue;
-                }
             }
         }
 

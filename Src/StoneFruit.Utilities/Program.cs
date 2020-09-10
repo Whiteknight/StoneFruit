@@ -1,12 +1,12 @@
-﻿using System;
-using Lamar;
+﻿using Lamar;
 using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Containers.Lamar;
 using StoneFruit.Execution;
+using System;
 
 namespace StoneFruit.Utilities
 {
-    class Program
+    static class Program
     {
         static void Main(string[] args)
         {
