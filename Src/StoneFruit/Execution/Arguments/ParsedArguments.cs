@@ -96,7 +96,7 @@ namespace StoneFruit.Execution.Arguments
                 f.MarkConsumed(false);
         }
 
-        public IPositionalArgument Shift() 
+        public IPositionalArgument Shift()
             => AccessPositionalsUntil(() => true) ?? MissingArgument.NoPositionals();
 
         public IPositionalArgument Get(int index)
@@ -116,6 +116,24 @@ namespace StoneFruit.Execution.Arguments
             if (index >= _accessedPositionals.Count)
                 return MissingArgument.NoPositionals();
             return _accessedPositionals[index];
+        }
+
+        public INamedArgument Get(string name)
+        {
+            name = name.ToLowerInvariant();
+
+            // Check the already-accessed named args. If we have it, return it.
+            if (_accessedNameds.ContainsKey(name))
+            {
+                var firstAvailable = _accessedNameds[name].FirstOrDefault(a => !a.Consumed);
+                if (firstAvailable != null)
+                    return _accessedNameds[name].First();
+            }
+
+            // Loop through all unaccessed args looking for the first one with the given
+            // name. 
+            var match = AccessNamedUntil(n => n == name, () => true);
+            return match ?? MissingArgument.NoneNamed(name);
         }
 
         public IEnumerable<IPositionalArgument> GetAllPositionals()
@@ -156,24 +174,6 @@ namespace StoneFruit.Execution.Arguments
             return null;
         }
 
-        public INamedArgument Get(string name)
-        {
-            name = name.ToLowerInvariant();
-
-            // Check the already-accessed named args. If we have it, return it.
-            if (_accessedNameds.ContainsKey(name))
-            {
-                var firstAvailable = _accessedNameds[name].FirstOrDefault(a => !a.Consumed);
-                if (firstAvailable != null)
-                    return _accessedNameds[name].First();
-            }
-
-            // Loop through all unaccessed args looking for the first one with the given
-            // name. 
-            var match = AccessNamedUntil(n => n == name, () => true);
-            return match ?? MissingArgument.NoneNamed(name);
-        }
-
         public IEnumerable<IArgument> GetAll(string name)
         {
             name = name.ToLowerInvariant();
@@ -196,30 +196,34 @@ namespace StoneFruit.Execution.Arguments
         {
             for (int i = 0; i < _rawArguments.Count; i++)
             {
-                var arg = _rawArguments[i];
-                if (arg is ParsedNamedArgument n)
-                {
-                    if (!shouldAccess(n.Name))
-                        continue;
-                    var accessor = new NamedArgument(n.Name, n.Value);
-                    _rawArguments[i] = null;
-                    AccessNamed(accessor);
-                    if (isComplete())
-                        return accessor;
-                }
-
-                if (arg is ParsedFlagPositionalOrNamedArgument n2)
-                {
-                    if (!shouldAccess(n2.Name))
-                        continue;
-                    var accessor = new NamedArgument(n2.Name, n2.Value);
-                    _rawArguments[i] = null;
-                    AccessNamed(accessor);
-                    if (isComplete())
-                        return accessor;
-                }
+                var accessor = GetNamedAccessorForArgument(i, shouldAccess);
+                if (accessor != null && isComplete())
+                    return accessor;
             }
 
+            return null;
+        }
+
+        private NamedArgument GetNamedAccessorForArgument(int i, Func<string, bool> shouldAccess)
+        {
+            var arg = _rawArguments[i];
+            if (arg is ParsedNamedArgument n && shouldAccess(n.Name))
+            {
+                var accessor = new NamedArgument(n.Name, n.Value);
+                _rawArguments[i] = null;
+                AccessNamed(accessor);
+                return accessor;
+            }
+
+            if (arg is ParsedFlagPositionalOrNamedArgument n2 && shouldAccess(n2.Name))
+            {
+                var accessor = new NamedArgument(n2.Name, n2.Value);
+                _rawArguments[i] = null;
+                AccessNamed(accessor);
+                return accessor;
+            }
+
+            // For all other argument types, there is no named accessor
             return null;
         }
 
@@ -263,28 +267,31 @@ namespace StoneFruit.Execution.Arguments
         {
             for (int i = 0; i < _rawArguments.Count; i++)
             {
-                var arg = _rawArguments[i];
-                if (arg is ParsedFlagArgument f)
-                {
-                    if (!isMatch(f.Name))
-                        continue;
-                    var accessor = new FlagArgument(f.Name);
-                    _rawArguments[i] = null;
-                    _accessedFlags.Add(f.Name, accessor);
-                    if (isComplete())
-                        return accessor;
-                }
+                var accessor = GetFlagAccessorForArgument(i, isMatch);
+                if (accessor != null && isComplete())
+                    return accessor;
+            }
 
-                if (arg is ParsedFlagPositionalOrNamedArgument fp)
-                {
-                    if (!isMatch(fp.Name))
-                        continue;
-                    var accessor = new FlagArgument(fp.Name);
-                    _accessedFlags.Add(fp.Name, accessor);
-                    _rawArguments[i] = new ParsedPositionalArgument(fp.Value);
-                    if (isComplete())
-                        return accessor;
-                }
+            return null;
+        }
+
+        private FlagArgument GetFlagAccessorForArgument(int i, Func<string, bool> isMatch)
+        {
+            var arg = _rawArguments[i];
+            if (arg is ParsedFlagArgument f && isMatch(f.Name))
+            {
+                var accessor = new FlagArgument(f.Name);
+                _rawArguments[i] = null;
+                _accessedFlags.Add(f.Name, accessor);
+                return accessor;
+            }
+
+            if (arg is ParsedFlagPositionalOrNamedArgument fp && isMatch(fp.Name))
+            {
+                var accessor = new FlagArgument(fp.Name);
+                _accessedFlags.Add(fp.Name, accessor);
+                _rawArguments[i] = new ParsedPositionalArgument(fp.Value);
+                return accessor;
             }
 
             return null;
