@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using ParserObjects;
 using ParserObjects.Parsers;
-using static ParserObjects.Parsers.ParserMethods;
-using static ParserObjects.Parsers.Specialty.QuotedParserMethods;
+using static ParserObjects.Parsers.ParserMethods<char>;
 using static ParserObjects.Parsers.Specialty.CStyleParserMethods;
+using static ParserObjects.Parsers.Specialty.QuotedParserMethods;
 using static ParserObjects.Parsers.Specialty.WhitespaceParserMethods;
 
 namespace StoneFruit.Execution.Scripts.Formatting
@@ -30,7 +30,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 singleQuotedString
             );
 
-            var unquotedValue = Match<char>(c => !char.IsWhiteSpace(c))
+            var unquotedValue = Match(c => !char.IsWhiteSpace(c))
                 .List(true)
                 .Transform(c => new string(c.ToArray()));
 
@@ -80,7 +80,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match(']'),
                 (n, e, o, s, c) => new NamedFetchNamedArgumentAccessor(n, s)
             );
-            
+
             // A named argument where the name is a literal but the value is fetched from a positional
             // literalNameFetchValueArg := <name> '=' '[' <integer> ']'
             var literalNameFetchPositionalArg = Rule(
@@ -158,7 +158,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
 
             // All possible args
             // <flag> | <named> | <positional>
-            var args = First<char, IArgumentAccessor>(
+            var args = First<IArgumentAccessor>(
                 literalNameFetchNamedArg,
                 literalNameFetchPositionalArg,
                 literalNamedArg,
@@ -188,7 +188,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
             return Rule(
                 verb,
                 argAndWhitespace.List(),
-                End<char>(),
+                End(),
 
                 (v, a, end) => new CommandFormat(v, a.ToList())
             );

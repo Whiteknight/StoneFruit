@@ -1,8 +1,8 @@
-﻿using ParserObjects;
-using ParserObjects.Parsers;
-using System;
+﻿using System;
 using System.Linq;
-using static ParserObjects.Parsers.ParserMethods;
+using ParserObjects;
+using ParserObjects.Parsers;
+using static ParserObjects.Parsers.ParserMethods<char>;
 using static ParserObjects.Parsers.Specialty.CStyleParserMethods;
 using static ParserObjects.Parsers.Specialty.QuotedParserMethods;
 using static ParserObjects.Parsers.Specialty.WhitespaceParserMethods;
@@ -24,7 +24,7 @@ namespace StoneFruit.Execution.Arguments
 
             var singleQuotedString = StrippedSingleQuotedString();
 
-            var unquotedValue = Match<char>(c => !char.IsWhiteSpace(c))
+            var unquotedValue = Match(c => !char.IsWhiteSpace(c))
                 .List(true)
                 .Transform(c => new string(c.ToArray()));
 
@@ -55,7 +55,7 @@ namespace StoneFruit.Execution.Arguments
             );
 
             // <flag> | <named> | <positional>
-            var args = First<char, IParsedArgument>(
+            var args = First<IParsedArgument>(
                 flagArg,
                 namedArg,
                 values.Transform(v => new ParsedPositionalArgument(v))

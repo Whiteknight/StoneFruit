@@ -1,7 +1,7 @@
 ﻿using System;
 using ParserObjects;
 using ParserObjects.Parsers;
-using static ParserObjects.Parsers.ParserMethods;
+using static ParserObjects.Parsers.ParserMethods<char>;
 using static ParserObjects.Parsers.Specialty.WhitespaceParserMethods;
 
 namespace StoneFruit.Execution
@@ -17,8 +17,8 @@ namespace StoneFruit.Execution
 
         private static IParser<char, string> GetParserInternal()
         {
-            var firstChar = Match<char>(c => c == '_' || char.IsLetter(c));
-            var bodyChars = Match<char>(c => c == '_' || c == '-' || char.IsLetterOrDigit(c));
+            var firstChar = Match(c => c == '_' || char.IsLetter(c));
+            var bodyChars = Match(c => c == '_' || c == '-' || char.IsLetterOrDigit(c));
             var verb = Rule(
                 firstChar,
                 bodyChars.ListCharToString(),
