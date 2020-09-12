@@ -1,10 +1,10 @@
 # Arguments and Syntax
 
-A Command is a combination of a verb and zero or more arguments. There are three types of arguments:
+A **Command** is a combination of a **verb** and zero or more **arguments**. There are three types of arguments:
 
-1. Positional arguments are unnamed values in the argument list and are accessed by index. There can be many positional arguments, each one with a unique index (starting from 0).
-1. Flag arguments are defined by their name and can appear in any order. A flag does not have a value, but is instead defined by whether or not it exists. Only one flag of a given name can be passed for a single command. Passing the same flag more than once will be ignored.
-1. Named arguments have a name and a value and can appear in any order. You can have multiple named arguments with the same name. Ordering of named arguments will not be preserved.
+1. **Positional** arguments are unnamed values in the argument list and are accessed by index. There can be many positional arguments, each one with a unique index (starting from 0).
+1. **Flag** arguments are defined by their name and can appear in any order. A flag does not have a value, but is instead defined by whether or not it exists. Only one flag of a given name can be passed for a single command. Passing the same flag more than once will be ignored.
+1. **Named** arguments have a name and a value and can appear in any order. You can have multiple named arguments with the same name. Ordering of named arguments will not be preserved.
 
 The `echo` built-in takes arguments of all three types:
 
@@ -16,7 +16,7 @@ echo -nonewline color=Red 'ERROR MESSAGE'
 
 ## Argument Syntax
 
-StoneFruit supports multiple different argument formats, which can be set in the `EngineBuilder`. The default syntax is the "Simplified" version. In all syntaxes, positional arguments are the same: Either a bare word with no whitespace or a quoted value (single- or double-quoted, with backslash escapes).
+StoneFruit supports multiple different argument formats, which can be set in the `IEngineBuilder`. The default syntax is the "Simplified" version. In all syntaxes, positional arguments are the same: Either a bare word with no whitespace or a quoted value (single- or double-quoted, with backslash escapes).
 
 ### Simplified
 
@@ -28,9 +28,9 @@ Simplified syntax is the default, is the simplest, and has no parsing ambiguitie
 Simplified argument grammar is the default, but you can specify it explicitly in your EngineBuilder:
 
 ```csharp
-engineBuilder
+services.SetupEngine(b => b
     .SetupArguments(a => a.UseSimplifiedArgumentParser())
-    ;
+);
 ```
 
 ### Posix Style
@@ -46,9 +46,9 @@ engineBuilder
 Ambiguities are resolved at execution time, if you ask for the named argument it will be treated like a named argument, otherwise if you ask for the flag or the positional, it will be treated as the combination of flag and positional.
 
 ```csharp
-engineBuilder
+services.SetupEngine(b => b
     .SetupArguments(a => a.UsePosixStyleArgumentParser())
-    ;
+);
 ```
 
 ### Powershell Style
@@ -56,12 +56,14 @@ engineBuilder
 Powershell style also contains some ambiguities but it is simpler than POSIX-style:
 
 * `-name` is the flag "name"
-* `-name` value' is ambiguous. It is either the flag "name" followed by the positional "value" or it's the named "name=value"
+* `-name value` is ambiguous. It is either the flag "name" followed by the positional "value" or it's the named "name=value"
+
+Again, ambiguities are resolved at runtime depending on how you access the arguments.
 
 ```csharp
-engineBuilder
+services.SetupEngine(b => b
     .SetupArguments(a => a.UsePowershellStyleArgumentParser())
-    ;
+);
 ```
 
 ### Windows CMD Style
@@ -77,7 +79,7 @@ engineBuilder
 
 ### Custom Parsers
 
-You can implement your own `IParser<char, IParsedArgument>` grammar for your own syntax if you want.
+You can implement your own `IParser<char, IParsedArgument>` grammar for your own syntax if you want. See the documentation for [ParserObjects](https://github.com/Whiteknight/ParserObjects) for more details about how to create your own parser.
 
 ```csharp
 engineBuilder
@@ -86,3 +88,5 @@ engineBuilder
 ```
 
 ## Retrieving Argument Values
+
+TBD

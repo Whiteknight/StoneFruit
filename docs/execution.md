@@ -18,7 +18,7 @@ If you call `engine.RunHeadlessWithCommandLineArgs()` it will always run in head
 
 If you call `engine.RunHeadless(cmd)` it will always run in headless mode using the given string as the only command input. If the string is null or empty, or contains an invalid verb, an error will be shown.
 
-If you call `engine.Run()` with command on the commandline your application will start in headless mode. If you support environments, the first argument must be the name of the environment to use, followed by the verb and arguments. If you do not support environments, the first argument should be the verb followed by the arguments. If there is no valid command on the commandline, `engine.Run()` will choose interactive mode instead.
+If you call `engine.Run()` with commandline arguments your application will start in headless mode. If you support environments, the first argument must be the name of the environment to use, followed by the verb and arguments. If you do not support environments, the first argument should be the verb followed by the arguments. If there is no valid command on the commandline, `engine.Run()` will choose interactive mode instead.
 
 ```bash
 mystonefruitapp Production echo 'test'
@@ -27,7 +27,7 @@ mystonefruitapp echo 'test'
 
 ### Scripting
 
-In headless ode, the Engine will first execute the `EngineStartHeadless` script, then it will execute the command from the commandline, and then it will execute the `EngineStopHeadless` script. See the page on [Scripting](scripting.md) for more details.
+In headless mode, the Engine will first execute the `EngineStartHeadless` script, then it will execute the command from the commandline, and then it will execute the `EngineStopHeadless` script. See the page on [Scripting](scripting.md) for more details.
 
 ### Headless Help
 

@@ -4,14 +4,14 @@ There are several methods of scripting in StoneFruit. These allow you to transla
 
 ## Verb Aliases
 
-Aliases allow you to invoke a single handler with multiple different verbs. An alias maps one verb to another one. When you use an alias, the verb is translated first, with the input alias and target verb both stored in the `Command` argument, before the handler is dispatched. You can setup aliases in your `EngineBuilder`:
+Aliases allow you to invoke a single handler with multiple different verbs. An alias maps one verb to another one. When you use an alias, the verb is translated first, with the input alias and target verb both stored in the `Command` argument, before the handler is dispatched. You can setup aliases in your `IEngineBuilder`:
 
 ```csharp
-engineBuilder
+services.SetupEngine(b => b
     .SetupHandlers(handlers => handlers
         .AddAlias("echo", "test")
     )  
-    ;
+);
 ```
 
 Now when you pass a command `test 'hello world'` the `echo` handler will be invoked with the given arguments. Inside your handler you can inspect the contents of the `Command` object to determine if an alias was used and possibly change behavior. For example, we can create a command that echos text to the output normally, but converts it to upper-case if we invoke it with the `yell` alias:
@@ -43,22 +43,22 @@ Aliases are only resolved once per command, so you cannot have one alias referen
 
 ## Scripts
 
-A script is a collection of zero or more commands which are executed in response to a single input command. These are setup in the `EngineBuilder` and employ a sophisticated mechanism for translating arguments. Here is a simple example:
+A script is a collection of zero or more commands which are executed in response to a single input command. These are setup in the `IEngineBuilder` and employ a sophisticated mechanism for translating arguments. Here is a simple example:
 
 ```csharp
-engineBuilder
+services.SetupEngine(b => b
     .SetupHandlers(handlers => handlers
         .AddScript("say-hello-world", new [] { 
             "echo hello", 
             "echo world" 
         })
     )
-    ;
+);
 ```
 
 ### Script Arguments
 
-Arguments in a script use the Simplified argument syntax (see the [Arguments])(arguments.md) page for more details) with extended placeholder syntax. Names of flags and named arguments, in all cases, can be quoted with single or double quotes.
+Arguments in a script use the Simplified argument syntax (see the [Arguments])(arguments.md) page for more details) with extended placeholder syntax. Names of flags and named arguments, in all cases, can be quoted with single or double quotes and are not case-sensitive.
 
 #### Positional Arguments
 
@@ -82,7 +82,7 @@ Flag arguments can be fetched and consumed from the input by name using the `?` 
 
 #### Named Arguments
 
-Named arguments can be fetched from the input in a few ways. They can be fetched and consumed with name and value using `{name}` syntax, all remaining named arguments can be fetched and consumed with `{*}` syntax, and values can fetched with literal names using `name=[]` syntax, where the argument can be an integer to get the value from a positional argument and a string to get the value of another named argument. Literal named values can be passed like normal.
+Named arguments can be fetched from the input in a few ways. They can be fetched and consumed with name and value using `{name}` syntax, all remaining named arguments can be fetched and consumed with `{*}` syntax, and positional arguments can be given names using the  `name=[]` syntax. Literal named values can be passed like normal.
 
 **Script**: `test {a} b=['x'] c=[0] d=4 {*}`
 
@@ -95,7 +95,9 @@ Named arguments can be fetched from the input in a few ways. They can be fetched
 The StoneFruit `EngineState` contains a number of pre-defined scripts which are executed in response to various events. You can modify these scripts in the EngineBuilder to change the behavior of the application:
 
 ```csharp
-    .SetupEvents(e => ...);
+services.SetupEngine(b => b
+    .SetupEvents(e => ...)
+);
 ```
 
 You can examine or modify the contents of these scripts within the context of the `EngineBuilder.SetupEvents()` method. This gives a way to customize behavior by setting up data or showing helpful information to users. Notice that some of these events are important to the operation of the system and errors in these scripts can create a fatal condition which will cause the engine to terminate.
@@ -103,14 +105,14 @@ You can examine or modify the contents of these scripts within the context of th
 For example, if you would like your application to display a custom message to the user when entering interactive mode, you can set it up like this:
 
 ```csharp
-engineBuilder
+services.SetupEngine(b => b
     .SetupEvents(scriptCatalog => {
         scriptCatalog.EngineStartInteractive.Add("echo 'hello world!'");
     })
-    ;
+);
 ```
 
-Event scripts use the same argument formatting syntax as normal scripts (described above). Scripts are available for the following events:
+Event scripts use the same argument formatting syntax as normal scripts (described above), and some scripts take arguments depending on the event. Scripts are available for the following events:
 
 ### Unhandled Errors
 
@@ -172,7 +174,7 @@ Whatever you put in this script will be executed by default when no verbs are sp
 
 ### Verb Not Found
 
-If a verb is specified, in headless or interactive mode, the `VerbNotFound` script is executed. By defailt it shows a brief error message:
+If an invalid verb is specified, in headless or interactive mode, the `VerbNotFound` script is executed. By default it shows a brief error message:
 
 ```
 echo Verb ['verb'] not found. Please check your spelling or help output and try again.
@@ -190,10 +192,10 @@ exit ['exitcode']
 The limit of commands to execute without user input can be set in the EngineBuilder. The default value is 20:
 
 ```csharp
-engineBuilder
+services.SetupEngine(b => b
     .SetupSettings(s => {
         s.MaxInputlessCommands = 20;
     })
-    ;
+);
 ```
 
