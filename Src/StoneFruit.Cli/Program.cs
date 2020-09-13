@@ -50,7 +50,7 @@ namespace StoneFruit.Cli
             builder
                 .SetupHandlers(h => h
                     .UsePublicMethodsAsHandlers(new MyObject(), getGroup: s => "public-methods")
-                    .Add("testf", (c, d) => d.Output.WriteLine("F"), group: "delegates")
+                    .Add("testf", (c, d) => d.Output.WriteLine("F"), description: "do F things", usage: "testf ...", group: "delegates")
                     .AddScript("testg", new[] { "echo test", "echo g" }, group: "scripts")
                     .AddScript("testh", new[] { "echo [0]", "echo ['a']" }, group: "scripts")
                     .AddScript("testi", new[]
@@ -60,6 +60,7 @@ namespace StoneFruit.Cli
                         "echo 3",
                         "echo 4"
                     }, group: "scripts")
+                    .AddAlias("testf", "testf-alias")
                 )
                 .SetupEnvironments(e => e.UseFactory(new MyEnvironmentFactory()))
                 .SetupEvents(e =>

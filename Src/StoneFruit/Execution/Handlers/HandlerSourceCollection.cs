@@ -4,45 +4,6 @@ using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Handlers
 {
-    public class AliasMap
-    {
-        private readonly Dictionary<string, string> _aliases;
-
-        public AliasMap()
-        {
-            _aliases = new Dictionary<string, string>();
-        }
-
-        public void AddAlias(string verb, string alias)
-        {
-            if (string.IsNullOrEmpty(alias) || string.IsNullOrEmpty(verb))
-                return;
-            alias = alias.ToLowerInvariant();
-            if (_aliases.ContainsKey(alias))
-                return;
-            verb = verb.ToLowerInvariant();
-            _aliases.Add(alias, verb);
-        }
-
-        public Command Translate(Command command)
-        {
-            if (_aliases.ContainsKey(command.Verb))
-            {
-                var newVerb = _aliases[command.Verb];
-                return command.Rename(newVerb);
-            }
-
-            return command;
-        }
-    }
-
-    public interface IHandlers
-    {
-        IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher);
-        IEnumerable<IVerbInfo> GetAll();
-        IVerbInfo GetByName(string name);
-    }
-
     /// <summary>
     /// Combines multiple ICommandSource implementations together in priorty order.
     /// </summary>
@@ -50,7 +11,6 @@ namespace StoneFruit.Execution.Handlers
     {
         private readonly AliasMap _aliases;
         private readonly IReadOnlyList<IHandlerSource> _sources;
-        
 
         public HandlerSourceCollection(IEnumerable<IHandlerSource> sources, AliasMap aliases)
         {
@@ -69,16 +29,41 @@ namespace StoneFruit.Execution.Handlers
 
         public IEnumerable<IVerbInfo> GetAll()
         {
-            return _sources.SelectMany(s => s.GetAll())
+            var allVerbs = _sources.SelectMany(s => s.GetAll())
                 .GroupBy(info => info.Verb)
-                .Select(g => g.First());
+                .Select(g => g.First())
+                .ToDictionary(v => v.Verb);
+            foreach (var aliasKvp in _aliases)
+            {
+                var verb = aliasKvp.Value;
+                var alias = aliasKvp.Key;
+                if (!allVerbs.ContainsKey(alias) && allVerbs.ContainsKey(verb))
+                {
+                    var verbInfo = allVerbs[verb];
+                    var info = _aliases.GetAliasInfoFromVerbInfo(alias, verb, verbInfo);
+                    allVerbs.Add(alias, info);
+                }
+            }
+            return allVerbs.Values;
         }
 
         public IVerbInfo GetByName(string name)
         {
-            return _sources
+            var byName = _sources
                 .Select(source => source.GetByName(name))
                 .FirstOrDefault(info => info != null);
+            if (byName != null)
+                return byName;
+
+            var aliased = _aliases.GetVerb(name);
+            var byAlias = _sources
+                .Select(source => source.GetByName(aliased))
+                .FirstOrDefault(info => info != null);
+
+            if (byAlias != null)
+                return _aliases.GetAliasInfoFromVerbInfo(name, aliased, byAlias);
+
+            return null;
         }
     }
 }

@@ -41,9 +41,6 @@ The help command by default hides some internal commands which are not necessary
 To see all commands, use the -showall flag
 ";
 
-        // TODO: Add a "static string Group" property to include a group name, so we can organize
-        // commands by grouping for prettier output
-
         public void Execute()
         {
             var arg = _args.Shift();
