@@ -15,14 +15,17 @@ namespace StoneFruit.Cli
     public class MyFirstHandler : IHandler
     {
         private readonly IOutput _output;
+        private readonly EngineState _state;
 
-        public MyFirstHandler(IOutput output)
+        public MyFirstHandler(IOutput output, EngineState state)
         {
             _output = output;
+            _state = state;
         }
 
         public void Execute()
         {
+            _state.Metadata.Add("test", this);
             _output.WriteLine("Starting the job...");
             // .. Do work here ..
             _output.WriteLine("Done.");

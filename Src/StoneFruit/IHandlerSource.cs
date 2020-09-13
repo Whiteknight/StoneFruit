@@ -42,11 +42,10 @@ namespace StoneFruit
             var requiredHandlers = new[]
             {
                 typeof(EchoHandler),
-                typeof(EnvironmentChangeHandler),
-                typeof(EnvironmentListHandler),
+                typeof(EnvironmentHandler),
                 typeof(ExitHandler),
                 typeof(HelpHandler),
-                typeof(MetadataRemoveHandler),
+                typeof(MetadataHandler),
             };
             return new TypeListConstructSource(requiredHandlers, null, null);
         }

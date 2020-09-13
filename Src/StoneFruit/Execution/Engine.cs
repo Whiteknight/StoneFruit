@@ -37,7 +37,7 @@ namespace StoneFruit.Execution
             Assert.ArgumentNotNull(parser, nameof(parser));
             Assert.ArgumentNotNull(output, nameof(output));
             Assert.ArgumentNotNull(eventCatalog, nameof(eventCatalog));
-            
+
             Environments = environments;
             _handlers = handlers;
             _eventCatalog = eventCatalog;
@@ -158,7 +158,7 @@ namespace StoneFruit.Execution
             // user command, and the headless stop script
             sources.AddToEnd(_state.EventCatalog.EngineStartHeadless, _parser);
             if (!string.IsNullOrWhiteSpace(startingEnvironment))
-                sources.AddToEnd($"{EnvironmentChangeHandler.Name} '{startingEnvironment}'");
+                sources.AddToEnd($"{EnvironmentHandler.Name} '{startingEnvironment}'");
             sources.AddToEnd(commandLine);
             sources.AddToEnd(_state.EventCatalog.EngineStopHeadless, _parser);
 
@@ -188,11 +188,11 @@ namespace StoneFruit.Execution
             // Change the environment if necessary. Otherwise the EngineStartInteractive
             // script will probably prompt the user to do so.
             if (!string.IsNullOrEmpty(environment))
-                source.AddToEnd($"{EnvironmentChangeHandler.Name} {environment}");
+                source.AddToEnd($"{EnvironmentHandler.Name} {environment}");
 
             source.AddToEnd(_state.EventCatalog.EngineStartInteractive, _parser);
             source.AddToEnd(new PromptCommandSource(Output, Environments, _state));
-            
+
             return RunLoop(source);
         }
 
@@ -254,7 +254,7 @@ namespace StoneFruit.Execution
                 var canExecute = _state.CommandCounter.VerifyCanExecuteNextCommand(_parser, Output);
                 if (!canExecute)
                     continue;
-                
+
                 try
                 {
                     // Get a cancellation token source, configured according to state 
@@ -312,7 +312,7 @@ namespace StoneFruit.Execution
             // We can't remove metadata in the script, because users might change the script
             // and inadvertantly break loop detection.
             _state.Metadata.Add(Constants.MetadataError, e, false);
-            _state.Commands.Prepend($"{MetadataRemoveHandler.Name} {Constants.MetadataError}");
+            _state.Commands.Prepend($"{MetadataHandler.Name} remove {Constants.MetadataError}");
             _state.Commands.Prepend(script.GetCommands(_parser, args));
         }
     }

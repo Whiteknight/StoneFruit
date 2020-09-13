@@ -56,7 +56,7 @@ namespace StoneFruit.Tests.Integration
             var output = new TestOutput();
             var engine = new EngineBuilder()
                 // We need env-change handler, so we can select one on startup
-                .SetupHandlers(h => h.UseHandlerTypes(typeof(TestEnvironmentHandler), typeof(EnvironmentChangeHandler)))
+                .SetupHandlers(h => h.UseHandlerTypes(typeof(TestEnvironmentHandler), typeof(EnvironmentHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEnvironments(e => e.UseInstances(new Dictionary<string, object> {
                     { "A", new TestEnvironment("A")},
@@ -85,7 +85,7 @@ namespace StoneFruit.Tests.Integration
             var output = new TestOutput();
             var engine = new EngineBuilder()
                 // We need env-change handler, so we can select one on startup
-                .SetupHandlers(h => h.UseHandlerTypes(typeof(TestEnvironmentHandler), typeof(EnvironmentChangeHandler)))
+                .SetupHandlers(h => h.UseHandlerTypes(typeof(TestEnvironmentHandler), typeof(EnvironmentHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEnvironments(e => e.UseFactory(new TestEnvironmentFactory()))
                 .SetupEvents(e => { e.EnvironmentChanged.Clear(); })
@@ -100,7 +100,7 @@ namespace StoneFruit.Tests.Integration
         {
             var output = new TestOutput("test");
             var engine = new EngineBuilder()
-                .SetupHandlers(h => h.UseHandlerTypes(typeof(TestEnvironmentHandler), typeof(EnvironmentChangeHandler), typeof(EchoHandler)))
+                .SetupHandlers(h => h.UseHandlerTypes(typeof(TestEnvironmentHandler), typeof(EnvironmentHandler), typeof(EchoHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEnvironments(e => e.UseFactory(new TestEnvironmentFactory()))
                 // Clear out start/stop scripts so we don't have anything extra in output

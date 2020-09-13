@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 
 namespace StoneFruit.Execution
 {
     /// <summary>
     /// Metadata storage for the EngineState
     /// </summary>
-    public class EngineStateMetadataCache
+    public class EngineStateMetadataCache : IEnumerable<KeyValuePair<string, object>>
     {
         private readonly Dictionary<string, object> _metadata;
 
@@ -32,6 +33,9 @@ namespace StoneFruit.Execution
                 return null;
             return _metadata[name];
         }
+
+        public IEnumerator<KeyValuePair<string, object>> GetEnumerator() => _metadata.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => _metadata.GetEnumerator();
 
         public void Remove(string name)
         {

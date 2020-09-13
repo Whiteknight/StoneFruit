@@ -22,7 +22,7 @@ namespace StoneFruit.Execution
             // Events when the engine starts and stops interactive mode
             EngineStartInteractive = new EventScript(
                 // Call the env-change command to make sure we have an environment set
-                $"{EnvironmentChangeHandler.NotSetName}",
+                $"{EnvironmentHandler.Name} -notset",
 
                 // Show a quick helpful message
                 $"{EchoHandler.Name} -nonewline Enter command ",
