@@ -144,8 +144,7 @@ namespace StoneFruit.Execution
             var (startingEnvironment, newCl) = GetStartingEnvironment(commandLine);
             commandLine = newCl;
 
-            // If at this point we have no commandLine left, run the HeadlessNoArgs script
-            // and execute immediately
+            // If there is no commandline left, run the HeadlessNoArgs script
             if (string.IsNullOrWhiteSpace(commandLine))
             {
                 sources.AddToEnd(_state.EventCatalog.HeadlessNoArgs, _parser,
@@ -188,7 +187,7 @@ namespace StoneFruit.Execution
             // Change the environment if necessary. Otherwise the EngineStartInteractive
             // script will probably prompt the user to do so.
             if (!string.IsNullOrEmpty(environment))
-                source.AddToEnd($"{EnvironmentHandler.Name} {environment}");
+                source.AddToEnd($"{EnvironmentHandler.Name} '{environment}'");
 
             source.AddToEnd(_state.EventCatalog.EngineStartInteractive, _parser);
             source.AddToEnd(new PromptCommandSource(Output, Environments, _state));
@@ -257,14 +256,14 @@ namespace StoneFruit.Execution
 
                 try
                 {
-                    // Get a cancellation token source, configured according to state 
+                    // Get a cancellation token source, configured according to state Command
                     // settings, and use that to dispatch the command
                     using var tokenSource = _state.GetConfiguredCancellationSource();
                     _dispatcher.Execute(command, tokenSource.Token);
                 }
                 catch (VerbNotFoundException vnf)
                 {
-                    // The verb was not found. Execute teh VerbNotFound script
+                    // The verb was not found. Execute the VerbNotFound script
                     var args = SyntheticArguments.From(("verb", vnf.Verb));
                     HandleError(vnf, _state.EventCatalog.VerbNotFound, args);
                 }
@@ -290,7 +289,7 @@ namespace StoneFruit.Execution
         {
             // If an exception is thrown while handling a previous exception, show an
             // angry error message and exit immediately
-            var currentException = _state.Metadata.Get(Constants.MetadataError);
+            var currentException = _state.Metadata.Get(Constants.MetadataError) as Exception;
             if (currentException != null)
             {
                 // This isn't scripted because it's critical error-handling code and we
@@ -300,8 +299,13 @@ namespace StoneFruit.Execution
                     .WriteLine("Received an exception while attempting to handle a previous exception")
                     .WriteLine("This is a fatal condition and the engine will exit")
                     .WriteLine("Make sure you clear the current exception when you are done handling it to avoid these situations")
+                    .WriteLine("Current Exception:")
                     .WriteLine(e.Message)
-                    .WriteLine(e.StackTrace);
+                    .WriteLine(e.StackTrace)
+                    .WriteLine("Previous Exception:")
+                    .WriteLine(currentException.Message)
+                    .WriteLine(currentException.StackTrace)
+                    ;
                 _state.Exit(Constants.ExitCodeCascadeError);
                 return;
             }
@@ -314,6 +318,10 @@ namespace StoneFruit.Execution
             _state.Metadata.Add(Constants.MetadataError, e, false);
             _state.Commands.Prepend($"{MetadataHandler.Name} remove {Constants.MetadataError}");
             _state.Commands.Prepend(script.GetCommands(_parser, args));
+            // Current command queue:
+            // 1. Error-handling script
+            // 2. "metadata remove __CURRENT_EXCEPTION"
+            // 3. previous contents of command queue, if any
         }
     }
 }
