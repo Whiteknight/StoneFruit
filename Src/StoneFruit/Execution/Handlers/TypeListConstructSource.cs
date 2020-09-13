@@ -46,17 +46,17 @@ namespace StoneFruit.Execution.Handlers
             });
         }
 
-        public IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher) 
+        public IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher)
             => _commands.ContainsKey(command.Verb) ? ResolveInstance(command, dispatcher, _commands[command.Verb]) : null;
 
         public IHandlerBase GetInstance<TCommand>(Command command, CommandDispatcher dispatcher)
             where TCommand : class, IHandlerBase
             => ResolveInstance(command, dispatcher, typeof(TCommand));
 
-        private IHandlerBase ResolveInstance(Command command, CommandDispatcher dispatcher, Type commandType) 
+        private IHandlerBase ResolveInstance(Command command, CommandDispatcher dispatcher, Type commandType)
             => _resolver(commandType, command, dispatcher) as IHandlerBase;
 
-        public IEnumerable<IVerbInfo> GetAll() 
+        public IEnumerable<IVerbInfo> GetAll()
             => _commands.Select(kvp => new VerbInfo(kvp.Key, kvp.Value));
 
         public IVerbInfo GetByName(string name)
@@ -73,6 +73,8 @@ namespace StoneFruit.Execution.Handlers
             }
 
             public string Verb { get; }
+
+            public string Group => _type.GetGroup();
             public string Description => _type.GetDescription();
             public string Usage => _type.GetUsage();
             public bool ShouldShowInHelp => _type.ShouldShowInHelp(Verb);

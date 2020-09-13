@@ -39,7 +39,7 @@ namespace StoneFruit.Containers.StructureMap
 
             return commandTypes
                 .OrEmptyIfNull()
-                .SelectMany(commandType => 
+                .SelectMany(commandType =>
                     _verbExtractor.GetVerbs(commandType)
                         .Select(verb => (verb, commandType))
                 )
@@ -53,7 +53,7 @@ namespace StoneFruit.Containers.StructureMap
             return type == null ? null : ResolveHandler(type);
         }
 
-        public IHandlerBase GetInstance<TCommand>() 
+        public IHandlerBase GetInstance<TCommand>()
             where TCommand : class, IHandlerBase
             => ResolveHandler(typeof(TCommand));
 
@@ -81,6 +81,7 @@ namespace StoneFruit.Containers.StructureMap
             public string Verb { get; }
             public string Description => _type.GetDescription();
             public string Usage => _type.GetUsage();
+            public string Group => _type.GetGroup();
             public bool ShouldShowInHelp => _type.ShouldShowInHelp(Verb);
         }
     }

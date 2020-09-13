@@ -14,6 +14,7 @@ namespace StoneFruit.Handlers
             _output = output;
         }
 
+        public static string Group => HelpHandler.BuiltinsGroup;
         public static string Description => "Diagnostic handler to display arguments passed";
         public static string Usage => "argument-display ...";
 

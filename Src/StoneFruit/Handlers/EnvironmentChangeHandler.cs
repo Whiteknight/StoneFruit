@@ -1,7 +1,7 @@
-﻿using StoneFruit.Execution;
-using StoneFruit.Execution.Arguments;
-using System;
+﻿using System;
 using System.Linq;
+using StoneFruit.Execution;
+using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.Handlers
 {
@@ -29,6 +29,7 @@ namespace StoneFruit.Handlers
             _dispatcher = dispatcher;
         }
 
+        public static string Group => HelpHandler.BuiltinsGroup;
         public static string Description => "Change environment if multiple environments are configured";
 
         public static string Usage => $@"{Name}

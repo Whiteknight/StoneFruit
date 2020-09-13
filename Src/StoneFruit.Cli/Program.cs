@@ -1,14 +1,14 @@
-﻿using Lamar;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Lamar;
 using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Containers.Lamar;
 using StoneFruit.Containers.Microsoft;
 using StoneFruit.Containers.StructureMap;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace StoneFruit.Cli
 {
@@ -46,17 +46,17 @@ namespace StoneFruit.Cli
         {
             builder
                 .SetupHandlers(h => h
-                    .UsePublicMethodsAsHandlers(new MyObject())
-                    .Add("testf", (c, d) => d.Output.WriteLine("F"))
-                    .AddScript("testg", new[] { "echo test", "echo g" })
-                    .AddScript("testh", new[] { "echo [0]", "echo ['a']" })
+                    .UsePublicMethodsAsHandlers(new MyObject(), getGroup: s => "public-methods")
+                    .Add("testf", (c, d) => d.Output.WriteLine("F"), group: "delegates")
+                    .AddScript("testg", new[] { "echo test", "echo g" }, group: "scripts")
+                    .AddScript("testh", new[] { "echo [0]", "echo ['a']" }, group: "scripts")
                     .AddScript("testi", new[]
                     {
                         "echo 1",
                         "echo 2",
                         "echo 3",
                         "echo 4"
-                    })
+                    }, group: "scripts")
                 )
                 .SetupEnvironments(e => e.UseFactory(new MyEnvironmentFactory()))
                 .SetupEvents(e =>

@@ -18,6 +18,7 @@ namespace StoneFruit.Handlers
             _state = state;
         }
 
+        public static string Group => HelpHandler.BuiltinsGroup;
         public static string Description => "Executes a script containing commands, one per line";
 
         public static string Usage => @"exec <fileName>

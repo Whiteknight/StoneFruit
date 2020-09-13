@@ -16,14 +16,14 @@ namespace StoneFruit.Containers.Microsoft
         /// <param name="build"></param>
         /// <param name="getProvider"></param>
         /// <returns></returns>
-        public static IServiceCollection SetupEngine<TEnvironment>(this IServiceCollection services, Action<IEngineBuilder> build, Func<IServiceProvider> getProvider) 
+        public static IServiceCollection SetupEngine<TEnvironment>(this IServiceCollection services, Action<IEngineBuilder> build, Func<IServiceProvider> getProvider)
             where TEnvironment : class
         {
             // Scan for handler classes in all assemblies, and setup a source to pull those types out of the
             // provider
             services.Scan(scanner => scanner
                 .FromApplicationDependencies()
-                .AddClasses(classes => classes.AssignableTo<IHandlerBase>())
+                .AddClasses(classes => classes.Where(t => t.IsPublic && typeof(IHandlerBase).IsAssignableFrom(t)))
                 .AsSelf()
                 .WithTransientLifetime()
             );
@@ -41,7 +41,7 @@ namespace StoneFruit.Containers.Microsoft
         /// <param name="build"></param>
         /// <param name="getProvider"></param>
         /// <returns></returns>
-        public static IServiceCollection SetupEngineScannerless<TEnvironment>(this IServiceCollection services, Action<IEngineBuilder> build, Func<IServiceProvider> getProvider) 
+        public static IServiceCollection SetupEngineScannerless<TEnvironment>(this IServiceCollection services, Action<IEngineBuilder> build, Func<IServiceProvider> getProvider)
             where TEnvironment : class
         {
             // Setup a custom resolver for manually-specified types, and use that in the

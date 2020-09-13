@@ -54,7 +54,7 @@ namespace StoneFruit.Containers.Ninject
 
             return commandTypes
                 .OrEmptyIfNull()
-                .SelectMany(commandType => 
+                .SelectMany(commandType =>
                     _verbExtractor.GetVerbs(commandType)
                     .Select(verb => (verb, commandType))
                 )
@@ -68,7 +68,7 @@ namespace StoneFruit.Containers.Ninject
             return type == null ? null : ResolveCommand(command, dispatcher, type);
         }
 
-        public IHandlerBase GetInstance<TCommand>(Command command, CommandDispatcher dispatcher) 
+        public IHandlerBase GetInstance<TCommand>(Command command, CommandDispatcher dispatcher)
             where TCommand : class, IHandlerBase
             => ResolveCommand(command, dispatcher, typeof(TCommand));
 
@@ -80,7 +80,7 @@ namespace StoneFruit.Containers.Ninject
         private IHandlerBase ResolveCommand(Command Command, CommandDispatcher dispatcher, Type type)
         {
             var context = new ChildKernel(_kernel);
-            
+
             // long-lived
             context.BindInstance(dispatcher);
             context.BindInstance(dispatcher.Environments);
@@ -114,6 +114,7 @@ namespace StoneFruit.Containers.Ninject
             public string Verb { get; }
             public string Description => _type.GetDescription();
             public string Usage => _type.GetUsage();
+            public string Group => _type.GetGroup();
             public bool ShouldShowInHelp => _type.ShouldShowInHelp(Verb);
         }
     }

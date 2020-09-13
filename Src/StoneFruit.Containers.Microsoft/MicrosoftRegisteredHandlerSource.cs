@@ -82,6 +82,7 @@ namespace StoneFruit.Containers.Microsoft
             public string Verb { get; }
             public string Description => Type.GetDescription();
             public string Usage => Type.GetUsage();
+            public string Group => Type.GetGroup();
             public bool ShouldShowInHelp => Type.ShouldShowInHelp(Verb);
         }
     }

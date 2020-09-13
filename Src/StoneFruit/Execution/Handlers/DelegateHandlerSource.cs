@@ -19,37 +19,39 @@ namespace StoneFruit.Execution.Handlers
 
         public int Count => _handlers.Count;
 
-        public IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher) 
+        public IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher)
             => _handlers.ContainsKey(command.Verb) ? _handlers[command.Verb].Create(command, dispatcher) : null;
 
         public IEnumerable<IVerbInfo> GetAll() => _handlers.Values;
 
         public IVerbInfo GetByName(string name) => _handlers.ContainsKey(name) ? _handlers[name] : null;
 
-        public DelegateHandlerSource Add(string verb, Action<Command, CommandDispatcher> act, string description = null, string usage = null)
+        public DelegateHandlerSource Add(string verb, Action<Command, CommandDispatcher> act, string description = null, string usage = null, string group = null)
         {
-            _handlers.Add(verb, new SyncHandlerFactory(act, verb, description, usage));
+            _handlers.Add(verb, new SyncHandlerFactory(act, verb, description, usage, group));
             return this;
         }
 
-        public DelegateHandlerSource AddAsync(string verb, Func<Command, CommandDispatcher, Task> func, string description = null, string usage = null)
+        public DelegateHandlerSource AddAsync(string verb, Func<Command, CommandDispatcher, Task> func, string description = null, string usage = null, string group = null)
         {
-            _handlers.Add(verb, new AsyncHandlerFactory(func, verb, description, usage));
+            _handlers.Add(verb, new AsyncHandlerFactory(func, verb, description, usage, group));
             return this;
         }
 
         private abstract class HandlerFactory : IVerbInfo
         {
-            protected HandlerFactory(string verb, string description, string usage)
+            protected HandlerFactory(string verb, string description, string usage, string group)
             {
                 Verb = verb;
                 Description = description ?? string.Empty;
                 Usage = usage ?? Description;
+                Group = group;
             }
 
             public string Verb { get; }
             public string Description { get; }
             public string Usage { get; }
+            public string Group { get; }
             public bool ShouldShowInHelp => true;
 
             public abstract IHandlerBase Create(Command command, CommandDispatcher dispatcher);
@@ -59,8 +61,8 @@ namespace StoneFruit.Execution.Handlers
         {
             private readonly Action<Command, CommandDispatcher> _act;
 
-            public SyncHandlerFactory(Action<Command, CommandDispatcher> act, string verb, string description, string usage)
-                : base(verb, description, usage)
+            public SyncHandlerFactory(Action<Command, CommandDispatcher> act, string verb, string description, string usage, string group)
+                : base(verb, description, usage, group)
             {
                 _act = act;
             }
@@ -76,8 +78,8 @@ namespace StoneFruit.Execution.Handlers
         {
             private readonly Func<Command, CommandDispatcher, Task> _func;
 
-            public AsyncHandlerFactory(Func<Command, CommandDispatcher, Task> func, string verb, string description, string usage) 
-                : base(verb, description, usage)
+            public AsyncHandlerFactory(Func<Command, CommandDispatcher, Task> func, string verb, string description, string usage, string group)
+                : base(verb, description, usage, group)
             {
                 _func = func;
             }

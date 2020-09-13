@@ -11,7 +11,7 @@ namespace StoneFruit.Utility
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static string GetDescription(this Type type) 
+        public static string GetDescription(this Type type)
             => GetPublicStaticStringPropertyValue(type, "Description");
 
         /// <summary>
@@ -19,8 +19,11 @@ namespace StoneFruit.Utility
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static string GetUsage(this Type type) 
+        public static string GetUsage(this Type type)
             => GetPublicStaticStringPropertyValue(type, "Usage") ?? GetDescription(type);
+
+        public static string GetGroup(this Type type)
+            => GetPublicStaticStringPropertyValue(type, "Group");
 
         private static string GetPublicStaticStringPropertyValue(Type type, string name)
         {

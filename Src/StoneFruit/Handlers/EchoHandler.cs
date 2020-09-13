@@ -21,6 +21,7 @@ namespace StoneFruit.Handlers
             _args = args;
         }
 
+        public static string Group => HelpHandler.BuiltinsGroup;
         public static string Description => "Writes a string of output to the console";
 
         public static string Usage => @"echo [color=<color>] [-nonewline] [-noheadless] ...
@@ -40,7 +41,7 @@ Appends a new-line to the end unless -nonewline is specified
             var colorName = _args.Get("color").AsString();
             if (!string.IsNullOrEmpty(colorName))
             {
-                var color = (ConsoleColor) Enum.Parse(typeof(ConsoleColor), colorName);
+                var color = (ConsoleColor)Enum.Parse(typeof(ConsoleColor), colorName);
                 output = output.Color(color);
             }
 

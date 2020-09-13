@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using StoneFruit.Execution.Scripts;
-using StoneFruit.Utility;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using StoneFruit.Execution.Scripts;
+using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Handlers
 {
@@ -72,27 +72,27 @@ namespace StoneFruit.Execution.Handlers
             return this;
         }
 
-        public IHandlerSetup Add(string verb, Action<Command, CommandDispatcher> handle, string description = null, string usage = null)
+        public IHandlerSetup Add(string verb, Action<Command, CommandDispatcher> handle, string description = null, string usage = null, string group = null)
         {
             Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
             Assert.ArgumentNotNull(handle, nameof(handle));
-            _delegates.Add(verb, handle, description, usage);
+            _delegates.Add(verb, handle, description, usage, group);
             return this;
         }
 
-        public IHandlerSetup Add(string verb, IHandlerBase handler, string description = null, string usage = null)
+        public IHandlerSetup Add(string verb, IHandlerBase handler, string description = null, string usage = null, string group = null)
         {
             Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
             Assert.ArgumentNotNull(handler, nameof(handler));
-            _instances.Add(verb, handler, description, usage);
+            _instances.Add(verb, handler, description, usage, group);
             return this;
         }
 
-        public IHandlerSetup AddAsync(string verb, Func<Command, CommandDispatcher, Task> handleAsync, string description = null, string usage = null)
+        public IHandlerSetup AddAsync(string verb, Func<Command, CommandDispatcher, Task> handleAsync, string description = null, string usage = null, string group = null)
         {
             Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
             Assert.ArgumentNotNull(handleAsync, nameof(handleAsync));
-            _delegates.AddAsync(verb, handleAsync, description, usage);
+            _delegates.AddAsync(verb, handleAsync, description, usage, group);
             return this;
         }
 
@@ -103,11 +103,11 @@ namespace StoneFruit.Execution.Handlers
             return AddSource(source);
         }
 
-        public IHandlerSetup AddScript(string verb, IEnumerable<string> lines, string description = null, string usage = null)
+        public IHandlerSetup AddScript(string verb, IEnumerable<string> lines, string description = null, string usage = null, string group = null)
         {
             Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
             Assert.ArgumentNotNull(lines, nameof(lines));
-            _scripts.AddScript(verb, lines, description, usage);
+            _scripts.AddScript(verb, lines, description, usage, group);
             return this;
         }
 
@@ -115,6 +115,8 @@ namespace StoneFruit.Execution.Handlers
         {
             Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
             Assert.ArgumentNotNull(aliases, nameof(aliases));
+            // TODO: We should try to get the description/usage/group from the verb and apply them to the alias
+            // TODO: If verb.Description is not provided, we should fill in a default like "Alias for {verb}"
             foreach (var alias in aliases)
                 _aliases.AddAlias(verb, alias);
             return this;

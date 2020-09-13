@@ -28,9 +28,9 @@ namespace StoneFruit.Execution.Scripts
 
         public IVerbInfo GetByName(string name) => _scripts.ContainsKey(name) ? _scripts[name] : null;
 
-        public void AddScript(string verb, IEnumerable<string> lines, string description = null, string usage = null)
+        public void AddScript(string verb, IEnumerable<string> lines, string description = null, string usage = null, string group = null)
         {
-            var script = new Script(verb, lines.OrEmptyIfNull().ToList(), description, usage);
+            var script = new Script(verb, lines.OrEmptyIfNull().ToList(), description, usage, group);
             _scripts.Add(verb, script);
         }
 
@@ -43,17 +43,19 @@ namespace StoneFruit.Execution.Scripts
             private readonly IReadOnlyList<string> _lines;
             private IReadOnlyList<CommandFormat> _formats;
 
-            public Script(string verb, IReadOnlyList<string> lines, string description, string usage)
+            public Script(string verb, IReadOnlyList<string> lines, string description, string usage, string group)
             {
                 _lines = lines;
                 Verb = verb;
                 Description = description;
                 Usage = usage;
+                Group = group;
             }
 
             public string Verb { get; }
             public string Description { get; }
             public string Usage { get; }
+            public string Group { get; }
             public bool ShouldShowInHelp => true;
 
             public IEnumerable<CommandFormat> GetFormats(ICommandParser parser)

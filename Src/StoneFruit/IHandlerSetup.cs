@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Handlers;
 using StoneFruit.Utility;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace StoneFruit
 {
@@ -27,7 +27,7 @@ namespace StoneFruit
         /// <param name="description"></param>
         /// <param name="usage"></param>
         /// <returns></returns>
-        IHandlerSetup Add(string verb, Action<Command, CommandDispatcher> handle, string description = null, string usage = null);
+        IHandlerSetup Add(string verb, Action<Command, CommandDispatcher> handle, string description = null, string usage = null, string group = null);
 
         /// <summary>
         /// Add a pre-existing handler instance with the given verb
@@ -37,7 +37,7 @@ namespace StoneFruit
         /// <param name="description"></param>
         /// <param name="usage"></param>
         /// <returns></returns>
-        IHandlerSetup Add(string verb, IHandlerBase handler, string description = null, string usage = null);
+        IHandlerSetup Add(string verb, IHandlerBase handler, string description = null, string usage = null, string group = null);
 
         /// <summary>
         /// Add a function delegate as a handler for asynchronous invokation
@@ -47,7 +47,7 @@ namespace StoneFruit
         /// <param name="description"></param>
         /// <param name="usage"></param>
         /// <returns></returns>
-        IHandlerSetup AddAsync(string verb, Func<Command, CommandDispatcher, Task> handleAsync, string description = null, string usage = null);
+        IHandlerSetup AddAsync(string verb, Func<Command, CommandDispatcher, Task> handleAsync, string description = null, string usage = null, string group = null);
 
         /// <summary>
         /// Add a script with a verb and zero or more commands to execute
@@ -57,7 +57,7 @@ namespace StoneFruit
         /// <param name="description"></param>
         /// <param name="usage"></param>
         /// <returns></returns>
-        IHandlerSetup AddScript(string verb, IEnumerable<string> lines, string description = null, string usage = null);
+        IHandlerSetup AddScript(string verb, IEnumerable<string> lines, string description = null, string usage = null, string group = null);
 
         /// <summary>
         /// Adds one or more aliases for a verb
@@ -99,10 +99,10 @@ namespace StoneFruit
         /// <param name="handlers"></param>
         /// <param name="instance"></param>
         /// <returns></returns>
-        public static IHandlerSetup UsePublicMethodsAsHandlers(this IHandlerSetup handlers, object instance)
+        public static IHandlerSetup UsePublicMethodsAsHandlers(this IHandlerSetup handlers, object instance, Func<string, string> getDescription = null, Func<string, string> getUsage = null, Func<string, string> getGroup = null)
         {
             Assert.ArgumentNotNull(handlers, nameof(handlers));
-            var source = new InstanceMethodHandlerSource(instance, null, null);
+            var source = new InstanceMethodHandlerSource(instance, getDescription, getUsage, getGroup);
             return handlers.AddSource(source);
         }
 

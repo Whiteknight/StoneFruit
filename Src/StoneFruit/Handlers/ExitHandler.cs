@@ -18,6 +18,7 @@ namespace StoneFruit.Handlers
             _args = args;
         }
 
+        public static string Group => HelpHandler.BuiltinsGroup;
         public static string Description => "Exits the application";
 
         public void Execute()

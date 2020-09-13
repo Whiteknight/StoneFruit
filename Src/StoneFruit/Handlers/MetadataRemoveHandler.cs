@@ -17,6 +17,8 @@ namespace StoneFruit.Handlers
             _args = args;
         }
 
+        public static string Group => HelpHandler.BuiltinsGroup;
+
         public void Execute()
         {
             foreach (var name in _args.GetAllPositionals())

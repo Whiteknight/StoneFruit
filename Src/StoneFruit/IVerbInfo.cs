@@ -21,6 +21,11 @@
         string Usage { get; }
 
         /// <summary>
+        /// The grouping that the verb belongs in.
+        /// </summary>
+        string Group { get; }
+
+        /// <summary>
         /// Whether or not to show the verb in the list when executing "help"
         /// </summary>
         bool ShouldShowInHelp { get; }

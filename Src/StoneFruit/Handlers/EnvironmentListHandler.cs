@@ -17,6 +17,7 @@ namespace StoneFruit.Handlers
             _output = output;
         }
 
+        public static string Group => HelpHandler.BuiltinsGroup;
         public static string Description => "Lists all available environments";
 
         public void Execute()

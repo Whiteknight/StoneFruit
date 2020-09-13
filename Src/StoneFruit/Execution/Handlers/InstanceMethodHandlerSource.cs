@@ -17,14 +17,16 @@ namespace StoneFruit.Execution.Handlers
         private readonly object _instance;
         private readonly Func<string, string> _getDescription;
         private readonly Func<string, string> _getUsage;
+        private readonly Func<string, string> _getGroup;
         private readonly Dictionary<string, MethodInfo> _methods;
 
-        public InstanceMethodHandlerSource(object instance, Func<string, string> getDescription, Func<string, string> getUsage)
+        public InstanceMethodHandlerSource(object instance, Func<string, string> getDescription, Func<string, string> getUsage, Func<string, string> getGroup)
         {
             Assert.ArgumentNotNull(instance, nameof(instance));
             _instance = instance;
             _getDescription = getDescription ?? (s => string.Empty);
             _getUsage = getUsage ?? (s => string.Empty);
+            _getGroup = getGroup ?? (s => string.Empty);
             _methods = _instance.GetType()
                 .GetMethods(BindingFlags.Instance | BindingFlags.Public)
                 .Where(m => m.ReturnType == typeof(void) || m.ReturnType == typeof(Task))
@@ -46,13 +48,13 @@ namespace StoneFruit.Execution.Handlers
 
         public IEnumerable<IVerbInfo> GetAll()
         {
-            return _methods.Select(kvp => new MethodInfoVerbInfo(kvp.Key, _getDescription, _getUsage));
+            return _methods.Select(kvp => new MethodInfoVerbInfo(kvp.Key, _getDescription, _getUsage, _getGroup));
         }
 
         public IVerbInfo GetByName(string name)
         {
             name = name.ToLowerInvariant();
-            return _methods.ContainsKey(name) ? new MethodInfoVerbInfo(name, _getDescription, _getUsage) : null;
+            return _methods.ContainsKey(name) ? new MethodInfoVerbInfo(name, _getDescription, _getUsage, _getGroup) : null;
         }
 
         // TODO: V2 Abstract this so we can inject a different implementation
@@ -73,17 +75,20 @@ namespace StoneFruit.Execution.Handlers
         {
             private readonly Func<string, string> _getDescription;
             private readonly Func<string, string> _getUsage;
+            private readonly Func<string, string> _getGroup;
 
-            public MethodInfoVerbInfo(string verb, Func<string, string> getDescription, Func<string, string> getUsage)
+            public MethodInfoVerbInfo(string verb, Func<string, string> getDescription, Func<string, string> getUsage, Func<string, string> getGroup)
             {
                 Verb = verb;
                 _getDescription = getDescription;
                 _getUsage = getUsage;
+                _getGroup = getGroup;
             }
 
             public string Verb { get; }
             public string Description => _getDescription(Verb);
             public string Usage => _getUsage(Verb);
+            public string Group => _getGroup(Verb);
             public bool ShouldShowInHelp => true;
         }
 

@@ -15,6 +15,7 @@ namespace StoneFruit.Handlers
             _state = state;
         }
 
+        public static string Group => HelpHandler.BuiltinsGroup;
         public static string Description => "Run a single command or a list of commands";
 
         public static string Usage => @"run <command>+

@@ -81,6 +81,7 @@ namespace StoneFruit.Containers.Lamar
             public string Verb { get; }
             public string Description => _type.GetDescription();
             public string Usage => _type.GetUsage();
+            public string Group => _type.GetGroup();
             public bool ShouldShowInHelp => _type.ShouldShowInHelp(Verb);
         }
     }
