@@ -115,8 +115,6 @@ namespace StoneFruit.Execution.Handlers
         {
             Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
             Assert.ArgumentNotNull(aliases, nameof(aliases));
-            // TODO: We should try to get the description/usage/group from the verb and apply them to the alias
-            // TODO: If verb.Description is not provided, we should fill in a default like "Alias for {verb}"
             foreach (var alias in aliases)
                 _aliases.AddAlias(verb, alias);
             return this;
