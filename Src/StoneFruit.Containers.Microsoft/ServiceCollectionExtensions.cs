@@ -23,7 +23,14 @@ namespace StoneFruit.Containers.Microsoft
             // provider
             services.Scan(scanner => scanner
                 .FromApplicationDependencies()
-                .AddClasses(classes => classes.Where(t => t.IsPublic && typeof(IHandlerBase).IsAssignableFrom(t)))
+                .AddClasses(classes => classes.Where(t =>
+                {
+                    if (!typeof(IHandlerBase).IsAssignableFrom(t))
+                        return false;
+                    if (!t.IsPublic)
+                        return false;
+                    return true;
+                }))
                 .AsSelf()
                 .WithTransientLifetime()
             );

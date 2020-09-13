@@ -8,55 +8,55 @@ using TestUtilities;
 
 namespace StoneFruit.Containers.Microsoft.Tests.Integration
 {
+    public class MyEnvironment
+    {
+        public string Name { get; }
+
+        public MyEnvironment(string name)
+        {
+            Name = name;
+        }
+    }
+
+    public class MyEnvironmentFactory : IEnvironmentFactory
+    {
+        public object Create(string name) => new MyEnvironment(name);
+
+        public IReadOnlyCollection<string> ValidEnvironments => new[] { "A", "B", "C" };
+    }
+
+    public class MyService
+    {
+        private readonly MyEnvironment _env;
+
+        public MyService(MyEnvironment env)
+        {
+            _env = env;
+        }
+
+        public string GetEnvironmentName() => _env.Name;
+    }
+
+    [Verb("test-service")]
+    public class MicrosoftServiceTestHandler : IHandler
+    {
+        private readonly MyService _service;
+        private readonly IOutput _output;
+
+        public MicrosoftServiceTestHandler(MyService service, IOutput output)
+        {
+            _service = service;
+            _output = output;
+        }
+
+        public void Execute()
+        {
+            _output.WriteLine(_service.GetEnvironmentName());
+        }
+    }
+
     public class ServiceTests
     {
-        public class MyEnvironment
-        {
-            public string Name { get; }
-
-            public MyEnvironment(string name)
-            {
-                Name = name;
-            }
-        }
-
-        private class MyEnvironmentFactory : IEnvironmentFactory
-        {
-            public object Create(string name) => new MyEnvironment(name);
-
-            public IReadOnlyCollection<string> ValidEnvironments => new[] { "A", "B", "C" };
-        }
-
-        public class MyService
-        {
-            private readonly MyEnvironment _env;
-
-            public MyService(MyEnvironment env)
-            {
-                _env = env;
-            }
-
-            public string GetEnvironmentName() => _env.Name;
-        }
-
-        [Verb("test-service")]
-        public class MicrosoftServiceTestHandler : IHandler
-        {
-            private readonly MyService _service;
-            private readonly IOutput _output;
-
-            public MicrosoftServiceTestHandler(MyService service, IOutput output)
-            {
-                _service = service;
-                _output = output;
-            }
-
-            public void Execute()
-            {
-                _output.WriteLine(_service.GetEnvironmentName());
-            }
-        }
-
         [Test]
         public void Test()
         {
