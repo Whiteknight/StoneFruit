@@ -73,7 +73,7 @@ To see all commands, use the -showall flag
             int maxCommandLength = infoList.Select(c => c.Verb.Length).Max();
             int descStartColumn = maxCommandLength + 4;
             var blankPrefix = new string(' ', descStartColumn);
-            int maxDescLineLength = Console.WindowWidth - descStartColumn;
+            int maxDescLineLength = GetConsoleWidth() - descStartColumn;
 
             if (infoGroups.ContainsKey(""))
                 OutputVerbList("", infoGroups[""], descStartColumn, maxDescLineLength, blankPrefix);
@@ -85,6 +85,18 @@ To see all commands, use the -showall flag
                 OutputVerbList("Built-In Verbs", infoGroups[BuiltinsGroup], descStartColumn, maxDescLineLength, blankPrefix);
 
             _output.WriteLine("Type 'help <command-name>' to get more information, if available.");
+        }
+
+        private int GetConsoleWidth()
+        {
+            try
+            {
+                return Console.WindowWidth;
+            }
+            catch
+            {
+                return int.MaxValue;
+            }
         }
 
         private void OutputVerbList(string groupName, IEnumerable<IVerbInfo> verbInfos, int descStartColumn, int maxDescLineLength, string blankPrefix)
