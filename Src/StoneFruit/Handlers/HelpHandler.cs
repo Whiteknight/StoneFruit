@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Handlers;
 
@@ -58,7 +59,7 @@ To see all commands, use the -showall flag
         {
             var info = _commands.GetByName(name);
             if (info == null)
-                throw new Exception($"Cannot find command named '{name}'");
+                throw new ExecutionException($"Cannot find command named '{name}'");
             _output.WriteLine(info.Usage);
         }
 
@@ -72,83 +73,50 @@ To see all commands, use the -showall flag
             int maxCommandLength = infoList.Select(c => c.Verb.Length).Max();
             int descStartColumn = maxCommandLength + 4;
             var blankPrefix = new string(' ', descStartColumn);
-            int maxDescLineLength = System.Console.WindowWidth - descStartColumn;
+            int maxDescLineLength = Console.WindowWidth - descStartColumn;
 
             if (infoGroups.ContainsKey(""))
-            {
-                foreach (var info in infoGroups[""])
-                {
-                    _output
-                        .Color(ConsoleColor.Green)
-                        .Write(info.Verb)
-                        .Write(new string(' ', descStartColumn - info.Verb.Length));
-                    var desc = info.Description;
-                    var lines = GetDescriptionLines(desc, maxDescLineLength);
-                    if (lines.Count == 0)
-                    {
-                        _output.WriteLine();
-                        continue;
-                    }
-
-                    _output.WriteLine(lines[0]);
-                    foreach (var line in lines.Skip(1))
-                        _output.WriteLine($"{blankPrefix}{line}");
-                }
-            }
+                OutputVerbList("", infoGroups[""], descStartColumn, maxDescLineLength, blankPrefix);
 
             foreach (var infoGroup in infoGroups.Where(g => g.Key != BuiltinsGroup && g.Key != ""))
-            {
-                _output
-                    .Color(ConsoleColor.Blue)
-                    .WriteLine(infoGroup.Key);
-                foreach (var info in infoGroup.Value)
-                {
-                    _output
-                        .Color(ConsoleColor.Green)
-                        .Write("  ")
-                        .Write(info.Verb)
-                        .Write(new string(' ', descStartColumn - info.Verb.Length));
-                    var desc = info.Description;
-                    var lines = GetDescriptionLines(desc, maxDescLineLength);
-                    if (lines.Count == 0)
-                    {
-                        _output.WriteLine();
-                        continue;
-                    }
-
-                    _output.WriteLine(lines[0]);
-                    foreach (var line in lines.Skip(1))
-                        _output.WriteLine($"{blankPrefix}{line}");
-                }
-            }
+                OutputVerbList(infoGroup.Key, infoGroup.Value, descStartColumn, maxDescLineLength, blankPrefix);
 
             if (infoGroups.ContainsKey(BuiltinsGroup) && infoGroups[BuiltinsGroup].Any())
-            {
-                _output
-                        .Color(ConsoleColor.Blue)
-                        .WriteLine("Built-In Verbs");
-                foreach (var info in infoGroups[BuiltinsGroup])
-                {
-                    _output
-                        .Color(ConsoleColor.Green)
-                        .Write("  ")
-                        .Write(info.Verb)
-                        .Write(new string(' ', descStartColumn - info.Verb.Length));
-                    var desc = info.Description;
-                    var lines = GetDescriptionLines(desc, maxDescLineLength);
-                    if (lines.Count == 0)
-                    {
-                        _output.WriteLine();
-                        continue;
-                    }
-
-                    _output.WriteLine(lines[0]);
-                    foreach (var line in lines.Skip(1))
-                        _output.WriteLine($"{blankPrefix}{line}");
-                }
-            }
+                OutputVerbList("Built-In Verbs", infoGroups[BuiltinsGroup], descStartColumn, maxDescLineLength, blankPrefix);
 
             _output.WriteLine("Type 'help <command-name>' to get more information, if available.");
+        }
+
+        private void OutputVerbList(string groupName, IEnumerable<IVerbInfo> verbInfos, int descStartColumn, int maxDescLineLength, string blankPrefix)
+        {
+            string padLeft = "";
+            if (!string.IsNullOrEmpty(groupName))
+            {
+                padLeft = "  ";
+                _output
+                    .Color(ConsoleColor.Blue)
+                    .WriteLine(groupName);
+            }
+
+            foreach (var info in verbInfos)
+            {
+                _output
+                    .Color(ConsoleColor.Green)
+                    .Write(padLeft)
+                    .Write(info.Verb)
+                    .Write(new string(' ', descStartColumn - info.Verb.Length));
+                var desc = info.Description;
+                var lines = GetDescriptionLines(desc, maxDescLineLength);
+                if (lines.Count == 0)
+                {
+                    _output.WriteLine();
+                    continue;
+                }
+
+                _output.WriteLine(lines[0]);
+                foreach (var line in lines.Skip(1))
+                    _output.WriteLine($"{blankPrefix}{line}");
+            }
         }
 
         private static List<string> GetDescriptionLines(string desc, int max)

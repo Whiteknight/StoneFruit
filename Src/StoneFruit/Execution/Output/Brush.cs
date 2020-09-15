@@ -49,7 +49,7 @@ namespace StoneFruit.Execution.Output
                 return $"{Foreground},{Background}";
             if (fmt == "B")
                 return ByteValue.ToString("X");
-            throw new Exception("Unknown ToString format " + fmt);
+            throw new ArgumentException("Unknown ToString format", nameof(fmt));
         }
 
         public byte ByteValue { get; }
@@ -84,7 +84,7 @@ namespace StoneFruit.Execution.Output
         {
             if (TryParse(s, out var palette))
                 return palette;
-            throw new Exception("Value not in a correct format");
+            throw new ArgumentException("Value not in a correct format", nameof(s));
         }
 
         public static bool TryParse(string s, out Brush palette)

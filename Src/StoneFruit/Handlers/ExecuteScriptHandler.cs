@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
@@ -29,9 +28,9 @@ Loads the contents of the file and treats each line as a separate command to exe
         {
             var scriptName = _args.Shift().Require().AsString();
             if (string.IsNullOrEmpty(scriptName))
-                throw new Exception("Must provide a file name to execute");
+                throw new ExecutionException("Must provide a file name to execute");
             if (!File.Exists(scriptName))
-                throw new Exception("File does not exist");
+                throw new ExecutionException($"File {scriptName} does not exist");
 
             var contents = File.ReadAllLines(scriptName)
                 .Where(s => !string.IsNullOrWhiteSpace(s))

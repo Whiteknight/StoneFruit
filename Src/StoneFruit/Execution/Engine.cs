@@ -49,7 +49,7 @@ namespace StoneFruit.Execution
         private void SetupState(bool headless)
         {
             if (_state != null)
-                throw new Exception("Cannot Run while the engine is already running.");
+                throw new ExecutionException("Cannot Run while the engine is already running.");
             _state = new EngineState(headless, _eventCatalog, _settings);
             _dispatcher = new CommandDispatcher(_parser, _handlers, Environments, _state, Output);
         }

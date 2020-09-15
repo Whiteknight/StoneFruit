@@ -50,7 +50,6 @@ List all available metadata entries
             {
                 foreach (var name in _args.GetAllPositionals())
                     _state.Metadata.Remove(name.AsString());
-                return;
             }
         }
     }
