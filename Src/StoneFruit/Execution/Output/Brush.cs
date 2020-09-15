@@ -1,7 +1,7 @@
-﻿using StoneFruit.Utility;
-using System;
+﻿using System;
 using System.Globalization;
 using System.Linq;
+using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Output
 {

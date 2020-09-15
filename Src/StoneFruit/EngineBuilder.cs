@@ -154,7 +154,7 @@ namespace StoneFruit
         public static void SetupExplicitEnvironmentRegistration<TEnvironment>(IServiceCollection services)
             where TEnvironment : class
         {
-            services.AddScoped<TEnvironment>(provider => provider.GetService<IEnvironmentCollection>().Current as TEnvironment);
+            services.AddScoped(provider => provider.GetService<IEnvironmentCollection>().Current as TEnvironment);
         }
 
         public Engine Build()
