@@ -31,5 +31,18 @@ namespace StoneFruit.Tests.Integration
             output.Lines.Should().Contain("help");
             output.Lines.Should().Contain("echo");
         }
+
+        [Test]
+        public void Help_Alias()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h.AddAlias("help", "help-alias"))
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .Build();
+            engine.RunHeadless("help");
+            output.Lines.Should().Contain("help");
+            output.Lines.Should().Contain("help-alias");
+        }
     }
 }

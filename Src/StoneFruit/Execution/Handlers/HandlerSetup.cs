@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Execution.Scripts;
+using StoneFruit.Handlers;
 using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Handlers
@@ -40,7 +41,7 @@ namespace StoneFruit.Execution.Handlers
                 services.AddSingleton<IHandlerSource>(_instances);
             foreach (var source in _sources)
                 services.AddSingleton(source);
-            services.AddSingleton<IHandlerSource>(HandlerSource.GetBuiltinHandlerSource());
+            services.AddSingleton(GetBuiltinHandlerSource());
             services.AddSingleton<IHandlers>(provider =>
             {
                 var sources = provider.GetServices<IHandlerSource>();
@@ -61,7 +62,7 @@ namespace StoneFruit.Execution.Handlers
                 sources.Add(_instances);
             foreach (var source in _sources)
                 sources.Add(source);
-            sources.Add(HandlerSource.GetBuiltinHandlerSource());
+            sources.Add(GetBuiltinHandlerSource());
             return new HandlerSourceCollection(sources, _aliases);
         }
 
@@ -118,6 +119,19 @@ namespace StoneFruit.Execution.Handlers
             foreach (var alias in aliases)
                 _aliases.AddAlias(verb, alias);
             return this;
+        }
+
+        private static IHandlerSource GetBuiltinHandlerSource()
+        {
+            var requiredHandlers = new[]
+            {
+                typeof(EchoHandler),
+                typeof(EnvironmentHandler),
+                typeof(ExitHandler),
+                typeof(HelpHandler),
+                typeof(MetadataHandler),
+            };
+            return new TypeListConstructSource(requiredHandlers, null, null);
         }
     }
 }

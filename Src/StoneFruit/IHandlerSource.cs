@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using StoneFruit.Execution;
-using StoneFruit.Execution.Handlers;
-using StoneFruit.Handlers;
 
 namespace StoneFruit
 {
@@ -33,21 +31,5 @@ namespace StoneFruit
         /// <param name="name"></param>
         /// <returns></returns>
         IVerbInfo GetByName(string name);
-    }
-
-    public static class HandlerSource
-    {
-        public static IHandlerSource GetBuiltinHandlerSource()
-        {
-            var requiredHandlers = new[]
-            {
-                typeof(EchoHandler),
-                typeof(EnvironmentHandler),
-                typeof(ExitHandler),
-                typeof(HelpHandler),
-                typeof(MetadataHandler),
-            };
-            return new TypeListConstructSource(requiredHandlers, null, null);
-        }
     }
 }
