@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
@@ -8,6 +9,37 @@ namespace StoneFruit.Tests.Execution.Arguments
 {
     public class SyntheticCommandArgumentsTests
     {
+        [Test]
+        public void Empty_Test()
+        {
+            var target = SyntheticArguments.Empty();
+            target.GetAllArguments().Count().Should().Be(0);
+        }
+
+        [Test]
+        public void Single_Test()
+        {
+            var target = SyntheticArguments.Single("test");
+            target.GetAllArguments().Count().Should().Be(1);
+            target.Shift().AsString().Should().Be("test");
+        }
+
+        [Test]
+        public void Get_Index_TooHigh()
+        {
+            var target = SyntheticArguments.Empty();
+            target.Get(0).Should().BeOfType<MissingArgument>();
+        }
+
+        [Test]
+        public void Get_Index_AlreadyConsumed()
+        {
+            var target = SyntheticArguments.Single("test");
+            target.Get(0).Should().NotBeOfType<MissingArgument>();
+            target.Get(0).MarkConsumed();
+            target.Get(0).Should().BeOfType<MissingArgument>();
+        }
+
         [Test]
         public void Get_Named_Consumed()
         {
@@ -39,6 +71,31 @@ namespace StoneFruit.Tests.Execution.Arguments
             target.Shift().Value.Should().Be("a");
             target.Shift().Value.Should().Be("b");
             target.Shift().Should().BeOfType<MissingArgument>();
+        }
+
+        [Test]
+        public void From_TupleList()
+        {
+            var target = SyntheticArguments.From(
+                ("a", "1"),
+                ("b", "2")
+            );
+            target.Get("a").AsString().Should().Be("1");
+            target.Get("b").AsString().Should().Be("2");
+        }
+
+        [Test]
+        public void From_Dictionary()
+        {
+            var target = SyntheticArguments.From(
+                new Dictionary<string, string>
+                {
+                    { "a", "1" },
+                    { "b", "2" }
+                }
+            );
+            target.Get("a").AsString().Should().Be("1");
+            target.Get("b").AsString().Should().Be("2");
         }
 
         [Test]
@@ -89,6 +146,23 @@ namespace StoneFruit.Tests.Execution.Arguments
                 new FlagArgument("c")
             });
             var result = target.MapTo<TestArgs1>();
+            result.A.Should().Be("test1");
+            result.B.Should().Be("test2");
+            result.C.Should().BeTrue();
+            result.D.Should().BeFalse();
+        }
+
+        [Test]
+        public void MapOnTo_Test()
+        {
+            var target = new SyntheticArguments(new IArgument[]
+            {
+                new PositionalArgument("test1"),
+                new NamedArgument("b", "test2"),
+                new FlagArgument("c")
+            });
+            var result = new TestArgs1();
+            target.MapOnto(result);
             result.A.Should().Be("test1");
             result.B.Should().Be("test2");
             result.C.Should().BeTrue();

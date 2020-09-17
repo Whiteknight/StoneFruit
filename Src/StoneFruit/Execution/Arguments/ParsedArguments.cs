@@ -20,17 +20,6 @@ namespace StoneFruit.Execution.Arguments
 
         private int _lastRawPositionalIndex;
 
-        // Empty args object with no values in it
-        public ParsedArguments()
-        {
-            Raw = string.Empty;
-            _accessedPositionals = new List<IPositionalArgument>();
-            _accessedNameds = new Dictionary<string, List<INamedArgument>>();
-            _accessedFlags = new Dictionary<string, IFlagArgument>();
-            _rawArguments = new List<IParsedArgument>();
-            _lastRawPositionalIndex = 0;
-        }
-
         // Args object built from parsed objects, which aren't accessed yet
         public ParsedArguments(IEnumerable<IParsedArgument> arguments)
             : this(string.Empty, arguments)

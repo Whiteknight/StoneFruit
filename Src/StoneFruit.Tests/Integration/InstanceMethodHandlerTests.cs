@@ -61,5 +61,19 @@ namespace StoneFruit.Tests.Integration
             engine.RunHeadless("testc");
             output.Lines[0].Should().Be("C");
         }
+
+        [Test]
+        public void InstanceMethods_Help()
+        {
+            var output = new TestOutput("help");
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject()))
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .Build();
+            engine.RunInteractively();
+            output.Lines.Should().Contain("testa");
+            output.Lines.Should().Contain("testb");
+            output.Lines.Should().Contain("testc");
+        }
     }
 }
