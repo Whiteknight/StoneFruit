@@ -1,7 +1,9 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
+using ParserObjects;
+using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
-using StoneFruit.Handlers;
+using StoneFruit.Execution.Scripts.Formatting;
 using TestUtilities;
 
 namespace StoneFruit.Tests.Integration
@@ -33,9 +35,108 @@ namespace StoneFruit.Tests.Integration
         {
             var output = new TestOutput();
             var engine = new EngineBuilder()
-                .SetupHandlers(h => h.UseHandlerTypes(typeof(EchoHandler), typeof(TestHandler)))
+                .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupArguments(a => a.UseSimplifiedArgumentParser())
+                .Build();
+            engine.RunHeadless("test a b=x -c");
+            output.Lines.Count.Should().Be(3);
+            output.Lines[0].Should().Be("a");
+            output.Lines[1].Should().Be("x");
+            output.Lines[2].Should().Be("True");
+        }
+
+        [Test]
+        public void UseParser_Test()
+        {
+            var output = new TestOutput();
+            var verbParser = VerbGrammar.GetParser();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHandler)))
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .SetupArguments(a => a.UseParser(new CommandParser(verbParser, SimplifiedArgumentGrammar.GetParser(), ScriptFormatGrammar.CreateParser(verbParser))))
+                .Build();
+            engine.RunHeadless("test a b=x -c");
+            output.Lines.Count.Should().Be(3);
+            output.Lines[0].Should().Be("a");
+            output.Lines[1].Should().Be("x");
+            output.Lines[2].Should().Be("True");
+        }
+
+        [Test]
+        public void UseParser_Null()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHandler)))
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .SetupArguments(a => a.UseParser(null))
+                .Build();
+            engine.RunHeadless("test a b=x -c");
+            output.Lines.Count.Should().Be(3);
+            output.Lines[0].Should().Be("a");
+            output.Lines[1].Should().Be("x");
+            output.Lines[2].Should().Be("True");
+        }
+
+        [Test]
+        public void UseVerbParser_Test()
+        {
+            var output = new TestOutput();
+            var verbParser = VerbGrammar.GetParser();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHandler)))
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .SetupArguments(a => a.UseVerbParser(verbParser))
+                .Build();
+            engine.RunHeadless("test a b=x -c");
+            output.Lines.Count.Should().Be(3);
+            output.Lines[0].Should().Be("a");
+            output.Lines[1].Should().Be("x");
+            output.Lines[2].Should().Be("True");
+        }
+
+        [Test]
+        public void UseVerbParser_Null()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHandler)))
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .SetupArguments(a => a.UseVerbParser(null))
+                .Build();
+            engine.RunHeadless("test a b=x -c");
+            output.Lines.Count.Should().Be(3);
+            output.Lines[0].Should().Be("a");
+            output.Lines[1].Should().Be("x");
+            output.Lines[2].Should().Be("True");
+        }
+
+        [Test]
+        public void UseScriptParser_Test()
+        {
+            var output = new TestOutput();
+            var verbParser = VerbGrammar.GetParser();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHandler)))
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .SetupArguments(a => a.UseScriptParser(ScriptFormatGrammar.CreateParser(verbParser)))
+                .Build();
+            engine.RunHeadless("test a b=x -c");
+            output.Lines.Count.Should().Be(3);
+            output.Lines[0].Should().Be("a");
+            output.Lines[1].Should().Be("x");
+            output.Lines[2].Should().Be("True");
+        }
+
+        [Test]
+        public void UseArgumentParser_Null1()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHandler)))
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .SetupArguments(a => a.UseArgumentParser((IParser<char, IParsedArgument>)null))
                 .Build();
             engine.RunHeadless("test a b=x -c");
             output.Lines.Count.Should().Be(3);
@@ -49,7 +150,7 @@ namespace StoneFruit.Tests.Integration
         {
             var output = new TestOutput();
             var engine = new EngineBuilder()
-                .SetupHandlers(h => h.UseHandlerTypes(typeof(EchoHandler), typeof(TestHandler)))
+                .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupArguments(a => a.UsePosixStyleArgumentParser())
                 .Build();
@@ -65,7 +166,7 @@ namespace StoneFruit.Tests.Integration
         {
             var output = new TestOutput();
             var engine = new EngineBuilder()
-                .SetupHandlers(h => h.UseHandlerTypes(typeof(EchoHandler), typeof(TestHandler)))
+                .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupArguments(a => a.UsePowershellStyleArgumentParser())
                 .Build();
@@ -81,7 +182,7 @@ namespace StoneFruit.Tests.Integration
         {
             var output = new TestOutput();
             var engine = new EngineBuilder()
-                .SetupHandlers(h => h.UseHandlerTypes(typeof(EchoHandler), typeof(TestHandler)))
+                .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupArguments(a => a.UseWindowsCmdArgumentParser())
                 .Build();
