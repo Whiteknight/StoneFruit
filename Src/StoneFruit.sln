@@ -13,13 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Containers.Struc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Containers.Lamar", "StoneFruit.Containers.Lamar\StoneFruit.Containers.Lamar.csproj", "{3195C070-122B-4D4C-BA1D-855BEAB6BA16}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Containers.Ninject", "StoneFruit.Containers.Ninject\StoneFruit.Containers.Ninject.csproj", "{FDCF1F6E-6BC6-4D84-8233-6D0141A626D9}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Containers.StructureMap.Tests", "StoneFruit.Containers.StructureMap.Tests\StoneFruit.Containers.StructureMap.Tests.csproj", "{110C4F3C-6CCA-475F-B7EE-687B82D4DBB5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Containers.Lamar.Tests", "StoneFruit.Containers.Lamar.Tests\StoneFruit.Containers.Lamar.Tests.csproj", "{A1BCF0B5-2956-4B42-8FA1-C32914B5F7CB}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Containers.Ninject.Tests", "StoneFruit.Containers.Ninject.Tests\StoneFruit.Containers.Ninject.Tests.csproj", "{DDF137B1-69AF-4A63-BDE1-BBFFC9EE5CA4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utility", "Utility", "{9D2EB7CA-4C3D-4D2B-AC90-6F9DA5FA21B1}"
 EndProject
@@ -31,7 +27,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Containers.Micro
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Utilities", "StoneFruit.Utilities\StoneFruit.Utilities.csproj", "{533164EF-C5B2-403A-B646-9B9B8672944B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoneFruit.Containers.Microsoft.Tests", "StoneFruit.Containers.Microsoft.Tests\StoneFruit.Containers.Microsoft.Tests.csproj", "{8C110CB3-0999-45E0-94BF-4779F72BC4E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Containers.Microsoft.Tests", "StoneFruit.Containers.Microsoft.Tests\StoneFruit.Containers.Microsoft.Tests.csproj", "{8C110CB3-0999-45E0-94BF-4779F72BC4E4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,10 +55,6 @@ Global
 		{3195C070-122B-4D4C-BA1D-855BEAB6BA16}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3195C070-122B-4D4C-BA1D-855BEAB6BA16}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3195C070-122B-4D4C-BA1D-855BEAB6BA16}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FDCF1F6E-6BC6-4D84-8233-6D0141A626D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FDCF1F6E-6BC6-4D84-8233-6D0141A626D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FDCF1F6E-6BC6-4D84-8233-6D0141A626D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FDCF1F6E-6BC6-4D84-8233-6D0141A626D9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{110C4F3C-6CCA-475F-B7EE-687B82D4DBB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{110C4F3C-6CCA-475F-B7EE-687B82D4DBB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{110C4F3C-6CCA-475F-B7EE-687B82D4DBB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -71,10 +63,6 @@ Global
 		{A1BCF0B5-2956-4B42-8FA1-C32914B5F7CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1BCF0B5-2956-4B42-8FA1-C32914B5F7CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1BCF0B5-2956-4B42-8FA1-C32914B5F7CB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DDF137B1-69AF-4A63-BDE1-BBFFC9EE5CA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DDF137B1-69AF-4A63-BDE1-BBFFC9EE5CA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DDF137B1-69AF-4A63-BDE1-BBFFC9EE5CA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DDF137B1-69AF-4A63-BDE1-BBFFC9EE5CA4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DE356F6C-E062-4BF1-B3F5-250E51C4BADE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DE356F6C-E062-4BF1-B3F5-250E51C4BADE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE356F6C-E062-4BF1-B3F5-250E51C4BADE}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -100,7 +88,6 @@ Global
 		{EB62CC40-2896-4F87-A6E5-44710BAD9FA1} = {7ECB8D3B-1ADA-4102-8AD0-0EF5229EF502}
 		{110C4F3C-6CCA-475F-B7EE-687B82D4DBB5} = {7ECB8D3B-1ADA-4102-8AD0-0EF5229EF502}
 		{A1BCF0B5-2956-4B42-8FA1-C32914B5F7CB} = {7ECB8D3B-1ADA-4102-8AD0-0EF5229EF502}
-		{DDF137B1-69AF-4A63-BDE1-BBFFC9EE5CA4} = {7ECB8D3B-1ADA-4102-8AD0-0EF5229EF502}
 		{DE356F6C-E062-4BF1-B3F5-250E51C4BADE} = {7ECB8D3B-1ADA-4102-8AD0-0EF5229EF502}
 		{533164EF-C5B2-403A-B646-9B9B8672944B} = {9D2EB7CA-4C3D-4D2B-AC90-6F9DA5FA21B1}
 		{8C110CB3-0999-45E0-94BF-4779F72BC4E4} = {7ECB8D3B-1ADA-4102-8AD0-0EF5229EF502}

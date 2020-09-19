@@ -13,7 +13,6 @@
   <ItemGroup>
     <ProjectReference Include="..\StoneFruit.Containers.Lamar\StoneFruit.Containers.Lamar.csproj" />
     <ProjectReference Include="..\StoneFruit.Containers.Microsoft\StoneFruit.Containers.Microsoft.csproj" />
-    <ProjectReference Include="..\StoneFruit.Containers.Ninject\StoneFruit.Containers.Ninject.csproj" />
     <ProjectReference Include="..\StoneFruit.Containers.StructureMap\StoneFruit.Containers.StructureMap.csproj" />
     <ProjectReference Include="..\StoneFruit\StoneFruit.csproj" />
   </ItemGroup>

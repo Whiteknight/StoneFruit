@@ -14,7 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\StoneFruit.Containers.Ninject\StoneFruit.Containers.Ninject.csproj" />
     <ProjectReference Include="..\StoneFruit\StoneFruit.csproj" />
     <ProjectReference Include="..\TestUtilities\TestUtilities.csproj" />
   </ItemGroup>
