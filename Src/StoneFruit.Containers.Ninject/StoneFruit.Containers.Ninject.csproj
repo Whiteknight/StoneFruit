@@ -22,7 +22,6 @@
   <ItemGroup>
     <PackageReference Include="Ninject" Version="3.3.4" />
     <PackageReference Include="Ninject.Extensions.ChildKernel" Version="3.3.0" />
-    <PackageReference Include="ninject.extensions.conventions" Version="3.3.0" />
   </ItemGroup>
 
   <ItemGroup>

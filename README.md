@@ -74,7 +74,9 @@ As an example, here's an `IEnvironmentFactory` implementation which supports 3 e
 public class MyEnvironmentFactory : IEnvironmentFactory
 {
     public object Create(string name)
-        => ConfigurationBuilder().AddJsonFile($"Configs/{name}.json").Build();
+        => new ConfigurationBuilder()
+            .AddJsonFile($"Configs/{name}.json")
+            .Build();
 
     public IReadOnlyCollection<string> ValidEnvironments 
         => new[] { "Local", "Integration", "Production" };

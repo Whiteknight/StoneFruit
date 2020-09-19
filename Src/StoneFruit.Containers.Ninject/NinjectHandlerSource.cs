@@ -25,11 +25,7 @@ namespace StoneFruit.Containers.Ninject
 
         public NinjectHandlerSource(IKernel kernel, ITypeVerbExtractor verbExtractor)
         {
-            if (kernel == null)
-            {
-                kernel = new StandardKernel();
-                kernel.ScanForHandlers();
-            }
+            Assert.ArgumentNotNull(kernel, nameof(kernel));
 
             _kernel = kernel;
             _verbExtractor = verbExtractor ?? TypeVerbExtractor.DefaultInstance;

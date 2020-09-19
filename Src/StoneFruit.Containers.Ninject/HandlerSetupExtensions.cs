@@ -12,9 +12,10 @@ namespace StoneFruit.Containers.Ninject
         /// <param name="kernel"></param>
         /// <param name="verbExtractor"></param>
         /// <returns></returns>
-        public static IHandlerSetup UseNinjectHandlerSource(this IHandlerSetup handlers, IKernel kernel = null, ITypeVerbExtractor verbExtractor = null)
+        public static IHandlerSetup UseNinjectHandlerSource(this IHandlerSetup handlers, IKernel kernel, ITypeVerbExtractor verbExtractor = null)
         {
             Assert.ArgumentNotNull(handlers, nameof(handlers));
+            Assert.ArgumentNotNull(kernel, nameof(kernel));
 
             var source = new NinjectHandlerSource(kernel, verbExtractor);
             return handlers.AddSource(source);
