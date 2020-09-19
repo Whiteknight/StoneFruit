@@ -1,8 +1,8 @@
-﻿using StoneFruit.Execution.Arguments;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Handlers;
 using StoneFruit.Utility;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace StoneFruit.Execution
 {
@@ -157,9 +157,6 @@ namespace StoneFruit.Execution
             var command = Command.Create(verb, args);
             return ExecuteAsync(command, token);
         }
-
-        // TODO V2: If the handler has a second Execute() method with arguments, we should attempt to invoke
-        // that version instead (converting named arguments to method arguments).
 
         /// <summary>
         /// Find and execute the appropriate handler for the given Command object

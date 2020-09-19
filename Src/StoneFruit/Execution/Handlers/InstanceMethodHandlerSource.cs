@@ -57,7 +57,6 @@ namespace StoneFruit.Execution.Handlers
             return _methods.ContainsKey(name) ? new MethodInfoVerbInfo(name, _getDescription, _getUsage, _getGroup) : null;
         }
 
-        // TODO: V2 Abstract this so we can inject a different implementation
         private static object InvokeMethod(object instance, MethodInfo method, ParameterInfo[] parameters, Command command, CommandDispatcher dispatcher, CancellationToken token)
         {
             var args = new object[parameters.Length];

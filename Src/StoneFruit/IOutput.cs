@@ -46,8 +46,6 @@ namespace StoneFruit
         /// <param name="keepHistory"></param>
         /// <returns></returns>
         string Prompt(string prompt, bool mustProvide = true, bool keepHistory = true);
-
-        // TODO V2: Synchronize across multiple outputting threads.
     }
 
     public static class OutputExtensions
@@ -118,7 +116,7 @@ namespace StoneFruit
         /// <param name="output"></param>
         /// <param name="color"></param>
         /// <returns></returns>
-        public static IOutput Color(this IOutput output, ConsoleColor color) => output.Color(b => (Brush) color);
+        public static IOutput Color(this IOutput output, ConsoleColor color) => output.Color(b => (Brush)color);
 
         /// <summary>
         /// Get a new output with the given brush for text and background color. If the

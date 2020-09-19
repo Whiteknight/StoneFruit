@@ -12,9 +12,6 @@ namespace StoneFruit.Execution.Scripts.Formatting
     {
         public static IParser<char, CommandFormat> CreateParser(IParser<char, string> verb)
         {
-            // TODO V2: A way to require an arg (and throw an error if it's not provided)
-            // TODO V2: A way to provide a default value if what we're looking for is missing
-
             var doubleQuotedString = StrippedDoubleQuotedString();
 
             var singleQuotedString = StrippedSingleQuotedString();
@@ -50,7 +47,6 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 (start, name) => new LiteralFlagArgumentAccessor(name)
             );
 
-            // TODO V2: Some ability to rename a flag?
             // Fetch a flag from the input and reproduce it on the output if it exists
             // fetchFlagArg := '?' <name>
             var fetchFlagArg = Rule(
