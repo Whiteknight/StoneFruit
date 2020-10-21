@@ -10,7 +10,7 @@ If you `.Run()` your engine without command-line arguments, or if you support en
 
 ### Scripting
 
-In interactive mode, the Engine will first execute the `EngineStartInteractive` script, then it will prompt the user for input, and then it will execute the `EngineStopInteractive` script. See the page on [Scripting](scripting.md) for more details.
+In interactive mode, the Engine will first execute the `EngineStartInteractive` script, then it will prompt the user for input until the user exits the application. See the page on [Scripting](scripting.md) for more details. 
 
 ## Headless Mode
 

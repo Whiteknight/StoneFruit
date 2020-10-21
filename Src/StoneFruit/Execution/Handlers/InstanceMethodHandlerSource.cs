@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using StoneFruit.Execution.Arguments;
 using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Handlers
@@ -33,15 +34,28 @@ namespace StoneFruit.Execution.Handlers
                 .ToDictionaryUnique(m => m.Name.ToLowerInvariant(), m => m);
         }
 
-        public IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher)
+        public IHandlerBase GetInstance(IArguments command, CommandDispatcher dispatcher)
         {
-            if (!_methods.ContainsKey(command.Verb))
+            var verbSource = command as IVerbSource;
+            if (verbSource == null)
                 return null;
-            var method = _methods[command.Verb];
+            var candidate = verbSource.GetVerbCandidatePositionals().FirstOrDefault();
+            if (candidate == null)
+                return null;
+            var verb = candidate.AsString();
+            if (!_methods.ContainsKey(verb))
+                return null;
+            var method = _methods[verb];
             if (method.ReturnType == typeof(void))
+            {
+                verbSource.SetVerbCount(1);
                 return new SyncHandlerWrapper(_instance, method, command, dispatcher);
+            }
             if (method.ReturnType == typeof(Task))
+            {
+                verbSource.SetVerbCount(1);
                 return new AsyncHandlerWrapper(_instance, method, command, dispatcher);
+            }
 
             return null;
         }
@@ -51,13 +65,17 @@ namespace StoneFruit.Execution.Handlers
             return _methods.Select(kvp => new MethodInfoVerbInfo(kvp.Key, _getDescription, _getUsage, _getGroup));
         }
 
-        public IVerbInfo GetByName(string name)
+        // Since we're using the name of a method as the verb, and you can't nest methods, the
+        // verb must only be a single string. Anything else is a non-match
+        public IVerbInfo GetByName(Verb verb)
         {
-            name = name.ToLowerInvariant();
+            if (verb.Count > 1)
+                return null;
+            var name = verb[0].ToLowerInvariant();
             return _methods.ContainsKey(name) ? new MethodInfoVerbInfo(name, _getDescription, _getUsage, _getGroup) : null;
         }
 
-        private static object InvokeMethod(object instance, MethodInfo method, ParameterInfo[] parameters, Command command, CommandDispatcher dispatcher, CancellationToken token)
+        private static object InvokeMethod(object instance, MethodInfo method, ParameterInfo[] parameters, IArguments command, CommandDispatcher dispatcher, CancellationToken token)
         {
             var args = new object[parameters.Length];
             var fetcher = new ArgumentValueFetcher(command, dispatcher, token);
@@ -72,22 +90,23 @@ namespace StoneFruit.Execution.Handlers
 
         private class MethodInfoVerbInfo : IVerbInfo
         {
+            private readonly string _verb;
             private readonly Func<string, string> _getDescription;
             private readonly Func<string, string> _getUsage;
             private readonly Func<string, string> _getGroup;
 
             public MethodInfoVerbInfo(string verb, Func<string, string> getDescription, Func<string, string> getUsage, Func<string, string> getGroup)
             {
-                Verb = verb;
+                _verb = verb;
                 _getDescription = getDescription;
                 _getUsage = getUsage;
                 _getGroup = getGroup;
             }
 
-            public string Verb { get; }
-            public string Description => _getDescription(Verb);
-            public string Usage => _getUsage(Verb);
-            public string Group => _getGroup(Verb);
+            public Verb Verb => new Verb(_verb);
+            public string Description => _getDescription(_verb);
+            public string Usage => _getUsage(_verb);
+            public string Group => _getGroup(_verb);
             public bool ShouldShowInHelp => true;
         }
 
@@ -95,10 +114,10 @@ namespace StoneFruit.Execution.Handlers
         {
             private readonly object _instance;
             private readonly MethodInfo _method;
-            private readonly Command _command;
+            private readonly IArguments _command;
             private readonly CommandDispatcher _dispatcher;
 
-            public SyncHandlerWrapper(object instance, MethodInfo method, Command command, CommandDispatcher dispatcher)
+            public SyncHandlerWrapper(object instance, MethodInfo method, IArguments command, CommandDispatcher dispatcher)
             {
                 _instance = instance;
                 _method = method;
@@ -123,10 +142,10 @@ namespace StoneFruit.Execution.Handlers
         {
             private readonly object _instance;
             private readonly MethodInfo _method;
-            private readonly Command _command;
+            private readonly IArguments _command;
             private readonly CommandDispatcher _dispatcher;
 
-            public AsyncHandlerWrapper(object instance, MethodInfo method, Command command, CommandDispatcher dispatcher)
+            public AsyncHandlerWrapper(object instance, MethodInfo method, IArguments command, CommandDispatcher dispatcher)
             {
                 Debug.Assert(method.ReturnType == typeof(Task));
                 _instance = instance;

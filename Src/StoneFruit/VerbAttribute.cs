@@ -9,14 +9,15 @@ namespace StoneFruit
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
     public class VerbAttribute : Attribute
     {
-        public VerbAttribute(string command, bool showInHelp = true)
+        // TODO V2: We should be able to put this attribute onto methods for InstanceMethod handlers
+        // and override the verb used
+        public VerbAttribute(params string[] verb)
         {
-            CommandName = command;
-            ShowInHelp = showInHelp;
+            Verb = verb;
         }
 
-        public string CommandName { get; }
+        public Verb Verb { get; }
 
-        public bool ShowInHelp { get; }
+        public bool Hide { get; set; }
     }
 }

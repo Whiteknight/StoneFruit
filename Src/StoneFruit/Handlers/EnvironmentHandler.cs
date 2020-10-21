@@ -44,7 +44,7 @@ Change directly to the specified environment
 Change directly to the environment at the specified position
 
 {Name} -notset [ <name> | <number> ]?
-Change the current environment, if any are configured but none are set.
+Change the current environment, only if any are configured but none are set.
 ";
 
         public void Execute()

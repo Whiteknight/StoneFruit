@@ -9,6 +9,6 @@
         /// Get the next command from the source. If there are no more commands, returns null
         /// </summary>
         /// <returns></returns>
-        CommandOrString GetNextCommand();
+        ArgumentsOrString GetNextCommand();
     }
 }

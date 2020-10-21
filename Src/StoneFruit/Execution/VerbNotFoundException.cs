@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.Execution
 {
@@ -11,7 +12,7 @@ namespace StoneFruit.Execution
     {
         public string Verb { get; }
 
-        public VerbNotFoundException(string verb) 
+        public VerbNotFoundException(string verb)
             : base($"Could not find handler for verb '{verb}'. Please check your spelling and try again")
         {
             Verb = verb;
@@ -21,6 +22,14 @@ namespace StoneFruit.Execution
             SerializationInfo info,
             StreamingContext context) : base(info, context)
         {
+        }
+
+        public static VerbNotFoundException FromArguments(IArguments arguments)
+        {
+            var firstPositional = arguments.Shift();
+            if (!firstPositional.Exists())
+                return new VerbNotFoundException("No verb provided. You must provide at least one verb");
+            return new VerbNotFoundException($"Could not find a handler for verb {firstPositional.AsString()}");
         }
     }
 }

@@ -11,7 +11,7 @@ namespace StoneFruit.Execution.Arguments
     /// state until intent is determined by user access. At this point the arguments are
     /// moved to an "accessed" state where they are known unambiguously.
     /// </summary>
-    public class ParsedArguments : IArguments
+    public class ParsedArguments : IArguments, IVerbSource
     {
         private readonly List<IParsedArgument> _rawArguments;
         private readonly List<IPositionalArgument> _accessedPositionals;
@@ -284,6 +284,48 @@ namespace StoneFruit.Execution.Arguments
             }
 
             return null;
+        }
+
+        // We access verbs before we access any args, so we can work entirely out of the
+        // raw unprocessed args list here.
+        public IReadOnlyList<IPositionalArgument> GetVerbCandidatePositionals()
+        {
+            var candidates = new List<IPositionalArgument>();
+            for (int i = 0; i < _rawArguments.Count; i++)
+            {
+                // TODO: In some cases we're going to double-convert args to PositionalArgument
+                // See if we can cache them and reuse them?
+                var arg = _rawArguments[i];
+                if (arg is ParsedPositionalArgument pa)
+                {
+                    candidates.Add(new PositionalArgument(pa.Value));
+                    continue;
+                }
+
+                if (arg is ParsedFlagPositionalOrNamedArgument fp)
+                {
+                    candidates.Add(new PositionalArgument(fp.Value));
+                    break;
+                }
+            }
+            return candidates;
+        }
+
+        public void SetVerbCount(int count)
+        {
+            // Check if the last verb in the list is a flag+positional. If so, replace it with a
+            // flag and decrement count;
+            var lastIndex = count - 1;
+            var lastArg = _rawArguments[lastIndex];
+            if (lastArg is ParsedFlagPositionalOrNamedArgument fp)
+            {
+                _rawArguments[lastIndex] = new ParsedFlagArgument(fp.Name);
+                count--;
+            }
+
+            // Remove count items from the beginning of the list, so they don't get included
+            // in later analysis/accesses
+            _rawArguments.RemoveRange(0, count);
         }
     }
 }

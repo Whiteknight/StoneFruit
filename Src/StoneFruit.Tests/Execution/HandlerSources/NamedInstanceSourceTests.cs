@@ -1,7 +1,7 @@
 ﻿using System;
 using FluentAssertions;
 using NUnit.Framework;
-using StoneFruit.Execution;
+using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Handlers;
 
 namespace StoneFruit.Tests.Execution.HandlerSources
@@ -25,7 +25,7 @@ namespace StoneFruit.Tests.Execution.HandlerSources
         {
             var target = new NamedInstanceHandlerSource();
             target.Add("test", new TestCommandHandler());
-            var result = target.GetInstance(Command.Create("test", null), null);
+            var result = target.GetInstance(SyntheticArguments.From("test"), null);
             result.Should().BeOfType<TestCommandHandler>();
         }
     }

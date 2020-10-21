@@ -10,17 +10,17 @@ namespace StoneFruit.Execution.Handlers
     /// </summary>
     public class ToLowerNameVerbExtractor : ITypeVerbExtractor
     {
-        public IReadOnlyList<string> GetVerbs(Type type)
+        public IReadOnlyList<Verb> GetVerbs(Type type)
         {
             if (!typeof(IHandlerBase).IsAssignableFrom(type))
-                return new string[0];
+                return new List<Verb>();
 
             var name = type.Name
                 .RemoveSuffix("verb")
                 .RemoveSuffix("command")
                 .RemoveSuffix("handler")
                 .ToLowerInvariant();
-            return new[] { name };
+            return new[] { new Verb(name) };
         }
     }
 }

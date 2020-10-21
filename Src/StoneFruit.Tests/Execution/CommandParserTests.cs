@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
-using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Scripts.Formatting;
 
@@ -24,7 +23,7 @@ namespace StoneFruit.Tests.Execution
         public void ParseArguments_ToObject_Positional()
         {
             var target = CommandParser.GetDefault();
-            var args = target.ParseArguments("x y z");
+            var args = target.ParseCommand("x y z");
             var result = args.MapTo<TestArgsPositional>();
             result.Arg1.Should().Be("x");
             result.Arg2.Should().Be("y");
@@ -42,7 +41,7 @@ namespace StoneFruit.Tests.Execution
         public void ParseArguments_ToObject_Flags()
         {
             var target = CommandParser.GetDefault();
-            var args = target.ParseArguments("-x -y");
+            var args = target.ParseCommand("-x -y");
             var result = args.MapTo<TestArgsFlags>();
             result.X.Should().BeTrue();
             result.Y.Should().BeTrue();
@@ -60,7 +59,7 @@ namespace StoneFruit.Tests.Execution
         public void ParseArguments_ToObject_Named()
         {
             var target = CommandParser.GetDefault();
-            var args = target.ParseArguments("x=a y=b z=c");
+            var args = target.ParseCommand("x=a y=b z=c");
             var result = args.MapTo<TestArgsNamed>();
             result.X.Should().Be("a");
             result.Y.Should().Be("b");
@@ -69,11 +68,10 @@ namespace StoneFruit.Tests.Execution
 
         private CommandParser GetSimplifiedParser()
         {
-            var verbParser = VerbGrammar.GetParser();
             var argParser = SimplifiedArgumentGrammar.GetParser();
-            var scriptParser = ScriptFormatGrammar.CreateParser(verbParser);
+            var scriptParser = ScriptFormatGrammar.CreateParser();
 
-            return new CommandParser(verbParser, argParser, scriptParser);
+            return new CommandParser(argParser, scriptParser);
         }
 
         [Test]
@@ -81,10 +79,10 @@ namespace StoneFruit.Tests.Execution
         {
             var parser = GetSimplifiedParser();
             var result = parser.ParseCommand("my-verb testa testb testc");
-            result.Verb.Should().Be("my-verb");
-            result.Arguments.Get(0).Value.Should().Be("testa");
-            result.Arguments.Get(1).Value.Should().Be("testb");
-            result.Arguments.Get(2).Value.Should().Be("testc");
+            result.Get(0).Value.Should().Be("my-verb");
+            result.Get(1).Value.Should().Be("testa");
+            result.Get(2).Value.Should().Be("testb");
+            result.Get(3).Value.Should().Be("testc");
         }
 
         [Test]
@@ -92,10 +90,10 @@ namespace StoneFruit.Tests.Execution
         {
             var parser = GetSimplifiedParser();
             var result = parser.ParseCommand("my-verb name1=value1 name2=value2");
-            result.Verb.Should().Be("my-verb");
-            var named1 = result.Arguments.Get("name1");
+            result.Get(0).Value.Should().Be("my-verb");
+            var named1 = result.Get("name1");
             named1.Value.Should().Be("value1");
-            var named2 = result.Arguments.Get("name2");
+            var named2 = result.Get("name2");
             named2.Value.Should().Be("value2");
         }
 
@@ -104,12 +102,11 @@ namespace StoneFruit.Tests.Execution
         {
             var parser = GetSimplifiedParser();
             var result = parser.ParseCommand("my-verb -flaga -flagb");
-            result.Verb.Should().Be("my-verb");
+            result.Get(0).Value.Should().Be("my-verb");
             result.Raw.Should().Be("my-verb -flaga -flagb");
-            result.Arguments.Raw.Should().Be("-flaga -flagb");
-            result.Arguments.HasFlag("flaga").Should().BeTrue();
-            result.Arguments.HasFlag("flagb").Should().BeTrue();
-            result.Arguments.HasFlag("flagc").Should().BeFalse();
+            result.HasFlag("flaga").Should().BeTrue();
+            result.HasFlag("flagb").Should().BeTrue();
+            result.HasFlag("flagc").Should().BeFalse();
         }
 
         [Test]
@@ -119,7 +116,6 @@ namespace StoneFruit.Tests.Execution
             var result = parser.ParseCommand("my-verb positional named=value -flag");
 
             result.Raw.Should().Be("my-verb positional named=value -flag");
-            result.Arguments.Raw.Should().Be("positional named=value -flag");
         }
     }
 }

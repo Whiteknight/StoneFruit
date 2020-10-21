@@ -7,13 +7,13 @@ namespace StoneFruit.Utility
 {
     public class ArgumentValueFetcher
     {
-        private readonly Command _command;
+        private readonly IArguments _arguments;
         private readonly CommandDispatcher _dispatcher;
         private readonly CancellationToken _token;
 
-        public ArgumentValueFetcher(Command command, CommandDispatcher dispatcher, CancellationToken token)
+        public ArgumentValueFetcher(IArguments arguments, CommandDispatcher dispatcher, CancellationToken token)
         {
-            _command = command;
+            _arguments = arguments;
             _dispatcher = dispatcher;
             _token = token;
         }
@@ -32,19 +32,17 @@ namespace StoneFruit.Utility
                 return _dispatcher.Output;
             if (type == typeof(CommandParser))
                 return _dispatcher.Parser;
-            if (type == typeof(Command))
-                return _command;
             if (type == typeof(IArguments))
-                return _command.Arguments;
+                return _arguments;
             if (_dispatcher.Environments?.Current?.GetType() != null && type == _dispatcher.Environments.Current.GetType())
                 return _dispatcher.Environments.Current;
 
             if (type == typeof(string))
-                return _command.Arguments.Get(name).AsString();
+                return _arguments.Get(name).AsString();
             if (type == typeof(int))
-                return _command.Arguments.Get(name).AsInt();
+                return _arguments.Get(name).AsInt();
             if (type == typeof(bool))
-                return _command.Arguments.HasFlag(name);
+                return _arguments.HasFlag(name);
 
             return null;
         }

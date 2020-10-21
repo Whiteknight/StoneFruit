@@ -33,7 +33,7 @@ Get overview information for all available verbs. The verb Command class must im
 
     public static string Description {{ get; }} 
 
-help <command-name>
+help <verb>
 Get detailed help information for the given verb. The verb Command class must implement
 
     public static string Usage {{ get; }}
@@ -44,10 +44,10 @@ To see all commands, use the -showall flag
 
         public void Execute()
         {
-            var arg = _args.Shift();
-            if (arg.Exists())
+            var verb = _args.GetAllPositionals().Select(p => p.AsString()).ToArray();
+            if (verb.Any())
             {
-                GetDetail(arg.Value);
+                GetDetail(verb);
                 return;
             }
 
@@ -55,11 +55,11 @@ To see all commands, use the -showall flag
             GetOverview(showAll);
         }
 
-        private void GetDetail(string name)
+        private void GetDetail(Verb verb)
         {
-            var info = _commands.GetByName(name);
+            var info = _commands.GetByName(verb);
             if (info == null)
-                throw new ExecutionException($"Cannot find command named '{name}'");
+                throw new ExecutionException($"Cannot find command named '{verb}'");
             _output.WriteLine(info.Usage);
         }
 
@@ -68,9 +68,10 @@ To see all commands, use the -showall flag
             var infoList = _commands.GetAll();
             if (!showAll)
                 infoList = infoList.Where(i => i.ShouldShowInHelp);
+            int maxCommandLength = infoList.Select(c => c.Verb.ToString().Length).Max();
+
             var infoGroups = infoList.GroupBy(v => v.Group ?? "").ToDictionary(g => g.Key, g => g.ToList());
 
-            int maxCommandLength = infoList.Select(c => c.Verb.Length).Max();
             int descStartColumn = maxCommandLength + 4;
             var blankPrefix = new string(' ', descStartColumn);
             int maxDescLineLength = GetConsoleWidth() - descStartColumn;
@@ -116,7 +117,7 @@ To see all commands, use the -showall flag
                     .Color(ConsoleColor.Green)
                     .Write(padLeft)
                     .Write(info.Verb)
-                    .Write(new string(' ', descStartColumn - info.Verb.Length));
+                    .Write(new string(' ', descStartColumn - info.Verb.ToString().Length));
                 var desc = info.Description;
                 var lines = GetDescriptionLines(desc, maxDescLineLength);
                 if (lines.Count == 0)

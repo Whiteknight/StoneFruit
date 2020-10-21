@@ -1,6 +1,6 @@
-﻿using StoneFruit.Utility;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Arguments
 {
@@ -93,6 +93,12 @@ namespace StoneFruit.Execution.Arguments
         /// the user if extra/unnecessary arguments have been passed.
         /// </summary>
         void VerifyAllAreConsumed();
+    }
+
+    public interface IVerbSource
+    {
+        IReadOnlyList<IPositionalArgument> GetVerbCandidatePositionals();
+        void SetVerbCount(int count);
     }
 
     public static class ArgumentsExtensions

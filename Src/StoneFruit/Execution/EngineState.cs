@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using StoneFruit.Execution.Arguments;
 using StoneFruit.Utility;
 
 namespace StoneFruit.Execution
@@ -22,8 +23,8 @@ namespace StoneFruit.Execution
             Settings = settings;
             Commands = new EngineStateCommandQueue();
             Metadata = new EngineStateMetadataCache();
-            CommandCounter = Headless ? 
-                new HeadlessEngineStateCommandCounter(Commands, eventCatalog, Settings) : 
+            CommandCounter = Headless ?
+                new HeadlessEngineStateCommandCounter(Commands, eventCatalog, Settings) :
                 (IEngineStateCommandCounter)new InteractiveEngineStateCommandCounter(Commands, Settings);
         }
 
@@ -35,7 +36,7 @@ namespace StoneFruit.Execution
         public EngineStateMetadataCache Metadata { get; }
         public IEngineStateCommandCounter CommandCounter { get; set; }
         public EngineSettings Settings { get; set; }
-        public Command CurrentCommand { get; set; }
+        public IArguments CurrentArguments { get; set; }
 
         /// <summary>
         /// Signal the runloop that it should exit immediately and stop executing commands.

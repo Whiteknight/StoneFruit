@@ -26,18 +26,19 @@ namespace StoneFruit.Execution.Handlers
         }
 
         public IEnumerator<KeyValuePair<string, string>> GetEnumerator() => ((IEnumerable<KeyValuePair<string, string>>)_aliases).GetEnumerator();
+
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_aliases).GetEnumerator();
 
-        public Command Translate(Command command)
-        {
-            if (_aliases.ContainsKey(command.Verb))
-            {
-                var newVerb = _aliases[command.Verb];
-                return command.Rename(newVerb);
-            }
+        //public Command Translate(Command command)
+        //{
+        //    if (_aliases.ContainsKey(command.Verb))
+        //    {
+        //        var newVerb = _aliases[command.Verb];
+        //        return command.Rename(newVerb);
+        //    }
 
-            return command;
-        }
+        //    return command;
+        //}
 
         public string GetVerb(string alias)
         {
@@ -47,26 +48,27 @@ namespace StoneFruit.Execution.Handlers
             return null;
         }
 
-        public IVerbInfo GetAliasInfoFromVerbInfo(string alias, string verb, IVerbInfo verbInfo)
+        public IVerbInfo GetAliasInfoFromVerbInfo(string[] alias, string verb, IVerbInfo verbInfo)
         {
-            if (_infos.ContainsKey(alias))
-                return _infos[alias];
+            return null;
+            //if (_infos.ContainsKey(alias))
+            //    return _infos[alias];
 
-            // We have to set these up lazily, because aliases might be configured before the handlers are
-            // configured. If using a DI container, the scanned list of handlers might not be available
-            // until later. 
-            var desc = string.IsNullOrEmpty(verbInfo.Description) ? $"Alias for {verb}" : verbInfo.Description;
-            var usage = $"{alias} is an alias for {verb}";
-            if (!string.IsNullOrEmpty(verbInfo.Usage))
-                usage += "\n" + verbInfo.Usage;
-            var info = new AliasVerbInfo(alias, desc, usage, verbInfo.Group, verbInfo.ShouldShowInHelp);
-            _infos.Add(alias, info);
-            return info;
+            //// We have to set these up lazily, because aliases might be configured before the handlers are
+            //// configured. If using a DI container, the scanned list of handlers might not be available
+            //// until later. 
+            //var desc = string.IsNullOrEmpty(verbInfo.Description) ? $"Alias for {verb}" : verbInfo.Description;
+            //var usage = $"{alias} is an alias for {verb}";
+            //if (!string.IsNullOrEmpty(verbInfo.Usage))
+            //    usage += "\n" + verbInfo.Usage;
+            //var info = new AliasVerbInfo(alias, desc, usage, verbInfo.Group, verbInfo.ShouldShowInHelp);
+            //_infos.Add(alias, info);
+            //return info;
         }
 
         private class AliasVerbInfo : IVerbInfo
         {
-            public AliasVerbInfo(string verb, string description, string usage, string group, bool shouldShowInHelp)
+            public AliasVerbInfo(Verb verb, string description, string usage, string group, bool shouldShowInHelp)
             {
                 Verb = verb;
                 Description = description;
@@ -75,7 +77,7 @@ namespace StoneFruit.Execution.Handlers
                 ShouldShowInHelp = shouldShowInHelp;
             }
 
-            public string Verb { get; }
+            public Verb Verb { get; }
 
             public string Description { get; }
 

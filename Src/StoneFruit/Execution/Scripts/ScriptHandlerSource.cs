@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Scripts.Formatting;
 using StoneFruit.Utility;
 
@@ -10,28 +11,32 @@ namespace StoneFruit.Execution.Scripts
     /// </summary>
     public class ScriptHandlerSource : IHandlerSource
     {
-        private readonly Dictionary<string, Script> _scripts;
+        private readonly VerbTrie<Script> _scripts;
 
         public ScriptHandlerSource()
         {
-            _scripts = new Dictionary<string, Script>();
+            _scripts = new VerbTrie<Script>();
         }
 
-        public IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher)
+        public IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher)
         {
-            if (!_scripts.ContainsKey(command.Verb))
+            var script = _scripts.Get(arguments);
+            if (script == null)
                 return null;
-            return new ScriptHandler(dispatcher.Parser, _scripts[command.Verb], command, dispatcher.State);
+            return new ScriptHandler(dispatcher.Parser, script, arguments, dispatcher.State);
         }
 
-        public IEnumerable<IVerbInfo> GetAll() => _scripts.Values;
+        public IEnumerable<IVerbInfo> GetAll() => _scripts.GetAll().Select(kvp => kvp.Value);
 
-        public IVerbInfo GetByName(string name) => _scripts.ContainsKey(name) ? _scripts[name] : null;
+        public IVerbInfo GetByName(Verb verb) => _scripts.Get(verb);
 
-        public void AddScript(string verb, IEnumerable<string> lines, string description = null, string usage = null, string group = null)
+        public void AddScript(Verb verb, IEnumerable<string> lines, string description = null, string usage = null, string group = null)
         {
-            var script = new Script(verb, lines.OrEmptyIfNull().ToList(), description, usage, group);
-            _scripts.Add(verb, script);
+            var scriptLines = lines.OrEmptyIfNull().ToList();
+            if (scriptLines.Count == 0)
+                return;
+            var script = new Script(verb, scriptLines, description, usage, group);
+            _scripts.Insert(verb, script);
         }
 
         public int Count => _scripts.Count;
@@ -43,7 +48,7 @@ namespace StoneFruit.Execution.Scripts
             private readonly IReadOnlyList<string> _lines;
             private IReadOnlyList<CommandFormat> _formats;
 
-            public Script(string verb, IReadOnlyList<string> lines, string description, string usage, string group)
+            public Script(Verb verb, IReadOnlyList<string> lines, string description, string usage, string group)
             {
                 _lines = lines;
                 Verb = verb;
@@ -52,7 +57,7 @@ namespace StoneFruit.Execution.Scripts
                 Group = group;
             }
 
-            public string Verb { get; }
+            public Verb Verb { get; }
             public string Description { get; }
             public string Usage { get; }
             public string Group { get; }
@@ -80,29 +85,31 @@ namespace StoneFruit.Execution.Scripts
         {
             private readonly ICommandParser _parser;
             private readonly Script _script;
-            private readonly Command _command;
+            private readonly IArguments _arguments;
             private readonly EngineState _state;
 
-            public ScriptHandler(ICommandParser parser, Script script, Command command, EngineState state)
+            public ScriptHandler(ICommandParser parser, Script script, IArguments arguments, EngineState state)
             {
                 _parser = parser;
                 _script = script;
-                _command = command;
+                _arguments = arguments;
                 _state = state;
             }
 
             public void Execute()
             {
+                // TODO V2: We have to remove the "verb" from _arguments that got us here. We don't
+                // want those treated like positional arguments
                 // Get the format objects, parsing them if necessary
                 var formats = _script.GetFormats(_parser);
                 foreach (var lineFormat in formats)
                 {
                     // Fill in arguments to the formats to create the command
-                    var command = lineFormat.Format(_command.Arguments);
-                    _command.Arguments.ResetAllArguments();
+                    var formattedArguments = lineFormat.Format(_arguments);
+                    _arguments.ResetAllArguments();
 
                     // Add the command to the EngineState for execution after this
-                    _state.Commands.Append(command);
+                    _state.Commands.Append(formattedArguments);
                 }
             }
         }

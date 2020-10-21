@@ -19,7 +19,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         [Test]
         public void Single_Test()
         {
-            var target = SyntheticArguments.Single("test");
+            var target = SyntheticArguments.From("test");
             target.GetAllArguments().Count().Should().Be(1);
             target.Shift().AsString().Should().Be("test");
         }
@@ -34,7 +34,7 @@ namespace StoneFruit.Tests.Execution.Arguments
         [Test]
         public void Get_Index_AlreadyConsumed()
         {
-            var target = SyntheticArguments.Single("test");
+            var target = SyntheticArguments.From("test");
             target.Get(0).Should().NotBeOfType<MissingArgument>();
             target.Get(0).MarkConsumed();
             target.Get(0).Should().BeOfType<MissingArgument>();

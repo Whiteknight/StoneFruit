@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using StoneFruit.Execution;
+using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit
 {
@@ -16,7 +17,7 @@ namespace StoneFruit
         /// <param name="command"></param>
         /// <param name="dispatcher"></param>
         /// <returns></returns>
-        IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher);
+        IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher);
 
         /// <summary>
         /// Get metadata information about all verbs registered with this source
@@ -30,6 +31,6 @@ namespace StoneFruit
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        IVerbInfo GetByName(string name);
+        IVerbInfo GetByName(Verb verb);
     }
 }

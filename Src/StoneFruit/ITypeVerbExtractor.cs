@@ -14,7 +14,7 @@ namespace StoneFruit
         /// </summary>
         /// <param name="type"></param>
         /// <returns>Should not return null</returns>
-        IReadOnlyList<string> GetVerbs(Type type);
+        IReadOnlyList<Verb> GetVerbs(Type type);
     }
 
     public static class TypeVerbExtractor
@@ -22,7 +22,7 @@ namespace StoneFruit
         private static readonly Lazy<ITypeVerbExtractor> _default = new Lazy<ITypeVerbExtractor>(
             () => new PriorityVerbExtractor(
                 new VerbAttributeVerbExtractor(),
-                new CamelToSpinalNameVerbExtractor()
+                new CamelCaseVerbExtractor()
             )
         );
 

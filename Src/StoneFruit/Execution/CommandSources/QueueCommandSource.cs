@@ -14,7 +14,7 @@ namespace StoneFruit.Execution.CommandSources
             _commands = new Queue<string>(commands);
         }
 
-        public CommandOrString GetNextCommand()
+        public ArgumentsOrString GetNextCommand()
         {
             if (_commands.Count == 0)
                 return null;

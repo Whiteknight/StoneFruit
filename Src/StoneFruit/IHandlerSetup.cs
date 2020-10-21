@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Execution;
+using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Handlers;
 using StoneFruit.Utility;
 
@@ -25,7 +26,7 @@ namespace StoneFruit
         /// <param name="description"></param>
         /// <param name="usage"></param>
         /// <returns></returns>
-        IHandlerSetup Add(string verb, Action<Command, CommandDispatcher> handle, string description = null, string usage = null, string group = null);
+        IHandlerSetup Add(Verb verb, Action<IArguments, CommandDispatcher> handle, string description = null, string usage = null, string group = null);
 
         /// <summary>
         /// Add a pre-existing handler instance with the given verb
@@ -35,7 +36,7 @@ namespace StoneFruit
         /// <param name="description"></param>
         /// <param name="usage"></param>
         /// <returns></returns>
-        IHandlerSetup Add(string verb, IHandlerBase handler, string description = null, string usage = null, string group = null);
+        IHandlerSetup Add(Verb verb, IHandlerBase handler, string description = null, string usage = null, string group = null);
 
         /// <summary>
         /// Add a function delegate as a handler for asynchronous invokation
@@ -45,7 +46,7 @@ namespace StoneFruit
         /// <param name="description"></param>
         /// <param name="usage"></param>
         /// <returns></returns>
-        IHandlerSetup AddAsync(string verb, Func<Command, CommandDispatcher, Task> handleAsync, string description = null, string usage = null, string group = null);
+        IHandlerSetup AddAsync(Verb verb, Func<IArguments, CommandDispatcher, Task> handleAsync, string description = null, string usage = null, string group = null);
 
         /// <summary>
         /// Add a script with a verb and zero or more commands to execute
@@ -55,15 +56,15 @@ namespace StoneFruit
         /// <param name="description"></param>
         /// <param name="usage"></param>
         /// <returns></returns>
-        IHandlerSetup AddScript(string verb, IEnumerable<string> lines, string description = null, string usage = null, string group = null);
+        IHandlerSetup AddScript(Verb verb, IEnumerable<string> lines, string description = null, string usage = null, string group = null);
 
-        /// <summary>
-        /// Adds one or more aliases for a verb
-        /// </summary>
-        /// <param name="verb"></param>
-        /// <param name="aliases"></param>
-        /// <returns></returns>
-        IHandlerSetup AddAlias(string verb, params string[] aliases);
+        ///// <summary>
+        ///// Adds one or more aliases for a verb
+        ///// </summary>
+        ///// <param name="verb"></param>
+        ///// <param name="aliases"></param>
+        ///// <returns></returns>
+        //IHandlerSetup AddAlias(Verb verb, params string[] aliases);
 
         /// <summary>
         /// Specify an explicit list of handler types to register with the Engine. Notice that these types

@@ -55,14 +55,14 @@ env-change  Change environment if multiple environments are configured
 env-list    Lists all available environments
 exit        Exits the application
 help        List all commands or get detailed information for a single command
-my-first
+my first
 Type 'help <command-name>' to get more information, if available.
 ```
 
-Our handler `MyFirstHandler` has been registered with the verb `my-first`. If we type that at the prompt we can see the output:
+Our handler `MyFirstHandler` has been registered with the verb `my first`. If we type that at the prompt we can see the output:
 
 ```
-> my-first
+> my first
 Starting the job...
 Done.
 ```

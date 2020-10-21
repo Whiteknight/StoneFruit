@@ -40,7 +40,7 @@ namespace StoneFruit.Utility
         /// <param name="type"></param>
         /// <param name="verb"></param>
         /// <returns></returns>
-        public static bool ShouldShowInHelp(this Type type, string verb)
+        public static bool ShouldShowInHelp(this Type type, Verb verb)
         {
             var attrs = type.GetCustomAttributes<VerbAttribute>().ToList();
 
@@ -48,7 +48,7 @@ namespace StoneFruit.Utility
             if (!attrs.Any())
                 return true;
 
-            return attrs.Any(a => a.CommandName == verb && a.ShowInHelp);
+            return attrs.Any(a => a.Verb.Equals(verb) && !a.Hide);
         }
     }
 }

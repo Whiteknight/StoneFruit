@@ -16,17 +16,17 @@ namespace StoneFruit.Execution.Handlers
             _extractors = extractors;
         }
 
-        public IReadOnlyList<string> GetVerbs(Type type)
+        public IReadOnlyList<Verb> GetVerbs(Type type)
         {
             if (!typeof(IHandlerBase).IsAssignableFrom(type))
-                return new string[0];
+                return new List<Verb>();
             foreach (var extractor in _extractors)
             {
                 var verbs = extractor.GetVerbs(type);
                 if (verbs != null && verbs.Count > 0)
                     return verbs;
             }
-            return new string[0];
+            return new List<Verb>();
         }
     }
 }

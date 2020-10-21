@@ -2,7 +2,7 @@
 
 A **Command** is a combination of a **verb** and zero or more **arguments**. There are three types of arguments:
 
-1. **Positional** arguments are unnamed values in the argument list and are accessed by index. There can be many positional arguments, each one with a unique index (starting from 0).
+1. **Positional** arguments are unnamed values in the argument list and are accessed by index. There can be many positional arguments, each one with a unique index (starting from 0). Positional arguments at the beginning of the argument list (before any flag or named arguments) may be used as a verb to dispatch control flow to a handler. Arguments which are used as Verbs are removed from the list of arguments.
 1. **Flag** arguments are defined by their name and can appear in any order. A flag does not have a value, but is instead defined by whether or not it exists. Only one flag of a given name can be passed for a single command. Passing the same flag more than once will be ignored.
 1. **Named** arguments have a name and a value and can appear in any order. You can have multiple named arguments with the same name. Ordering of named arguments will not be preserved.
 
@@ -24,6 +24,7 @@ Simplified syntax is the default, is the simplest, and has no parsing ambiguitie
 
 * `-flag` is the flag "flag"
 * `name=value` is the named argument with name "name" and value "value"
+* `value` is the positional argument with the value "value"
 
 Simplified argument grammar is the default, but you can specify it explicitly in your EngineBuilder:
 
@@ -37,13 +38,14 @@ services.SetupEngine(b => b
 
 "POSIX"-style is a little bit different from program to program, and has become quite complex. StoneFruit attempts to cover most of the common patterns from modern apps, though there are some ambiguities in the syntax:
 
-* `-a` is the Flag "a", `-abc` are the three flags "a", "b", "c".
-* `--abc` is the Flag "abc".
+* `-a` is the Flag "a"
+* `-abc` are the three flags "a", "b", "c".
+* `--abc` is the flag "abc".
 * `--name=value` is a named argument "name" with value "value".
 * `--name value` is an ambiguous case which might be the flag "name" followed by the positional "value", or it might be a named argument "name=value"
 * `-a value` is also an ambiguous case, which might be the flag "a" followed by the positional "value", or it might be a named argument "a=value"
 
-Ambiguities are resolved at execution time, if you ask for the named argument it will be treated like a named argument, otherwise if you ask for the flag or the positional, it will be treated as the combination of flag and positional.
+Ambiguities are resolved at handler execution time, if the handler asks for the named argument it will be treated like a named argument, otherwise if you ask for the flag or the positional, it will be treated as the combination of flag and positional.
 
 ```csharp
 services.SetupEngine(b => b

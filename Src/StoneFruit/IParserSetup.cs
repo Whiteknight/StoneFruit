@@ -21,14 +21,6 @@ namespace StoneFruit
         IParserSetup UseParser(ICommandParser parser);
 
         /// <summary>
-        /// Specify a parser to use for verbs. Notice that you cannot set a Verb parser
-        /// if you specify a Command parser.
-        /// </summary>
-        /// <param name="verbParser"></param>
-        /// <returns></returns>
-        IParserSetup UseVerbParser(IParser<char, string> verbParser);
-
-        /// <summary>
         /// Specify an argument parser to use. Notice that you cannot set an Argument
         /// parser if you specify a Command parser.
         /// </summary>
@@ -52,6 +44,7 @@ namespace StoneFruit
         /// <returns></returns>
         IParserSetup UseScriptParser(IParser<char, CommandFormat> scriptParser);
 
+        // TODO: Move these into an IBuildable<T> and don't expose these to the user
         void BuildUp(IServiceCollection services);
         ICommandParser Build();
     }

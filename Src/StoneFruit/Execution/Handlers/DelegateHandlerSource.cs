@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using StoneFruit.Execution.Arguments;
+using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Handlers
 {
@@ -10,37 +13,44 @@ namespace StoneFruit.Execution.Handlers
     /// </summary>
     public class DelegateHandlerSource : IHandlerSource
     {
-        private readonly Dictionary<string, HandlerFactory> _handlers;
+        private readonly VerbTrie<HandlerFactory> _handlers;
 
         public DelegateHandlerSource()
         {
-            _handlers = new Dictionary<string, HandlerFactory>();
+            _handlers = new VerbTrie<HandlerFactory>();
         }
 
         public int Count => _handlers.Count;
 
-        public IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher)
-            => _handlers.ContainsKey(command.Verb) ? _handlers[command.Verb].Create(command, dispatcher) : null;
-
-        public IEnumerable<IVerbInfo> GetAll() => _handlers.Values;
-
-        public IVerbInfo GetByName(string name) => _handlers.ContainsKey(name) ? _handlers[name] : null;
-
-        public DelegateHandlerSource Add(string verb, Action<Command, CommandDispatcher> act, string description = null, string usage = null, string group = null)
+        public IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher)
         {
-            _handlers.Add(verb, new SyncHandlerFactory(act, verb, description, usage, group));
+            var factory = _handlers.Get(arguments);
+            if (factory == null)
+                return null;
+            return factory.Create(arguments, dispatcher);
+        }
+
+        public IEnumerable<IVerbInfo> GetAll() => _handlers.GetAll().Select(kvp => kvp.Value);
+
+        public IVerbInfo GetByName(Verb verb) => _handlers.Get(verb);
+
+        public DelegateHandlerSource Add(Verb verb, Action<IArguments, CommandDispatcher> act, string description = null, string usage = null, string group = null)
+        {
+            var factory = new SyncHandlerFactory(act, verb, description, usage, group);
+            _handlers.Insert(verb, factory);
             return this;
         }
 
-        public DelegateHandlerSource AddAsync(string verb, Func<Command, CommandDispatcher, Task> func, string description = null, string usage = null, string group = null)
+        public DelegateHandlerSource AddAsync(Verb verb, Func<IArguments, CommandDispatcher, Task> func, string description = null, string usage = null, string group = null)
         {
-            _handlers.Add(verb, new AsyncHandlerFactory(func, verb, description, usage, group));
+            var factory = new AsyncHandlerFactory(func, verb, description, usage, group);
+            _handlers.Insert(verb, new AsyncHandlerFactory(func, verb, description, usage, group));
             return this;
         }
 
         private abstract class HandlerFactory : IVerbInfo
         {
-            protected HandlerFactory(string verb, string description, string usage, string group)
+            protected HandlerFactory(Verb verb, string description, string usage, string group)
             {
                 Verb = verb;
                 Description = description ?? string.Empty;
@@ -48,43 +58,43 @@ namespace StoneFruit.Execution.Handlers
                 Group = group;
             }
 
-            public string Verb { get; }
+            public Verb Verb { get; }
             public string Description { get; }
             public string Usage { get; }
             public string Group { get; }
             public bool ShouldShowInHelp => true;
 
-            public abstract IHandlerBase Create(Command command, CommandDispatcher dispatcher);
+            public abstract IHandlerBase Create(IArguments arguments, CommandDispatcher dispatcher);
         }
 
         private class SyncHandlerFactory : HandlerFactory
         {
-            private readonly Action<Command, CommandDispatcher> _act;
+            private readonly Action<IArguments, CommandDispatcher> _act;
 
-            public SyncHandlerFactory(Action<Command, CommandDispatcher> act, string verb, string description, string usage, string group)
+            public SyncHandlerFactory(Action<IArguments, CommandDispatcher> act, Verb verb, string description, string usage, string group)
                 : base(verb, description, usage, group)
             {
                 _act = act;
             }
 
 
-            public override IHandlerBase Create(Command command, CommandDispatcher dispatcher)
+            public override IHandlerBase Create(IArguments arguments, CommandDispatcher dispatcher)
             {
-                return new SyncHandler(_act, command, dispatcher);
+                return new SyncHandler(_act, arguments, dispatcher);
             }
         }
 
         private class AsyncHandlerFactory : HandlerFactory
         {
-            private readonly Func<Command, CommandDispatcher, Task> _func;
+            private readonly Func<IArguments, CommandDispatcher, Task> _func;
 
-            public AsyncHandlerFactory(Func<Command, CommandDispatcher, Task> func, string verb, string description, string usage, string group)
+            public AsyncHandlerFactory(Func<IArguments, CommandDispatcher, Task> func, Verb verb, string description, string usage, string group)
                 : base(verb, description, usage, group)
             {
                 _func = func;
             }
 
-            public override IHandlerBase Create(Command command, CommandDispatcher dispatcher)
+            public override IHandlerBase Create(IArguments command, CommandDispatcher dispatcher)
             {
                 return new AsyncHandler(_func, command, dispatcher);
             }
@@ -92,11 +102,11 @@ namespace StoneFruit.Execution.Handlers
 
         private class SyncHandler : IHandler
         {
-            private readonly Action<Command, CommandDispatcher> _act;
-            private readonly Command _command;
+            private readonly Action<IArguments, CommandDispatcher> _act;
+            private readonly IArguments _command;
             private readonly CommandDispatcher _dispatcher;
 
-            public SyncHandler(Action<Command, CommandDispatcher> act, Command command, CommandDispatcher dispatcher)
+            public SyncHandler(Action<IArguments, CommandDispatcher> act, IArguments command, CommandDispatcher dispatcher)
             {
                 _act = act;
                 _command = command;
@@ -111,11 +121,11 @@ namespace StoneFruit.Execution.Handlers
 
         private class AsyncHandler : IAsyncHandler
         {
-            private readonly Func<Command, CommandDispatcher, Task> _func;
-            private readonly Command _command;
+            private readonly Func<IArguments, CommandDispatcher, Task> _func;
+            private readonly IArguments _command;
             private readonly CommandDispatcher _dispatcher;
 
-            public AsyncHandler(Func<Command, CommandDispatcher, Task> func, Command command, CommandDispatcher dispatcher)
+            public AsyncHandler(Func<IArguments, CommandDispatcher, Task> func, IArguments command, CommandDispatcher dispatcher)
             {
                 _func = func;
                 _command = command;

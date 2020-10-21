@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Execution;
+using StoneFruit.Execution.Arguments;
 using StoneFruit.Utility;
 
 namespace StoneFruit.Containers.Microsoft
@@ -15,7 +16,7 @@ namespace StoneFruit.Containers.Microsoft
     public class MicrosoftRegisteredHandlerSource : IHandlerSource
     {
         private readonly Func<IServiceProvider> _getProvider;
-        private readonly IReadOnlyDictionary<string, VerbInfo> _verbs;
+        private readonly VerbTrie<VerbInfo> _verbs;
 
         public MicrosoftRegisteredHandlerSource(IServiceCollection services, Func<IServiceProvider> getProvider, ITypeVerbExtractor verbExtractor)
         {
@@ -23,7 +24,7 @@ namespace StoneFruit.Containers.Microsoft
             _verbs = SetupVerbMapping(services, verbExtractor);
         }
 
-        private IReadOnlyDictionary<string, VerbInfo> SetupVerbMapping(IServiceCollection services, ITypeVerbExtractor verbExtractor)
+        private VerbTrie<VerbInfo> SetupVerbMapping(IServiceCollection services, ITypeVerbExtractor verbExtractor)
         {
             var handlerRegistrations = services.Where(sd => typeof(IHandlerBase).IsAssignableFrom(sd.ServiceType)).ToList();
             var instances = handlerRegistrations
@@ -50,36 +51,37 @@ namespace StoneFruit.Containers.Microsoft
                         .Select(verb => new VerbInfo(verb, sd.ServiceType))
                 )
                 .ToList();
+
             return instances
                 .Concat(types)
                 .Concat(factories)
-                .ToDictionaryUnique(vi => vi.Verb, vi => vi);
+                .ToVerbTrie(verb => verb.Verb);
         }
 
-        public IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher)
+        public IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher)
         {
-            if (!_verbs.ContainsKey(command.Verb))
+            var serviceType = _verbs.Get(arguments);
+            if (serviceType == null)
                 return null;
-            var serviceType = _verbs[command.Verb].Type;
             using var scope = _getProvider().CreateScope();
-            return scope.ServiceProvider.GetService(serviceType) as IHandlerBase;
+            return scope.ServiceProvider.GetService(serviceType.Type) as IHandlerBase;
         }
 
-        public IEnumerable<IVerbInfo> GetAll() => _verbs.Values;
+        public IEnumerable<IVerbInfo> GetAll() => _verbs.GetAll().Select(kvp => kvp.Value);
 
-        public IVerbInfo GetByName(string name) => _verbs.ContainsKey(name) ? _verbs[name] : null;
+        public IVerbInfo GetByName(Verb verb) => _verbs.Get(verb);
 
         private class VerbInfo : IVerbInfo
         {
             public Type Type { get; }
 
-            public VerbInfo(string verb, Type type)
+            public VerbInfo(Verb verb, Type type)
             {
                 Type = type;
                 Verb = verb;
             }
 
-            public string Verb { get; }
+            public Verb Verb { get; }
             public string Description => Type.GetDescription();
             public string Usage => Type.GetUsage();
             public string Group => Type.GetGroup();

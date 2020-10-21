@@ -2,10 +2,6 @@
 
 StoneFruit is developed with DI containers in mind. If you have a DI container you prefer to use, you can scan for instances of `IHandler` and `IAsyncHandler`. Or, you can use one of the existing bindings for popular containers. For DI containers, the Stonefruit engine is configured as a series of registrations in your container, and then the engine instance is created by your container. 
 
-## Ninject
-
-See the [Ninject Quick Start](start_ninject.md) for information on configuring Ninject to run StoneFruit.
-
 ## StructureMap
 
 See the [StructureMap Quick Start](start_structuremap.md) for information on configuring StructureMap to run StoneFruit.

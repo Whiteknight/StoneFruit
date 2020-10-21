@@ -2,7 +2,7 @@
 
 namespace StoneFruit.Handlers
 {
-    [Verb("argument-display", false)]
+    [Verb("argument-display", Hide = true)]
     public class ArgumentDisplayHandler : IHandler
     {
         private readonly IArguments _args;
