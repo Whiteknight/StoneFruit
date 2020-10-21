@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Handlers;
@@ -76,18 +75,6 @@ namespace StoneFruit
         /// <param name="verbExtractor"></param>
         /// <returns></returns>
         IHandlerSetup UseHandlerTypes(IEnumerable<Type> commandTypes, TypeInstanceResolver resolver = null, ITypeVerbExtractor verbExtractor = null);
-
-        /// <summary>
-        /// Build up registrations in the provided service collection
-        /// </summary>
-        /// <param name="services"></param>
-        void BuildUp(IServiceCollection services);
-
-        /// <summary>
-        /// Build the IHandlers instance directly
-        /// </summary>
-        /// <returns></returns>
-        IHandlers Build();
     }
 
     public static class HandlerSetupExtensions

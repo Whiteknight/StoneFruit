@@ -98,8 +98,6 @@ namespace StoneFruit.Execution.Scripts
 
             public void Execute()
             {
-                // TODO V2: We have to remove the "verb" from _arguments that got us here. We don't
-                // want those treated like positional arguments
                 // Get the format objects, parsing them if necessary
                 var formats = _script.GetFormats(_parser);
                 foreach (var lineFormat in formats)

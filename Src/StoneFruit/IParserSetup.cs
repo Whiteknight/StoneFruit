@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Extensions.DependencyInjection;
 using ParserObjects;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Scripts.Formatting;
@@ -43,10 +42,6 @@ namespace StoneFruit
         /// <param name="scriptParser"></param>
         /// <returns></returns>
         IParserSetup UseScriptParser(IParser<char, CommandFormat> scriptParser);
-
-        // TODO: Move these into an IBuildable<T> and don't expose these to the user
-        void BuildUp(IServiceCollection services);
-        ICommandParser Build();
     }
 
     public static class ParserSetupExtensions

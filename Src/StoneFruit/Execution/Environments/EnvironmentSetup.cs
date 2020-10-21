@@ -1,12 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace StoneFruit.Execution.Environments
 {
     /// <summary>
     /// Sets up the environment mechanism
     /// </summary>
-    public class EnvironmentSetup : IEnvironmentSetup
+    public class EnvironmentSetup : IEnvironmentSetup, ISetupBuildable<IEnvironmentCollection>
     {
         private IEnvironmentCollection _environments;
 
