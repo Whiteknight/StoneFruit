@@ -2,7 +2,7 @@
 
 namespace StoneFruit
 {
-    public interface ISetupBuildable<T>
+    public interface ISetupBuildable<out T>
     {
         void BuildUp(IServiceCollection services);
         T Build();

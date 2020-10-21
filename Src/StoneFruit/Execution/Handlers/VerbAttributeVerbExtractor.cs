@@ -14,7 +14,6 @@ namespace StoneFruit.Execution.Handlers
 
             return type.GetCustomAttributes<VerbAttribute>()
                 .Select(a => a.Verb)
-                // TODO V2: Distinct
                 .ToList();
         }
 
