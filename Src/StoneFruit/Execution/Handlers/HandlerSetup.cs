@@ -19,7 +19,6 @@ namespace StoneFruit.Execution.Handlers
         private readonly DelegateHandlerSource _delegates;
         private readonly ScriptHandlerSource _scripts;
         private readonly NamedInstanceHandlerSource _instances;
-        private readonly AliasMap _aliases;
 
         public HandlerSetup(TypeInstanceResolver defaultResolver = null)
         {
@@ -28,12 +27,10 @@ namespace StoneFruit.Execution.Handlers
             _delegates = new DelegateHandlerSource();
             _scripts = new ScriptHandlerSource();
             _instances = new NamedInstanceHandlerSource();
-            _aliases = new AliasMap();
         }
 
         public void BuildUp(IServiceCollection services)
         {
-            services.AddSingleton(_aliases);
             if (_delegates.Count > 0)
                 services.AddSingleton<IHandlerSource>(_delegates);
             if (_scripts.Count > 0)
@@ -46,8 +43,7 @@ namespace StoneFruit.Execution.Handlers
             services.AddSingleton<IHandlers>(provider =>
             {
                 var sources = provider.GetServices<IHandlerSource>();
-                var aliases = provider.GetService<AliasMap>();
-                return new HandlerSourceCollection(sources, aliases);
+                return new HandlerSourceCollection(sources);
             });
         }
 
@@ -64,7 +60,7 @@ namespace StoneFruit.Execution.Handlers
             foreach (var source in _sources)
                 sources.Add(source);
             sources.Add(GetBuiltinHandlerSource());
-            return new HandlerSourceCollection(sources, _aliases);
+            return new HandlerSourceCollection(sources);
         }
 
         public IHandlerSetup AddSource(IHandlerSource source)
@@ -110,15 +106,6 @@ namespace StoneFruit.Execution.Handlers
             Assert.ArgumentNotNull(verb, nameof(verb));
             Assert.ArgumentNotNull(lines, nameof(lines));
             _scripts.AddScript(verb, lines, description, usage, group);
-            return this;
-        }
-
-        public IHandlerSetup AddAlias(string verb, params string[] aliases)
-        {
-            Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
-            Assert.ArgumentNotNull(aliases, nameof(aliases));
-            foreach (var alias in aliases)
-                _aliases.AddAlias(verb, alias);
             return this;
         }
 

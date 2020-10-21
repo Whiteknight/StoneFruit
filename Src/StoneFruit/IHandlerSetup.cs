@@ -57,14 +57,6 @@ namespace StoneFruit
         /// <returns></returns>
         IHandlerSetup AddScript(Verb verb, IEnumerable<string> lines, string description = null, string usage = null, string group = null);
 
-        ///// <summary>
-        ///// Adds one or more aliases for a verb
-        ///// </summary>
-        ///// <param name="verb"></param>
-        ///// <param name="aliases"></param>
-        ///// <returns></returns>
-        //IHandlerSetup AddAlias(Verb verb, params string[] aliases);
-
         /// <summary>
         /// Specify an explicit list of handler types to register with the Engine. Notice that these types
         /// may not be constructed using your DI container of choice. If you are using a DI container, you
