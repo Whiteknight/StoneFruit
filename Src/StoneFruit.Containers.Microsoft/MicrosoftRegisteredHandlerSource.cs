@@ -18,13 +18,13 @@ namespace StoneFruit.Containers.Microsoft
         private readonly Func<IServiceProvider> _getProvider;
         private readonly VerbTrie<VerbInfo> _verbs;
 
-        public MicrosoftRegisteredHandlerSource(IServiceCollection services, Func<IServiceProvider> getProvider, ITypeVerbExtractor verbExtractor)
+        public MicrosoftRegisteredHandlerSource(IServiceCollection services, Func<IServiceProvider> getProvider, IVerbExtractor verbExtractor)
         {
             _getProvider = getProvider;
             _verbs = SetupVerbMapping(services, verbExtractor);
         }
 
-        private VerbTrie<VerbInfo> SetupVerbMapping(IServiceCollection services, ITypeVerbExtractor verbExtractor)
+        private VerbTrie<VerbInfo> SetupVerbMapping(IServiceCollection services, IVerbExtractor verbExtractor)
         {
             var handlerRegistrations = services.Where(sd => typeof(IHandlerBase).IsAssignableFrom(sd.ServiceType)).ToList();
             var instances = handlerRegistrations

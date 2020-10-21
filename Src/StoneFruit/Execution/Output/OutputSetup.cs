@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace StoneFruit.Execution.Output
 {
-    public class OutputSetup : IOutputSetup
+    public class OutputSetup : IOutputSetup, ISetupBuildable<IOutput>
     {
         private bool _useConsole;
         private readonly List<IOutput> _secondaries;

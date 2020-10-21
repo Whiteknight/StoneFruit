@@ -19,60 +19,56 @@ namespace StoneFruit.Execution.Handlers
         private readonly Func<string, string> _getDescription;
         private readonly Func<string, string> _getUsage;
         private readonly Func<string, string> _getGroup;
-        private readonly Dictionary<string, MethodInfo> _methods;
+        private readonly VerbTrie<MethodInfo> _methods;
 
-        public InstanceMethodHandlerSource(object instance, Func<string, string> getDescription, Func<string, string> getUsage, Func<string, string> getGroup)
+        public InstanceMethodHandlerSource(object instance, Func<string, string> getDescription, Func<string, string> getUsage, Func<string, string> getGroup, IVerbExtractor verbExtractor)
         {
             Assert.ArgumentNotNull(instance, nameof(instance));
             _instance = instance;
             _getDescription = getDescription ?? (s => string.Empty);
             _getUsage = getUsage ?? (s => string.Empty);
             _getGroup = getGroup ?? (s => string.Empty);
-            _methods = _instance.GetType()
+            var methodInfos = _instance.GetType()
                 .GetMethods(BindingFlags.Instance | BindingFlags.Public)
-                .Where(m => m.ReturnType == typeof(void) || m.ReturnType == typeof(Task))
-                .ToDictionaryUnique(m => m.Name.ToLowerInvariant(), m => m);
+                .Where(m => m.ReturnType == typeof(void) || m.ReturnType == typeof(Task));
+
+            verbExtractor ??= VerbExtractor.DefaultInstance;
+            _methods = new VerbTrie<MethodInfo>();
+            foreach (var method in methodInfos)
+            {
+                var verbs = verbExtractor.GetVerbs(method);
+                foreach (var verb in verbs)
+                    _methods.Insert(verb, method);
+            }
         }
 
-        public IHandlerBase GetInstance(IArguments command, CommandDispatcher dispatcher)
+        public IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher)
         {
-            var verbSource = command as IVerbSource;
-            if (verbSource == null)
+            var method = _methods.Get(arguments);
+            if (method == null)
                 return null;
-            var candidate = verbSource.GetVerbCandidatePositionals().FirstOrDefault();
-            if (candidate == null)
-                return null;
-            var verb = candidate.AsString();
-            if (!_methods.ContainsKey(verb))
-                return null;
-            var method = _methods[verb];
+
             if (method.ReturnType == typeof(void))
-            {
-                verbSource.SetVerbCount(1);
-                return new SyncHandlerWrapper(_instance, method, command, dispatcher);
-            }
+                return new SyncHandlerWrapper(_instance, method, arguments, dispatcher);
             if (method.ReturnType == typeof(Task))
-            {
-                verbSource.SetVerbCount(1);
-                return new AsyncHandlerWrapper(_instance, method, command, dispatcher);
-            }
+                return new AsyncHandlerWrapper(_instance, method, arguments, dispatcher);
 
             return null;
         }
 
         public IEnumerable<IVerbInfo> GetAll()
         {
-            return _methods.Select(kvp => new MethodInfoVerbInfo(kvp.Key, _getDescription, _getUsage, _getGroup));
+            return _methods.GetAll().Select(kvp => new MethodInfoVerbInfo(kvp.Key, _getDescription, _getUsage, _getGroup));
         }
 
         // Since we're using the name of a method as the verb, and you can't nest methods, the
         // verb must only be a single string. Anything else is a non-match
         public IVerbInfo GetByName(Verb verb)
         {
-            if (verb.Count > 1)
+            var method = _methods.Get(verb);
+            if (method == null)
                 return null;
-            var name = verb[0].ToLowerInvariant();
-            return _methods.ContainsKey(name) ? new MethodInfoVerbInfo(name, _getDescription, _getUsage, _getGroup) : null;
+            return new MethodInfoVerbInfo(verb, _getDescription, _getUsage, _getGroup);
         }
 
         private static object InvokeMethod(object instance, MethodInfo method, ParameterInfo[] parameters, IArguments command, CommandDispatcher dispatcher, CancellationToken token)
@@ -90,23 +86,22 @@ namespace StoneFruit.Execution.Handlers
 
         private class MethodInfoVerbInfo : IVerbInfo
         {
-            private readonly string _verb;
             private readonly Func<string, string> _getDescription;
             private readonly Func<string, string> _getUsage;
             private readonly Func<string, string> _getGroup;
 
-            public MethodInfoVerbInfo(string verb, Func<string, string> getDescription, Func<string, string> getUsage, Func<string, string> getGroup)
+            public MethodInfoVerbInfo(Verb verb, Func<string, string> getDescription, Func<string, string> getUsage, Func<string, string> getGroup)
             {
-                _verb = verb;
+                Verb = verb;
                 _getDescription = getDescription;
                 _getUsage = getUsage;
                 _getGroup = getGroup;
             }
 
-            public Verb Verb => new Verb(_verb);
-            public string Description => _getDescription(_verb);
-            public string Usage => _getUsage(_verb);
-            public string Group => _getGroup(_verb);
+            public Verb Verb { get; }
+            public string Description => _getDescription(Verb.ToString());
+            public string Usage => _getUsage(Verb.ToString());
+            public string Group => _getGroup(Verb.ToString());
             public bool ShouldShowInHelp => true;
         }
 

@@ -15,11 +15,11 @@ namespace StoneFruit.Containers.StructureMap
     /// </summary>
     public class StructureMapHandlerSource : IHandlerSource
     {
-        private readonly ITypeVerbExtractor _verbExtractor;
+        private readonly IVerbExtractor _verbExtractor;
         private readonly IContainer _container;
         private readonly VerbTrie<Type> _nameMap;
 
-        public StructureMapHandlerSource(IServiceProvider serviceProvider, ITypeVerbExtractor verbExtractor)
+        public StructureMapHandlerSource(IServiceProvider serviceProvider, IVerbExtractor verbExtractor)
         {
             Assert.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
 
@@ -27,7 +27,7 @@ namespace StoneFruit.Containers.StructureMap
             if (_container == null)
                 throw new ArgumentException("Expected StructureMap Container", nameof(serviceProvider));
 
-            _verbExtractor = verbExtractor ?? TypeVerbExtractor.DefaultInstance;
+            _verbExtractor = verbExtractor ?? VerbExtractor.DefaultInstance;
             _nameMap = SetupNameMapping();
         }
 

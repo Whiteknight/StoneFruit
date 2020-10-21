@@ -12,7 +12,7 @@ namespace StoneFruit.Execution.Handlers
     /// <summary>
     /// Setup handlers and handler sources
     /// </summary>
-    public class HandlerSetup : IHandlerSetup
+    public class HandlerSetup : IHandlerSetup, ISetupBuildable<IHandlers>
     {
         private readonly TypeInstanceResolver _defaultResolver;
         private readonly List<IHandlerSource> _sources;
@@ -98,7 +98,7 @@ namespace StoneFruit.Execution.Handlers
             return this;
         }
 
-        public IHandlerSetup UseHandlerTypes(IEnumerable<Type> commandTypes, TypeInstanceResolver resolver = null, ITypeVerbExtractor verbExtractor = null)
+        public IHandlerSetup UseHandlerTypes(IEnumerable<Type> commandTypes, TypeInstanceResolver resolver = null, IVerbExtractor verbExtractor = null)
         {
             Assert.ArgumentNotNull(commandTypes, nameof(commandTypes));
             var source = new TypeListConstructSource(commandTypes, resolver ?? _defaultResolver, verbExtractor);

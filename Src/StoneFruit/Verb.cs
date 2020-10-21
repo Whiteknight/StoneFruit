@@ -11,14 +11,18 @@ namespace StoneFruit
 
         public Verb(string verb)
         {
-            // TODO V2: If verb contains spaces, split it
-            _verb = new[] { verb };
+            if (verb.Contains(' '))
+                _verb = verb.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            else
+                _verb = new[] { verb };
         }
 
         public Verb(string[] verb)
         {
-            // TODO V2: If verb has Length==1 and verb[0] contains spaces, split it
-            _verb = verb;
+            if (verb.Length == 1 && verb[0].Contains(' '))
+                _verb = verb[0].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            else
+                _verb = verb;
         }
 
         public static implicit operator Verb(string s) => new Verb(s);

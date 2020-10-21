@@ -15,10 +15,10 @@ namespace StoneFruit.Execution.Handlers
         private readonly TypeInstanceResolver _resolver;
         private readonly VerbTrie<VerbInfo> _types;
 
-        public TypeListConstructSource(IEnumerable<Type> commandTypes, TypeInstanceResolver resolver, ITypeVerbExtractor verbExtractor)
+        public TypeListConstructSource(IEnumerable<Type> commandTypes, TypeInstanceResolver resolver, IVerbExtractor verbExtractor)
         {
             _resolver = resolver ?? DefaultResolver;
-            verbExtractor ??= TypeVerbExtractor.DefaultInstance;
+            verbExtractor ??= VerbExtractor.DefaultInstance;
             _types = new VerbTrie<VerbInfo>();
             foreach (var commandType in commandTypes)
             {

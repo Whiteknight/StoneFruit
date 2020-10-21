@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace StoneFruit
 {
@@ -34,8 +33,5 @@ namespace StoneFruit
         /// </summary>
         /// <returns></returns>
         IEnvironmentSetup None();
-
-        void BuildUp(IServiceCollection services);
-        IEnvironmentCollection Build();
     }
 }

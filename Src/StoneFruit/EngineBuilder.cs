@@ -102,12 +102,12 @@ namespace StoneFruit
         /// <returns></returns>
         public void BuildUp(IServiceCollection services)
         {
-            _handlers.BuildUp(services);
+            (_handlers as ISetupBuildable<IHandlers>).BuildUp(services);
             services.AddSingleton(_eventCatalog);
             services.AddSingleton(_settings);
-            _environments.BuildUp(services);
-            _parsers.BuildUp(services);
-            _output.BuildUp(services);
+            (_environments as ISetupBuildable<IEnvironmentCollection>).BuildUp(services);
+            (_parsers as ISetupBuildable<ICommandParser>).BuildUp(services);
+            (_output as ISetupBuildable<IOutput>).BuildUp(services);
         }
 
         /// <summary>
@@ -158,10 +158,10 @@ namespace StoneFruit
 
         public Engine Build()
         {
-            var handlers = _handlers.Build();
-            var environments = _environments.Build();
-            var parser = _parsers.Build();
-            var output = _output.Build();
+            var handlers = (_handlers as ISetupBuildable<IHandlers>).Build();
+            var environments = (_environments as ISetupBuildable<IEnvironmentCollection>).Build();
+            var parser = (_parsers as ISetupBuildable<ICommandParser>).Build();
+            var output = (_output as ISetupBuildable<IOutput>).Build();
 
             return new Engine(handlers, environments, parser, output, _eventCatalog, _settings);
         }

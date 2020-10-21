@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Handlers;
@@ -75,19 +74,7 @@ namespace StoneFruit
         /// <param name="resolver"></param>
         /// <param name="verbExtractor"></param>
         /// <returns></returns>
-        IHandlerSetup UseHandlerTypes(IEnumerable<Type> commandTypes, TypeInstanceResolver resolver = null, ITypeVerbExtractor verbExtractor = null);
-
-        /// <summary>
-        /// Build up registrations in the provided service collection
-        /// </summary>
-        /// <param name="services"></param>
-        void BuildUp(IServiceCollection services);
-
-        /// <summary>
-        /// Build the IHandlers instance directly
-        /// </summary>
-        /// <returns></returns>
-        IHandlers Build();
+        IHandlerSetup UseHandlerTypes(IEnumerable<Type> commandTypes, TypeInstanceResolver resolver = null, IVerbExtractor verbExtractor = null);
     }
 
     public static class HandlerSetupExtensions
@@ -98,10 +85,10 @@ namespace StoneFruit
         /// <param name="handlers"></param>
         /// <param name="instance"></param>
         /// <returns></returns>
-        public static IHandlerSetup UsePublicMethodsAsHandlers(this IHandlerSetup handlers, object instance, Func<string, string> getDescription = null, Func<string, string> getUsage = null, Func<string, string> getGroup = null)
+        public static IHandlerSetup UsePublicMethodsAsHandlers(this IHandlerSetup handlers, object instance, Func<string, string> getDescription = null, Func<string, string> getUsage = null, Func<string, string> getGroup = null, IVerbExtractor verbExtractor = null)
         {
             Assert.ArgumentNotNull(handlers, nameof(handlers));
-            var source = new InstanceMethodHandlerSource(instance, getDescription, getUsage, getGroup);
+            var source = new InstanceMethodHandlerSource(instance, getDescription, getUsage, getGroup, verbExtractor);
             return handlers.AddSource(source);
         }
 

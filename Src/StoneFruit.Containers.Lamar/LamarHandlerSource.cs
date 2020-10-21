@@ -17,14 +17,14 @@ namespace StoneFruit.Containers.Lamar
     public class LamarHandlerSource : IHandlerSource
     {
         // TODO: V2 should be able to handle registrations made AFTER .SetupEngine()
-        private readonly ITypeVerbExtractor _verbExtractor;
+        private readonly IVerbExtractor _verbExtractor;
         private readonly IContainer _container;
         private readonly Lazy<VerbTrie<Type>> _nameMap;
 
-        public LamarHandlerSource(IServiceProvider provider, ITypeVerbExtractor verbExtractor)
+        public LamarHandlerSource(IServiceProvider provider, IVerbExtractor verbExtractor)
         {
             _container = provider as IContainer ?? throw new ArgumentException("Expected a Lamar Container", nameof(provider));
-            _verbExtractor = verbExtractor ?? TypeVerbExtractor.DefaultInstance;
+            _verbExtractor = verbExtractor ?? VerbExtractor.DefaultInstance;
             _nameMap = new Lazy<VerbTrie<Type>>(SetupNameMapping);
         }
 

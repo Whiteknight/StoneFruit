@@ -37,14 +37,14 @@ namespace StoneFruit.Utility
 
         public TValue Get(IArguments args)
         {
-            // TODO V2: Should propagate this requirement further up the chain so people aren't
-            // surprised to pass in a custom IArguments and not get what they expect
             var argsWithVerb = args as IVerbSource;
             if (argsWithVerb == null)
                 return default;
+
             var node = GetNode(argsWithVerb);
             if (node == null)
                 return default;
+
             return node.Value;
         }
 
