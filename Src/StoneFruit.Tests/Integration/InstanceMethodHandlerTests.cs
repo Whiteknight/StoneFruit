@@ -8,7 +8,7 @@ namespace StoneFruit.Tests.Integration
 {
     public class InstanceMethodHandlerTests
     {
-        public class MyObject
+        public class MyObject1
         {
             public void TestA(IOutput output)
             {
@@ -32,7 +32,7 @@ namespace StoneFruit.Tests.Integration
         {
             var output = new TestOutput();
             var engine = new EngineBuilder()
-                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject()))
+                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject1()))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
             engine.RunHeadless("test a");
@@ -44,7 +44,7 @@ namespace StoneFruit.Tests.Integration
         {
             var output = new TestOutput();
             var engine = new EngineBuilder()
-                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject(), verbExtractor: new ToLowerNameVerbExtractor()))
+                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject1(), verbExtractor: new ToLowerNameVerbExtractor()))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
             engine.RunHeadless("testa");
@@ -56,7 +56,7 @@ namespace StoneFruit.Tests.Integration
         {
             var output = new TestOutput();
             var engine = new EngineBuilder()
-                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject(), verbExtractor: new CamelCaseToSpinalCaseVerbExtractor()))
+                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject1(), verbExtractor: new CamelCaseToSpinalCaseVerbExtractor()))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
             engine.RunHeadless("test-a");
@@ -68,7 +68,7 @@ namespace StoneFruit.Tests.Integration
         {
             var output = new TestOutput();
             var engine = new EngineBuilder()
-                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject()))
+                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject1()))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
             engine.RunHeadless("test b name=x");
@@ -80,7 +80,7 @@ namespace StoneFruit.Tests.Integration
         {
             var output = new TestOutput();
             var engine = new EngineBuilder()
-                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject()))
+                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject1()))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
             engine.RunHeadless("test c");
@@ -92,13 +92,34 @@ namespace StoneFruit.Tests.Integration
         {
             var output = new TestOutput("help");
             var engine = new EngineBuilder()
-                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject()))
+                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject1()))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
             engine.RunInteractively();
             output.Lines.Should().Contain("test a");
             output.Lines.Should().Contain("test b");
             output.Lines.Should().Contain("test c");
+        }
+
+        public class MyObject2
+        {
+            [Verb("aaa")]
+            public void TestA(IOutput output)
+            {
+                output.WriteLine("A");
+            }
+        }
+
+        [Test]
+        public void A_VerbAttribute()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject2()))
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .Build();
+            engine.RunHeadless("aaa");
+            output.Lines[0].Should().Be("A");
         }
     }
 }

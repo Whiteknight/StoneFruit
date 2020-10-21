@@ -30,11 +30,6 @@ namespace StoneFruit.Utility
 
         public int Count { get; private set; }
 
-        //public bool Contains(IEnumerable<TKey> keys)
-        //{
-        //    return GetNode(keys) != null;
-        //}
-
         public TValue Get(IArguments args)
         {
             var argsWithVerb = args as IVerbSource;
@@ -48,13 +43,6 @@ namespace StoneFruit.Utility
             return node.Value;
         }
 
-        public IReadOnlyList<KeyValuePair<Verb, TValue>> GetAll()
-        {
-            var values = new List<KeyValuePair<Verb, TValue>>();
-            _root.AppendAll("", values);
-            return values;
-        }
-
         public TValue Get(IEnumerable<string> keys)
         {
             var current = _root;
@@ -66,6 +54,13 @@ namespace StoneFruit.Utility
                 current = node;
             }
             return current.Value;
+        }
+
+        public IReadOnlyList<KeyValuePair<Verb, TValue>> GetAll()
+        {
+            var values = new List<KeyValuePair<Verb, TValue>>();
+            _root.AppendAll("", values);
+            return values;
         }
 
         private Node GetNode(IVerbSource args)

@@ -43,7 +43,6 @@ namespace StoneFruit.Execution.Handlers
 
         public DelegateHandlerSource AddAsync(Verb verb, Func<IArguments, CommandDispatcher, Task> func, string description = null, string usage = null, string group = null)
         {
-            var factory = new AsyncHandlerFactory(func, verb, description, usage, group);
             _handlers.Insert(verb, new AsyncHandlerFactory(func, verb, description, usage, group));
             return this;
         }
@@ -103,38 +102,38 @@ namespace StoneFruit.Execution.Handlers
         private class SyncHandler : IHandler
         {
             private readonly Action<IArguments, CommandDispatcher> _act;
-            private readonly IArguments _command;
+            private readonly IArguments _arguments;
             private readonly CommandDispatcher _dispatcher;
 
-            public SyncHandler(Action<IArguments, CommandDispatcher> act, IArguments command, CommandDispatcher dispatcher)
+            public SyncHandler(Action<IArguments, CommandDispatcher> act, IArguments arguments, CommandDispatcher dispatcher)
             {
                 _act = act;
-                _command = command;
+                _arguments = arguments;
                 _dispatcher = dispatcher;
             }
 
             public void Execute()
             {
-                _act(_command, _dispatcher);
+                _act(_arguments, _dispatcher);
             }
         }
 
         private class AsyncHandler : IAsyncHandler
         {
             private readonly Func<IArguments, CommandDispatcher, Task> _func;
-            private readonly IArguments _command;
+            private readonly IArguments _arguments;
             private readonly CommandDispatcher _dispatcher;
 
-            public AsyncHandler(Func<IArguments, CommandDispatcher, Task> func, IArguments command, CommandDispatcher dispatcher)
+            public AsyncHandler(Func<IArguments, CommandDispatcher, Task> func, IArguments arguments, CommandDispatcher dispatcher)
             {
                 _func = func;
-                _command = command;
+                _arguments = arguments;
                 _dispatcher = dispatcher;
             }
 
             public Task ExecuteAsync(CancellationToken cancellation)
             {
-                return _func(_command, _dispatcher);
+                return _func(_arguments, _dispatcher);
             }
         }
     }
