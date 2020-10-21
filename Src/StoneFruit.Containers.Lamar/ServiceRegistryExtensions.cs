@@ -50,7 +50,7 @@ namespace StoneFruit.Containers.Lamar
         public static ServiceRegistry SetupEngineScannerless(ServiceRegistry services, Action<IEngineBuilder> build)
         {
             EngineBuilder.SetupEngineRegistrations(services, build);
-            services.AddSingleton<IHandlerSource>(provider => new LamarHandlerSource(provider, TypeVerbExtractor.DefaultInstance));
+            services.AddSingleton<IHandlerSource>(provider => new LamarHandlerSource(provider, VerbExtractor.DefaultInstance));
 
             return services;
         }

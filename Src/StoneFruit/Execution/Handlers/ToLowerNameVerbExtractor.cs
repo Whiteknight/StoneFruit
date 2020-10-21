@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Handlers
@@ -8,14 +9,27 @@ namespace StoneFruit.Execution.Handlers
     /// Verb extractor which takes the name of the handler class, removes common suffixes
     /// ('verb', 'handler', 'command') and converts the remainder to lowercase.
     /// </summary>
-    public class ToLowerNameVerbExtractor : ITypeVerbExtractor
+    public class ToLowerNameVerbExtractor : IVerbExtractor
     {
         public IReadOnlyList<Verb> GetVerbs(Type type)
         {
-            if (!typeof(IHandlerBase).IsAssignableFrom(type))
+            if (type == null || !typeof(IHandlerBase).IsAssignableFrom(type))
                 return new List<Verb>();
 
-            var name = type.Name
+            return GetVerbs(type.Name);
+        }
+
+        public IReadOnlyList<Verb> GetVerbs(MethodInfo method)
+        {
+            if (method == null)
+                return new List<Verb>();
+
+            return GetVerbs(method.Name);
+        }
+
+        private IReadOnlyList<Verb> GetVerbs(string name)
+        {
+            name = name
                 .RemoveSuffix("verb")
                 .RemoveSuffix("command")
                 .RemoveSuffix("handler")

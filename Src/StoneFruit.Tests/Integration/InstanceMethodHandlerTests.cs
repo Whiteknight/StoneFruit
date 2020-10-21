@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
+using StoneFruit.Execution.Handlers;
 using TestUtilities;
 
 namespace StoneFruit.Tests.Integration
@@ -34,7 +35,31 @@ namespace StoneFruit.Tests.Integration
                 .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject()))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
+            engine.RunHeadless("test a");
+            output.Lines[0].Should().Be("A");
+        }
+
+        [Test]
+        public void A_LowerCaseVerbExtractor()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject(), verbExtractor: new ToLowerNameVerbExtractor()))
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .Build();
             engine.RunHeadless("testa");
+            output.Lines[0].Should().Be("A");
+        }
+
+        [Test]
+        public void A_CamelToSpinalVerbExtractor()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject(), verbExtractor: new CamelCaseToSpinalCaseVerbExtractor()))
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .Build();
+            engine.RunHeadless("test-a");
             output.Lines[0].Should().Be("A");
         }
 
@@ -46,7 +71,7 @@ namespace StoneFruit.Tests.Integration
                 .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject()))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
-            engine.RunHeadless("testb name=x");
+            engine.RunHeadless("test b name=x");
             output.Lines[0].Should().Be("B: x");
         }
 
@@ -58,7 +83,7 @@ namespace StoneFruit.Tests.Integration
                 .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject()))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
-            engine.RunHeadless("testc");
+            engine.RunHeadless("test c");
             output.Lines[0].Should().Be("C");
         }
 
@@ -71,9 +96,9 @@ namespace StoneFruit.Tests.Integration
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
             engine.RunInteractively();
-            output.Lines.Should().Contain("testa");
-            output.Lines.Should().Contain("testb");
-            output.Lines.Should().Contain("testc");
+            output.Lines.Should().Contain("test a");
+            output.Lines.Should().Contain("test b");
+            output.Lines.Should().Contain("test c");
         }
     }
 }

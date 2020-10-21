@@ -40,9 +40,11 @@ namespace StoneFruit.Utility
             var argsWithVerb = args as IVerbSource;
             if (argsWithVerb == null)
                 return default;
+
             var node = GetNode(argsWithVerb);
             if (node == null)
                 return default;
+
             return node.Value;
         }
 

@@ -21,7 +21,7 @@ namespace StoneFruit.Containers.StructureMap
             EngineBuilder.SetupEngineRegistrations(services, build);
             EngineBuilder.SetupExplicitEnvironmentRegistration<TEnvironment>(services);
 
-            services.AddSingleton<IHandlerSource>(provider => new StructureMapHandlerSource(provider, TypeVerbExtractor.DefaultInstance));
+            services.AddSingleton<IHandlerSource>(provider => new StructureMapHandlerSource(provider, VerbExtractor.DefaultInstance));
             container.Configure(c =>
             {
                 c.ScanForCommandVerbs();

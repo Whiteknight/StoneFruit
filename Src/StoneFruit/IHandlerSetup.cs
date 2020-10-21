@@ -74,7 +74,7 @@ namespace StoneFruit
         /// <param name="resolver"></param>
         /// <param name="verbExtractor"></param>
         /// <returns></returns>
-        IHandlerSetup UseHandlerTypes(IEnumerable<Type> commandTypes, TypeInstanceResolver resolver = null, ITypeVerbExtractor verbExtractor = null);
+        IHandlerSetup UseHandlerTypes(IEnumerable<Type> commandTypes, TypeInstanceResolver resolver = null, IVerbExtractor verbExtractor = null);
     }
 
     public static class HandlerSetupExtensions
@@ -85,10 +85,10 @@ namespace StoneFruit
         /// <param name="handlers"></param>
         /// <param name="instance"></param>
         /// <returns></returns>
-        public static IHandlerSetup UsePublicMethodsAsHandlers(this IHandlerSetup handlers, object instance, Func<string, string> getDescription = null, Func<string, string> getUsage = null, Func<string, string> getGroup = null)
+        public static IHandlerSetup UsePublicMethodsAsHandlers(this IHandlerSetup handlers, object instance, Func<string, string> getDescription = null, Func<string, string> getUsage = null, Func<string, string> getGroup = null, IVerbExtractor verbExtractor = null)
         {
             Assert.ArgumentNotNull(handlers, nameof(handlers));
-            var source = new InstanceMethodHandlerSource(instance, getDescription, getUsage, getGroup);
+            var source = new InstanceMethodHandlerSource(instance, getDescription, getUsage, getGroup, verbExtractor);
             return handlers.AddSource(source);
         }
 

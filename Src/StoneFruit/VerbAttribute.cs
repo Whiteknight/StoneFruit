@@ -6,7 +6,7 @@ namespace StoneFruit
     /// Specify a custom verb to use if the correct verb cannot be automatically determined
     /// from the class name
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
     public class VerbAttribute : Attribute
     {
         // TODO V2: We should be able to put this attribute onto methods for InstanceMethod handlers
