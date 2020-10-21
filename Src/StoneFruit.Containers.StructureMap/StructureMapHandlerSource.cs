@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using StoneFruit.Execution;
+using StoneFruit.Execution.Arguments;
 using StoneFruit.Utility;
 using StructureMap;
 
@@ -16,7 +17,7 @@ namespace StoneFruit.Containers.StructureMap
     {
         private readonly ITypeVerbExtractor _verbExtractor;
         private readonly IContainer _container;
-        private readonly IReadOnlyDictionary<string, Type> _nameMap;
+        private readonly VerbTrie<Type> _nameMap;
 
         public StructureMapHandlerSource(IServiceProvider serviceProvider, ITypeVerbExtractor verbExtractor)
         {
@@ -30,7 +31,7 @@ namespace StoneFruit.Containers.StructureMap
             _nameMap = SetupNameMapping();
         }
 
-        private IReadOnlyDictionary<string, Type> SetupNameMapping()
+        private VerbTrie<Type> SetupNameMapping()
         {
             var commandTypes = _container.Model.AllInstances
                 .Where(i => typeof(IHandlerBase).IsAssignableFrom(i.PluginType))
@@ -41,15 +42,14 @@ namespace StoneFruit.Containers.StructureMap
                 .OrEmptyIfNull()
                 .SelectMany(commandType =>
                     _verbExtractor.GetVerbs(commandType)
-                        .Select(verb => (verb, commandType))
+                        .Select(verb => (Verb: verb, Type: commandType))
                 )
-                .ToDictionaryUnique();
+                .ToVerbTrie(x => x.Verb, x => x.Type);
         }
 
-        public IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher)
+        public IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher)
         {
-            var verb = command.Verb.ToLowerInvariant();
-            var type = _nameMap.ContainsKey(verb) ? _nameMap[verb] : null;
+            var type = _nameMap.Get(arguments);
             return type == null ? null : ResolveHandler(type);
         }
 
@@ -57,10 +57,15 @@ namespace StoneFruit.Containers.StructureMap
             where TCommand : class, IHandlerBase
             => ResolveHandler(typeof(TCommand));
 
-        public IEnumerable<IVerbInfo> GetAll() => _nameMap.Select(kvp => new VerbInfo(kvp.Key, kvp.Value));
+        public IEnumerable<IVerbInfo> GetAll() => _nameMap.GetAll().Select(kvp => new VerbInfo(kvp.Key, kvp.Value));
 
-        public IVerbInfo GetByName(string name)
-            => _nameMap.ContainsKey(name) ? new VerbInfo(name, _nameMap[name]) : null;
+        public IVerbInfo GetByName(Verb verb)
+        {
+            var type = _nameMap.Get(verb);
+            if (type == null)
+                return null;
+            return new VerbInfo(verb, type);
+        }
 
         private IHandlerBase ResolveHandler(Type type)
         {
@@ -72,13 +77,13 @@ namespace StoneFruit.Containers.StructureMap
         {
             private readonly Type _type;
 
-            public VerbInfo(string verb, Type type)
+            public VerbInfo(Verb verb, Type type)
             {
                 _type = type;
                 Verb = verb;
             }
 
-            public string Verb { get; }
+            public Verb Verb { get; }
             public string Description => _type.GetDescription();
             public string Usage => _type.GetUsage();
             public string Group => _type.GetGroup();

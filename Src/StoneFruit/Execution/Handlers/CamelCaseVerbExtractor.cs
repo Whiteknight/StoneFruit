@@ -12,30 +12,31 @@ namespace StoneFruit.Execution.Handlers
     /// suffixes are removed ('verb', 'command', 'handler'), CamelCase is converted to
     /// spinal-case, and the name is converted to lower-case.
     /// </summary>
-    public class CamelToSpinalNameVerbExtractor : ITypeVerbExtractor
+    public class CamelCaseVerbExtractor : ITypeVerbExtractor
     {
-        public IReadOnlyList<string> GetVerbs(Type type)
+        public IReadOnlyList<Verb> GetVerbs(Type type)
         {
             if (!typeof(IHandlerBase).IsAssignableFrom(type))
-                return new string[0];
+                return new List<Verb>();
 
             var name = type.Name
                 .RemoveSuffix("verb")
                 .RemoveSuffix("command")
                 .RemoveSuffix("handler");
-            name = CamelCaseToSpinalCase(name);
-            return new[] { name };
+            var verb = GetVerb(name);
+            return new[] { new Verb(verb) };
         }
 
-        private static string CamelCaseToSpinalCase(string s)
+        private static string[] GetVerb(string s)
         {
             if (string.IsNullOrEmpty(s))
-                return s;
+                return new[] { string.Empty };
+
             var camelCase = CamelCase();
             var result = camelCase.Parse(s);
             if (!result.Success)
-                return s.ToLowerInvariant();
-            return string.Join("-", result.Value.Select(s => s.ToLowerInvariant()));
+                return new[] { s.ToLowerInvariant() };
+            return result.Value.Select(s => s.ToLowerInvariant()).ToArray();
         }
     }
 }

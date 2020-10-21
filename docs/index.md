@@ -4,11 +4,11 @@
 
 ## Quick Example: Git
 
-Git is a powerful development tool but typing "`git`" by itself at the prompt doesn't do much. To access the varied functionality of git, you must specify a **verb** like "`git clone`", "`git add`" or "`git rebase`". Each different verb causes the application to do different tasks, often with completely separate sets of input arguments and program output. StoneFruit is like this: It allows you to create a program with many verbs, each of which can do something different and useful.
+Git is a powerful development tool but typing "`git`" by itself at the prompt doesn't do much. To access the varied functionality of git, you must specify a **verb** like "`git clone`", "`git add`" or "`git remote add`". Each different verb causes the application to do different tasks, often with completely separate sets of input arguments and program output. StoneFruit is like this: It allows you to create a program with many verbs, each of which can do something different and useful.
 
 ## Basic Terminology
 
-A **Verb** is the name of an action which the user types at the commandline, which may have arguments and output effects. Verbs in StoneFruit are case-insensitive
+A **Verb** is the name of an action which the user types at the commandline, which may have arguments and output effects. Verbs in StoneFruit are case-insensitive and may be one or several words.
 
 A **Handler** is a class which is invoked by StoneFruit when a verb is input. A single Handler class may correspond to one or more verbs.
 
@@ -24,7 +24,6 @@ To get started, we need to create an `EngineBuilder`, configure it, and build an
 
 * [Lamar Quick Start](start_lamar.md)
 * [StructureMap Quick Start](start_structuremap.md)
-* [Ninject Quick Start](start_ninject.md)
 * [Microsoft DI Quick Start](start_microsoft.md)
 * [No DI Quick Start](start_basic.md)
 

@@ -10,7 +10,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
 {
     public static class ScriptFormatGrammar
     {
-        public static IParser<char, CommandFormat> CreateParser(IParser<char, string> verb)
+        public static IParser<char, CommandFormat> CreateParser()
         {
             var doubleQuotedString = StrippedDoubleQuotedString();
 
@@ -182,11 +182,10 @@ namespace StoneFruit.Execution.Scripts.Formatting
             // The command with verb and all arguments
             // command := <verb> <argAndWhitespace>* <end>
             return Rule(
-                verb,
-                argAndWhitespace.List(),
+                argAndWhitespace.List(true),
                 End(),
 
-                (v, a, end) => new CommandFormat(v, a.ToList())
+                (a, end) => new CommandFormat(a.ToList())
             );
         }
     }

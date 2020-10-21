@@ -34,13 +34,13 @@ namespace StoneFruit.Execution
             _lines.AddRange(lines);
         }
 
-        public IEnumerable<CommandOrString> GetCommands(ICommandParser parser, IArguments args)
+        public IEnumerable<ArgumentsOrString> GetCommands(ICommandParser parser, IArguments args)
         {
             return _lines
                 .Where(l => !string.IsNullOrEmpty(l))
                 .Select(parser.ParseScript)
                 .Select(format => format.Format(args))
-                .Select(c => (CommandOrString)c);
+                .Select(c => new ArgumentsOrString(c));
         }
 
         public override string ToString() => string.Join("\n", _lines);

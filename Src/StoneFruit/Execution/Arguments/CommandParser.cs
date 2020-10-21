@@ -13,17 +13,14 @@ namespace StoneFruit.Execution.Arguments
     /// </summary>
     public class CommandParser : ICommandParser
     {
-        private readonly IParser<char, string> _verbParser;
         private readonly IParser<char, IParsedArgument> _argsParser;
         private readonly IParser<char, CommandFormat> _scriptParser;
 
-        public CommandParser(IParser<char, string> verbParser, IParser<char, IParsedArgument> argParser, IParser<char, CommandFormat> scriptParser)
+        public CommandParser(IParser<char, IParsedArgument> argParser, IParser<char, CommandFormat> scriptParser)
         {
-            Assert.ArgumentNotNull(verbParser, nameof(verbParser));
             Assert.ArgumentNotNull(argParser, nameof(argParser));
             Assert.ArgumentNotNull(scriptParser, nameof(scriptParser));
 
-            _verbParser = verbParser;
             _argsParser = argParser;
             _scriptParser = scriptParser;
         }
@@ -34,10 +31,9 @@ namespace StoneFruit.Execution.Arguments
         /// <returns></returns>
         public static CommandParser GetDefault()
         {
-            var verbParser = VerbGrammar.GetParser();
             var argParser = SimplifiedArgumentGrammar.GetParser();
-            var scriptParser = ScriptFormatGrammar.CreateParser(verbParser);
-            return new CommandParser(verbParser, argParser, scriptParser);
+            var scriptParser = ScriptFormatGrammar.CreateParser();
+            return new CommandParser(argParser, scriptParser);
         }
 
         /// <summary>
@@ -45,13 +41,14 @@ namespace StoneFruit.Execution.Arguments
         /// </summary>
         /// <param name="verbs"></param>
         /// <param name="args"></param>
-        /// <param name="line"></param>
+        /// <param name="raw"></param>
         /// <returns></returns>
-        public static Command ParseCommand(IParser<char, string> verbs, IParser<char, IParsedArgument> args, string line)
+        public static IArguments ParseCommand(IParser<char, IParsedArgument> args, string raw)
         {
-            var sequence = new StringCharacterSequence(line);
-            var verb = verbs.Parse(sequence).Value;
-            var rawArgs = sequence.GetRemainder();
+            if (string.IsNullOrEmpty(raw))
+                return SyntheticArguments.Empty();
+
+            var sequence = new StringCharacterSequence(raw);
             var argsList = args.List().Parse(sequence).Value.ToList();
             if (!sequence.IsAtEnd)
             {
@@ -59,21 +56,11 @@ namespace StoneFruit.Execution.Arguments
                 throw new ParseException($"Could not parse all arguments. '{remainder}' fails at {sequence.CurrentLocation}");
             }
 
-            var cmdArgs = new ParsedArguments(rawArgs, argsList);
-            return Command.CreateFromParser(verb, cmdArgs, line);
+            var cmdArgs = new ParsedArguments(raw, argsList);
+            return cmdArgs;
         }
 
-        public Command ParseCommand(string line) => ParseCommand(_verbParser, _argsParser, line);
-
-        public IArguments ParseArguments(string args)
-        {
-            if (string.IsNullOrEmpty(args))
-                return SyntheticArguments.Empty();
-
-            var sequence = new StringCharacterSequence(args);
-            var argsList = _argsParser.List().Parse(sequence).Value.ToList();
-            return new ParsedArguments(args, argsList);
-        }
+        public IArguments ParseCommand(string line) => ParseCommand(_argsParser, line);
 
         public CommandFormat ParseScript(string script)
         {

@@ -1,5 +1,4 @@
-﻿using StoneFruit.Execution;
-using StoneFruit.Execution.Arguments;
+﻿using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Scripts.Formatting;
 
 namespace StoneFruit
@@ -10,18 +9,12 @@ namespace StoneFruit
     public interface ICommandParser
     {
         /// <summary>
-        /// Parse the line of text into a Command with a verb and arguments
+        /// Parse the line of text into a sequence of arguments. The first few arguments are
+        /// expected to be the verb to invoke
         /// </summary>
         /// <param name="line"></param>
         /// <returns></returns>
-        Command ParseCommand(string line);
-
-        /// <summary>
-        /// Parse the line of text into an IArguments object
-        /// </summary>
-        /// <param name="args"></param>
-        /// <returns></returns>
-        IArguments ParseArguments(string args);
+        IArguments ParseCommand(string line);
 
         /// <summary>
         /// Parse the line of text into a CommandFormat template

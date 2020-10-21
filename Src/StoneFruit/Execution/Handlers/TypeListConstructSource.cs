@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using StoneFruit.Execution.Arguments;
 using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Handlers
@@ -12,22 +13,22 @@ namespace StoneFruit.Execution.Handlers
     public class TypeListConstructSource : IHandlerSource
     {
         private readonly TypeInstanceResolver _resolver;
-        private readonly IReadOnlyDictionary<string, Type> _commands;
+        private readonly VerbTrie<VerbInfo> _types;
 
         public TypeListConstructSource(IEnumerable<Type> commandTypes, TypeInstanceResolver resolver, ITypeVerbExtractor verbExtractor)
         {
             _resolver = resolver ?? DefaultResolver;
             verbExtractor ??= TypeVerbExtractor.DefaultInstance;
-            _commands = commandTypes
-                .OrEmptyIfNull()
-                .SelectMany(commandType =>
-                    verbExtractor.GetVerbs(commandType)
-                    .Select(verb => (verb, commandType))
-                )
-                .ToDictionaryUnique();
+            _types = new VerbTrie<VerbInfo>();
+            foreach (var commandType in commandTypes)
+            {
+                var verbs = verbExtractor.GetVerbs(commandType);
+                foreach (var verb in verbs)
+                    _types.Insert(verb, new VerbInfo(verb, commandType));
+            }
         }
 
-        private static object DefaultResolver(Type commandType, Command command, CommandDispatcher dispatcher)
+        private static object DefaultResolver(Type commandType, IArguments arguments, CommandDispatcher dispatcher)
         {
             return DuckTypeConstructorInvoker.TryConstruct(commandType, new[]
             {
@@ -41,43 +42,45 @@ namespace StoneFruit.Execution.Handlers
 
                 // transient objects
                 dispatcher.Environments.Current,
-                command,
-                command.Arguments
+                arguments
             });
         }
 
-        public IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher)
-            => _commands.ContainsKey(command.Verb) ? ResolveInstance(command, dispatcher, _commands[command.Verb]) : null;
+        public IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher)
+        {
+            var verbInfo = _types.Get(arguments);
+            if (verbInfo?.Type == null)
+                return null;
+            return ResolveInstance(arguments, dispatcher, verbInfo.Type);
+        }
 
-        public IHandlerBase GetInstance<TCommand>(Command command, CommandDispatcher dispatcher)
+        public IHandlerBase GetInstance<TCommand>(IArguments command, CommandDispatcher dispatcher)
             where TCommand : class, IHandlerBase
             => ResolveInstance(command, dispatcher, typeof(TCommand));
 
-        private IHandlerBase ResolveInstance(Command command, CommandDispatcher dispatcher, Type commandType)
+        private IHandlerBase ResolveInstance(IArguments command, CommandDispatcher dispatcher, Type commandType)
             => _resolver(commandType, command, dispatcher) as IHandlerBase;
 
-        public IEnumerable<IVerbInfo> GetAll()
-            => _commands.Select(kvp => new VerbInfo(kvp.Key, kvp.Value));
+        public IEnumerable<IVerbInfo> GetAll() => _types.GetAll().Select(kvp => kvp.Value);
 
-        public IVerbInfo GetByName(string name)
-            => _commands.ContainsKey(name) ? new VerbInfo(name, _commands[name]) : null;
+        public IVerbInfo GetByName(Verb verb) => _types.Get(verb);
 
         private class VerbInfo : IVerbInfo
         {
-            private readonly Type _type;
-
-            public VerbInfo(string verb, Type type)
+            public VerbInfo(Verb verb, Type type)
             {
                 Verb = verb;
-                _type = type;
+                Type = type;
             }
 
-            public string Verb { get; }
+            public Type Type { get; }
 
-            public string Group => _type.GetGroup();
-            public string Description => _type.GetDescription();
-            public string Usage => _type.GetUsage();
-            public bool ShouldShowInHelp => _type.ShouldShowInHelp(Verb);
+            public Verb Verb { get; }
+
+            public string Group => Type.GetGroup();
+            public string Description => Type.GetDescription();
+            public string Usage => Type.GetUsage();
+            public bool ShouldShowInHelp => Type.ShouldShowInHelp(Verb);
         }
     }
 }

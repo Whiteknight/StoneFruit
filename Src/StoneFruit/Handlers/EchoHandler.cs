@@ -5,7 +5,7 @@ using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.Handlers
 {
-    [Verb(Name, showInHelp: false)]
+    [Verb(Name, Hide = true)]
     public class EchoHandler : IHandler
     {
         public const string Name = "echo";

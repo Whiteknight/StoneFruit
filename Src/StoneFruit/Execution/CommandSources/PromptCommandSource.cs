@@ -16,7 +16,7 @@
             _state = state;
         }
 
-        public CommandOrString GetNextCommand()
+        public ArgumentsOrString GetNextCommand()
         {
             var str = _output.Prompt($"{_environments.CurrentName}");
             _state.CommandCounter.ReceiveUserInput();

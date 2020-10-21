@@ -4,7 +4,7 @@ using StoneFruit.Execution.Arguments;
 namespace StoneFruit.Handlers
 {
     [Verb(Name)]
-    [Verb("quit", showInHelp: false)]
+    [Verb("quit", Hide = true)]
     public class ExitHandler : IHandler
     {
         public const string Name = "exit";

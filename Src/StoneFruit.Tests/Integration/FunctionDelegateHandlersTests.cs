@@ -2,6 +2,7 @@
 using FluentAssertions;
 using NUnit.Framework;
 using StoneFruit.Execution;
+using StoneFruit.Execution.Arguments;
 using TestUtilities;
 
 namespace StoneFruit.Tests.Integration
@@ -23,7 +24,7 @@ namespace StoneFruit.Tests.Integration
         [Test]
         public void Test_Async()
         {
-            Task handle(Command c, CommandDispatcher d)
+            Task handle(IArguments arguments, CommandDispatcher d)
             {
                 d.Output.WriteLine("TEST");
                 return Task.CompletedTask;

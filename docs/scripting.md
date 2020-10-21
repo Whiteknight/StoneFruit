@@ -2,45 +2,6 @@
 
 There are several methods of scripting in StoneFruit. These allow you to translate one command into one or more commands to execute in sequence, or to execute commands in response to specific events in the Engine.
 
-## Verb Aliases
-
-Aliases allow you to invoke a single handler with multiple different verbs. An alias maps one verb to another one. When you use an alias, the verb is translated first, with the input alias and target verb both stored in the `Command` argument, before the handler is dispatched. You can setup aliases in your `IEngineBuilder`:
-
-```csharp
-services.SetupEngine(b => b
-    .SetupHandlers(handlers => handlers
-        .AddAlias("echo", "test")
-    )  
-);
-```
-
-Now when you pass a command `test 'hello world'` the `echo` handler will be invoked with the given arguments. Inside your handler you can inspect the contents of the `Command` object to determine if an alias was used and possibly change behavior. For example, we can create a command that echos text to the output normally, but converts it to upper-case if we invoke it with the `yell` alias:
-
-```csharp
-[Verb("say")]
-public class SayHandler : IHandler
-{
-    private readonly Command _command;
-    private readonly IOutput _output;
-
-    public SayHandler(Command command, IOutput output)
-    {
-        _command = command;
-        _output = output;
-    }
-
-    public void Execute()
-    {
-        var text = _command.Arguments.Shift().AsString();
-        if (command.Alias == "yell")
-            text = text.ToUpperInvariant();
-        _output.WriteLine(text);
-    }
-}
-```
-
-Aliases are only resolved once per command, so you cannot have one alias reference another alias. Notice you can also apply multiple `[Verb()]` attributes to a single handler, which will produce almost the same effect.
-
 ## Scripts
 
 A script is a collection of zero or more commands which are executed in response to a single input command. These are setup in the `IEngineBuilder` and employ a sophisticated mechanism for translating arguments. Here is a simple example:
@@ -134,7 +95,7 @@ A script is executed when the engine enters and exits headless mode. These scrip
 A script executes when the engine enters interactive mode, `EngineStartInteractive`. This script prompts the user for an environment if necessary and shows a brief welcome message. This is the default script:
 
 ```
-env-change-notset
+env -notset
 echo -nonewline Enter command
 echo -nonewline color=DarkGray " ('help' for help, 'exit' to quit)"
 echo ':'
@@ -182,7 +143,7 @@ echo Verb ['verb'] not found. Please check your spelling or help output and try 
 
 ### Maximum Headless Commands
 
-StoneFruit will only execute a limited number of commands without user input, to avoid infinite loops. This can occur in recursive situations when a script references itself (directly or through an alias) or when scripts themselves start to get too long. In Interactive mode a prompt will be shown to the user asking if execution should continue. In headless mode, the `MaximumHeadlessCommands` script is executed instead. By default this script shows an error message about maximum limit exceeded and exits with a special exit code.
+StoneFruit will only execute a limited number of commands without user input, to avoid infinite loops. This can occur in recursive situations when a script references itself, when scripts themselves start to get too long, or when handlers invoke other handlers in sequence. In Interactive mode a prompt will be shown to the user asking if execution should continue. In headless mode, the `MaximumHeadlessCommands` script is executed instead. By default this script shows an error message about maximum limit exceeded and exits with a special exit code.
 
 ```
 echo Maximum ['limit'] commands executed without user input. Terminating runloop.

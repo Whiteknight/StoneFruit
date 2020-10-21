@@ -147,8 +147,7 @@ namespace StoneFruit
             });
             services.AddScoped(provider => provider.GetService<EngineAccessor>().Engine.GetCurrentState());
             services.AddScoped(provider => provider.GetService<EngineAccessor>().Engine.GetCurrentDispatcher());
-            services.AddScoped(provider => provider.GetService<EngineState>().CurrentCommand);
-            services.AddScoped(provider => provider.GetService<EngineState>().CurrentCommand?.Arguments);
+            services.AddScoped(provider => provider.GetService<EngineState>().CurrentArguments);
         }
 
         public static void SetupExplicitEnvironmentRegistration<TEnvironment>(IServiceCollection services)

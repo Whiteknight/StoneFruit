@@ -8,7 +8,7 @@
         /// <summary>
         /// The verb used to invoke the handler. All verbs are case-insensitive
         /// </summary>
-        string Verb { get; }
+        Verb Verb { get; }
 
         /// <summary>
         /// A short description of the verb.

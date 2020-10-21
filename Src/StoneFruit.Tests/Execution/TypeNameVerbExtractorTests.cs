@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
-using StoneFruit.Execution;
 using StoneFruit.Execution.Handlers;
 
 namespace StoneFruit.Tests.Utility
@@ -15,9 +14,9 @@ namespace StoneFruit.Tests.Utility
         [Test]
         public void GetVerbs_CamelCaseToSpinalCase()
         {
-            var target = new CamelToSpinalNameVerbExtractor();
+            var target = new CamelCaseVerbExtractor();
             var result = target.GetVerbs(typeof(FirstTestHandler)).ToList();
-            result.Should().Contain("first-test");
+            result[0].ToString().Should().Be("first test");
         }
     }
 }

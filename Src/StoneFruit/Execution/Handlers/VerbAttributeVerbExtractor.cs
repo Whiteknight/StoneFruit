@@ -7,14 +7,14 @@ namespace StoneFruit.Execution.Handlers
 {
     public class VerbAttributeVerbExtractor : ITypeVerbExtractor
     {
-        public IReadOnlyList<string> GetVerbs(Type type)
+        public IReadOnlyList<Verb> GetVerbs(Type type)
         {
             if (!typeof(IHandlerBase).IsAssignableFrom(type))
-                return new string[0];
+                return new List<Verb>();
 
             return type.GetCustomAttributes<VerbAttribute>()
-                .Select(a => a.CommandName.ToLowerInvariant())
-                .Distinct()
+                .Select(a => a.Verb)
+                // TODO V2: Distinct
                 .ToList();
         }
     }

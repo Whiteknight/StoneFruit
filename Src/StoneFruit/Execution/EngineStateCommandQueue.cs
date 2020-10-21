@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.Execution
 {
@@ -8,11 +9,11 @@ namespace StoneFruit.Execution
     /// </summary>
     public class EngineStateCommandQueue
     {
-        private readonly LinkedList<CommandOrString> _additionalCommands;
+        private readonly LinkedList<ArgumentsOrString> _additionalCommands;
 
         public EngineStateCommandQueue()
         {
-            _additionalCommands = new LinkedList<CommandOrString>();
+            _additionalCommands = new LinkedList<ArgumentsOrString>();
         }
 
         public void Append(string command)
@@ -20,9 +21,9 @@ namespace StoneFruit.Execution
             _additionalCommands.AddLast(command);
         }
 
-        public void Append(Command command)
+        public void Append(IArguments arguments)
         {
-            _additionalCommands.AddLast(command);
+            _additionalCommands.AddLast(new ArgumentsOrString(arguments));
         }
 
         public void Append(IEnumerable<string> commands)
@@ -38,7 +39,7 @@ namespace StoneFruit.Execution
                 _additionalCommands.AddFirst(list[i]);
         }
 
-        public void Prepend(IEnumerable<CommandOrString> commands)
+        public void Prepend(IEnumerable<ArgumentsOrString> commands)
         {
             var list = commands.ToList();
             for (int i = list.Count - 1; i >= 0; i--)
@@ -50,12 +51,12 @@ namespace StoneFruit.Execution
             _additionalCommands.AddFirst(command);
         }
 
-        public void Prepend(Command command)
+        public void Prepend(IArguments arguments)
         {
-            _additionalCommands.AddFirst(command);
+            _additionalCommands.AddFirst(new ArgumentsOrString(arguments));
         }
 
-        public CommandOrString GetNext()
+        public ArgumentsOrString GetNext()
         {
             if (_additionalCommands.Count == 0)
                 return null;

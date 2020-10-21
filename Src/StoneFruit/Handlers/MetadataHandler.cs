@@ -4,7 +4,7 @@ using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.Handlers
 {
-    [Verb(Name, false)]
+    [Verb(Name, Hide = true)]
     public class MetadataHandler : IHandler
     {
         public const string Name = "metadata";

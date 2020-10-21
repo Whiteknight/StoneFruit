@@ -9,11 +9,12 @@ namespace StoneFruit.Execution.Arguments
     /// optimization over the ParsedArguments because we don't have to keep track of
     /// ambiguous cases.
     /// </summary>
-    public class SyntheticArguments : IArguments
+    public class SyntheticArguments : IArguments, IVerbSource
     {
         private readonly IReadOnlyList<IPositionalArgument> _positionals;
         private readonly IReadOnlyDictionary<string, List<INamedArgument>> _nameds;
         private readonly IReadOnlyDictionary<string, IFlagArgument> _flags;
+        private int _verbCount;
         private int _accessedShiftIndex;
 
         public SyntheticArguments(IReadOnlyList<IArgument> arguments)
@@ -31,6 +32,7 @@ namespace StoneFruit.Execution.Arguments
                 .ToDictionary(a => a.Name.ToLowerInvariant());
 
             _accessedShiftIndex = 0;
+            _verbCount = 0;
         }
 
         /// <summary>
@@ -70,20 +72,22 @@ namespace StoneFruit.Execution.Arguments
             return new SyntheticArguments(argsList);
         }
 
-        /// <summary>
-        /// An arguments object for a single value
-        /// </summary>
-        /// <param name="arg"></param>
-        /// <returns></returns>
-        public static SyntheticArguments Single(string arg)
-            => new SyntheticArguments(new IArgument[] { new PositionalArgument(arg) });
+        public static SyntheticArguments From(params string[] args)
+        {
+            var argsList = args
+                .Select(s => new PositionalArgument(s))
+                .ToList();
+            return new SyntheticArguments(argsList);
+        }
 
         public void VerifyAllAreConsumed()
         {
             var sb = new StringBuilder();
             sb.AppendLine("Arguments were provided which were not consumed.");
             sb.AppendLine();
-            var unconsumed = _positionals.Where(p => !p.Consumed)
+            var unconsumed = _positionals
+                .Skip(_verbCount)
+                .Where(p => !p.Consumed)
                 .Cast<IArgument>()
                 .Concat(_nameds.SelectMany(kvp => kvp.Value).Where(n => !n.Consumed))
                 .Concat(_flags.Values.Where(f => !f.Consumed))
@@ -108,7 +112,7 @@ namespace StoneFruit.Execution.Arguments
 
         public void ResetAllArguments()
         {
-            foreach (var p in _positionals)
+            foreach (var p in _positionals.Skip(_verbCount))
                 p.MarkConsumed(false);
             foreach (var n in _nameds.Values.SelectMany(x => x))
                 n.MarkConsumed(false);
@@ -118,20 +122,23 @@ namespace StoneFruit.Execution.Arguments
 
         public IPositionalArgument Shift()
         {
-            if (_positionals.Count <= _accessedShiftIndex)
+            var currentIndex = _verbCount + _accessedShiftIndex;
+            if (_positionals.Count <= currentIndex)
                 return MissingArgument.NoPositionals();
-            return _positionals[_accessedShiftIndex++];
+            _accessedShiftIndex++;
+            return _positionals[currentIndex];
         }
 
         public IPositionalArgument Get(int index)
         {
-            if (index >= _positionals.Count)
+            var realIndex = index + _verbCount;
+            if (realIndex >= _positionals.Count)
                 return MissingArgument.NoPositionals();
 
-            if (_positionals[index].Consumed)
+            if (_positionals[realIndex].Consumed)
                 return MissingArgument.PositionalConsumed(index);
 
-            return _positionals[index];
+            return _positionals[realIndex];
         }
 
         public INamedArgument Get(string name)
@@ -148,7 +155,7 @@ namespace StoneFruit.Execution.Arguments
         }
 
         public IEnumerable<IPositionalArgument> GetAllPositionals()
-            => _positionals.Where(a => !a.Consumed);
+            => _positionals.Skip(_verbCount).Where(a => !a.Consumed);
 
         public IEnumerable<IArgument> GetAll(string name)
         {
@@ -176,5 +183,12 @@ namespace StoneFruit.Execution.Arguments
             => _flags.ContainsKey(name.ToLowerInvariant());
 
         public IEnumerable<IFlagArgument> GetAllFlags() => _flags.Values.Where(a => !a.Consumed);
+
+        public IReadOnlyList<IPositionalArgument> GetVerbCandidatePositionals() => _positionals;
+
+        public void SetVerbCount(int count)
+        {
+            _verbCount = count;
+        }
     }
 }

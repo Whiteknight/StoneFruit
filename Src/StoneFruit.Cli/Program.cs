@@ -60,7 +60,7 @@ namespace StoneFruit.Cli
                         "echo 3",
                         "echo 4"
                     }, group: "scripts")
-                    .AddAlias("testf", "testf-alias")
+                //.AddAlias("testf", "testf-alias")
                 )
                 .SetupEnvironments(e => e.UseFactory(new MyEnvironmentFactory()))
                 .SetupEvents(e =>

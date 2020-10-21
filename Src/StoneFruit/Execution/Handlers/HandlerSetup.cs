@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Scripts;
 using StoneFruit.Handlers;
 using StoneFruit.Utility;
@@ -73,25 +74,25 @@ namespace StoneFruit.Execution.Handlers
             return this;
         }
 
-        public IHandlerSetup Add(string verb, Action<Command, CommandDispatcher> handle, string description = null, string usage = null, string group = null)
+        public IHandlerSetup Add(Verb verb, Action<IArguments, CommandDispatcher> handle, string description = null, string usage = null, string group = null)
         {
-            Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
+            Assert.ArgumentNotNull(verb, nameof(verb));
             Assert.ArgumentNotNull(handle, nameof(handle));
             _delegates.Add(verb, handle, description, usage, group);
             return this;
         }
 
-        public IHandlerSetup Add(string verb, IHandlerBase handler, string description = null, string usage = null, string group = null)
+        public IHandlerSetup Add(Verb verb, IHandlerBase handler, string description = null, string usage = null, string group = null)
         {
-            Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
+            Assert.ArgumentNotNull(verb, nameof(verb));
             Assert.ArgumentNotNull(handler, nameof(handler));
             _instances.Add(verb, handler, description, usage, group);
             return this;
         }
 
-        public IHandlerSetup AddAsync(string verb, Func<Command, CommandDispatcher, Task> handleAsync, string description = null, string usage = null, string group = null)
+        public IHandlerSetup AddAsync(Verb verb, Func<IArguments, CommandDispatcher, Task> handleAsync, string description = null, string usage = null, string group = null)
         {
-            Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
+            Assert.ArgumentNotNull(verb, nameof(verb));
             Assert.ArgumentNotNull(handleAsync, nameof(handleAsync));
             _delegates.AddAsync(verb, handleAsync, description, usage, group);
             return this;
@@ -104,9 +105,9 @@ namespace StoneFruit.Execution.Handlers
             return AddSource(source);
         }
 
-        public IHandlerSetup AddScript(string verb, IEnumerable<string> lines, string description = null, string usage = null, string group = null)
+        public IHandlerSetup AddScript(Verb verb, IEnumerable<string> lines, string description = null, string usage = null, string group = null)
         {
-            Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
+            Assert.ArgumentNotNull(verb, nameof(verb));
             Assert.ArgumentNotNull(lines, nameof(lines));
             _scripts.AddScript(verb, lines, description, usage, group);
             return this;

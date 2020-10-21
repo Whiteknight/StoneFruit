@@ -53,11 +53,11 @@ namespace StoneFruit.Execution
         /// </summary>
         /// <param name="command"></param>
         /// <param name="token"></param>
-        public void Execute(CommandOrString command, CancellationToken token = default)
+        public void Execute(ArgumentsOrString command, CancellationToken token = default)
         {
             Assert.ArgumentNotNull(command, nameof(command));
-            if (command.Object != null)
-                Execute(command.Object, token);
+            if (command.Arguments != null)
+                Execute(command.Arguments, token);
             else if (!string.IsNullOrEmpty(command.String))
                 Execute(command.String, token);
         }
@@ -74,33 +74,34 @@ namespace StoneFruit.Execution
             Execute(command, token);
         }
 
-        /// <summary>
-        /// Find and execute the appropriate handler for the given verb and arguments
-        /// </summary>
-        /// <param name="verb"></param>
-        /// <param name="args"></param>
-        /// <param name="token"></param>
-        public void Execute(string verb, IArguments args, CancellationToken token = default)
-        {
-            Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
-            var command = Command.Create(verb, args);
-            Execute(command, token);
-        }
+        // TODO V2: Method to prepend positionals onto IArguments
+        ///// <summary>
+        ///// Find and execute the appropriate handler for the given verb and arguments
+        ///// </summary>
+        ///// <param name="verb"></param>
+        ///// <param name="args"></param>
+        ///// <param name="token"></param>
+        //public void Execute(string verb, IArguments args, CancellationToken token = default)
+        //{
+        //    Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
+        //    var command = Command.Create(verb, args);
+        //    Execute(command, token);
+        //}
 
         /// <summary>
         /// Find and execute the appropriate handler for the given Command object
         /// </summary>
         /// <param name="command"></param>
         /// <param name="token"></param>
-        public void Execute(Command command, CancellationToken token = default)
+        public void Execute(IArguments arguments, CancellationToken token = default)
         {
-            Assert.ArgumentNotNull(command, nameof(command));
-            State.CurrentCommand = command;
-            var handler = Handlers.GetInstance(command, this) ?? throw new VerbNotFoundException(command.Verb);
+            Assert.ArgumentNotNull(arguments, nameof(arguments));
+            State.CurrentArguments = arguments;
+            var handler = Handlers.GetInstance(arguments, this) ?? throw VerbNotFoundException.FromArguments(arguments);
             if (handler is IHandler syncHandler)
             {
                 syncHandler.Execute();
-                State.CurrentCommand = null;
+                State.CurrentArguments = null;
                 return;
             }
 
@@ -110,7 +111,7 @@ namespace StoneFruit.Execution
                     .ConfigureAwait(false)
                     .GetAwaiter()
                     .GetResult();
-                State.CurrentCommand = null;
+                State.CurrentArguments = null;
             }
         }
 
@@ -121,11 +122,11 @@ namespace StoneFruit.Execution
         /// <param name="command"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        public Task ExecuteAsync(CommandOrString command, CancellationToken token = default)
+        public Task ExecuteAsync(ArgumentsOrString command, CancellationToken token = default)
         {
             Assert.ArgumentNotNull(command, nameof(command));
-            if (command.Object != null)
-                return ExecuteAsync(command.Object, token);
+            if (command.Arguments != null)
+                return ExecuteAsync(command.Arguments, token);
             if (!string.IsNullOrEmpty(command.String))
                 return ExecuteAsync(command.String, token);
             return Task.CompletedTask;
@@ -144,19 +145,20 @@ namespace StoneFruit.Execution
             return ExecuteAsync(command, token);
         }
 
-        /// <summary>
-        /// Find and execute the appropriate handler for the given verb and arguments
-        /// </summary>
-        /// <param name="verb"></param>
-        /// <param name="args"></param>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        public Task ExecuteAsync(string verb, IArguments args, CancellationToken token = default)
-        {
-            Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
-            var command = Command.Create(verb, args);
-            return ExecuteAsync(command, token);
-        }
+        // TODO: Method to prepend positionals onto IArguments
+        ///// <summary>
+        ///// Find and execute the appropriate handler for the given verb and arguments
+        ///// </summary>
+        ///// <param name="verb"></param>
+        ///// <param name="args"></param>
+        ///// <param name="token"></param>
+        ///// <returns></returns>
+        //public Task ExecuteAsync(string verb, IArguments args, CancellationToken token = default)
+        //{
+        //    Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
+        //    var command = Command.Create(verb, args);
+        //    return ExecuteAsync(command, token);
+        //}
 
         /// <summary>
         /// Find and execute the appropriate handler for the given Command object
@@ -164,22 +166,22 @@ namespace StoneFruit.Execution
         /// <param name="command"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        public async Task ExecuteAsync(Command command, CancellationToken token = default)
+        public async Task ExecuteAsync(IArguments arguments, CancellationToken token = default)
         {
-            Assert.ArgumentNotNull(command, nameof(command));
-            State.CurrentCommand = command;
-            var handler = Handlers.GetInstance(command, this) ?? throw new VerbNotFoundException(command.Verb);
+            Assert.ArgumentNotNull(arguments, nameof(arguments));
+            State.CurrentArguments = arguments;
+            var handler = Handlers.GetInstance(arguments, this) ?? throw VerbNotFoundException.FromArguments(arguments);
             if (handler is IHandler syncHandler)
             {
                 syncHandler.Execute();
-                State.CurrentCommand = null;
+                State.CurrentArguments = null;
                 return;
             }
 
             if (handler is IAsyncHandler asyncHandler)
             {
                 await asyncHandler.ExecuteAsync(token);
-                State.CurrentCommand = null;
+                State.CurrentArguments = null;
             }
         }
     }

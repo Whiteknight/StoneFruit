@@ -10,23 +10,21 @@ namespace StoneFruit.Execution.Scripts.Formatting
     /// </summary>
     public class CommandFormat
     {
-        private readonly string _verb;
         private readonly IReadOnlyList<IArgumentAccessor> _args;
 
-        public CommandFormat(string verb, IReadOnlyList<IArgumentAccessor> args)
+        public CommandFormat(IReadOnlyList<IArgumentAccessor> args)
         {
-            _verb = verb;
             _args = args;
         }
 
-        public Command Format(IArguments args)
+        public IArguments Format(IArguments args)
         {
             var argsList = _args
                 .SelectMany(a => a.Access(args))
                 .Where(a => a != null)
                 .ToList();
-            var commandArguments = new SyntheticArguments(argsList);
-            return Command.Create(_verb, commandArguments);
+            var arguments = new SyntheticArguments(argsList);
+            return arguments;
         }
     }
 }

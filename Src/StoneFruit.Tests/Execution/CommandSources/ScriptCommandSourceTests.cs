@@ -16,8 +16,8 @@ namespace StoneFruit.Tests.Execution.CommandSources
                 "test2"
             );
             var target = new ScriptCommandSource(script, CommandParser.GetDefault());
-            target.GetNextCommand().Object.Verb.Should().Be("test1");
-            target.GetNextCommand().Object.Verb.Should().Be("test2");
+            target.GetNextCommand().Arguments.Get(0).Value.Should().Be("test1");
+            target.GetNextCommand().Arguments.Get(0).Value.Should().Be("test2");
             target.GetNextCommand().Should().Be(null);
         }
 
