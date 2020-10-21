@@ -74,19 +74,18 @@ namespace StoneFruit.Execution
             Execute(command, token);
         }
 
-        // TODO V2: Method to prepend positionals onto IArguments
-        ///// <summary>
-        ///// Find and execute the appropriate handler for the given verb and arguments
-        ///// </summary>
-        ///// <param name="verb"></param>
-        ///// <param name="args"></param>
-        ///// <param name="token"></param>
-        //public void Execute(string verb, IArguments args, CancellationToken token = default)
-        //{
-        //    Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
-        //    var command = Command.Create(verb, args);
-        //    Execute(command, token);
-        //}
+        /// <summary>
+        /// Find and execute the appropriate handler for the given verb and arguments
+        /// </summary>
+        /// <param name="verb"></param>
+        /// <param name="args"></param>
+        /// <param name="token"></param>
+        public void Execute(Verb verb, IArguments args, CancellationToken token = default)
+        {
+            Assert.ArgumentNotNull(args, nameof(args));
+            var newArgs = new PrependedVerbArguments(verb, args);
+            Execute(newArgs, token);
+        }
 
         /// <summary>
         /// Find and execute the appropriate handler for the given Command object
@@ -145,20 +144,19 @@ namespace StoneFruit.Execution
             return ExecuteAsync(command, token);
         }
 
-        // TODO: Method to prepend positionals onto IArguments
-        ///// <summary>
-        ///// Find and execute the appropriate handler for the given verb and arguments
-        ///// </summary>
-        ///// <param name="verb"></param>
-        ///// <param name="args"></param>
-        ///// <param name="token"></param>
-        ///// <returns></returns>
-        //public Task ExecuteAsync(string verb, IArguments args, CancellationToken token = default)
-        //{
-        //    Assert.ArgumentNotNullOrEmpty(verb, nameof(verb));
-        //    var command = Command.Create(verb, args);
-        //    return ExecuteAsync(command, token);
-        //}
+        /// <summary>
+        /// Find and execute the appropriate handler for the given verb and arguments
+        /// </summary>
+        /// <param name="verb"></param>
+        /// <param name="args"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public Task ExecuteAsync(Verb verb, IArguments args, CancellationToken token = default)
+        {
+            Assert.ArgumentNotNull(args, nameof(args));
+            var newArgs = new PrependedVerbArguments(verb, args);
+            return ExecuteAsync(newArgs, token);
+        }
 
         /// <summary>
         /// Find and execute the appropriate handler for the given Command object
