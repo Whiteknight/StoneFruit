@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using ParserObjects;
 using StoneFruit.Utility;
@@ -8,12 +7,7 @@ using static ParserObjects.Parsers.Specialty.IdentifierParserMethods;
 
 namespace StoneFruit.Execution.Handlers
 {
-    /// <summary>
-    /// Verb extractor to derive the verb from the name of the handler class. Common
-    /// suffixes are removed ('verb', 'command', 'handler'), CamelCase is converted to
-    /// spinal-case, and the name is converted to lower-case.
-    /// </summary>
-    public class CamelCaseVerbExtractor : IVerbExtractor
+    public class CamelCaseToSpinalCaseVerbExtractor : IVerbExtractor
     {
         public IReadOnlyList<Verb> GetVerbs(Type type)
         {
@@ -43,8 +37,8 @@ namespace StoneFruit.Execution.Handlers
             if (!result.Success)
                 return new List<Verb>();
 
-            var verb = result.Value.Select(s => s.ToLowerInvariant()).ToArray();
-            return new[] { new Verb(verb) };
+            var spinal = string.Join("-", result.Value).ToLowerInvariant();
+            return new[] { new Verb(spinal) };
         }
     }
 }

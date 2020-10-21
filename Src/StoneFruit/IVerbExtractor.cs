@@ -24,7 +24,8 @@ namespace StoneFruit
         private static readonly Lazy<IVerbExtractor> _default = new Lazy<IVerbExtractor>(
             () => new PriorityVerbExtractor(
                 new VerbAttributeVerbExtractor(),
-                new CamelCaseVerbExtractor()
+                new CamelCaseVerbExtractor(),
+                new ToLowerNameVerbExtractor()
             )
         );
 
