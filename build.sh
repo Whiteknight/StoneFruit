@@ -1,14 +1,10 @@
-dotnet build -f netstandard2.0 Src/StoneFruit/StoneFruit.csproj --configuration Release
-dotnet pack Src/StoneFruit/StoneFruit.csproj --configuration Release --no-build --no-restore
+. ./_allProjects.sh
+for project in ${all_projects[@]}; do
+    dotnet restore Src/$project/$project.csproj
+    dotnet build Src/$project/$project.csproj --configuration Release --no-restore
+    dotnet pack Src/$project/$project.csproj --no-build --no-restore
+done
 
-dotnet build -f netstandard2.0 Src/StoneFruit.Containers.StructureMap/StoneFruit.Containers.StructureMap.csproj --configuration Release
-dotnet pack Src/StoneFruit.Containers.StructureMap/StoneFruit.Containers.StructureMap.csproj --configuration Release --no-build --no-restore
-
-dotnet build -f netstandard2.0 Src/StoneFruit.Containers.Lamar/StoneFruit.Containers.Lamar.csproj --configuration Release
-dotnet pack Src/StoneFruit.Containers.Lamar/StoneFruit.Containers.Lamar.csproj --configuration Release --no-build --no-restore
-
-dotnet build -f netstandard2.0 Src/StoneFruit.Containers.Microsoft/StoneFruit.Containers.Microsoft.csproj --configuration Release
-dotnet pack Src/StoneFruit.Containers.Microsoft/StoneFruit.Containers.Microsoft.csproj --configuration Release --no-build --no-restore
 
 dotnet build -f netstandard2.0 Src/StoneFruit.Containers.Unity/StoneFruit.Containers.Unity.csproj --configuration Release
 dotnet pack Src/StoneFruit.Containers.Unity/StoneFruit.Containers.Unity.csproj --configuration Release --no-build --no-restore

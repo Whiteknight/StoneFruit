@@ -1,0 +1,1 @@
+all_projects=("StoneFruit" "StoneFruit.Containers.Lamar" "StoneFruit.Containers.Microsoft" "StoneFruit.Containers.StructureMap");
