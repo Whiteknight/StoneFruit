@@ -114,6 +114,22 @@ namespace StoneFruit.Tests.Integration
         }
 
         [Test]
+        public void AddScript_FlagsRenamed()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h
+                    .UseHandlerTypes(typeof(ArgumentDisplayHandler))
+                    .AddScript("test", new[] { "argument-display ?x:a ?y:b" })
+                )
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .Build();
+            engine.RunHeadless("test -x");
+            output.Lines.Count.Should().Be(1);
+            output.Lines[0].Should().Be("flag: a");
+        }
+
+        [Test]
         public void AddScript_AllFlags()
         {
             var output = new TestOutput();
