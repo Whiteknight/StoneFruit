@@ -47,6 +47,17 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 (start, name) => new LiteralFlagArgumentAccessor(name)
             );
 
+            // Fetch a flag from the input and rename it on the output if it exists
+            // fetchFlagRenameArg := '?' <name> ':' <name>
+            var fetchFlagRenameArg = Rule(
+                Match('?'),
+                names,
+                Match(':'),
+                names,
+
+                (q, name, c, newName) => new FetchFlagArgumentAccessor(name, newName)
+            );
+
             // Fetch a flag from the input and reproduce it on the output if it exists
             // fetchFlagArg := '?' <name>
             var fetchFlagArg = Rule(
@@ -163,6 +174,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
 
                 fetchAllFlagsArg,
                 literalFlagArg,
+                fetchFlagRenameArg,
                 fetchFlagArg,
 
                 fetchAllPositionalsArg,

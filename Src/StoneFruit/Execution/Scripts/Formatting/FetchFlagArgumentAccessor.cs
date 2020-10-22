@@ -10,10 +10,12 @@ namespace StoneFruit.Execution.Scripts.Formatting
     public class FetchFlagArgumentAccessor : IArgumentAccessor
     {
         private readonly string _name;
+        private readonly string _newName;
 
-        public FetchFlagArgumentAccessor(string name)
+        public FetchFlagArgumentAccessor(string name, string newName = null)
         {
             _name = name;
+            _newName = newName;
         }
 
         public IEnumerable<IArgument> Access(IArguments args)
@@ -22,7 +24,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
             if (!flag.Exists())
                 return Enumerable.Empty<IArgument>();
             flag.MarkConsumed();
-            return new [] { new FlagArgument(_name) };
+            return new[] { new FlagArgument(_newName ?? _name) };
         }
     }
 }
