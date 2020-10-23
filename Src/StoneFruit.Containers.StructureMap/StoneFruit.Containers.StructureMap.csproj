@@ -12,7 +12,7 @@
     <Description>CLI Commandlet host and execution engine, StructureMap container bindings</Description>
     <Copyright>Copyright 2020</Copyright>
     <PackageProjectUrl>https://github.com/Whiteknight/StoneFruit</PackageProjectUrl>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,12 +22,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\StoneFruit\StoneFruit.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="LICENSE" Pack="true" PackagePath="">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>
