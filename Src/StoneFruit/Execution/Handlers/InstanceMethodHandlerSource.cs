@@ -32,7 +32,7 @@ namespace StoneFruit.Execution.Handlers
                 .GetMethods(BindingFlags.Instance | BindingFlags.Public)
                 .Where(m => m.ReturnType == typeof(void) || m.ReturnType == typeof(Task));
 
-            verbExtractor ??= VerbExtractor.DefaultInstance;
+            verbExtractor ??= PriorityVerbExtractor.DefaultInstance;
             _methods = new VerbTrie<MethodInfo>();
             foreach (var method in methodInfos)
             {

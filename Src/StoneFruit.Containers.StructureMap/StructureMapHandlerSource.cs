@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
+using StoneFruit.Execution.Handlers;
 using StoneFruit.Utility;
 using StructureMap;
 
@@ -27,7 +28,7 @@ namespace StoneFruit.Containers.StructureMap
             if (_container == null)
                 throw new System.ArgumentException("Expected StructureMap Container", nameof(serviceProvider));
 
-            _verbExtractor = verbExtractor ?? VerbExtractor.DefaultInstance;
+            _verbExtractor = verbExtractor ?? PriorityVerbExtractor.DefaultInstance;
             _nameMap = SetupNameMapping();
         }
 

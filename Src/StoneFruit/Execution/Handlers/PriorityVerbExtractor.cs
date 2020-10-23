@@ -10,12 +10,26 @@ namespace StoneFruit.Execution.Handlers
     /// </summary>
     public class PriorityVerbExtractor : IVerbExtractor
     {
+        private static readonly Lazy<IVerbExtractor> _default = new Lazy<IVerbExtractor>(
+            () => new PriorityVerbExtractor(
+                new VerbAttributeVerbExtractor(),
+                new CamelCaseVerbExtractor(),
+                new ToLowerNameVerbExtractor()
+            )
+        );
+
         private readonly IVerbExtractor[] _extractors;
 
         public PriorityVerbExtractor(params IVerbExtractor[] extractors)
         {
             _extractors = extractors;
         }
+
+        /// <summary>
+        /// Get the default ITypeVerbExtractor instance which will be used if a custom
+        /// one isn't provided.
+        /// </summary>
+        public static IVerbExtractor DefaultInstance => _default.Value;
 
         public IReadOnlyList<Verb> GetVerbs(Type type)
         {
