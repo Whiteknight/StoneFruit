@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
+using StoneFruit.Execution.Handlers;
 using StructureMap;
-using System;
 
 namespace StoneFruit.Containers.StructureMap
 {
@@ -21,7 +22,7 @@ namespace StoneFruit.Containers.StructureMap
             EngineBuilder.SetupEngineRegistrations(services, build);
             EngineBuilder.SetupExplicitEnvironmentRegistration<TEnvironment>(services);
 
-            services.AddSingleton<IHandlerSource>(provider => new StructureMapHandlerSource(provider, VerbExtractor.DefaultInstance));
+            services.AddSingleton<IHandlerSource>(provider => new StructureMapHandlerSource(provider, PriorityVerbExtractor.DefaultInstance));
             container.Configure(c =>
             {
                 c.ScanForCommandVerbs();

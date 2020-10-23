@@ -18,7 +18,7 @@ namespace StoneFruit.Execution.Handlers
         public TypeListConstructSource(IEnumerable<Type> commandTypes, TypeInstanceResolver resolver, IVerbExtractor verbExtractor)
         {
             _resolver = resolver ?? DefaultResolver;
-            verbExtractor ??= VerbExtractor.DefaultInstance;
+            verbExtractor ??= PriorityVerbExtractor.DefaultInstance;
             _types = new VerbTrie<VerbInfo>();
             foreach (var commandType in commandTypes)
             {

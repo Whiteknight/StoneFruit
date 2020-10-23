@@ -5,6 +5,7 @@ using Lamar;
 using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
+using StoneFruit.Execution.Handlers;
 using StoneFruit.Utility;
 
 namespace StoneFruit.Containers.Lamar
@@ -24,7 +25,7 @@ namespace StoneFruit.Containers.Lamar
         public LamarHandlerSource(IServiceProvider provider, IVerbExtractor verbExtractor)
         {
             _container = provider as IContainer ?? throw new System.ArgumentException("Expected a Lamar Container", nameof(provider));
-            _verbExtractor = verbExtractor ?? VerbExtractor.DefaultInstance;
+            _verbExtractor = verbExtractor ?? PriorityVerbExtractor.DefaultInstance;
             _nameMap = new Lazy<VerbTrie<Type>>(SetupNameMapping);
         }
 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using StoneFruit.Execution.Handlers;
 
 namespace StoneFruit
 {
@@ -17,22 +16,5 @@ namespace StoneFruit
         /// <returns>Should not return null</returns>
         IReadOnlyList<Verb> GetVerbs(Type type);
         IReadOnlyList<Verb> GetVerbs(MethodInfo method);
-    }
-
-    public static class VerbExtractor
-    {
-        private static readonly Lazy<IVerbExtractor> _default = new Lazy<IVerbExtractor>(
-            () => new PriorityVerbExtractor(
-                new VerbAttributeVerbExtractor(),
-                new CamelCaseVerbExtractor(),
-                new ToLowerNameVerbExtractor()
-            )
-        );
-
-        /// <summary>
-        /// Get the default ITypeVerbExtractor instance which will be used if a custom
-        /// one isn't provided.
-        /// </summary>
-        public static IVerbExtractor DefaultInstance => _default.Value;
     }
 }

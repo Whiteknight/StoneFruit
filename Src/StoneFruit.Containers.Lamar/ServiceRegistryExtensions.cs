@@ -1,6 +1,7 @@
 ﻿using System;
 using Lamar;
 using Microsoft.Extensions.DependencyInjection;
+using StoneFruit.Execution.Handlers;
 
 namespace StoneFruit.Containers.Lamar
 {
@@ -50,7 +51,7 @@ namespace StoneFruit.Containers.Lamar
         public static ServiceRegistry SetupEngineScannerless(ServiceRegistry services, Action<IEngineBuilder> build)
         {
             EngineBuilder.SetupEngineRegistrations(services, build);
-            services.AddSingleton<IHandlerSource>(provider => new LamarHandlerSource(provider, VerbExtractor.DefaultInstance));
+            services.AddSingleton<IHandlerSource>(provider => new LamarHandlerSource(provider, PriorityVerbExtractor.DefaultInstance));
 
             return services;
         }
