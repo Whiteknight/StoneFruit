@@ -12,20 +12,30 @@ namespace StoneFruit.Execution.Scripts.Formatting
     {
         private readonly string _newName;
         private readonly int _index;
+        private readonly bool _required;
+        private readonly string _defaultValue;
 
-        public NamedFetchPositionalArgumentAccessor(string newName, int index)
+        public NamedFetchPositionalArgumentAccessor(string newName, int index, bool required, string defaultValue)
         {
             _newName = newName;
             _index = index;
+            _required = required;
+            _defaultValue = defaultValue;
         }
 
         public IEnumerable<IArgument> Access(IArguments args)
         {
             var arg = args.Get(_index);
-            if (!arg.Exists())
+            if (arg.Exists())
+            {
+                arg.MarkConsumed();
+                return new[] { new NamedArgument(_newName, arg.AsString(string.Empty)) };
+            }
+            if (!_required)
                 return Enumerable.Empty<IArgument>();
-            arg.MarkConsumed();
-            return new[] { new NamedArgument(_newName, arg.AsString(string.Empty)),  };
+            if (!string.IsNullOrEmpty(_defaultValue))
+                return new[] { new NamedArgument(_newName, _defaultValue) };
+            throw ArgumentParseException.MissingRequiredArgument(_index);
         }
     }
 }

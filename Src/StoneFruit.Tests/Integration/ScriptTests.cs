@@ -26,7 +26,7 @@ namespace StoneFruit.Tests.Integration
         }
 
         [Test]
-        public void AddScript_FetchPositional()
+        public void AddScript_Positional()
         {
             var output = new TestOutput();
             var engine = new EngineBuilder()
@@ -44,7 +44,69 @@ namespace StoneFruit.Tests.Integration
         }
 
         [Test]
-        public void AddScript_FetchAllPositionals()
+        public void AddScript_PositionalIndexed_RequiredFail()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h
+                    .UseHandlerTypes(typeof(ArgumentDisplayHandler))
+                    .AddScript("test", new[] { "argument-display [0]!" })
+                )
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .Build();
+            engine.RunHeadless("test");
+            output.Lines[0].Should().StartWith("Required argument");
+        }
+
+        [Test]
+        public void AddScript_PositionalIndexed_DefaultValue()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h
+                    .UseHandlerTypes(typeof(ArgumentDisplayHandler))
+                    .AddScript("test", new[] { "argument-display [0]!test" })
+                )
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .Build();
+            engine.RunHeadless("test");
+            output.Lines.Count.Should().Be(1);
+            output.Lines[0].Should().Be("0: test");
+        }
+
+        [Test]
+        public void AddScript_PositionalNamed_RequiredFail()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h
+                    .UseHandlerTypes(typeof(ArgumentDisplayHandler))
+                    .AddScript("test", new[] { "argument-display ['x']!" })
+                )
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .Build();
+            engine.RunHeadless("test");
+            output.Lines[0].Should().StartWith("Required argument");
+        }
+
+        [Test]
+        public void AddScript_PositionalNamed_DefaultValue()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h
+                    .UseHandlerTypes(typeof(ArgumentDisplayHandler))
+                    .AddScript("test", new[] { "argument-display ['x']!test" })
+                )
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .Build();
+            engine.RunHeadless("test");
+            output.Lines.Count.Should().Be(1);
+            output.Lines[0].Should().Be("0: test");
+        }
+
+        [Test]
+        public void AddScript_AllPositionals()
         {
             var output = new TestOutput();
             var engine = new EngineBuilder()
@@ -77,6 +139,100 @@ namespace StoneFruit.Tests.Integration
             output.Lines[0].Should().Be("'a': y");
             output.Lines[1].Should().Be("'c': z");
             output.Lines[2].Should().Be("'d': x");
+        }
+
+        [Test]
+        public void AddScript_LiteralNameNamedValue_RequiredFail()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h
+                    .UseHandlerTypes(typeof(ArgumentDisplayHandler))
+                    // 'b' is required but not provided. 
+                    .AddScript("test", new[] { "argument-display a=['b']!" })
+                )
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .Build();
+            engine.RunHeadless("test");
+            output.Lines[0].Should().StartWith("Required argument");
+        }
+
+        [Test]
+        public void AddScript_LiteralNameNamedValue_DefaultValue()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h
+                    .UseHandlerTypes(typeof(ArgumentDisplayHandler))
+                    .AddScript("test", new[] { "argument-display a=['b']!test" })
+                )
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .Build();
+            engine.RunHeadless("test");
+            output.Lines.Count.Should().Be(1);
+            output.Lines[0].Should().Be("'a': test");
+        }
+
+        [Test]
+        public void AddScript_LiteralNamePositionalValue_RequiredFail()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h
+                    .UseHandlerTypes(typeof(ArgumentDisplayHandler))
+                    .AddScript("test", new[] { "argument-display d=[0]!" })
+                )
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .Build();
+            engine.RunHeadless("test");
+            output.Lines[0].Should().StartWith("Required argument");
+        }
+
+        [Test]
+        public void AddScript_LiteralNamePositionalValue_DefaultValue()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h
+                    .UseHandlerTypes(typeof(ArgumentDisplayHandler))
+                    .AddScript("test", new[] { "argument-display d=[0]!test" })
+                )
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .Build();
+            engine.RunHeadless("test");
+            output.Lines.Count.Should().Be(1);
+            output.Lines[0].Should().Be("'d': test");
+        }
+
+        [Test]
+        public void AddScript_Named_RequiredFail()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h
+                    .UseHandlerTypes(typeof(ArgumentDisplayHandler))
+                    .AddScript("test", new[] { "argument-display {c}!" })
+                )
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .Build();
+            engine.RunHeadless("test");
+            output.Lines[0].Should().StartWith("Required argument");
+        }
+
+        [Test]
+        public void AddScript_Named_DefaultValue()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h
+                    .UseHandlerTypes(typeof(ArgumentDisplayHandler))
+                    .AddScript("test", new[] { "argument-display {c}!test" })
+                )
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .Build();
+            engine.RunHeadless("test");
+            output.Lines.Count.Should().Be(1);
+            output.Lines[0].Should().Be("'c': test");
         }
 
         [Test]

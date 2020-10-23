@@ -51,6 +51,14 @@ Named arguments can be fetched from the input in a few ways. They can be fetched
 
 **Output**: `test a=1 b=2 c=3 d=4 e=5`
 
+#### Required Args and Default Values
+
+Most of the preceeding argument types can be marked as being required or a default value can be provided if the argument is missing. The `!` syntax marks the argument as required. If a required argument is not provided, an error will be thrown and the script will be aborted. The `!<value>` syntax will denote that the default value will be used if the argument is missing.
+
+**Script**: `test [0]!first ['a']! {b}!second`
+
+In this example, if there are no positionals, the value `first` will be passed as the first positional. If the named value `"b"` is not provided, the argument `b=second` will be passed. If the named value `"a"` is not provided, an exception will be thrown and the script will not be executed. Notice that this mechanism doesn't preclude the `test` handler from throwing it's own exceptions if values are missing, or providing it's own default values. 
+
 ## EventScripts
 
 The StoneFruit `EngineState` contains a number of pre-defined scripts which are executed in response to various events. You can modify these scripts in the EngineBuilder to change the behavior of the application:

@@ -51,6 +51,6 @@
 
         public long AsLong(long defaultValue = 0) => defaultValue;
 
-        public void Throw(string errorMessage) => throw new CommandArgumentException(string.IsNullOrEmpty(errorMessage) ? Message : errorMessage);
+        public void Throw(string errorMessage) => throw new ArgumentParseException(string.IsNullOrEmpty(errorMessage) ? Message : errorMessage);
     }
 }

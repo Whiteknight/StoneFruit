@@ -67,15 +67,10 @@ namespace StoneFruit.Execution.Scripts
             {
                 if (_formats != null)
                     return _formats;
-                var formats = new List<CommandFormat>();
-                foreach (var line in _lines)
-                {
-                    var result = parser.ParseScript(line);
-                    formats.Add(result);
-                }
-
-                _formats = formats;
-                return formats;
+                _formats = _lines
+                    .Select(l => parser.ParseScript(l))
+                    .ToList();
+                return _formats;
             }
         }
 

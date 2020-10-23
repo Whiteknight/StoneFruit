@@ -11,19 +11,29 @@ namespace StoneFruit.Execution.Scripts.Formatting
     public class FetchNamedArgumentAccessor : IArgumentAccessor
     {
         private readonly string _name;
+        private readonly bool _required;
+        private readonly string _defaultValue;
 
-        public FetchNamedArgumentAccessor(string name)
+        public FetchNamedArgumentAccessor(string name, bool required, string defaultValue)
         {
             _name = name;
+            _required = required;
+            _defaultValue = defaultValue;
         }
 
         public IEnumerable<IArgument> Access(IArguments args)
         {
             var arg = args.Get(_name);
-            if (!arg.Exists())
+            if (arg.Exists())
+            {
+                arg.MarkConsumed();
+                return new[] { new NamedArgument(_name, arg.AsString(string.Empty)) };
+            }
+            if (!_required)
                 return Enumerable.Empty<IArgument>();
-            arg.MarkConsumed();
-            return new [] { new NamedArgument(_name, arg.AsString(string.Empty)) };
+            if (!string.IsNullOrEmpty(_defaultValue))
+                return new[] { new NamedArgument(_name, _defaultValue) };
+            throw ArgumentParseException.MissingRequiredArgument(_name);
         }
     }
 }

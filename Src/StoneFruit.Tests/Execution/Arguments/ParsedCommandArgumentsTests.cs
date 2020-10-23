@@ -105,7 +105,7 @@ namespace StoneFruit.Tests.Execution.Arguments
                 new ParsedFlagArgument("c")
             });
             Action act = () => target.VerifyAllAreConsumed();
-            act.Should().Throw<CommandArgumentException>();
+            act.Should().Throw<StoneFruit.Execution.Arguments.ArgumentParseException>();
         }
 
         [Test]
@@ -121,7 +121,7 @@ namespace StoneFruit.Tests.Execution.Arguments
             target.Get("b");
             target.GetFlag("c");
             Action act = () => target.VerifyAllAreConsumed();
-            act.Should().Throw<CommandArgumentException>();
+            act.Should().Throw<StoneFruit.Execution.Arguments.ArgumentParseException>();
         }
 
         [Test]
