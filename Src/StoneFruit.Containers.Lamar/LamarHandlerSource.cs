@@ -23,7 +23,7 @@ namespace StoneFruit.Containers.Lamar
 
         public LamarHandlerSource(IServiceProvider provider, IVerbExtractor verbExtractor)
         {
-            _container = provider as IContainer ?? throw new ArgumentException("Expected a Lamar Container", nameof(provider));
+            _container = provider as IContainer ?? throw new System.ArgumentException("Expected a Lamar Container", nameof(provider));
             _verbExtractor = verbExtractor ?? VerbExtractor.DefaultInstance;
             _nameMap = new Lazy<VerbTrie<Type>>(SetupNameMapping);
         }

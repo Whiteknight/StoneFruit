@@ -11,19 +11,30 @@ namespace StoneFruit.Execution.Scripts.Formatting
     public class FetchPositionalArgumentAccessor : IArgumentAccessor
     {
         private readonly int _index;
+        private readonly bool _required;
+        private readonly string _defaultValue;
 
-        public FetchPositionalArgumentAccessor(int index)
+        public FetchPositionalArgumentAccessor(int index, bool required, string defaultValue)
         {
             _index = index;
+            _required = required;
+            _defaultValue = defaultValue;
         }
 
         public IEnumerable<IArgument> Access(IArguments args)
         {
             var arg = args.Get(_index);
-            if (!arg.Exists() || arg.Consumed)
+            if (arg.Exists() && !arg.Consumed)
+            {
+                arg.MarkConsumed();
+                return new[] { new PositionalArgument(arg.AsString(string.Empty)) };
+            }
+            if (!_required)
                 return Enumerable.Empty<IArgument>();
-            arg.MarkConsumed();
-            return new [] { new PositionalArgument(arg.AsString(string.Empty)) };
+            if (!string.IsNullOrEmpty(_defaultValue))
+                return new[] { new PositionalArgument(_defaultValue) };
+
+            throw ArgumentParseException.MissingRequiredArgument(_index);
         }
     }
 }

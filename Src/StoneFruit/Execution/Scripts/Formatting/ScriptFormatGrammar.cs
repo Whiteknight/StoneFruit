@@ -38,6 +38,13 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 unquotedValue
             );
 
+            var requiredOrDefaultValue = Rule(
+                Match('!'),
+                values.Optional(),
+
+                (bang, v) => new RequiredValue(v)
+            ).Optional();
+
             // A literal flag which is passed without modification
             // literalFlagArg := '-' <names>
             var literalFlagArg = Rule(
@@ -78,25 +85,29 @@ namespace StoneFruit.Execution.Scripts.Formatting
             );
 
             // A named argument where the name is a literal but the value fetched from a named arg
-            // literalNameFetchValueArg := <name> '=' '[' <quotedString> ']'
+            // literalNameFetchValueArg := <name> '=' '[' <quotedString> ']' <requiredOrDefaultValue>
             var literalNameFetchNamedArg = Rule(
                 names,
                 Match('='),
                 Match('['),
                 values,
                 Match(']'),
-                (n, e, o, s, c) => new NamedFetchNamedArgumentAccessor(n, s)
+                requiredOrDefaultValue,
+
+                (n, e, o, s, c, rdv) => new NamedFetchNamedArgumentAccessor(n, s, rdv != null, rdv?.DefaultValue)
             );
 
             // A named argument where the name is a literal but the value is fetched from a positional
-            // literalNameFetchValueArg := <name> '=' '[' <integer> ']'
+            // literalNameFetchValueArg := <name> '=' '[' <integer> ']' <requiredOrDefaultValue>
             var literalNameFetchPositionalArg = Rule(
                 names,
                 Match('='),
                 Match('['),
                 integer,
                 Match(']'),
-                (n, e, o, i, c) => new NamedFetchPositionalArgumentAccessor(n, i)
+                requiredOrDefaultValue,
+
+                (n, e, o, i, c, rdv) => new NamedFetchPositionalArgumentAccessor(n, i, rdv != null, rdv?.DefaultValue)
             );
 
             // Fetch a named argument including name and value
@@ -106,8 +117,9 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match('{'),
                 names,
                 Match('}'),
+                requiredOrDefaultValue,
 
-                (o, s, c) => new FetchNamedArgumentAccessor(s)
+                (o, s, c, rdv) => new FetchNamedArgumentAccessor(s, rdv != null, rdv?.DefaultValue)
             );
 
             // Fetch all remaining unconsumed named arguments
@@ -130,8 +142,9 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match('['),
                 integer,
                 Match(']'),
+                requiredOrDefaultValue,
 
-                (o, i, c) => new FetchPositionalArgumentAccessor(i)
+                (o, i, c, rdv) => new FetchPositionalArgumentAccessor(i, rdv != null, rdv?.DefaultValue)
             );
 
             // Fetch all remaining unconsumed positional arguments
@@ -159,8 +172,9 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match('['),
                 quotedString,
                 Match(']'),
+                requiredOrDefaultValue,
 
-                (o, s, c) => new FetchNamedToPositionalArgumentAccessor(s)
+                (o, s, c, rdv) => new FetchNamedToPositionalArgumentAccessor(s, rdv != null, rdv?.DefaultValue)
             );
 
             // All possible args
@@ -199,6 +213,18 @@ namespace StoneFruit.Execution.Scripts.Formatting
 
                 (a, end) => new CommandFormat(a.ToList())
             );
+        }
+
+        // If this object exists at all, the preceeding argument is required. It may have a default
+        // value if one is specified
+        private class RequiredValue
+        {
+            public RequiredValue(string defaultValue)
+            {
+                DefaultValue = defaultValue;
+            }
+
+            public string DefaultValue { get; }
         }
     }
 }

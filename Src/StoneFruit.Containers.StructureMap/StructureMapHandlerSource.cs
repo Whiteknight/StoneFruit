@@ -25,7 +25,7 @@ namespace StoneFruit.Containers.StructureMap
 
             _container = (serviceProvider as StructureMapServiceProvider)?.Container;
             if (_container == null)
-                throw new ArgumentException("Expected StructureMap Container", nameof(serviceProvider));
+                throw new System.ArgumentException("Expected StructureMap Container", nameof(serviceProvider));
 
             _verbExtractor = verbExtractor ?? VerbExtractor.DefaultInstance;
             _nameMap = SetupNameMapping();

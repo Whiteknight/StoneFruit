@@ -179,7 +179,7 @@ namespace StoneFruit.Tests.Execution.Arguments
                 new FlagArgument("c")
             });
             Action act = () => target.VerifyAllAreConsumed();
-            act.Should().Throw<CommandArgumentException>();
+            act.Should().Throw<StoneFruit.Execution.Arguments.ArgumentParseException>();
         }
 
         [Test]

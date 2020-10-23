@@ -72,7 +72,7 @@ namespace StoneFruit.Execution.Arguments
             sb.AppendLine();
             foreach (var line in fromAll)
                 sb.AppendLine(line);
-            throw new CommandArgumentException(sb.ToString());
+            throw new ArgumentParseException(sb.ToString());
         }
 
         public void ResetAllArguments()

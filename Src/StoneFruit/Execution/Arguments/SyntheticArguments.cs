@@ -107,7 +107,7 @@ namespace StoneFruit.Execution.Arguments
                 sb.AppendLine(str);
             }
 
-            throw new CommandArgumentException(sb.ToString());
+            throw new ArgumentParseException(sb.ToString());
         }
 
         public void ResetAllArguments()
