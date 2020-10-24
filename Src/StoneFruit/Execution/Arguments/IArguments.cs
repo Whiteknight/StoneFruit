@@ -95,12 +95,6 @@ namespace StoneFruit.Execution.Arguments
         void VerifyAllAreConsumed();
     }
 
-    public interface IVerbSource
-    {
-        IReadOnlyList<IPositionalArgument> GetVerbCandidatePositionals();
-        void SetVerbCount(int count);
-    }
-
     public static class ArgumentsExtensions
     {
         /// <summary>

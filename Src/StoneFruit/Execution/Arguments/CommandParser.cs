@@ -37,31 +37,31 @@ namespace StoneFruit.Execution.Arguments
         }
 
         /// <summary>
-        /// Parse a Command from a line of text using the given parser objects
+        /// Parse the given line of text as an IArguments
         /// </summary>
-        /// <param name="verbs"></param>
-        /// <param name="args"></param>
         /// <param name="raw"></param>
         /// <returns></returns>
-        public static IArguments ParseCommand(IParser<char, IParsedArgument> args, string raw)
+        public IArguments ParseCommand(string raw)
         {
             if (string.IsNullOrEmpty(raw))
                 return SyntheticArguments.Empty();
 
             var sequence = new StringCharacterSequence(raw);
-            var argsList = args.List().Parse(sequence).Value.ToList();
+            var argsList = _argsParser.List().Parse(sequence).Value.ToList();
             if (!sequence.IsAtEnd)
             {
                 var remainder = sequence.GetRemainder();
                 throw new ParseException($"Could not parse all arguments. '{remainder}' fails at {sequence.CurrentLocation}");
             }
 
-            var cmdArgs = new ParsedArguments(raw, argsList);
-            return cmdArgs;
+            return new ParsedArguments(argsList, raw);
         }
 
-        public IArguments ParseCommand(string line) => ParseCommand(_argsParser, line);
-
+        /// <summary>
+        /// Parse the given line of script as a CommandFormat to be used for creating commands
+        /// </summary>
+        /// <param name="script"></param>
+        /// <returns></returns>
         public CommandFormat ParseScript(string script)
         {
             var input = new StringCharacterSequence(script);
