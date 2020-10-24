@@ -5,13 +5,12 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using StoneFruit.Execution.Arguments;
 using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Handlers
 {
     /// <summary>
-    /// Handler source for public methods on a pre-defined object instance
+    /// Handler source for public methods on a pre-constructed object instance
     /// </summary>
     public class InstanceMethodHandlerSource : IHandlerSource
     {

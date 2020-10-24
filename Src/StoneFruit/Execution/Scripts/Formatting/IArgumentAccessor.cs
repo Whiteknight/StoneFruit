@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.Execution.Scripts.Formatting
 {

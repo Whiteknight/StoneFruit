@@ -1,6 +1,4 @@
-﻿using StoneFruit.Execution.Arguments;
-
-namespace StoneFruit.Handlers
+﻿namespace StoneFruit.Handlers
 {
     [Verb("argument-display", Hide = true)]
     public class ArgumentDisplayHandler : IHandler

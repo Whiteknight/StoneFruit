@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.Utilities
 {

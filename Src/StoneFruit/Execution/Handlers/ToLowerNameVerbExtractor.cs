@@ -6,7 +6,7 @@ using StoneFruit.Utility;
 namespace StoneFruit.Execution.Handlers
 {
     /// <summary>
-    /// Verb extractor which takes the name of the handler class, removes common suffixes
+    /// Verb extractor which takes the name of the handler class or method, removes common suffixes
     /// ('verb', 'handler', 'command') and converts the remainder to lowercase.
     /// </summary>
     public class ToLowerNameVerbExtractor : IVerbExtractor

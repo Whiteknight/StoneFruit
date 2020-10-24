@@ -2,7 +2,6 @@
 using FluentAssertions;
 using NUnit.Framework;
 using StoneFruit.Execution;
-using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Environments;
 using StoneFruit.Execution.Handlers;
 using StoneFruit.Execution.Output;

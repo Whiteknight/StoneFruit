@@ -18,7 +18,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
 
             var names = Identifier();
 
-            var integer = Integer();
+            var integers = Integer();
 
             var whitespace = Whitespace().Optional();
 
@@ -103,7 +103,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 names,
                 Match('='),
                 Match('['),
-                integer,
+                integers,
                 Match(']'),
                 requiredOrDefaultValue,
 
@@ -140,7 +140,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
             // fetchPositionalArg := '[' <integer> ']'
             var fetchPositionalArg = Rule(
                 Match('['),
-                integer,
+                integers,
                 Match(']'),
                 requiredOrDefaultValue,
 

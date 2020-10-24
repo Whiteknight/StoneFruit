@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Scripts;
 using StoneFruit.Handlers;
 using StoneFruit.Utility;

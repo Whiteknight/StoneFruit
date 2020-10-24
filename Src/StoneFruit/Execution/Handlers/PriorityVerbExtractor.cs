@@ -10,6 +10,8 @@ namespace StoneFruit.Execution.Handlers
     /// </summary>
     public class PriorityVerbExtractor : IVerbExtractor
     {
+        // The default set of extractors. First we look for VerbAttribute, then we attempt to parse
+        // the name as CamelCase, finally we just take the name and lowercase it.
         private static readonly Lazy<IVerbExtractor> _default = new Lazy<IVerbExtractor>(
             () => new PriorityVerbExtractor(
                 new VerbAttributeVerbExtractor(),

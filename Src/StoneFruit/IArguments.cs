@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using StoneFruit.Execution.Arguments;
 using StoneFruit.Utility;
 
-namespace StoneFruit.Execution.Arguments
+namespace StoneFruit
 {
     /// <summary>
     /// Collection of parsed arguments. All names are case-invariant.
@@ -156,7 +157,7 @@ namespace StoneFruit.Execution.Arguments
         public static void MapOnto<T>(this IArguments args, T obj)
         {
             Assert.ArgumentNotNull(args, nameof(args));
-            CommandArgumentMapper.MapOnto<T>(args, obj);
+            CommandArgumentMapper.MapOnto(args, obj);
         }
 
         /// <summary>

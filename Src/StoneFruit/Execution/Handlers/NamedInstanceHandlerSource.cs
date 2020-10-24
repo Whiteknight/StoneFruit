@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using StoneFruit.Execution.Arguments;
 using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Handlers
 {
     /// <summary>
-    /// Handler source for manually-specified handler instances
+    /// Handler source for manually-specified handler instances.  This type is mainly used for
+    /// situations where the user doesn't employ a DI container to detect and resolve handler types
+    /// automatically
     /// </summary>
     public class NamedInstanceHandlerSource : IHandlerSource
     {

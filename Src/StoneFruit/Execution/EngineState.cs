@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading;
-using StoneFruit.Execution.Arguments;
 using StoneFruit.Utility;
 
 namespace StoneFruit.Execution
