@@ -52,7 +52,7 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .SetupArguments(a => a.UseParser(new CommandParser(SimplifiedArgumentGrammar.GetParser(), ScriptFormatGrammar.CreateParser())))
+                .SetupArguments(a => a.UseParser(new CommandParser(SimplifiedArgumentGrammar.GetParser(), ScriptFormatGrammar.GetParser())))
                 .Build();
             engine.RunHeadless("test a b=x -c");
             output.Lines.Count.Should().Be(3);
@@ -85,7 +85,7 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .SetupArguments(a => a.UseScriptParser(ScriptFormatGrammar.CreateParser()))
+                .SetupArguments(a => a.UseScriptParser(ScriptFormatGrammar.GetParser()))
                 .Build();
             engine.RunHeadless("test a b=x -c");
             output.Lines.Count.Should().Be(3);

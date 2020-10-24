@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using ParserObjects;
 using ParserObjects.Parsers;
 using static ParserObjects.Parsers.ParserMethods<char>;
@@ -10,7 +11,11 @@ namespace StoneFruit.Execution.Scripts.Formatting
 {
     public static class ScriptFormatGrammar
     {
-        public static IParser<char, CommandFormat> CreateParser()
+        private static readonly Lazy<IParser<char, CommandFormat>> _instance = new Lazy<IParser<char, CommandFormat>>(GetParserInternal);
+
+        public static IParser<char, CommandFormat> GetParser() => _instance.Value;
+
+        private static IParser<char, CommandFormat> GetParserInternal()
         {
             var doubleQuotedString = StrippedDoubleQuotedString();
 

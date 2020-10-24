@@ -32,7 +32,7 @@ namespace StoneFruit.Execution.Arguments
         public static CommandParser GetDefault()
         {
             var argParser = SimplifiedArgumentGrammar.GetParser();
-            var scriptParser = ScriptFormatGrammar.CreateParser();
+            var scriptParser = ScriptFormatGrammar.GetParser();
             return new CommandParser(argParser, scriptParser);
         }
 

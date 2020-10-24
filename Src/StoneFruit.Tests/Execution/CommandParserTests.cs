@@ -69,7 +69,7 @@ namespace StoneFruit.Tests.Execution
         private CommandParser GetSimplifiedParser()
         {
             var argParser = SimplifiedArgumentGrammar.GetParser();
-            var scriptParser = ScriptFormatGrammar.CreateParser();
+            var scriptParser = ScriptFormatGrammar.GetParser();
 
             return new CommandParser(argParser, scriptParser);
         }

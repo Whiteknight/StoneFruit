@@ -20,7 +20,7 @@ namespace StoneFruit.Execution.Arguments
 
         private int _lastRawPositionalIndex;
 
-        public ParsedArguments(IEnumerable<IParsedArgument> arguments, string rawArgs)
+        public ParsedArguments(IEnumerable<IParsedArgument> arguments, string rawArgs = null)
         {
             Raw = rawArgs ?? string.Empty;
             _accessedPositionals = new List<IPositionalArgument>();
