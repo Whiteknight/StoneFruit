@@ -37,12 +37,19 @@ namespace StoneFruit.Utility
             if (_dispatcher.Environments?.Current?.GetType() != null && type == _dispatcher.Environments.Current.GetType())
                 return _dispatcher.Environments.Current;
 
-            if (type == typeof(string))
-                return _arguments.Get(name).AsString();
-            if (type == typeof(int))
-                return _arguments.Get(name).AsInt();
             if (type == typeof(bool))
                 return _arguments.HasFlag(name);
+
+            IValuedArgument arg = _arguments.Get(name);
+            if (!arg.Exists())
+                arg = _arguments.Get(index);
+            if (!arg.Exists())
+                return null;
+
+            if (type == typeof(string))
+                return arg.AsString();
+            if (type == typeof(int))
+                return arg.AsInt();
 
             return null;
         }

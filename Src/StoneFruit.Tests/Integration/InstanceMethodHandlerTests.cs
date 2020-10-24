@@ -121,5 +121,71 @@ namespace StoneFruit.Tests.Integration
             engine.RunHeadless("aaa");
             output.Lines[0].Should().Be("A");
         }
+
+        public class MyObject3
+        {
+            [Verb("test")]
+            public void TestA(string value, IOutput output)
+            {
+                output.WriteLine(value);
+            }
+        }
+
+        [Test]
+        public void Argument_string_PassedFromNamed()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject3()))
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .Build();
+            engine.RunHeadless("test value=test");
+            output.Lines[0].Should().Be("test");
+        }
+
+        [Test]
+        public void Argument_string_PassedFromPositional()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject3()))
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .Build();
+            engine.RunHeadless("test test");
+            output.Lines[0].Should().Be("test");
+        }
+
+        public class MyObject4
+        {
+            [Verb("test")]
+            public void TestA(IOutput output, bool flag)
+            {
+                output.WriteLine(flag);
+            }
+        }
+
+        [Test]
+        public void Argument_bool_PassedFromFlag_True()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject4()))
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .Build();
+            engine.RunHeadless("test -flag");
+            output.Lines[0].Should().Be("True");
+        }
+
+        [Test]
+        public void Argument_bool_PassedFromFlag_False()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject4()))
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .Build();
+            engine.RunHeadless("test");
+            output.Lines[0].Should().Be("False");
+        }
     }
 }

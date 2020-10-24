@@ -15,6 +15,12 @@ namespace StoneFruit
         /// <param name="type"></param>
         /// <returns>Should not return null</returns>
         IReadOnlyList<Verb> GetVerbs(Type type);
+
+        /// <summary>
+        /// Gets a list of possible verbs from the method
+        /// </summary>
+        /// <param name="method"></param>
+        /// <returns></returns>
         IReadOnlyList<Verb> GetVerbs(MethodInfo method);
     }
 }
