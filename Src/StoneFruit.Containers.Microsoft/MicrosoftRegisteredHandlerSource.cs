@@ -14,18 +14,16 @@ namespace StoneFruit.Containers.Microsoft
     /// </summary>
     public class MicrosoftRegisteredHandlerSource : IHandlerSource
     {
+        private readonly IServiceCollection _services;
         private readonly Func<IServiceProvider> _getProvider;
         private readonly VerbTrie<VerbInfo> _verbs;
 
         public MicrosoftRegisteredHandlerSource(IServiceCollection services, Func<IServiceProvider> getProvider, IVerbExtractor verbExtractor)
         {
+            _services = services;
             _getProvider = getProvider;
-            _verbs = SetupVerbMapping(services, verbExtractor);
-        }
-
-        private VerbTrie<VerbInfo> SetupVerbMapping(IServiceCollection services, IVerbExtractor verbExtractor)
-        {
-            var handlerRegistrations = services.Where(sd => typeof(IHandlerBase).IsAssignableFrom(sd.ServiceType)).ToList();
+            _verbs = new VerbTrie<VerbInfo>();
+            var handlerRegistrations = _services.Where(sd => typeof(IHandlerBase).IsAssignableFrom(sd.ServiceType)).ToList();
             var instances = handlerRegistrations
                 .Where(sd => sd.ImplementationInstance != null)
                 .SelectMany(sd =>
@@ -51,10 +49,11 @@ namespace StoneFruit.Containers.Microsoft
                 )
                 .ToList();
 
-            return instances
+            var allVerbInfos = instances
                 .Concat(types)
-                .Concat(factories)
-                .ToVerbTrie(verb => verb.Verb);
+                .Concat(factories);
+            foreach (var verbInfo in allVerbInfos)
+                _verbs.Insert(verbInfo.Verb, verbInfo);
         }
 
         public IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher)

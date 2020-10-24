@@ -6,13 +6,13 @@ namespace StoneFruit.Tests.Execution.Environments
 {
     public class InstanceEnvironmentCollectionTests
     {
-        [Test]
-        public void IsValid_string_Tests()
-        {
-            var target = new InstanceEnvironmentCollection(null);
-            target.IsValid("").Should().BeTrue();
-            target.IsValid("xxx").Should().BeFalse();
-        }
+        //[Test]
+        //public void IsValid_string_Tests()
+        //{
+        //    var target = new InstanceEnvironmentCollection(null);
+        //    target.IsValid("").Should().BeTrue();
+        //    target.IsValid("xxx").Should().BeFalse();
+        //}
 
         [Test]
         public void IsValid_int_Tests()

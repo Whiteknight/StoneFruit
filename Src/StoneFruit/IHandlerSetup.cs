@@ -10,11 +10,21 @@ namespace StoneFruit
     public interface IHandlerSetup
     {
         /// <summary>
+        /// Set the Verb Extractor to use to get verbs from classes and methods where verbs are
+        /// not explicitly supplied
+        /// </summary>
+        /// <param name="verbExtractor"></param>
+        /// <returns></returns>
+        IHandlerSetup UseVerbExtractor(IVerbExtractor verbExtractor);
+
+        /// <summary>
         /// Add a handler source where handlers can be looked up
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
         IHandlerSetup AddSource(IHandlerSource source);
+
+        IHandlerSetup AddSource(Func<HandlerSourceBuildContext, IHandlerSource> getSource);
 
         /// <summary>
         /// Add a function delegate as a handler
@@ -55,17 +65,16 @@ namespace StoneFruit
         /// <param name="usage"></param>
         /// <returns></returns>
         IHandlerSetup AddScript(Verb verb, IEnumerable<string> lines, string description = null, string usage = null, string group = null);
+    }
 
-        /// <summary>
-        /// Specify an explicit list of handler types to register with the Engine. Notice that these types
-        /// may not be constructed using your DI container of choice. If you are using a DI container, you
-        /// should try to register types with the container instead.
-        /// </summary>
-        /// <param name="commandTypes"></param>
-        /// <param name="resolver"></param>
-        /// <param name="verbExtractor"></param>
-        /// <returns></returns>
-        IHandlerSetup UseHandlerTypes(IEnumerable<Type> commandTypes, TypeInstanceResolver resolver = null, IVerbExtractor verbExtractor = null);
+    public class HandlerSourceBuildContext
+    {
+        public HandlerSourceBuildContext(IVerbExtractor verbExtractor)
+        {
+            VerbExtractor = verbExtractor;
+        }
+
+        public IVerbExtractor VerbExtractor { get; }
     }
 
     public static class HandlerSetupExtensions
@@ -76,11 +85,10 @@ namespace StoneFruit
         /// <param name="handlers"></param>
         /// <param name="instance"></param>
         /// <returns></returns>
-        public static IHandlerSetup UsePublicMethodsAsHandlers(this IHandlerSetup handlers, object instance, Func<string, string> getDescription = null, Func<string, string> getUsage = null, Func<string, string> getGroup = null, IVerbExtractor verbExtractor = null)
+        public static IHandlerSetup UsePublicMethodsAsHandlers(this IHandlerSetup handlers, object instance, Func<string, string> getDescription = null, Func<string, string> getUsage = null, Func<string, string> getGroup = null)
         {
             Assert.ArgumentNotNull(handlers, nameof(handlers));
-            var source = new InstanceMethodHandlerSource(instance, getDescription, getUsage, getGroup, verbExtractor);
-            return handlers.AddSource(source);
+            return handlers.AddSource(ctx => new InstanceMethodHandlerSource(instance, getDescription, getUsage, getGroup, ctx.VerbExtractor));
         }
 
         /// <summary>
@@ -94,7 +102,23 @@ namespace StoneFruit
         {
             Assert.ArgumentNotNull(handlers, nameof(handlers));
             Assert.ArgumentNotNull(commandTypes, nameof(commandTypes));
-            return handlers.UseHandlerTypes(commandTypes);
+            return handlers.UseHandlerTypes(commandTypes, null);
+        }
+
+        /// <summary>
+        /// Specify an explicit list of handler types to register with the Engine. Notice that these types
+        /// may not be constructed using your DI container of choice. If you are using a DI container, you
+        /// should try to register types with the container instead.
+        /// </summary>
+        /// <param name="commandTypes"></param>
+        /// <param name="resolver"></param>
+        /// <param name="verbExtractor"></param>
+        /// <returns></returns>
+        public static IHandlerSetup UseHandlerTypes(this IHandlerSetup handlers, IEnumerable<Type> commandTypes, TypeInstanceResolver resolver = null)
+        {
+            Assert.ArgumentNotNull(handlers, nameof(handlers));
+            Assert.ArgumentNotNull(commandTypes, nameof(commandTypes));
+            return handlers.AddSource(ctx => new TypeListConstructSource(commandTypes, resolver, ctx.VerbExtractor));
         }
     }
 }

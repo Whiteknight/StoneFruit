@@ -27,12 +27,10 @@ namespace StoneFruit.Execution.Handlers
             _getDescription = getDescription ?? (s => string.Empty);
             _getUsage = getUsage ?? (s => string.Empty);
             _getGroup = getGroup ?? (s => string.Empty);
+            _methods = new VerbTrie<MethodInfo>();
             var methodInfos = _instance.GetType()
                 .GetMethods(BindingFlags.Instance | BindingFlags.Public)
                 .Where(m => m.ReturnType == typeof(void) || m.ReturnType == typeof(Task));
-
-            verbExtractor ??= PriorityVerbExtractor.DefaultInstance;
-            _methods = new VerbTrie<MethodInfo>();
             foreach (var method in methodInfos)
             {
                 var verbs = verbExtractor.GetVerbs(method);

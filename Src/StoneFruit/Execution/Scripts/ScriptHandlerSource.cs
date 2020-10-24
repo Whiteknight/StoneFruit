@@ -38,6 +38,11 @@ namespace StoneFruit.Execution.Scripts
             _scripts.Insert(verb, script);
         }
 
+        public void Initialize(IVerbExtractor verbExtractor)
+        {
+            // No initialization necessary
+        }
+
         public int Count => _scripts.Count;
 
         // This is going to stay a private child class because it has ugly mutable state

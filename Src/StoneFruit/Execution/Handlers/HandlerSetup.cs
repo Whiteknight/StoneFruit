@@ -13,16 +13,15 @@ namespace StoneFruit.Execution.Handlers
     /// </summary>
     public class HandlerSetup : IHandlerSetup, ISetupBuildable<IHandlers>
     {
-        private readonly TypeInstanceResolver _defaultResolver;
-        private readonly List<IHandlerSource> _sources;
+        private readonly List<Func<HandlerSourceBuildContext, IHandlerSource>> _sourceFactories;
         private readonly DelegateHandlerSource _delegates;
         private readonly ScriptHandlerSource _scripts;
         private readonly NamedInstanceHandlerSource _instances;
+        private IVerbExtractor _verbExtractor;
 
-        public HandlerSetup(TypeInstanceResolver defaultResolver = null)
+        public HandlerSetup()
         {
-            _defaultResolver = defaultResolver;
-            _sources = new List<IHandlerSource>();
+            _sourceFactories = new List<Func<HandlerSourceBuildContext, IHandlerSource>>();
             _delegates = new DelegateHandlerSource();
             _scripts = new ScriptHandlerSource();
             _instances = new NamedInstanceHandlerSource();
@@ -30,15 +29,24 @@ namespace StoneFruit.Execution.Handlers
 
         public void BuildUp(IServiceCollection services)
         {
+            var verbExtractor = _verbExtractor ?? PriorityVerbExtractor.DefaultInstance;
+            services.AddSingleton(verbExtractor);
+
             if (_delegates.Count > 0)
                 services.AddSingleton<IHandlerSource>(_delegates);
             if (_scripts.Count > 0)
                 services.AddSingleton<IHandlerSource>(_scripts);
             if (_instances.Count > 0)
                 services.AddSingleton<IHandlerSource>(_instances);
-            foreach (var source in _sources)
+
+            var buildContext = new HandlerSourceBuildContext(verbExtractor);
+            _sourceFactories.Add(GetBuiltinHandlerSource);
+            foreach (var sourceFactory in _sourceFactories)
+            {
+                var source = sourceFactory(buildContext);
                 services.AddSingleton(source);
-            services.AddSingleton(GetBuiltinHandlerSource());
+            }
+
             services.AddSingleton<IHandlers>(provider =>
             {
                 var sources = provider.GetServices<IHandlerSource>();
@@ -56,16 +64,35 @@ namespace StoneFruit.Execution.Handlers
                 sources.Add(_scripts);
             if (_instances.Count > 0)
                 sources.Add(_instances);
-            foreach (var source in _sources)
+
+            var verbExtractor = _verbExtractor ?? PriorityVerbExtractor.DefaultInstance;
+            var buildContext = new HandlerSourceBuildContext(verbExtractor);
+            _sourceFactories.Add(GetBuiltinHandlerSource);
+            foreach (var sourceFactory in _sourceFactories)
+            {
+                var source = sourceFactory(buildContext);
                 sources.Add(source);
-            sources.Add(GetBuiltinHandlerSource());
+            }
+
             return new HandlerSourceCollection(sources);
+        }
+
+        public IHandlerSetup UseVerbExtractor(IVerbExtractor verbExtractor)
+        {
+            _verbExtractor = verbExtractor;
+            return this;
         }
 
         public IHandlerSetup AddSource(IHandlerSource source)
         {
             Assert.ArgumentNotNull(source, nameof(source));
-            _sources.Add(source);
+            return AddSource(_ => source);
+        }
+
+        public IHandlerSetup AddSource(Func<HandlerSourceBuildContext, IHandlerSource> getSource)
+        {
+            Assert.ArgumentNotNull(getSource, nameof(getSource));
+            _sourceFactories.Add(getSource);
             return this;
         }
 
@@ -93,13 +120,6 @@ namespace StoneFruit.Execution.Handlers
             return this;
         }
 
-        public IHandlerSetup UseHandlerTypes(IEnumerable<Type> commandTypes, TypeInstanceResolver resolver = null, IVerbExtractor verbExtractor = null)
-        {
-            Assert.ArgumentNotNull(commandTypes, nameof(commandTypes));
-            var source = new TypeListConstructSource(commandTypes, resolver ?? _defaultResolver, verbExtractor);
-            return AddSource(source);
-        }
-
         public IHandlerSetup AddScript(Verb verb, IEnumerable<string> lines, string description = null, string usage = null, string group = null)
         {
             Assert.ArgumentNotNull(verb, nameof(verb));
@@ -108,7 +128,7 @@ namespace StoneFruit.Execution.Handlers
             return this;
         }
 
-        private static IHandlerSource GetBuiltinHandlerSource()
+        private static IHandlerSource GetBuiltinHandlerSource(HandlerSourceBuildContext context)
         {
             var requiredHandlers = new[]
             {
@@ -118,7 +138,7 @@ namespace StoneFruit.Execution.Handlers
                 typeof(HelpHandler),
                 typeof(MetadataHandler),
             };
-            return new TypeListConstructSource(requiredHandlers, null, null);
+            return new TypeListConstructSource(requiredHandlers, null, context.VerbExtractor);
         }
     }
 }

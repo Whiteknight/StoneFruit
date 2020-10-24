@@ -4,7 +4,6 @@ using System.Linq;
 using Lamar;
 using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Execution;
-using StoneFruit.Execution.Handlers;
 using StoneFruit.Utility;
 
 namespace StoneFruit.Containers.Lamar
@@ -17,19 +16,13 @@ namespace StoneFruit.Containers.Lamar
     public class LamarHandlerSource : IHandlerSource
     {
         // TODO: V2 should be able to handle registrations made AFTER .SetupEngine()
-        private readonly IVerbExtractor _verbExtractor;
         private readonly IContainer _container;
-        private readonly Lazy<VerbTrie<Type>> _nameMap;
+        private readonly VerbTrie<Type> _handlers;
 
         public LamarHandlerSource(IServiceProvider provider, IVerbExtractor verbExtractor)
         {
-            _container = provider as IContainer ?? throw new System.ArgumentException("Expected a Lamar Container", nameof(provider));
-            _verbExtractor = verbExtractor ?? PriorityVerbExtractor.DefaultInstance;
-            _nameMap = new Lazy<VerbTrie<Type>>(SetupNameMapping);
-        }
-
-        private VerbTrie<Type> SetupNameMapping()
-        {
+            _container = provider as IContainer ?? throw new ArgumentException("Expected a Lamar Container", nameof(provider));
+            _handlers = new VerbTrie<Type>();
             var commandTypes = _container.Model.AllInstances
                 .Where(i => typeof(IHandlerBase).IsAssignableFrom(i.ImplementationType))
                 .Select(i => i.ImplementationType ?? i.ServiceType)
@@ -40,26 +33,24 @@ namespace StoneFruit.Containers.Lamar
             var verbAndTypes = commandTypes
                 .OrEmptyIfNull()
                 .SelectMany(commandType =>
-                    _verbExtractor.GetVerbs(commandType)
+                    verbExtractor.GetVerbs(commandType)
                     .Select(verb => (Verb: verb, Type: commandType))
                 );
-            var trie = new VerbTrie<Type>();
             foreach (var verbAndType in verbAndTypes)
-                trie.Insert(verbAndType.Verb, verbAndType.Type);
-            return trie;
+                _handlers.Insert(verbAndType.Verb, verbAndType.Type);
         }
 
         public IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher)
         {
-            var type = _nameMap.Value.Get(arguments);
+            var type = _handlers.Get(arguments);
             return type == null ? null : ResolveHandler(type);
         }
 
-        public IEnumerable<IVerbInfo> GetAll() => _nameMap.Value.GetAll().Select(kvp => new VerbInfo(kvp.Key, kvp.Value));
+        public IEnumerable<IVerbInfo> GetAll() => _handlers.GetAll().Select(kvp => new VerbInfo(kvp.Key, kvp.Value));
 
         public IVerbInfo GetByName(Verb verb)
         {
-            var type = _nameMap.Value.Get(verb);
+            var type = _handlers.Get(verb);
             if (type == null)
                 return null;
             return new VerbInfo(verb, type);

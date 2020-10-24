@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using StoneFruit.Execution;
-using StoneFruit.Execution.Handlers;
 using StoneFruit.Utility;
 using StructureMap;
 
@@ -15,7 +14,6 @@ namespace StoneFruit.Containers.StructureMap
     /// </summary>
     public class StructureMapHandlerSource : IHandlerSource
     {
-        private readonly IVerbExtractor _verbExtractor;
         private readonly IContainer _container;
         private readonly VerbTrie<Type> _nameMap;
 
@@ -25,26 +23,22 @@ namespace StoneFruit.Containers.StructureMap
 
             _container = (serviceProvider as StructureMapServiceProvider)?.Container;
             if (_container == null)
-                throw new System.ArgumentException("Expected StructureMap Container", nameof(serviceProvider));
+                throw new ArgumentException("Expected StructureMap Container", nameof(serviceProvider));
 
-            _verbExtractor = verbExtractor ?? PriorityVerbExtractor.DefaultInstance;
-            _nameMap = SetupNameMapping();
-        }
-
-        private VerbTrie<Type> SetupNameMapping()
-        {
+            _nameMap = new VerbTrie<Type>();
             var commandTypes = _container.Model.AllInstances
                 .Where(i => typeof(IHandlerBase).IsAssignableFrom(i.PluginType))
                 .Select(i => i.ReturnedType ?? i.PluginType)
                 .ToList();
 
-            return commandTypes
+            var handlerTypes = commandTypes
                 .OrEmptyIfNull()
                 .SelectMany(commandType =>
-                    _verbExtractor.GetVerbs(commandType)
+                    verbExtractor.GetVerbs(commandType)
                         .Select(verb => (Verb: verb, Type: commandType))
-                )
-                .ToVerbTrie(x => x.Verb, x => x.Type);
+                );
+            foreach (var handlerType in handlerTypes)
+                _nameMap.Insert(handlerType.Verb, handlerType.Type);
         }
 
         public IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher)
