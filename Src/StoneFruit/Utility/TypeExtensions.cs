@@ -22,6 +22,11 @@ namespace StoneFruit.Utility
         public static string GetUsage(this Type type)
             => GetPublicStaticStringPropertyValue(type, "Usage") ?? GetDescription(type);
 
+        /// <summary>
+        /// Get the group of the IHandlerBase class
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static string GetGroup(this Type type)
             => GetPublicStaticStringPropertyValue(type, "Group");
 

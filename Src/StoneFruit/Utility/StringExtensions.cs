@@ -1,6 +1,5 @@
 ﻿using System;
 
-
 namespace StoneFruit.Utility
 {
     public static class StringExtensions
