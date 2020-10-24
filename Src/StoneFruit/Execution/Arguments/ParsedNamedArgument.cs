@@ -1,7 +1,7 @@
 ﻿namespace StoneFruit.Execution.Arguments
 {
     /// <summary>
-    /// An argument defined by a name
+    /// An argument defined by a name. This is a raw parsed argument, it won't be used in this form
     /// </summary>
     public class ParsedNamedArgument : IParsedArgument
     {

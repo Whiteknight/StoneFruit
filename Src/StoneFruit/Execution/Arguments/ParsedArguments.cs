@@ -20,16 +20,9 @@ namespace StoneFruit.Execution.Arguments
 
         private int _lastRawPositionalIndex;
 
-        // Args object built from parsed objects, which aren't accessed yet
-        public ParsedArguments(IEnumerable<IParsedArgument> arguments)
-            : this(string.Empty, arguments)
+        public ParsedArguments(IEnumerable<IParsedArgument> arguments, string rawArgs)
         {
-        }
-
-        // Args object built from parsed objects, which aren't accessed yet
-        public ParsedArguments(string rawArgs, IEnumerable<IParsedArgument> arguments)
-        {
-            Raw = rawArgs;
+            Raw = rawArgs ?? string.Empty;
             _accessedPositionals = new List<IPositionalArgument>();
             _accessedNameds = new Dictionary<string, List<INamedArgument>>();
             _accessedFlags = new Dictionary<string, IFlagArgument>();
