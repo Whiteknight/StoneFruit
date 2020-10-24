@@ -29,7 +29,7 @@ namespace StoneFruit.Execution.Arguments
                 return _parser;
 
             var argParser = _argParser ?? SimplifiedArgumentGrammar.GetParser();
-            var scriptParser = _scriptParser ?? ScriptFormatGrammar.CreateParser();
+            var scriptParser = _scriptParser ?? ScriptFormatGrammar.GetParser();
             return new CommandParser(argParser, scriptParser);
         }
 
