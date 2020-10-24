@@ -46,6 +46,11 @@ namespace StoneFruit.Execution.Handlers
             return this;
         }
 
+        // We need to return an IHandler instance which has the IArguments from the current command
+        // injected already into the constructor. So when we register the delegate we store a 
+        // factory to create an IHandler. The factory takes the IArguments from the current command
+        // and creates a new IHandler instance with the IArguments injected into the constructor.
+
         private abstract class HandlerFactory : IVerbInfo
         {
             protected HandlerFactory(Verb verb, string description, string usage, string group)
