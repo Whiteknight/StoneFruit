@@ -15,7 +15,7 @@ namespace StoneFruit.Containers.StructureMap
     public class StructureMapHandlerSource : IHandlerSource
     {
         private readonly IContainer _container;
-        private readonly VerbTrie<Type> _nameMap;
+        private readonly VerbTrie<Type> _types;
 
         public StructureMapHandlerSource(IServiceProvider serviceProvider, IVerbExtractor verbExtractor)
         {
@@ -25,25 +25,19 @@ namespace StoneFruit.Containers.StructureMap
             if (_container == null)
                 throw new ArgumentException("Expected StructureMap Container", nameof(serviceProvider));
 
-            _nameMap = new VerbTrie<Type>();
-            var commandTypes = _container.Model.AllInstances
+            _types = _container.Model.AllInstances
                 .Where(i => typeof(IHandlerBase).IsAssignableFrom(i.PluginType))
                 .Select(i => i.ReturnedType ?? i.PluginType)
-                .ToList();
-
-            var handlerTypes = commandTypes
-                .OrEmptyIfNull()
-                .SelectMany(commandType =>
-                    verbExtractor.GetVerbs(commandType)
-                        .Select(verb => (Verb: verb, Type: commandType))
-                );
-            foreach (var handlerType in handlerTypes)
-                _nameMap.Insert(handlerType.Verb, handlerType.Type);
+                .SelectMany(commandType => verbExtractor
+                    .GetVerbs(commandType)
+                    .Select(verb => (Verb: verb, Type: commandType))
+                )
+                .ToVerbTrie(h => h.Verb, h => h.Type);
         }
 
         public IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher)
         {
-            var type = _nameMap.Get(arguments);
+            var type = _types.Get(arguments);
             return type == null ? null : ResolveHandler(type);
         }
 
@@ -51,11 +45,12 @@ namespace StoneFruit.Containers.StructureMap
             where TCommand : class, IHandlerBase
             => ResolveHandler(typeof(TCommand));
 
-        public IEnumerable<IVerbInfo> GetAll() => _nameMap.GetAll().Select(kvp => new VerbInfo(kvp.Key, kvp.Value));
+        public IEnumerable<IVerbInfo> GetAll()
+            => _types.GetAll().Select(kvp => new VerbInfo(kvp.Key, kvp.Value));
 
         public IVerbInfo GetByName(Verb verb)
         {
-            var type = _nameMap.Get(verb);
+            var type = _types.Get(verb);
             if (type == null)
                 return null;
             return new VerbInfo(verb, type);

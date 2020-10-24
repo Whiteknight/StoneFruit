@@ -27,16 +27,14 @@ namespace StoneFruit.Execution.Handlers
             _getDescription = getDescription ?? (s => string.Empty);
             _getUsage = getUsage ?? (s => string.Empty);
             _getGroup = getGroup ?? (s => string.Empty);
-            _methods = new VerbTrie<MethodInfo>();
-            var methodInfos = _instance.GetType()
+            _methods = _instance.GetType()
                 .GetMethods(BindingFlags.Instance | BindingFlags.Public)
-                .Where(m => m.ReturnType == typeof(void) || m.ReturnType == typeof(Task));
-            foreach (var method in methodInfos)
-            {
-                var verbs = verbExtractor.GetVerbs(method);
-                foreach (var verb in verbs)
-                    _methods.Insert(verb, method);
-            }
+                .Where(m => m.ReturnType == typeof(void) || m.ReturnType == typeof(Task))
+                .SelectMany(m => verbExtractor
+                    .GetVerbs(m)
+                    .Select(v => (Method: m, Verb: v))
+                )
+                .ToVerbTrie(x => x.Verb, x => x.Method);
         }
 
         public IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher)

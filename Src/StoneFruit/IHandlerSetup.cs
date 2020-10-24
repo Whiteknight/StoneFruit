@@ -18,12 +18,11 @@ namespace StoneFruit
         IHandlerSetup UseVerbExtractor(IVerbExtractor verbExtractor);
 
         /// <summary>
-        /// Add a handler source where handlers can be looked up
+        /// Add a new handler source to the list of sources. Sources are stored in order, sources
+        /// added first will be searched first for a matching handler.
         /// </summary>
-        /// <param name="source"></param>
+        /// <param name="getSource"></param>
         /// <returns></returns>
-        IHandlerSetup AddSource(IHandlerSource source);
-
         IHandlerSetup AddSource(Func<HandlerSourceBuildContext, IHandlerSource> getSource);
 
         /// <summary>
@@ -79,6 +78,18 @@ namespace StoneFruit
 
     public static class HandlerSetupExtensions
     {
+        /// <summary>
+        /// Add a handler source where handlers can be looked up
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static IHandlerSetup AddSource(this IHandlerSetup handlers, IHandlerSource source)
+        {
+            Assert.ArgumentNotNull(handlers, nameof(handlers));
+            Assert.ArgumentNotNull(source, nameof(source));
+            return handlers.AddSource(_ => source);
+        }
+
         /// <summary>
         /// Use the public methods of an instance object as handlers
         /// </summary>

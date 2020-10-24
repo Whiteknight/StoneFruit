@@ -32,6 +32,7 @@ namespace StoneFruit.Execution.Handlers
             var verbExtractor = _verbExtractor ?? PriorityVerbExtractor.DefaultInstance;
             services.AddSingleton(verbExtractor);
 
+            // Register these sources only if they have entries. 
             if (_delegates.Count > 0)
                 services.AddSingleton<IHandlerSource>(_delegates);
             if (_scripts.Count > 0)
@@ -39,6 +40,7 @@ namespace StoneFruit.Execution.Handlers
             if (_instances.Count > 0)
                 services.AddSingleton<IHandlerSource>(_instances);
 
+            // Invoke factory methods to create sources and register them with the DI
             var buildContext = new HandlerSourceBuildContext(verbExtractor);
             _sourceFactories.Add(GetBuiltinHandlerSource);
             foreach (var sourceFactory in _sourceFactories)
@@ -47,6 +49,7 @@ namespace StoneFruit.Execution.Handlers
                 services.AddSingleton(source);
             }
 
+            // Add the IHandlers, which gets the list of all IHandlerSource instances from the DI
             services.AddSingleton<IHandlers>(provider =>
             {
                 var sources = provider.GetServices<IHandlerSource>();
@@ -58,6 +61,7 @@ namespace StoneFruit.Execution.Handlers
         {
             var sources = new List<IHandlerSource>();
 
+            // Add these sources only if they have entries
             if (_delegates.Count > 0)
                 sources.Add(_delegates);
             if (_scripts.Count > 0)
@@ -65,6 +69,7 @@ namespace StoneFruit.Execution.Handlers
             if (_instances.Count > 0)
                 sources.Add(_instances);
 
+            // Invoke factory methods to create sources and add them to the list
             var verbExtractor = _verbExtractor ?? PriorityVerbExtractor.DefaultInstance;
             var buildContext = new HandlerSourceBuildContext(verbExtractor);
             _sourceFactories.Add(GetBuiltinHandlerSource);
@@ -74,6 +79,7 @@ namespace StoneFruit.Execution.Handlers
                 sources.Add(source);
             }
 
+            // Return the source collection
             return new HandlerSourceCollection(sources);
         }
 
@@ -81,12 +87,6 @@ namespace StoneFruit.Execution.Handlers
         {
             _verbExtractor = verbExtractor;
             return this;
-        }
-
-        public IHandlerSetup AddSource(IHandlerSource source)
-        {
-            Assert.ArgumentNotNull(source, nameof(source));
-            return AddSource(_ => source);
         }
 
         public IHandlerSetup AddSource(Func<HandlerSourceBuildContext, IHandlerSource> getSource)

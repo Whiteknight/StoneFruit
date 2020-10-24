@@ -22,22 +22,16 @@ namespace StoneFruit.Containers.Lamar
         public LamarHandlerSource(IServiceProvider provider, IVerbExtractor verbExtractor)
         {
             _container = provider as IContainer ?? throw new ArgumentException("Expected a Lamar Container", nameof(provider));
-            _handlers = new VerbTrie<Type>();
-            var commandTypes = _container.Model.AllInstances
+            _handlers = _container.Model.AllInstances
                 .Where(i => typeof(IHandlerBase).IsAssignableFrom(i.ImplementationType))
                 .Select(i => i.ImplementationType ?? i.ServiceType)
                 .Where(t => t != null && t.IsClass && !t.IsAbstract)
                 .Distinct()
-                .ToList();
-
-            var verbAndTypes = commandTypes
-                .OrEmptyIfNull()
-                .SelectMany(commandType =>
-                    verbExtractor.GetVerbs(commandType)
+                .SelectMany(commandType => verbExtractor
+                    .GetVerbs(commandType)
                     .Select(verb => (Verb: verb, Type: commandType))
-                );
-            foreach (var verbAndType in verbAndTypes)
-                _handlers.Insert(verbAndType.Verb, verbAndType.Type);
+                )
+                .ToVerbTrie(x => x.Verb, x => x.Type);
         }
 
         public IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher)

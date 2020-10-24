@@ -22,7 +22,7 @@ namespace StoneFruit.Containers.Microsoft
         {
             _services = services;
             _getProvider = getProvider;
-            _verbs = new VerbTrie<VerbInfo>();
+
             var handlerRegistrations = _services.Where(sd => typeof(IHandlerBase).IsAssignableFrom(sd.ServiceType)).ToList();
             var instances = handlerRegistrations
                 .Where(sd => sd.ImplementationInstance != null)
@@ -49,11 +49,10 @@ namespace StoneFruit.Containers.Microsoft
                 )
                 .ToList();
 
-            var allVerbInfos = instances
+            _verbs = instances
                 .Concat(types)
-                .Concat(factories);
-            foreach (var verbInfo in allVerbInfos)
-                _verbs.Insert(verbInfo.Verb, verbInfo);
+                .Concat(factories)
+                .ToVerbTrie(i => i.Verb);
         }
 
         public IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher)
