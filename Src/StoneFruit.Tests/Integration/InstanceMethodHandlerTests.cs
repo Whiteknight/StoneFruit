@@ -44,7 +44,10 @@ namespace StoneFruit.Tests.Integration
         {
             var output = new TestOutput();
             var engine = new EngineBuilder()
-                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject1(), verbExtractor: new ToLowerNameVerbExtractor()))
+                .SetupHandlers(h => h
+                    .UseVerbExtractor(new ToLowerNameVerbExtractor())
+                    .UsePublicMethodsAsHandlers(new MyObject1())
+                )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
             engine.RunHeadless("testa");
@@ -56,7 +59,9 @@ namespace StoneFruit.Tests.Integration
         {
             var output = new TestOutput();
             var engine = new EngineBuilder()
-                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject1(), verbExtractor: new CamelCaseToSpinalCaseVerbExtractor()))
+                .SetupHandlers(h => h
+                    .UseVerbExtractor(new CamelCaseToSpinalCaseVerbExtractor())
+                    .UsePublicMethodsAsHandlers(new MyObject1()))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
             engine.RunHeadless("test-a");

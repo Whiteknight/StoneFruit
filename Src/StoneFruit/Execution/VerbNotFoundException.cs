@@ -9,12 +9,11 @@ namespace StoneFruit.Execution
     [Serializable]
     public class VerbNotFoundException : Exception
     {
-        public string Verb { get; }
+        public string Verb { get; private set; }
 
-        public VerbNotFoundException(string verb)
-            : base($"Could not find handler for verb '{verb}'. Please check your spelling and try again")
+        public VerbNotFoundException(string message)
+            : base(message)
         {
-            Verb = verb;
         }
 
         protected VerbNotFoundException(
@@ -28,7 +27,7 @@ namespace StoneFruit.Execution
             var firstPositional = arguments.Shift();
             if (!firstPositional.Exists())
                 return new VerbNotFoundException("No verb provided. You must provide at least one verb");
-            return new VerbNotFoundException($"Could not find a handler for verb {firstPositional.AsString()}");
+            return new VerbNotFoundException($"Could not find a handler for verb {firstPositional.AsString()}") { Verb = firstPositional.AsString() };
         }
     }
 }

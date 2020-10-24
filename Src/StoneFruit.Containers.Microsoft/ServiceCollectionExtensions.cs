@@ -60,8 +60,7 @@ namespace StoneFruit.Containers.Microsoft
             EngineBuilder.SetupExplicitEnvironmentRegistration<TEnvironment>(services);
 
             // Setup a Handler Source to resolve handler instances from the provider
-            var registeredHandlerSource = new MicrosoftRegisteredHandlerSource(services, getProvider, PriorityVerbExtractor.DefaultInstance);
-            handlersBuilder.AddSource(registeredHandlerSource);
+            handlersBuilder.AddSource(ctx => new MicrosoftRegisteredHandlerSource(services, getProvider, ctx.VerbExtractor));
 
             // Build up the final Engine registrations. This involves resolving some
             // dependencies which were setup previously
