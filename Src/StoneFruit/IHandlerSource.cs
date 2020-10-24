@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using StoneFruit.Execution;
-using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit
 {

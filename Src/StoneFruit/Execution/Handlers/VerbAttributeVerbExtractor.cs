@@ -5,6 +5,9 @@ using System.Reflection;
 
 namespace StoneFruit.Execution.Handlers
 {
+    /// <summary>
+    /// Extracts a list of Verbs from VerbAttribute annotations on the class or method
+    /// </summary>
     public class VerbAttributeVerbExtractor : IVerbExtractor
     {
         public IReadOnlyList<Verb> GetVerbs(Type type)

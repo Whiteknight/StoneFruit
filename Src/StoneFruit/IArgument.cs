@@ -1,17 +1,9 @@
 ﻿using System;
+using StoneFruit.Execution.Arguments;
 using StoneFruit.Utility;
 
-namespace StoneFruit.Execution.Arguments
+namespace StoneFruit
 {
-    /// <summary>
-    /// A raw argument value from the parser. The full understanding of what type of
-    /// argument this is might not be fully determined until an attempt is made to
-    /// access it.
-    /// </summary>
-    public interface IParsedArgument
-    {
-    }
-
     /// <summary>
     /// Represents a single argument, either positional, named, or otherwise
     /// </summary>

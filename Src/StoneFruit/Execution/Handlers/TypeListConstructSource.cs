@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using StoneFruit.Execution.Arguments;
 using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Handlers
 {
     /// <summary>
-    /// A command source which takes a list of Type and attempts to construct one using
-    /// built-in mechanisms
+    /// A handler source which takes a list of Type and attempts to construct one using
+    /// built-in mechanisms. This source is used primarily for built-in handlers and for situations
+    /// where the user is not employing a DI container to find and resolve handlers automatically.
     /// </summary>
     public class TypeListConstructSource : IHandlerSource
     {

@@ -1,5 +1,4 @@
-﻿using StoneFruit.Execution.Arguments;
-using StoneFruit.Execution.Scripts.Formatting;
+﻿using StoneFruit.Execution.Scripts.Formatting;
 
 namespace StoneFruit
 {
