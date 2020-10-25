@@ -1,4 +1,5 @@
 ﻿using System;
+using ParserObjects.Utility;
 
 namespace StoneFruit.Execution.Output
 {
@@ -9,12 +10,9 @@ namespace StoneFruit.Execution.Output
     {
         public IOutput Color(Func<Brush, Brush> changeBrush)
         {
-            if (changeBrush == null)
-                return this;
+            Assert.ArgumentNotNull(changeBrush, nameof(changeBrush));
             var brush = changeBrush(Brush.Current);
-            if (brush.Equals(Brush.Current))
-                return this;
-            return new ColoredOutputWrapper(brush, this);
+            return brush.Equals(Brush.Current) ? (IOutput)this : new ColoredOutputWrapper(brush, this);
         }
 
         public IOutput WriteLine()
