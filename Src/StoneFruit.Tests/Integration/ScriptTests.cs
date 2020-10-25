@@ -14,7 +14,7 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                    .AddScript("test", new[] { "argument-display a b=c -d" })
+                    .AddScript("test", new[] { "args a b=c -d" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
@@ -32,7 +32,7 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                    .AddScript("test", new[] { "argument-display [1] [0] ['x'] [3]" })
+                    .AddScript("test", new[] { "args [1] [0] ['x'] [3]" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
@@ -50,7 +50,7 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                    .AddScript("test", new[] { "argument-display [0]!" })
+                    .AddScript("test", new[] { "args [0]!" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
@@ -65,7 +65,7 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                    .AddScript("test", new[] { "argument-display [0]!test" })
+                    .AddScript("test", new[] { "args [0]!test" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
@@ -81,7 +81,7 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                    .AddScript("test", new[] { "argument-display ['x']!" })
+                    .AddScript("test", new[] { "args ['x']!" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
@@ -96,7 +96,7 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                    .AddScript("test", new[] { "argument-display ['x']!test" })
+                    .AddScript("test", new[] { "args ['x']!test" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
@@ -112,7 +112,7 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                    .AddScript("test", new[] { "argument-display [1] [*]" })
+                    .AddScript("test", new[] { "args [1] [*]" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
@@ -130,7 +130,7 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                    .AddScript("test", new[] { "argument-display a=['b'] {c} d=[0]" })
+                    .AddScript("test", new[] { "args a=['b'] {c} d=[0]" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
@@ -149,7 +149,7 @@ namespace StoneFruit.Tests.Integration
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
                     // 'b' is required but not provided. 
-                    .AddScript("test", new[] { "argument-display a=['b']!" })
+                    .AddScript("test", new[] { "args a=['b']!" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
@@ -164,7 +164,7 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                    .AddScript("test", new[] { "argument-display a=['b']!test" })
+                    .AddScript("test", new[] { "args a=['b']!test" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
@@ -180,7 +180,7 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                    .AddScript("test", new[] { "argument-display d=[0]!" })
+                    .AddScript("test", new[] { "args d=[0]!" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
@@ -195,7 +195,7 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                    .AddScript("test", new[] { "argument-display d=[0]!test" })
+                    .AddScript("test", new[] { "args d=[0]!test" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
@@ -211,7 +211,7 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                    .AddScript("test", new[] { "argument-display {c}!" })
+                    .AddScript("test", new[] { "args {c}!" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
@@ -226,7 +226,7 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                    .AddScript("test", new[] { "argument-display {c}!test" })
+                    .AddScript("test", new[] { "args {c}!test" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
@@ -242,7 +242,7 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                    .AddScript("test", new[] { "argument-display {b} {*}" })
+                    .AddScript("test", new[] { "args {b} {*}" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
@@ -260,7 +260,7 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                    .AddScript("test", new[] { "argument-display ?x ?y" })
+                    .AddScript("test", new[] { "args ?x ?y" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
@@ -276,7 +276,7 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                    .AddScript("test", new[] { "argument-display ?x:a ?y:b" })
+                    .AddScript("test", new[] { "args ?x:a ?y:b" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
@@ -292,7 +292,7 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                    .AddScript("test", new[] { "argument-display ?y -*" })
+                    .AddScript("test", new[] { "args ?y -*" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
@@ -313,7 +313,7 @@ namespace StoneFruit.Tests.Integration
                     .AddScript("test", new[]
                     {
                         "echo start",
-                        "argument-display [0] {b} ?d",
+                        "args [0] {b} ?d",
                         "echo stop"
                     })
                 )
@@ -335,7 +335,7 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                    .AddScript("test1", new[] { "argument-display [0]" })
+                    .AddScript("test1", new[] { "args [0]" })
                     .AddScript("test2", new[] { "test1 [0]" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
@@ -353,7 +353,7 @@ namespace StoneFruit.Tests.Integration
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
                     .AddScript("test2", new[] { "test1 [0]" })
-                    .AddScript("test1", new[] { "argument-display [0]" })
+                    .AddScript("test1", new[] { "args [0]" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
