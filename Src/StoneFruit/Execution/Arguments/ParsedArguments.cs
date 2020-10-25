@@ -286,8 +286,10 @@ namespace StoneFruit.Execution.Arguments
             var candidates = new List<IPositionalArgument>();
             for (int i = 0; i < _rawArguments.Count; i++)
             {
-                // TODO: In some cases we're going to double-convert args to PositionalArgument
-                // See if we can cache them and reuse them?
+                // In some cases we're going to double-convert an arg. We'll pull more positionals
+                // than we need, decide that some of them are not part of the verb, and put back
+                // the rest. It's a small price to pay to avoid the complexity of conditionally
+                // caching them.
                 var arg = _rawArguments[i];
                 if (arg is ParsedPositionalArgument pa)
                 {
