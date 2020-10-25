@@ -16,7 +16,7 @@ namespace StoneFruit.Execution.Output
         public IOutput Color(Func<Brush, Brush> changeBrush)
         {
             var newBrush = changeBrush?.Invoke(_color);
-            return newBrush == _color ? this : new ColoredOutputWrapper(newBrush.Value, _inner);
+            return newBrush.HasValue && newBrush == _color ? this : new ColoredOutputWrapper(newBrush.Value, _inner);
         }
 
         public IOutput WriteLine() => WithBrush(() => _inner.WriteLine());
