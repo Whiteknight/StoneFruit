@@ -15,7 +15,6 @@ namespace StoneFruit.Containers.Lamar
     /// </summary>
     public class LamarHandlerSource : IHandlerSource
     {
-        // TODO: V2 should be able to handle registrations made AFTER .SetupEngine()
         private readonly IContainer _container;
         private readonly VerbTrie<Type> _handlers;
 
