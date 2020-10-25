@@ -19,7 +19,7 @@ namespace StoneFruit.Containers.StructureMap.Tests.Integration
             }
         }
 
-        private class MyEnvironmentFactory : IEnvironmentFactory
+        public class MyEnvironmentFactory : IEnvironmentFactory
         {
             public object Create(string name) => new MyEnvironment(name);
 

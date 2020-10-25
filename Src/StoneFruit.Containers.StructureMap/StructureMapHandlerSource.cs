@@ -41,10 +41,6 @@ namespace StoneFruit.Containers.StructureMap
             return type == null ? null : ResolveHandler(type);
         }
 
-        public IHandlerBase GetInstance<TCommand>()
-            where TCommand : class, IHandlerBase
-            => ResolveHandler(typeof(TCommand));
-
         public IEnumerable<IVerbInfo> GetAll()
             => _types.GetAll().Select(kvp => new VerbInfo(kvp.Key, kvp.Value));
 
