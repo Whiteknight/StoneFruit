@@ -14,16 +14,14 @@ namespace StoneFruit.Containers.Microsoft
     /// </summary>
     public class MicrosoftRegisteredHandlerSource : IHandlerSource
     {
-        private readonly IServiceCollection _services;
         private readonly Func<IServiceProvider> _getProvider;
         private readonly VerbTrie<VerbInfo> _verbs;
 
         public MicrosoftRegisteredHandlerSource(IServiceCollection services, Func<IServiceProvider> getProvider, IVerbExtractor verbExtractor)
         {
-            _services = services;
             _getProvider = getProvider;
 
-            var handlerRegistrations = _services.Where(sd => typeof(IHandlerBase).IsAssignableFrom(sd.ServiceType)).ToList();
+            var handlerRegistrations = services.Where(sd => typeof(IHandlerBase).IsAssignableFrom(sd.ServiceType)).ToList();
             var instances = handlerRegistrations
                 .Where(sd => sd.ImplementationInstance != null)
                 .SelectMany(sd =>

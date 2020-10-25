@@ -296,30 +296,12 @@ namespace StoneFruit.Execution.Arguments
                     candidates.Add(new PositionalArgument(pa.Value));
                     continue;
                 }
-
-                if (arg is ParsedFlagPositionalOrNamedArgument fp)
-                {
-                    candidates.Add(new PositionalArgument(fp.Value));
-                    break;
-                }
             }
             return candidates;
         }
 
         public void SetVerbCount(int count)
         {
-            // Check if the last verb in the list is a flag+positional. If so, replace it with a
-            // flag and decrement count;
-            var lastIndex = count - 1;
-            var lastArg = _rawArguments[lastIndex];
-            if (lastArg is ParsedFlagPositionalOrNamedArgument fp)
-            {
-                _rawArguments[lastIndex] = new ParsedFlagArgument(fp.Name);
-                count--;
-            }
-
-            // Remove count items from the beginning of the list, so they don't get included
-            // in later analysis/accesses
             _rawArguments.RemoveRange(0, count);
         }
     }
