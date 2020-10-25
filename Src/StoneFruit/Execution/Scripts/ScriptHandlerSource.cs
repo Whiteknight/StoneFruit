@@ -106,7 +106,7 @@ namespace StoneFruit.Execution.Scripts
                     _arguments.ResetAllArguments();
 
                     // Add the command to the EngineState for execution after this
-                    _state.Commands.Append(formattedArguments);
+                    _state.Commands.Append(new ArgumentsOrString(formattedArguments));
                 }
             }
         }
