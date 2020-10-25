@@ -97,9 +97,9 @@ namespace StoneFruit.Execution.Handlers
                 _func = func;
             }
 
-            public override IHandlerBase Create(IArguments command, CommandDispatcher dispatcher)
+            public override IHandlerBase Create(IArguments arguments, CommandDispatcher dispatcher)
             {
-                return new AsyncHandler(_func, command, dispatcher);
+                return new AsyncHandler(_func, arguments, dispatcher);
             }
         }
 

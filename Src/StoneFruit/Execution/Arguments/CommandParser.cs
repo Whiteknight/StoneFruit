@@ -39,14 +39,14 @@ namespace StoneFruit.Execution.Arguments
         /// <summary>
         /// Parse the given line of text as an IArguments
         /// </summary>
-        /// <param name="raw"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        public IArguments ParseCommand(string raw)
+        public IArguments ParseCommand(string command)
         {
-            if (string.IsNullOrEmpty(raw))
+            if (string.IsNullOrEmpty(command))
                 return SyntheticArguments.Empty();
 
-            var sequence = new StringCharacterSequence(raw);
+            var sequence = new StringCharacterSequence(command);
             var argsList = _argsParser.List().Parse(sequence).Value.ToList();
             if (!sequence.IsAtEnd)
             {
@@ -54,7 +54,7 @@ namespace StoneFruit.Execution.Arguments
                 throw new ParseException($"Could not parse all arguments. '{remainder}' fails at {sequence.CurrentLocation}");
             }
 
-            return new ParsedArguments(argsList, raw);
+            return new ParsedArguments(argsList, command);
         }
 
         /// <summary>
