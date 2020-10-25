@@ -35,6 +35,7 @@ namespace StoneFruit.Execution
         }
 
         public IEnumerator<KeyValuePair<string, object>> GetEnumerator() => _metadata.GetEnumerator();
+
         IEnumerator IEnumerable.GetEnumerator() => _metadata.GetEnumerator();
 
         public void Remove(string name)
