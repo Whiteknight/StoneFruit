@@ -33,6 +33,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Containers.Unity
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoneFruit.Containers.Unity.Tests", "StoneFruit.Containers.Unity.Tests\StoneFruit.Containers.Unity.Tests.csproj", "{39F30584-26EF-481E-A469-DDBC45F4EF00}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Containers.Autofac", "StoneFruit.Containers.Autofac\StoneFruit.Containers.Autofac.csproj", "{2021CDF3-8EBB-4D0F-A1F8-4F7D7719B789}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoneFruit.Containers.Autofac.Tests", "StoneFruit.Containers.Autofac.Tests\StoneFruit.Containers.Autofac.Tests.csproj", "{BB0415FD-8DC7-4C26-B093-28551FC03FAD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -91,6 +95,14 @@ Global
 		{39F30584-26EF-481E-A469-DDBC45F4EF00}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{39F30584-26EF-481E-A469-DDBC45F4EF00}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39F30584-26EF-481E-A469-DDBC45F4EF00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2021CDF3-8EBB-4D0F-A1F8-4F7D7719B789}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2021CDF3-8EBB-4D0F-A1F8-4F7D7719B789}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2021CDF3-8EBB-4D0F-A1F8-4F7D7719B789}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2021CDF3-8EBB-4D0F-A1F8-4F7D7719B789}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB0415FD-8DC7-4C26-B093-28551FC03FAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB0415FD-8DC7-4C26-B093-28551FC03FAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB0415FD-8DC7-4C26-B093-28551FC03FAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB0415FD-8DC7-4C26-B093-28551FC03FAD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -104,6 +116,7 @@ Global
 		{533164EF-C5B2-403A-B646-9B9B8672944B} = {9D2EB7CA-4C3D-4D2B-AC90-6F9DA5FA21B1}
 		{8C110CB3-0999-45E0-94BF-4779F72BC4E4} = {7ECB8D3B-1ADA-4102-8AD0-0EF5229EF502}
 		{39F30584-26EF-481E-A469-DDBC45F4EF00} = {7ECB8D3B-1ADA-4102-8AD0-0EF5229EF502}
+		{BB0415FD-8DC7-4C26-B093-28551FC03FAD} = {7ECB8D3B-1ADA-4102-8AD0-0EF5229EF502}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1C3F9AD9-B506-4995-9D1A-F855E1B280FA}
