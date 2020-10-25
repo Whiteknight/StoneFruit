@@ -48,22 +48,29 @@ namespace StoneFruit.Execution
         public IOutput Output { get; }
 
         /// <summary>
-        /// Find and execute the appropriate handler for the given command object or
-        /// unparsed command string
+        /// Find and execute the appropriate handler for the given arguments object or
+        /// unparsed command string. This overload is mostly intended for internal use. If you have
+        /// a raw unparsed command string or a parsed IArguments object, you should use one of
+        /// those overloads instead
         /// </summary>
-        /// <param name="command"></param>
+        /// <param name="argsOrString"></param>
         /// <param name="token"></param>
-        public void Execute(ArgumentsOrString command, CancellationToken token = default)
+        public void Execute(ArgumentsOrString argsOrString, CancellationToken token = default)
         {
-            Assert.ArgumentNotNull(command, nameof(command));
-            if (command.Arguments != null)
-                Execute(command.Arguments, token);
-            else if (!string.IsNullOrEmpty(command.String))
-                Execute(command.String, token);
+            Assert.ArgumentNotNull(argsOrString, nameof(argsOrString));
+            if (argsOrString.Arguments != null)
+                Execute(argsOrString.Arguments, token);
+            else if (!string.IsNullOrEmpty(argsOrString.String))
+            {
+                var command = Parser.ParseCommand(argsOrString.String);
+                Execute(command, token);
+            }
         }
 
         /// <summary>
-        /// Find and execute the appropriate handler for the given unparsed command string
+        /// Find and execute the appropriate handler for the given unparsed command string. Use
+        /// this overload if you have the raw text of a command to execute and do not want to 
+        /// parse it out yourself
         /// </summary>
         /// <param name="commandString"></param>
         /// <param name="token"></param>
@@ -75,7 +82,8 @@ namespace StoneFruit.Execution
         }
 
         /// <summary>
-        /// Find and execute the appropriate handler for the given verb and arguments
+        /// Find and execute the appropriate handler for the given verb and arguments. Use this
+        /// overload if you want to explicitly separate the verb from the rest of the arguments
         /// </summary>
         /// <param name="verb"></param>
         /// <param name="args"></param>
@@ -88,7 +96,8 @@ namespace StoneFruit.Execution
         }
 
         /// <summary>
-        /// Find and execute the appropriate handler for the given Command object
+        /// Find and execute the appropriate handler for the given arguments. Use this variant if
+        /// you have a parsed IArguments which contains the verb and args for the command
         /// </summary>
         /// <param name="command"></param>
         /// <param name="token"></param>
@@ -115,19 +124,21 @@ namespace StoneFruit.Execution
         }
 
         /// <summary>
-        /// Find and execute the appropriate handler for the given command object or
-        /// unparsed command string
+        /// Find and execute the appropriate handler for the given arguments object or
+        /// unparsed command string. This overload is mostly intended for internal use. If you have
+        /// a raw unparsed command string or a parsed IArguments object, you should call one of 
+        /// those overloads instead.
         /// </summary>
-        /// <param name="command"></param>
+        /// <param name="argsOrString"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        public Task ExecuteAsync(ArgumentsOrString command, CancellationToken token = default)
+        public Task ExecuteAsync(ArgumentsOrString argsOrString, CancellationToken token = default)
         {
-            Assert.ArgumentNotNull(command, nameof(command));
-            if (command.Arguments != null)
-                return ExecuteAsync(command.Arguments, token);
-            if (!string.IsNullOrEmpty(command.String))
-                return ExecuteAsync(command.String, token);
+            Assert.ArgumentNotNull(argsOrString, nameof(argsOrString));
+            if (argsOrString.Arguments != null)
+                return ExecuteAsync(argsOrString.Arguments, token);
+            if (!string.IsNullOrEmpty(argsOrString.String))
+                return ExecuteAsync(argsOrString.String, token);
             return Task.CompletedTask;
         }
 
@@ -145,7 +156,9 @@ namespace StoneFruit.Execution
         }
 
         /// <summary>
-        /// Find and execute the appropriate handler for the given verb and arguments
+        /// Find and execute the appropriate handler for the given verb and arguments. Use this
+        /// variant if you have already separated the verb from the rest of the arguments and you
+        /// want to specify each explicitly.
         /// </summary>
         /// <param name="verb"></param>
         /// <param name="args"></param>
@@ -159,7 +172,9 @@ namespace StoneFruit.Execution
         }
 
         /// <summary>
-        /// Find and execute the appropriate handler for the given Command object
+        /// Find and execute the appropriate handler for the given Command object. Use this
+        /// overload if you have a parsed IArguments object which contains the verb and args for
+        /// the command
         /// </summary>
         /// <param name="command"></param>
         /// <param name="token"></param>
