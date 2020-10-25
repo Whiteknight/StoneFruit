@@ -290,12 +290,8 @@ namespace StoneFruit.Execution.Arguments
                 // than we need, decide that some of them are not part of the verb, and put back
                 // the rest. It's a small price to pay to avoid the complexity of conditionally
                 // caching them.
-                var arg = _rawArguments[i];
-                if (arg is ParsedPositionalArgument pa)
-                {
+                if (_rawArguments[i] is ParsedPositionalArgument pa)
                     candidates.Add(new PositionalArgument(pa.Value));
-                    continue;
-                }
             }
             return candidates;
         }
