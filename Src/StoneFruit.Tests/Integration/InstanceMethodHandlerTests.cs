@@ -28,7 +28,7 @@ namespace StoneFruit.Tests.Integration
         }
 
         [Test]
-        public void A_Test()
+        public void ExecuteMethod_WithOutput()
         {
             var output = new TestOutput();
             var engine = new EngineBuilder()
@@ -40,7 +40,7 @@ namespace StoneFruit.Tests.Integration
         }
 
         [Test]
-        public void A_LowerCaseVerbExtractor()
+        public void ExecuteMethod_LowerCaseVerbExtractor()
         {
             var output = new TestOutput();
             var engine = new EngineBuilder()
@@ -55,7 +55,7 @@ namespace StoneFruit.Tests.Integration
         }
 
         [Test]
-        public void A_CamelToSpinalVerbExtractor()
+        public void ExecuteMethod_CamelToSpinalVerbExtractor()
         {
             var output = new TestOutput();
             var engine = new EngineBuilder()
@@ -69,7 +69,7 @@ namespace StoneFruit.Tests.Integration
         }
 
         [Test]
-        public void B_Test()
+        public void ExecuteMethod_WithNamedArgumentString()
         {
             var output = new TestOutput();
             var engine = new EngineBuilder()
@@ -81,7 +81,7 @@ namespace StoneFruit.Tests.Integration
         }
 
         [Test]
-        public void C_Test()
+        public void ExecuteMethod_Async()
         {
             var output = new TestOutput();
             var engine = new EngineBuilder()
@@ -116,7 +116,7 @@ namespace StoneFruit.Tests.Integration
         }
 
         [Test]
-        public void A_VerbAttribute()
+        public void ExecuteMethod_VerbAttribute()
         {
             var output = new TestOutput();
             var engine = new EngineBuilder()
@@ -191,6 +191,27 @@ namespace StoneFruit.Tests.Integration
                 .Build();
             engine.RunHeadless("test");
             output.Lines[0].Should().Be("False");
+        }
+
+        public class MyObject5
+        {
+            public int TestA(IOutput output)
+            {
+                output.WriteLine("invoked");
+                return 1;
+            }
+        }
+
+        [Test]
+        public void NotInvoked_InvalidReturnType()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject5()))
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .Build();
+            engine.RunHeadless("test a");
+            output.Lines[0].Should().StartWith("Verb test not found");
         }
     }
 }
