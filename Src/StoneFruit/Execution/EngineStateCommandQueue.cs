@@ -15,44 +15,27 @@ namespace StoneFruit.Execution
             _additionalCommands = new LinkedList<ArgumentsOrString>();
         }
 
-        public void Append(string command)
+        public void Append(ArgumentsOrString argsOrString)
         {
-            _additionalCommands.AddLast(command);
+            _additionalCommands.AddLast(argsOrString);
         }
 
-        public void Append(IArguments arguments)
+        public void Append(IEnumerable<ArgumentsOrString> argsOrStrings)
         {
-            _additionalCommands.AddLast(new ArgumentsOrString(arguments));
+            foreach (var argsOrString in argsOrStrings)
+                Append(argsOrString);
         }
 
-        public void Append(IEnumerable<string> commands)
+        public void Prepend(IEnumerable<ArgumentsOrString> argsOrStrings)
         {
-            foreach (var command in commands)
-                Append(command);
-        }
-
-        public void Prepend(IEnumerable<string> commands)
-        {
-            var list = commands.ToList();
+            var list = argsOrStrings.ToList();
             for (int i = list.Count - 1; i >= 0; i--)
                 _additionalCommands.AddFirst(list[i]);
         }
 
-        public void Prepend(IEnumerable<ArgumentsOrString> commands)
+        public void Prepend(ArgumentsOrString argsOrString)
         {
-            var list = commands.ToList();
-            for (int i = list.Count - 1; i >= 0; i--)
-                _additionalCommands.AddFirst(list[i]);
-        }
-
-        public void Prepend(string command)
-        {
-            _additionalCommands.AddFirst(command);
-        }
-
-        public void Prepend(IArguments arguments)
-        {
-            _additionalCommands.AddFirst(new ArgumentsOrString(arguments));
+            _additionalCommands.AddFirst(argsOrString);
         }
 
         public ArgumentsOrString GetNext()
