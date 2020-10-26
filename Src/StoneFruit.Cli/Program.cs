@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Autofac;
 using Lamar;
 using Microsoft.Extensions.DependencyInjection;
+using StoneFruit.Containers.Autofac;
 using StoneFruit.Containers.Lamar;
 using StoneFruit.Containers.Microsoft;
 using StoneFruit.Containers.StructureMap;
@@ -39,7 +41,8 @@ namespace StoneFruit.Cli
             //var engine = NoneMain();
             //var engine = StructureMapMain();
             //var engine = LamarMain();
-            var engine = MicrosoftMain();
+            //var engine = MicrosoftMain();
+            var engine = AutofacMain();
             Environment.ExitCode = engine.RunWithCommandLineArguments();
 
             Console.ReadKey();
@@ -107,6 +110,14 @@ namespace StoneFruit.Cli
 
             var container = new Container(serviceCollection);
             return container.GetService<Engine>();
+        }
+
+        private static Engine AutofacMain()
+        {
+            var containerBuilder = new Autofac.ContainerBuilder();
+            containerBuilder.SetupEngine<MyEnvironment>(Build);
+            Autofac.IContainer container = containerBuilder.Build();
+            return container.Resolve<Engine>();
         }
     }
 

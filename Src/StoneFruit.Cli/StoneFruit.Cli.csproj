@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\StoneFruit.Containers.Autofac\StoneFruit.Containers.Autofac.csproj" />
     <ProjectReference Include="..\StoneFruit.Containers.Lamar\StoneFruit.Containers.Lamar.csproj" />
     <ProjectReference Include="..\StoneFruit.Containers.Microsoft\StoneFruit.Containers.Microsoft.csproj" />
     <ProjectReference Include="..\StoneFruit.Containers.StructureMap\StoneFruit.Containers.StructureMap.csproj" />
