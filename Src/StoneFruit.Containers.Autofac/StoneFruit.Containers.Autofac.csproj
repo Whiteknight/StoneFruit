@@ -1,7 +1,18 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>StoneFruit.Containers.Autofac</AssemblyName>
+    <RootNamespace>StoneFruit.Containers.Autofac</RootNamespace>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <LangVersion>8.0</LangVersion>
+    <Version>2.0.0-alpha1</Version>
+    <Authors>Andrew F. Whitworth</Authors>
+    <Company />
+    <Description>CLI Commandlet host and execution engine, Lamar container bindings</Description>
+    <Copyright>Copyright 2020</Copyright>
+    <PackageProjectUrl>https://github.com/Whiteknight/StoneFruit</PackageProjectUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
