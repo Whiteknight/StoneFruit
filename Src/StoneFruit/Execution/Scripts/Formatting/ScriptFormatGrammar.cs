@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Linq;
 using ParserObjects;
-using ParserObjects.Parsers;
-using static ParserObjects.Parsers.ParserMethods<char>;
-using static ParserObjects.Parsers.Specialty.CStyleParserMethods;
-using static ParserObjects.Parsers.Specialty.QuotedParserMethods;
-using static ParserObjects.Parsers.Specialty.WhitespaceParserMethods;
+using static ParserObjects.CStyleParserMethods;
+using static ParserObjects.ParserMethods;
+using static ParserObjects.ParserMethods<char>;
 
 namespace StoneFruit.Execution.Scripts.Formatting
 {
@@ -32,7 +30,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 singleQuotedString
             );
 
-            var unquotedValue = Match(c => !char.IsWhiteSpace(c))
+            var unquotedValue = Match(c => char.IsLetterOrDigit(c) || char.IsPunctuation(c))
                 .List(true)
                 .Transform(c => new string(c.ToArray()));
 
@@ -47,7 +45,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match('!'),
                 values.Optional(),
 
-                (bang, v) => new RequiredValue(v)
+                (bang, v) => new RequiredValue(v.GetValueOrDefault(null))
             ).Optional();
 
             // A literal flag which is passed without modification
@@ -99,7 +97,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match(']'),
                 requiredOrDefaultValue,
 
-                (n, e, o, s, c, rdv) => new NamedFetchNamedArgumentAccessor(n, s, rdv != null, rdv?.DefaultValue)
+                (n, e, o, s, c, rdv) => new NamedFetchNamedArgumentAccessor(n, s, rdv.Success, rdv.GetValueOrDefault(null)?.DefaultValue)
             );
 
             // A named argument where the name is a literal but the value is fetched from a positional
@@ -112,7 +110,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match(']'),
                 requiredOrDefaultValue,
 
-                (n, e, o, i, c, rdv) => new NamedFetchPositionalArgumentAccessor(n, i, rdv != null, rdv?.DefaultValue)
+                (n, e, o, i, c, rdv) => new NamedFetchPositionalArgumentAccessor(n, i, rdv.Success, rdv.GetValueOrDefault(null)?.DefaultValue)
             );
 
             // Fetch a named argument including name and value
@@ -124,7 +122,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match('}'),
                 requiredOrDefaultValue,
 
-                (o, s, c, rdv) => new FetchNamedArgumentAccessor(s, rdv != null, rdv?.DefaultValue)
+                (o, s, c, rdv) => new FetchNamedArgumentAccessor(s, rdv.Success, rdv.GetValueOrDefault(null)?.DefaultValue)
             );
 
             // Fetch all remaining unconsumed named arguments
@@ -149,7 +147,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match(']'),
                 requiredOrDefaultValue,
 
-                (o, i, c, rdv) => new FetchPositionalArgumentAccessor(i, rdv != null, rdv?.DefaultValue)
+                (o, i, c, rdv) => new FetchPositionalArgumentAccessor(i, rdv.Success, rdv.GetValueOrDefault(null)?.DefaultValue)
             );
 
             // Fetch all remaining unconsumed positional arguments
@@ -179,7 +177,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match(']'),
                 requiredOrDefaultValue,
 
-                (o, s, c, rdv) => new FetchNamedToPositionalArgumentAccessor(s, rdv != null, rdv?.DefaultValue)
+                (o, s, c, rdv) => new FetchNamedToPositionalArgumentAccessor(s, rdv.Success, rdv.GetValueOrDefault(null)?.DefaultValue)
             );
 
             // All possible args
@@ -214,7 +212,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
             // command := <verb> <argAndWhitespace>* <end>
             return Rule(
                 argAndWhitespace.List(true),
-                End(),
+                If(End(), Produce(() => true)),
 
                 (a, end) => new CommandFormat(a.ToList())
             );

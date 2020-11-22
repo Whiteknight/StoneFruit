@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using ParserObjects;
-using ParserObjects.Parsers;
-using static ParserObjects.Parsers.ParserMethods<char>;
-using static ParserObjects.Parsers.Specialty.QuotedParserMethods;
-using static ParserObjects.Parsers.Specialty.WhitespaceParserMethods;
+using static ParserObjects.ParserMethods;
+using static ParserObjects.ParserMethods<char>;
 
 namespace StoneFruit.Execution.Arguments
 {
@@ -24,7 +21,7 @@ namespace StoneFruit.Execution.Arguments
 
             var singleQuotedString = StrippedSingleQuotedString();
 
-            var unquotedValue = Match(c => !char.IsWhiteSpace(c))
+            var unquotedValue = Match(c => char.IsLetterOrDigit(c) || char.IsPunctuation(c))
                 .List(true)
                 .Transform(c => new string(c.ToArray()));
 
@@ -38,7 +35,7 @@ namespace StoneFruit.Execution.Arguments
             );
 
             // The name can be numbers or symbols or anything besides whitespace.
-            var name = Match(c => !char.IsWhiteSpace(c) && c != '=').ListCharToString(true);
+            var name = Match(c => char.IsLetterOrDigit(c) || c == '-' || c == '_').ListCharToString(true);
 
             var singleDash = Match('-');
             var doubleDash = Match("--");
@@ -51,7 +48,7 @@ namespace StoneFruit.Execution.Arguments
                 Match('='),
                 value,
 
-                (s, n, e, v) => new IParsedArgument[] { new ParsedNamedArgument(n, v) }
+                (s, n, e, v) => (IParsedArgument)new ParsedNamedArgument(n, v)
             );
 
             // '--' <name> <ws> <value>
@@ -61,7 +58,7 @@ namespace StoneFruit.Execution.Arguments
                 whitespace,
                 value,
 
-                (s, n, e, v) => new IParsedArgument[] { new ParsedFlagPositionalOrNamedArgument(n, v) }
+                (s, n, e, v) => (IParsedArgument)new ParsedFlagPositionalOrNamedArgument(n, v)
             );
 
             // '--' <name>
@@ -69,7 +66,7 @@ namespace StoneFruit.Execution.Arguments
                 doubleDash,
                 name,
 
-                (s, n) => new IParsedArgument[] { new ParsedFlagArgument(n) }
+                (s, n) => (IParsedArgument)new ParsedFlagArgument(n)
             );
 
             // We include this case because some short args with a positional following, are treated like
@@ -81,7 +78,7 @@ namespace StoneFruit.Execution.Arguments
                 whitespace,
                 value,
 
-                (dash, n, ws, v) => new IParsedArgument[] { new ParsedFlagPositionalOrNamedArgument(n, v) }
+                (dash, n, ws, v) => (IParsedArgument)new ParsedFlagPositionalOrNamedArgument(n, v)
             );
 
             // '-' <char>*
@@ -89,13 +86,13 @@ namespace StoneFruit.Execution.Arguments
                 singleDash,
                 singleIdChar.List(true),
 
-                (s, n) => n.Select(x => new ParsedFlagArgument(x.ToString()))
+                (s, n) => (IParsedArgument)new MultiParsedFlagArgument(n.Select(x => x.ToString()))
             );
 
-            var positional = value.Transform(v => new IParsedArgument[] { new ParsedPositionalArgument(v) });
+            var positional = value.Transform(v => (IParsedArgument)new ParsedPositionalArgument(v));
 
             // <named> | <longFlag> | <shortFlag> | <positional>
-            var args = First<IEnumerable<IParsedArgument>>(
+            var args = First(
                 longEqualsNamedArg,
                 longImpliedNamedArg,
                 longFlagArg,
@@ -111,7 +108,7 @@ namespace StoneFruit.Execution.Arguments
                 (ws, arg) => arg
             );
 
-            return whitespaceAndArgs.Flatten<char, IEnumerable<IParsedArgument>, IParsedArgument>();
+            return whitespaceAndArgs;
         }
     }
 }

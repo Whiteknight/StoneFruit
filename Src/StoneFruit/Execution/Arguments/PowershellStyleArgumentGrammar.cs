@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Linq;
 using ParserObjects;
-using ParserObjects.Parsers;
-using static ParserObjects.Parsers.ParserMethods<char>;
-using static ParserObjects.Parsers.Specialty.CStyleParserMethods;
-using static ParserObjects.Parsers.Specialty.QuotedParserMethods;
-using static ParserObjects.Parsers.Specialty.WhitespaceParserMethods;
+using static ParserObjects.CStyleParserMethods;
+using static ParserObjects.ParserMethods;
+using static ParserObjects.ParserMethods<char>;
 
 namespace StoneFruit.Execution.Arguments
 {
@@ -24,7 +22,7 @@ namespace StoneFruit.Execution.Arguments
 
             var singleQuotedString = StrippedSingleQuotedString();
 
-            var unquotedValue = Match(c => !char.IsWhiteSpace(c))
+            var unquotedValue = Match(c => char.IsLetterOrDigit(c) || char.IsPunctuation(c))
                 .List(true)
                 .Transform(c => new string(c.ToArray()));
 

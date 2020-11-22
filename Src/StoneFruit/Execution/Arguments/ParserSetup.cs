@@ -59,12 +59,6 @@ namespace StoneFruit.Execution.Arguments
             return this;
         }
 
-        public IParserSetup UseArgumentParser(IParser<char, IEnumerable<IParsedArgument>> argParser)
-        {
-            var parser = argParser.Flatten<char, IEnumerable<IParsedArgument>, IParsedArgument>();
-            return UseArgumentParser(parser);
-        }
-
         public IParserSetup UseScriptParser(IParser<char, CommandFormat> scriptParser)
         {
             if (scriptParser == null)
