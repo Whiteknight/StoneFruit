@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using ParserObjects;
+﻿using ParserObjects;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Scripts.Formatting;
 using StoneFruit.Utility;
@@ -26,14 +25,6 @@ namespace StoneFruit
         /// <param name="argParser"></param>
         /// <returns></returns>
         IParserSetup UseArgumentParser(IParser<char, IParsedArgument> argParser);
-
-        /// <summary>
-        /// Specify an argument parser to use. Notice that you cannot set an Argument
-        /// parser if you specify a Command parser.
-        /// </summary>
-        /// <param name="argParser"></param>
-        /// <returns></returns>
-        IParserSetup UseArgumentParser(IParser<char, IEnumerable<IParsedArgument>> argParser);
 
         /// <summary>
         /// Specify a parser to use for scripts. Notice that you cannot set a Script

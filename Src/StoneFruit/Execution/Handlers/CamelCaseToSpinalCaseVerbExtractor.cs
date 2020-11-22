@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using ParserObjects;
 using StoneFruit.Utility;
-using static ParserObjects.Parsers.Specialty.IdentifierParserMethods;
+using static ParserObjects.ParserMethods;
 
 namespace StoneFruit.Execution.Handlers
 {

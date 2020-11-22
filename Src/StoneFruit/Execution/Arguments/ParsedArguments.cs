@@ -26,7 +26,13 @@ namespace StoneFruit.Execution.Arguments
             _accessedPositionals = new List<IPositionalArgument>();
             _accessedNameds = new Dictionary<string, List<INamedArgument>>();
             _accessedFlags = new Dictionary<string, IFlagArgument>();
-            _rawArguments = arguments.ToList();
+            _rawArguments = arguments
+                .SelectMany(a => a switch
+                {
+                    MultiParsedFlagArgument mp => mp.ToIndividualArgs(),
+                    _ => new[] { a }
+                })
+                .ToList();
         }
 
         public string Raw { get; }
