@@ -31,7 +31,7 @@ namespace StoneFruit.Execution.Arguments
                 doubleQuotedString,
                 singleQuotedString,
                 unquotedValue
-            );
+            ).Named("Value");
 
             var names = Identifier();
 
@@ -40,8 +40,8 @@ namespace StoneFruit.Execution.Arguments
                 Match('-'),
                 names,
 
-                (start, name) => new ParsedFlagArgument(name)
-            );
+                (_, name) => new ParsedFlagArgument(name)
+            ).Named("Flag");
 
             // <name> '=' <value>
             var namedArg = Rule(
@@ -49,15 +49,15 @@ namespace StoneFruit.Execution.Arguments
                 Match('='),
                 values,
 
-                (name, equals, value) => new ParsedNamedArgument(name, value)
-            );
+                (name, _, value) => new ParsedNamedArgument(name, value)
+            ).Named("Named");
 
             // <flag> | <named> | <positional>
             var args = First<IParsedArgument>(
                 flagArg,
                 namedArg,
                 values.Transform(v => new ParsedPositionalArgument(v))
-            );
+            ).Named("Argument");
 
             var whitespace = Whitespace();
 
@@ -65,8 +65,8 @@ namespace StoneFruit.Execution.Arguments
                 whitespace.Optional(),
                 args,
 
-                (ws, arg) => arg
-            );
+                (_, arg) => arg
+            ).Named("WhitespaceAndArgument");
         }
     }
 }

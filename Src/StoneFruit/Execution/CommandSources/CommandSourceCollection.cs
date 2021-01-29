@@ -8,7 +8,7 @@ namespace StoneFruit.Execution.CommandSources
     /// Ordered collection of ICommandSources. A source is drained and then removed from
     /// the list.
     /// </summary>
-    public class CommandSourceCollection 
+    public class CommandSourceCollection
     {
         private readonly LinkedList<ICommandSource> _sources;
 

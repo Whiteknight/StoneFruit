@@ -14,12 +14,12 @@
 
         public bool Consumed { get; set; }
 
-        public string AsString(string defaultValue = null) => bool.TrueString;
+        public string AsString(string _ = null) => bool.TrueString;
 
-        public bool AsBool(bool defaultValue = false) => true;
+        public bool AsBool(bool _ = false) => true;
 
-        public int AsInt(int defaultValue = 0) => 1;
+        public int AsInt(int _ = 0) => 1;
 
-        public long AsLong(long defaultValue = 0) => 1L;
+        public long AsLong(long _ = 0) => 1L;
     }
 }

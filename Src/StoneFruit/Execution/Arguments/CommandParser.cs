@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using ParserObjects;
-using ParserObjects.Parsers;
 using ParserObjects.Sequences;
 using StoneFruit.Execution.Scripts.Formatting;
 using StoneFruit.Utility;

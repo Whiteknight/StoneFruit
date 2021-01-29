@@ -63,7 +63,7 @@ namespace StoneFruit.Execution.Arguments
                 });
 
             var fromAll = fromRaw.Concat(fromAccessed).ToList();
-            if (!fromAll.Any())
+            if (fromAll.Count == 0)
                 return;
 
             var sb = new StringBuilder();
@@ -92,18 +92,12 @@ namespace StoneFruit.Execution.Arguments
             // Check if we have accessed this index already. If so we either return it or
             // it's consumed already
             if (index < _accessedPositionals.Count)
-            {
-                if (_accessedPositionals[index].Consumed)
-                    return MissingArgument.PositionalConsumed(index);
-                return _accessedPositionals[index];
-            }
+                return !_accessedPositionals[index].Consumed ? _accessedPositionals[index] : MissingArgument.PositionalConsumed(index);
 
             // Loop through the unaccessed args until we either find the one we're looking
             // for or we run out.
             AccessPositionalsUntil(() => index < _accessedPositionals.Count);
-            if (index >= _accessedPositionals.Count)
-                return MissingArgument.NoPositionals();
-            return _accessedPositionals[index];
+            return index < _accessedPositionals.Count ? _accessedPositionals[index] : MissingArgument.NoPositionals();
         }
 
         public INamedArgument Get(string name)
@@ -119,7 +113,7 @@ namespace StoneFruit.Execution.Arguments
             }
 
             // Loop through all unaccessed args looking for the first one with the given
-            // name. 
+            // name.
             var match = AccessNamedUntil(n => n == name, () => true);
             return match ?? MissingArgument.NoneNamed(name);
         }
@@ -166,9 +160,7 @@ namespace StoneFruit.Execution.Arguments
         {
             name = name.ToLowerInvariant();
             AccessNamedUntil(n => n == name, () => false);
-            if (_accessedNameds.ContainsKey(name))
-                return _accessedNameds[name].Where(a => !a.Consumed);
-            return Enumerable.Empty<IArgument>();
+            return _accessedNameds.ContainsKey(name) ? _accessedNameds[name].Where(a => !a.Consumed) : Enumerable.Empty<IArgument>();
         }
 
         public IEnumerable<INamedArgument> GetAllNamed()
@@ -247,7 +239,7 @@ namespace StoneFruit.Execution.Arguments
 
         public IEnumerable<IFlagArgument> GetAllFlags()
         {
-            AccessFlagsUntil(n => true, () => false);
+            AccessFlagsUntil(_ => true, () => false);
             return _accessedFlags.Values.Where(a => !a.Consumed);
         }
 

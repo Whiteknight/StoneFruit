@@ -20,14 +20,18 @@ namespace StoneFruit.Execution.Arguments
         {
         }
 
-        public static ArgumentParseException MissingRequiredArgument(int index)
+        public ArgumentParseException() : base()
         {
-            return new ArgumentParseException($"Required argument at position {index} was not provided");
         }
 
-        public static ArgumentParseException MissingRequiredArgument(string argument)
+        public ArgumentParseException(string message, Exception innerException) : base(message, innerException)
         {
-            return new ArgumentParseException($"Required argument named '{argument}' was not provided");
         }
+
+        public static ArgumentParseException MissingRequiredArgument(int index)
+            => new ArgumentParseException($"Required argument at position {index} was not provided");
+
+        public static ArgumentParseException MissingRequiredArgument(string argument)
+            => new ArgumentParseException($"Required argument named '{argument}' was not provided");
     }
 }

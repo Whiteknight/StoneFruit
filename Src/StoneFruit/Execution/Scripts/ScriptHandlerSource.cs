@@ -38,7 +38,7 @@ namespace StoneFruit.Execution.Scripts
             _scripts.Insert(verb, script);
         }
 
-        public void Initialize(IVerbExtractor verbExtractor)
+        public void Initialize(IVerbExtractor _)
         {
             // No initialization necessary
         }

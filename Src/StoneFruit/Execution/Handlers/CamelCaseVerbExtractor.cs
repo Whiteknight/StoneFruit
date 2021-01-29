@@ -18,7 +18,7 @@ namespace StoneFruit.Execution.Handlers
         public IReadOnlyList<Verb> GetVerbs(Type type)
         {
             if (type == null || !typeof(IHandlerBase).IsAssignableFrom(type))
-                return new List<Verb>();
+                return Array.Empty<Verb>();
 
             return GetVerbs(type.Name);
         }
@@ -28,7 +28,7 @@ namespace StoneFruit.Execution.Handlers
         private IReadOnlyList<Verb> GetVerbs(string name)
         {
             if (string.IsNullOrEmpty(name))
-                return new List<Verb>();
+                return Array.Empty<Verb>();
 
             name = name
                 .RemoveSuffix("verb")
@@ -36,12 +36,12 @@ namespace StoneFruit.Execution.Handlers
                 .RemoveSuffix("handler");
 
             if (string.IsNullOrEmpty(name))
-                return new List<Verb>();
+                return Array.Empty<Verb>();
 
             var camelCase = CamelCase();
             var result = camelCase.Parse(name);
             if (!result.Success)
-                return new List<Verb>();
+                return Array.Empty<Verb>();
 
             var verb = result.Value.Select(s => s.ToLowerInvariant()).ToArray();
             return new[] { new Verb(verb) };

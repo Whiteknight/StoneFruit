@@ -19,6 +19,14 @@ namespace StoneFruit.Execution
         {
         }
 
+        public EngineBuildException() : base()
+        {
+        }
+
+        public EngineBuildException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+
         public static EngineBuildException NoHandlers()
         {
             return new EngineBuildException(@"No Handlers configured.

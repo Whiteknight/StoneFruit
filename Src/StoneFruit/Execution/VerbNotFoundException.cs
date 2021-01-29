@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace StoneFruit.Execution
 {
     /// <summary>
-    /// Exception thrown by the engine when a verb cannot be found. 
+    /// Exception thrown by the engine when a verb cannot be found.
     /// </summary>
     [Serializable]
     public class VerbNotFoundException : Exception
@@ -19,6 +19,14 @@ namespace StoneFruit.Execution
         protected VerbNotFoundException(
             SerializationInfo info,
             StreamingContext context) : base(info, context)
+        {
+        }
+
+        public VerbNotFoundException() : base()
+        {
+        }
+
+        public VerbNotFoundException(string message, Exception innerException) : base(message, innerException)
         {
         }
 

@@ -146,12 +146,7 @@ namespace StoneFruit.Execution.Arguments
             name = name.ToLowerInvariant();
             if (!_nameds.ContainsKey(name))
                 return MissingArgument.NoneNamed(name);
-
-            var firstAvailable = _nameds[name].FirstOrDefault(a => !a.Consumed);
-            if (firstAvailable == null)
-                return MissingArgument.NoneNamed(name);
-
-            return firstAvailable;
+            return _nameds[name].FirstOrDefault(a => !a.Consumed) ?? MissingArgument.NoneNamed(name);
         }
 
         public IEnumerable<IPositionalArgument> GetAllPositionals()
@@ -160,10 +155,7 @@ namespace StoneFruit.Execution.Arguments
         public IEnumerable<IArgument> GetAll(string name)
         {
             name = name.ToLowerInvariant();
-            if (!_nameds.ContainsKey(name))
-                return Enumerable.Empty<IArgument>();
-
-            return _nameds[name].Where(a => !a.Consumed);
+            return _nameds.ContainsKey(name) ? _nameds[name].Where(a => !a.Consumed) : Enumerable.Empty<IArgument>();
         }
 
         public IEnumerable<INamedArgument> GetAllNamed()

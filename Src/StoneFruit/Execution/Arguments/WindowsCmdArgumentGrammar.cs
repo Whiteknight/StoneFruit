@@ -32,7 +32,7 @@ namespace StoneFruit.Execution.Arguments
                 doubleQuotedString,
                 singleQuotedString,
                 unquotedValue
-            );
+            ).Named("Value");
 
             var name = Identifier();
 
@@ -43,8 +43,8 @@ namespace StoneFruit.Execution.Arguments
                 Match(':'),
                 value,
 
-                (s, n, e, v) => new ParsedNamedArgument(n, v)
-            );
+                (_, n, _, v) => new ParsedNamedArgument(n, v)
+            ).Named("Named");
 
             // '-' <name> <whitespace> <value>
             var maybeNamedArg = Rule(
@@ -53,16 +53,16 @@ namespace StoneFruit.Execution.Arguments
                 whitespace,
                 value,
 
-                (s, name, e, value) => new ParsedFlagPositionalOrNamedArgument(name, value)
-            );
+                (_, name, _, value) => new ParsedFlagPositionalOrNamedArgument(name, value)
+            ).Named("NamedMaybeValue");
 
             // '/' <name>
             var flagArg = Rule(
                 Match('/'),
                 name,
 
-                (s, n) => new ParsedFlagArgument(n)
-            );
+                (_, n) => new ParsedFlagArgument(n)
+            ).Named("Flag");
 
             // <named> | <flag> | <positional>
             var args = First<IParsedArgument>(
@@ -70,13 +70,13 @@ namespace StoneFruit.Execution.Arguments
                 maybeNamedArg,
                 flagArg,
                 value.Transform(v => new ParsedPositionalArgument(v))
-            );
+            ).Named("Argument");
 
             return Rule(
                 whitespace,
                 args,
 
-                (ws, arg) => arg
+                (_, arg) => arg
             );
         }
     }
