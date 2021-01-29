@@ -30,7 +30,7 @@ namespace StoneFruit.Execution.Arguments
 
             // '--' | '-'
             var nameStart = First(
-                Match("--").Transform(c => '-'),
+                Match("--").Transform(_ => '-'),
                 Match('-')
             );
 
@@ -39,7 +39,7 @@ namespace StoneFruit.Execution.Arguments
                 doubleQuotedString,
                 singleQuotedString,
                 unquotedValue
-            );
+            ).Named("Value");
 
             var names = Identifier();
 
@@ -54,30 +54,30 @@ namespace StoneFruit.Execution.Arguments
                 whitespace,
                 values,
 
-                (s, name, e, value) => new ParsedFlagPositionalOrNamedArgument(name, value)
-            );
+                (_, name, _, value) => new ParsedFlagPositionalOrNamedArgument(name, value)
+            ).Named("Named");
 
             // <nameStart> <name>
             var longFlagArg = Rule(
                 nameStart,
                 names,
 
-                (s, name) => new ParsedFlagArgument(name)
-            );
+                (_, name) => new ParsedFlagArgument(name)
+            ).Named("LongFlag");
 
             // <named> | <longFlag> | <positional>
             var args = First<IParsedArgument>(
                 namedArg,
                 longFlagArg,
                 values.Transform(v => new ParsedPositionalArgument(v))
-            );
+            ).Named("Argument");
 
             var whitespaceAndArgs = Rule(
                 whitespace,
                 args,
 
-                (ws, arg) => arg
-            );
+                (_, arg) => arg
+            ).Named("WhitespaceAndArgument");
 
             return whitespaceAndArgs;
         }

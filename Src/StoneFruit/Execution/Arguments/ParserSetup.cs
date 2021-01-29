@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using ParserObjects;
-using ParserObjects.Parsers;
 using StoneFruit.Execution.Scripts.Formatting;
 
 namespace StoneFruit.Execution.Arguments
