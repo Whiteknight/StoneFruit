@@ -39,13 +39,9 @@ namespace StoneFruit.Execution.Handlers
 
         public IVerbInfo GetByName(Verb verb)
         {
-            var byName = _sources
+            return _sources
                 .Select(source => source.GetByName(verb))
                 .FirstOrDefault(info => info != null);
-            if (byName != null)
-                return byName;
-
-            return null;
         }
     }
 }

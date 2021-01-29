@@ -24,9 +24,9 @@ namespace StoneFruit.Execution.Handlers
         {
             Assert.ArgumentNotNull(instance, nameof(instance));
             _instance = instance;
-            _getDescription = getDescription ?? (s => string.Empty);
-            _getUsage = getUsage ?? (s => string.Empty);
-            _getGroup = getGroup ?? (s => string.Empty);
+            _getDescription = getDescription ?? (_ => string.Empty);
+            _getUsage = getUsage ?? (_ => string.Empty);
+            _getGroup = getGroup ?? (_ => string.Empty);
             _methods = _instance.GetType()
                 .GetMethods(BindingFlags.Instance | BindingFlags.Public)
                 .Where(m => m.ReturnType == typeof(void) || m.ReturnType == typeof(Task))
@@ -52,9 +52,8 @@ namespace StoneFruit.Execution.Handlers
         }
 
         public IEnumerable<IVerbInfo> GetAll()
-        {
-            return _methods.GetAll().Select(kvp => new MethodInfoVerbInfo(kvp.Key, _getDescription, _getUsage, _getGroup));
-        }
+            => _methods.GetAll()
+                .Select(kvp => new MethodInfoVerbInfo(kvp.Key, _getDescription, _getUsage, _getGroup));
 
         // Since we're using the name of a method as the verb, and you can't nest methods, the
         // verb must only be a single string. Anything else is a non-match

@@ -50,7 +50,7 @@ namespace StoneFruit.Execution.Output
             return this;
         }
 
-        public string Prompt(string prompt, bool mustProvide = true, bool keepHistory = true) 
+        public string Prompt(string prompt, bool mustProvide = true, bool keepHistory = true)
             => _primary?.Prompt(prompt, mustProvide, keepHistory) ?? string.Empty;
     }
 }

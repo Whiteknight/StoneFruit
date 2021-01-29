@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace StoneFruit.Execution.Output
@@ -42,7 +41,7 @@ namespace StoneFruit.Execution.Output
                 if (_secondaries.Count == 0)
                     return new NullOutput();
                 if (_secondaries.Count == 1)
-                    return _secondaries.First();
+                    return _secondaries[0];
                 return new CombinedOutput(null, _secondaries);
             }
 

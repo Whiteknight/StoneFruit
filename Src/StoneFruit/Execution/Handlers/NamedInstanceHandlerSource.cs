@@ -25,9 +25,7 @@ namespace StoneFruit.Execution.Handlers
         }
 
         public IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher)
-        {
-            return _verbs.Get(arguments)?.HandlerObject;
-        }
+            => _verbs.Get(arguments)?.HandlerObject;
 
         public IEnumerable<IVerbInfo> GetAll() => _verbs.GetAll().Select(kvp => kvp.Value);
 

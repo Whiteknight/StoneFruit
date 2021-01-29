@@ -40,7 +40,7 @@ namespace StoneFruit.Execution.Handlers
             foreach (var extractor in _extractors)
             {
                 var verbs = extractor.GetVerbs(type);
-                if (verbs != null && verbs.Count > 0)
+                if (verbs?.Count > 0)
                     return verbs;
             }
             return new List<Verb>();
@@ -53,7 +53,7 @@ namespace StoneFruit.Execution.Handlers
             foreach (var extractor in _extractors)
             {
                 var verbs = extractor.GetVerbs(method);
-                if (verbs != null && verbs.Count > 0)
+                if (verbs?.Count > 0)
                     return verbs;
             }
             return new List<Verb>();
