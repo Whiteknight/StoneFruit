@@ -13,14 +13,14 @@ namespace StoneFruit.Execution.Arguments
     /// </summary>
     public class ParsedArguments : IArguments, IVerbSource
     {
-        private readonly List<IParsedArgument> _rawArguments;
+        private readonly List<IParsedArgument?> _rawArguments;
         private readonly List<IPositionalArgument> _accessedPositionals;
         private readonly Dictionary<string, List<INamedArgument>> _accessedNameds;
         private readonly Dictionary<string, IFlagArgument> _accessedFlags;
 
         private int _lastRawPositionalIndex;
 
-        public ParsedArguments(IEnumerable<IParsedArgument> arguments, string rawArgs = null)
+        public ParsedArguments(IEnumerable<IParsedArgument> arguments, string? rawArgs = null)
         {
             Raw = rawArgs ?? string.Empty;
             _accessedPositionals = new List<IPositionalArgument>();
@@ -32,6 +32,7 @@ namespace StoneFruit.Execution.Arguments
                     MultiParsedFlagArgument mp => mp.ToIndividualArgs(),
                     _ => new[] { a }
                 })
+                .Cast<IParsedArgument?>()
                 .ToList();
         }
 
@@ -84,8 +85,7 @@ namespace StoneFruit.Execution.Arguments
                 f.MarkConsumed(false);
         }
 
-        public IPositionalArgument Shift()
-            => AccessPositionalsUntil(() => true) ?? MissingArgument.NoPositionals();
+        public IPositionalArgument Shift() => AccessPositionalsUntil(() => true);
 
         public IPositionalArgument Get(int index)
         {
@@ -146,14 +146,13 @@ namespace StoneFruit.Execution.Arguments
                     var accessor = new PositionalArgument(fp.Value);
                     _accessedPositionals.Add(accessor);
                     // Replace the Flag+Positional arg with just a flag, the positional is consumed
-                    var flag = new ParsedFlagArgument(fp.Name);
-                    _rawArguments[i] = flag;
+                    _rawArguments[i] = new ParsedFlagArgument(fp.Name);
                     if (match())
                         return accessor;
                 }
             }
 
-            return null;
+            return MissingArgument.NoPositionals();
         }
 
         public IEnumerable<IArgument> GetAll(string name)
@@ -166,13 +165,13 @@ namespace StoneFruit.Execution.Arguments
         public IEnumerable<INamedArgument> GetAllNamed()
         {
             // Access all named arguments
-            AccessNamedUntil(n => true, () => false);
+            AccessNamedUntil(_ => true, () => false);
             return _accessedNameds.Values
                 .SelectMany(n => n)
                 .Where(a => !a.Consumed);
         }
 
-        private INamedArgument AccessNamedUntil(Func<string, bool> shouldAccess, Func<bool> isComplete)
+        private INamedArgument? AccessNamedUntil(Func<string, bool> shouldAccess, Func<bool> isComplete)
         {
             for (int i = 0; i < _rawArguments.Count; i++)
             {
@@ -184,7 +183,7 @@ namespace StoneFruit.Execution.Arguments
             return null;
         }
 
-        private NamedArgument GetNamedAccessorForArgument(int i, Func<string, bool> shouldAccess)
+        private NamedArgument? GetNamedAccessorForArgument(int i, Func<string, bool> shouldAccess)
         {
             var arg = _rawArguments[i];
             if (arg is ParsedNamedArgument n && shouldAccess(n.Name))
@@ -234,7 +233,7 @@ namespace StoneFruit.Execution.Arguments
             if (_accessedFlags.ContainsKey(name))
                 return true;
             var arg = AccessFlagsUntil(n => n == name, () => true);
-            return arg.Exists();
+            return arg?.Exists() == true;
         }
 
         public IEnumerable<IFlagArgument> GetAllFlags()
@@ -243,7 +242,7 @@ namespace StoneFruit.Execution.Arguments
             return _accessedFlags.Values.Where(a => !a.Consumed);
         }
 
-        private IFlagArgument AccessFlagsUntil(Func<string, bool> isMatch, Func<bool> isComplete)
+        private IFlagArgument? AccessFlagsUntil(Func<string, bool> isMatch, Func<bool> isComplete)
         {
             for (int i = 0; i < _rawArguments.Count; i++)
             {
@@ -255,7 +254,7 @@ namespace StoneFruit.Execution.Arguments
             return null;
         }
 
-        private FlagArgument GetFlagAccessorForArgument(int i, Func<string, bool> isMatch)
+        private FlagArgument? GetFlagAccessorForArgument(int i, Func<string, bool> isMatch)
         {
             var arg = _rawArguments[i];
             if (arg is ParsedFlagArgument f && isMatch(f.Name))

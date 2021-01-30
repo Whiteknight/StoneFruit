@@ -28,9 +28,9 @@
         public static MissingArgument FlagMissing(string name)
             => new MissingArgument($"Cannot get flag named '{name}'");
 
-        public string Value => null;
+        public string Value => string.Empty;
 
-        public string Name => null;
+        public string Name => string.Empty;
 
         public bool Consumed
         {
@@ -43,7 +43,7 @@
 
         public IArgument MarkConsumed(bool _ = true) => this;
 
-        public string AsString(string defaultValue = null) => defaultValue;
+        public string AsString(string defaultValue = "") => defaultValue;
 
         public bool AsBool(bool defaultValue = false) => defaultValue;
 

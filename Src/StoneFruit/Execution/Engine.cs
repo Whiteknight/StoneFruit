@@ -9,11 +9,13 @@ namespace StoneFruit.Execution
 {
     public class EngineAccessor
     {
-        public Engine Engine { get; private set; }
+        private Engine? _engine;
+
+        public Engine Engine => _engine ?? throw new InvalidOperationException("Cannot access engine because one has not been created");
 
         public void SetEngine(Engine engine)
         {
-            Engine = engine;
+            _engine = engine;
         }
     }
 
@@ -27,8 +29,8 @@ namespace StoneFruit.Execution
         private readonly EngineSettings _settings;
         private readonly ICommandParser _parser;
 
-        private EngineState _state;
-        private CommandDispatcher _dispatcher;
+        private EngineState? _state;
+        private CommandDispatcher? _dispatcher;
 
         public Engine(IHandlers handlers, IEnvironmentCollection environments, ICommandParser parser, IOutput output, EngineEventCatalog eventCatalog, EngineSettings settings)
         {
@@ -60,9 +62,9 @@ namespace StoneFruit.Execution
             _dispatcher = null;
         }
 
-        public EngineState GetCurrentState() => _state;
+        public EngineState GetCurrentState() => _state ?? throw new InvalidOperationException("Cannot access State, one has not been created");
 
-        public CommandDispatcher GetCurrentDispatcher() => _dispatcher;
+        public CommandDispatcher GetCurrentDispatcher() => _dispatcher ?? throw new InvalidOperationException("Cannot access Dispatcher, one has not been created");
 
         /// <summary>
         /// The set of configured environments
@@ -133,7 +135,7 @@ namespace StoneFruit.Execution
             // require a valid environment to run help
             if (commandLine == "help")
             {
-                sources.AddToEnd(_state.EventCatalog.HeadlessHelp, _parser,
+                sources.AddToEnd(_state!.EventCatalog.HeadlessHelp, _parser,
                     ("exitcode", Constants.ExitCodeHeadlessHelp.ToString())
                 );
                 return RunLoop(sources);
@@ -147,7 +149,7 @@ namespace StoneFruit.Execution
             // If there is no commandline left, run the HeadlessNoArgs script
             if (string.IsNullOrWhiteSpace(commandLine))
             {
-                sources.AddToEnd(_state.EventCatalog.HeadlessNoArgs, _parser,
+                sources.AddToEnd(_state!.EventCatalog.HeadlessNoArgs, _parser,
                     ("exitcode", Constants.ExitCodeHeadlessNoVerb.ToString())
                 );
                 return RunLoop(sources);
@@ -155,7 +157,7 @@ namespace StoneFruit.Execution
 
             // Setup the Headless start script, an environment change command if any, the
             // user command, and the headless stop script
-            sources.AddToEnd(_state.EventCatalog.EngineStartHeadless, _parser);
+            sources.AddToEnd(_state!.EventCatalog.EngineStartHeadless, _parser);
             if (!string.IsNullOrWhiteSpace(startingEnvironment))
                 sources.AddToEnd($"{EnvironmentHandler.Name} '{startingEnvironment}'");
             sources.AddToEnd(commandLine);
@@ -179,7 +181,7 @@ namespace StoneFruit.Execution
         /// condition.
         /// </summary>
         /// <param name="environment"></param>
-        public int RunInteractively(string environment)
+        public int RunInteractively(string? environment)
         {
             SetupState(false);
             var source = new CommandSourceCollection();
@@ -189,7 +191,7 @@ namespace StoneFruit.Execution
             if (!string.IsNullOrEmpty(environment))
                 source.AddToEnd($"{EnvironmentHandler.Name} '{environment}'");
 
-            source.AddToEnd(_state.EventCatalog.EngineStartInteractive, _parser);
+            source.AddToEnd(_state!.EventCatalog.EngineStartInteractive, _parser);
             source.AddToEnd(new PromptCommandSource(Output, Environments, _state));
 
             return RunLoop(source);
@@ -210,7 +212,7 @@ namespace StoneFruit.Execution
         // See if the given commandLine starts with a valid environment name. If so,
         // extract the environment name from the front and return the remainder of the
         // commandline.
-        private (string startingEnvironment, string commandLine) GetStartingEnvironment(string commandLine)
+        private (string? startingEnvironment, string commandLine) GetStartingEnvironment(string commandLine)
         {
             var validEnvironments = Environments.GetNames();
             if (validEnvironments.Count <= 1)
@@ -242,7 +244,8 @@ namespace StoneFruit.Execution
             {
                 // Get a command. If we have one in the state use that. Otherwise try to
                 // get one from the sources. If null, we're all done so exit
-                var command = _state.Commands.GetNext() ?? sources.GetNextCommand();
+                var commandResult = _state!.Commands.GetNext();
+                var command = commandResult.HasValue ? commandResult.Value : sources.GetNextCommand();
                 if (command?.IsValid != true)
                     return Constants.ExitCodeOk;
 
@@ -258,7 +261,7 @@ namespace StoneFruit.Execution
                     // Get a cancellation token source, configured according to state Command
                     // settings, and use that to dispatch the command
                     using var tokenSource = _state.GetConfiguredCancellationSource();
-                    _dispatcher.Execute(command, tokenSource.Token);
+                    _dispatcher!.Execute(command, tokenSource.Token);
                 }
                 catch (VerbNotFoundException vnf)
                 {
@@ -288,8 +291,9 @@ namespace StoneFruit.Execution
         {
             // If an exception is thrown while handling a previous exception, show an
             // angry error message and exit immediately
-            var currentException = _state.Metadata.Get(Constants.MetadataError) as Exception;
-            if (currentException != null)
+            var currentExceptionResult = _state!.Metadata.Get(Constants.MetadataError);
+
+            if (currentExceptionResult.HasValue && currentExceptionResult.Value is Exception currentException)
             {
                 // This isn't scripted because it's critical error-handling code and we
                 // don't want the user to clear/override it

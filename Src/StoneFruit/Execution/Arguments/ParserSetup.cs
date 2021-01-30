@@ -9,10 +9,9 @@ namespace StoneFruit.Execution.Arguments
     /// </summary>
     public class ParserSetup : IParserSetup, ISetupBuildable<ICommandParser>
     {
-        private IParser<char, IParsedArgument> _argParser;
-        private IParser<char, CommandFormat> _scriptParser;
-
-        private ICommandParser _parser;
+        private IParser<char, IParsedArgument>? _argParser;
+        private IParser<char, CommandFormat>? _scriptParser;
+        private ICommandParser? _parser;
 
         public void BuildUp(IServiceCollection services)
         {

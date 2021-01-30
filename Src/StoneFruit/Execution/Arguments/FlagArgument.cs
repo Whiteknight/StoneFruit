@@ -14,7 +14,7 @@
 
         public bool Consumed { get; set; }
 
-        public string AsString(string _ = null) => bool.TrueString;
+        public string AsString(string _ = "") => bool.TrueString;
 
         public bool AsBool(bool _ = false) => true;
 

@@ -26,11 +26,12 @@ namespace StoneFruit
         }
 
         public static implicit operator Verb(string s) => new Verb(s);
+
         public static implicit operator Verb(string[] s) => new Verb(s);
 
-        public string this[int index] => _verb == null ? null : _verb[index];
+        public string this[int index] => _verb[index];
 
-        public int Count => _verb == null ? 0 : _verb.Count;
+        public int Count => _verb.Count;
 
         public IEnumerator<string> GetEnumerator() => (_verb ?? Enumerable.Empty<string>()).GetEnumerator();
 
@@ -40,9 +41,9 @@ namespace StoneFruit
 
         public bool Equals(Verb other)
         {
-            if (this.Count != other.Count)
+            if (Count != other.Count)
                 return false;
-            for (int i = 0; i < this.Count; i++)
+            for (int i = 0; i < Count; i++)
             {
                 if (this[i] != other[i])
                     return false;

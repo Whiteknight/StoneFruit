@@ -30,7 +30,7 @@ namespace StoneFruit
         /// </summary>
         /// <param name="defaultValue"></param>
         /// <returns></returns>
-        string AsString(string defaultValue = null);
+        string AsString(string defaultValue = "");
 
         /// <summary>
         /// Get the value of the argument as a boolean, with a default value if the argument doesn't exist
@@ -93,7 +93,7 @@ namespace StoneFruit
         /// </summary>
         /// <param name="argument"></param>
         /// <returns></returns>
-        public static T Require<T>(this T argument, string errorMessage = null)
+        public static T Require<T>(this T argument, string errorMessage = "")
             where T : IArgument
         {
             Assert.ArgumentNotNull(argument, nameof(argument));
@@ -140,7 +140,7 @@ namespace StoneFruit
             }
             catch
             {
-                return default;
+                return defaultValue;
             }
         }
     }

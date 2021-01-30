@@ -11,6 +11,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
 {
     public static class ScriptFormatGrammar
     {
+        private static readonly RequiredValue _noRequiredValue = new RequiredValue("");
         private static readonly Lazy<IParser<char, CommandFormat>> _instance = new Lazy<IParser<char, CommandFormat>>(GetParserInternal);
 
         public static IParser<char, CommandFormat> GetParser() => _instance.Value;
@@ -47,7 +48,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match('!'),
                 values.Optional(),
 
-                (_, v) => new RequiredValue(v.GetValueOrDefault(null))
+                (_, v) => new RequiredValue(v.GetValueOrDefault(""))
             ).Optional();
 
             // A literal flag which is passed without modification
@@ -76,7 +77,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match('?'),
                 names,
 
-                (_, name) => new FetchFlagArgumentAccessor(name)
+                (_, name) => new FetchFlagArgumentAccessor(name, name)
             );
 
             // A literal named arg which is passed without modification
@@ -99,7 +100,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match(']'),
                 requiredOrDefaultValue,
 
-                (n, _, _, s, _, rdv) => new NamedFetchNamedArgumentAccessor(n, s, rdv.Success, rdv.GetValueOrDefault(null)?.DefaultValue)
+                (n, _, _, s, _, rdv) => new NamedFetchNamedArgumentAccessor(n, s, rdv.Success, rdv.GetValueOrDefault(_noRequiredValue).DefaultValue)
             );
 
             // A named argument where the name is a literal but the value is fetched from a positional
@@ -112,7 +113,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match(']'),
                 requiredOrDefaultValue,
 
-                (n, _, _, i, _, rdv) => new NamedFetchPositionalArgumentAccessor(n, i, rdv.Success, rdv.GetValueOrDefault(null)?.DefaultValue)
+                (n, _, _, i, _, rdv) => new NamedFetchPositionalArgumentAccessor(n, i, rdv.Success, rdv.GetValueOrDefault(_noRequiredValue).DefaultValue)
             );
 
             // Fetch a named argument including name and value
@@ -124,7 +125,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match('}'),
                 requiredOrDefaultValue,
 
-                (_, s, _, rdv) => new FetchNamedArgumentAccessor(s, rdv.Success, rdv.GetValueOrDefault(null)?.DefaultValue)
+                (_, s, _, rdv) => new FetchNamedArgumentAccessor(s, rdv.Success, rdv.GetValueOrDefault(_noRequiredValue).DefaultValue)
             );
 
             // Fetch all remaining unconsumed named arguments
@@ -149,7 +150,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match(']'),
                 requiredOrDefaultValue,
 
-                (_, i, _, rdv) => new FetchPositionalArgumentAccessor(i, rdv.Success, rdv.GetValueOrDefault(null)?.DefaultValue)
+                (_, i, _, rdv) => new FetchPositionalArgumentAccessor(i, rdv.Success, rdv.GetValueOrDefault(_noRequiredValue).DefaultValue)
             );
 
             // Fetch all remaining unconsumed positional arguments
@@ -179,7 +180,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match(']'),
                 requiredOrDefaultValue,
 
-                (_, s, _, rdv) => new FetchNamedToPositionalArgumentAccessor(s, rdv.Success, rdv.GetValueOrDefault(null)?.DefaultValue)
+                (_, s, _, rdv) => new FetchNamedToPositionalArgumentAccessor(s, rdv.Success, rdv.GetValueOrDefault(_noRequiredValue).DefaultValue)
             );
 
             // All possible args
@@ -282,7 +283,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
             private readonly string _name;
             private readonly string _newName;
 
-            public FetchFlagArgumentAccessor(string name, string newName = null)
+            public FetchFlagArgumentAccessor(string name, string newName)
             {
                 _name = name;
                 _newName = newName;
@@ -294,7 +295,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 if (!flag.Exists())
                     return Enumerable.Empty<IArgument>();
                 flag.MarkConsumed();
-                return new[] { new FlagArgument(_newName ?? _name) };
+                return new[] { new FlagArgument(_newName) };
             }
         }
 
