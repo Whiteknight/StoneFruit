@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net5.0</TargetFrameworks>
     <AssemblyName>StoneFruit.Containers.StructureMap</AssemblyName>
     <RootNamespace>StoneFruit.Containers.StructureMap</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -16,13 +16,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="structuremap" Version="4.7.0" />
+    <PackageReference Include="structuremap" Version="4.7.1" />
     <PackageReference Include="StructureMap.Microsoft.DependencyInjection" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\StoneFruit\StoneFruit.csproj" />
   </ItemGroup>
-
 </Project>
-

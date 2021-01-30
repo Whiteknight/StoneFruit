@@ -1,17 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net5.0</TargetFrameworks>
+    <AssemblyName>StoneFruit.Containers.Autofac</AssemblyName>
+    <RootNamespace>StoneFruit.Containers.Autofac</RootNamespace>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <LangVersion>8.0</LangVersion>
+    <Version>2.0.0-alpha1</Version>
+    <Authors>Andrew F. Whitworth</Authors>
+    <Company />
+    <Description>CLI Commandlet host and execution engine, Lamar container bindings</Description>
+    <Copyright>Copyright 2020</Copyright>
+    <PackageProjectUrl>https://github.com/Whiteknight/StoneFruit</PackageProjectUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="6.0.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.0.2" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.9" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\StoneFruit\StoneFruit.csproj" />
   </ItemGroup>
-
 </Project>

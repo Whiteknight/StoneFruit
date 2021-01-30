@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net5.0</TargetFrameworks>
     <AssemblyName>StoneFruit.Containers.Lamar</AssemblyName>
     <RootNamespace>StoneFruit.Containers.Lamar</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -20,8 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Lamar" Version="4.2.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.3" />
+    <PackageReference Include="Lamar" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
   </ItemGroup>
-
 </Project>
