@@ -23,8 +23,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 .SelectMany(a => a.Access(args))
                 .Where(a => a != null)
                 .ToList();
-            var arguments = new SyntheticArguments(argsList);
-            return arguments;
+            return new SyntheticArguments(argsList);
         }
     }
 }

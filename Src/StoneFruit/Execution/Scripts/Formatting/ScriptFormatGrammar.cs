@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ParserObjects;
+using StoneFruit.Execution.Arguments;
 using static ParserObjects.CStyleParserMethods;
 using static ParserObjects.ParserMethods;
 using static ParserObjects.ParserMethods<char>;
@@ -45,7 +47,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match('!'),
                 values.Optional(),
 
-                (bang, v) => new RequiredValue(v.GetValueOrDefault(null))
+                (_, v) => new RequiredValue(v.GetValueOrDefault(null))
             ).Optional();
 
             // A literal flag which is passed without modification
@@ -54,7 +56,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match('-'),
                 names,
 
-                (start, name) => new LiteralFlagArgumentAccessor(name)
+                (_, name) => new LiteralFlagArgumentAccessor(name)
             );
 
             // Fetch a flag from the input and rename it on the output if it exists
@@ -65,7 +67,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match(':'),
                 names,
 
-                (q, name, c, newName) => new FetchFlagArgumentAccessor(name, newName)
+                (_, name, _, newName) => new FetchFlagArgumentAccessor(name, newName)
             );
 
             // Fetch a flag from the input and reproduce it on the output if it exists
@@ -74,7 +76,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match('?'),
                 names,
 
-                (q, name) => new FetchFlagArgumentAccessor(name)
+                (_, name) => new FetchFlagArgumentAccessor(name)
             );
 
             // A literal named arg which is passed without modification
@@ -84,7 +86,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match('='),
                 values,
 
-                (name, equals, value) => new LiteralNamedArgumentAccessor(name, value)
+                (name, _, value) => new LiteralNamedArgumentAccessor(name, value)
             );
 
             // A named argument where the name is a literal but the value fetched from a named arg
@@ -97,7 +99,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match(']'),
                 requiredOrDefaultValue,
 
-                (n, e, o, s, c, rdv) => new NamedFetchNamedArgumentAccessor(n, s, rdv.Success, rdv.GetValueOrDefault(null)?.DefaultValue)
+                (n, _, _, s, _, rdv) => new NamedFetchNamedArgumentAccessor(n, s, rdv.Success, rdv.GetValueOrDefault(null)?.DefaultValue)
             );
 
             // A named argument where the name is a literal but the value is fetched from a positional
@@ -110,7 +112,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match(']'),
                 requiredOrDefaultValue,
 
-                (n, e, o, i, c, rdv) => new NamedFetchPositionalArgumentAccessor(n, i, rdv.Success, rdv.GetValueOrDefault(null)?.DefaultValue)
+                (n, _, _, i, _, rdv) => new NamedFetchPositionalArgumentAccessor(n, i, rdv.Success, rdv.GetValueOrDefault(null)?.DefaultValue)
             );
 
             // Fetch a named argument including name and value
@@ -122,7 +124,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match('}'),
                 requiredOrDefaultValue,
 
-                (o, s, c, rdv) => new FetchNamedArgumentAccessor(s, rdv.Success, rdv.GetValueOrDefault(null)?.DefaultValue)
+                (_, s, _, rdv) => new FetchNamedArgumentAccessor(s, rdv.Success, rdv.GetValueOrDefault(null)?.DefaultValue)
             );
 
             // Fetch all remaining unconsumed named arguments
@@ -132,7 +134,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match('*'),
                 Match('}'),
 
-                (o, s, c) => new FetchAllNamedArgumentAccessor()
+                (_, _, _) => new FetchAllNamedArgumentAccessor()
             );
 
             // A literal positional argument
@@ -147,7 +149,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match(']'),
                 requiredOrDefaultValue,
 
-                (o, i, c, rdv) => new FetchPositionalArgumentAccessor(i, rdv.Success, rdv.GetValueOrDefault(null)?.DefaultValue)
+                (_, i, _, rdv) => new FetchPositionalArgumentAccessor(i, rdv.Success, rdv.GetValueOrDefault(null)?.DefaultValue)
             );
 
             // Fetch all remaining unconsumed positional arguments
@@ -157,7 +159,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match('*'),
                 Match(']'),
 
-                (o, s, c) => new FetchAllPositionalArgumentAccessor()
+                (_, _, _) => new FetchAllPositionalArgumentAccessor()
             );
 
             // Fetch all remaining unconsumed flag arguments
@@ -166,7 +168,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match('-'),
                 Match('*'),
 
-                (o, s) => new FetchAllFlagsArgumentAccessor()
+                (_, _) => new FetchAllFlagsArgumentAccessor()
             );
 
             // Fetch the value of a named argument and pass it as a positional argument
@@ -177,7 +179,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 Match(']'),
                 requiredOrDefaultValue,
 
-                (o, s, c, rdv) => new FetchNamedToPositionalArgumentAccessor(s, rdv.Success, rdv.GetValueOrDefault(null)?.DefaultValue)
+                (_, s, _, rdv) => new FetchNamedToPositionalArgumentAccessor(s, rdv.Success, rdv.GetValueOrDefault(null)?.DefaultValue)
             );
 
             // All possible args
@@ -205,7 +207,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 args,
                 whitespace,
 
-                (a, ws) => a
+                (a, _) => a
             );
 
             // The command with verb and all arguments
@@ -214,7 +216,7 @@ namespace StoneFruit.Execution.Scripts.Formatting
                 argAndWhitespace.List(true),
                 If(End(), Produce(() => true)),
 
-                (a, end) => new CommandFormat(a.ToList())
+                (a, _) => new CommandFormat(a.ToList())
             );
         }
 
@@ -228,6 +230,264 @@ namespace StoneFruit.Execution.Scripts.Formatting
             }
 
             public string DefaultValue { get; }
+        }
+
+        private class FetchAllFlagsArgumentAccessor : IArgumentAccessor
+        {
+            public IEnumerable<IArgument> Access(IArguments args)
+            {
+                var results = new List<IArgument>();
+                var flags = args.GetAllFlags();
+                foreach (var flag in flags)
+                {
+                    flag.MarkConsumed();
+                    results.Add(new FlagArgument(flag.Name));
+                }
+
+                return results;
+            }
+        }
+
+        private class FetchAllNamedArgumentAccessor : IArgumentAccessor
+        {
+            public IEnumerable<IArgument> Access(IArguments args)
+            {
+                var results = new List<IArgument>();
+                foreach (var named in args.GetAllNamed())
+                {
+                    named.MarkConsumed();
+                    results.Add(new NamedArgument(named.Name, named.Value));
+                }
+
+                return results;
+            }
+        }
+
+        private class FetchAllPositionalArgumentAccessor : IArgumentAccessor
+        {
+            public IEnumerable<IArgument> Access(IArguments args)
+            {
+                var results = new List<IArgument>();
+                foreach (var positional in args.GetAllPositionals())
+                {
+                    positional.MarkConsumed();
+                    results.Add(new PositionalArgument(positional.Value));
+                }
+                return results;
+            }
+        }
+
+        private class FetchFlagArgumentAccessor : IArgumentAccessor
+        {
+            private readonly string _name;
+            private readonly string _newName;
+
+            public FetchFlagArgumentAccessor(string name, string newName = null)
+            {
+                _name = name;
+                _newName = newName;
+            }
+
+            public IEnumerable<IArgument> Access(IArguments args)
+            {
+                var flag = args.GetFlag(_name);
+                if (!flag.Exists())
+                    return Enumerable.Empty<IArgument>();
+                flag.MarkConsumed();
+                return new[] { new FlagArgument(_newName ?? _name) };
+            }
+        }
+
+        private class FetchNamedArgumentAccessor : IArgumentAccessor
+        {
+            private readonly string _name;
+            private readonly bool _required;
+            private readonly string _defaultValue;
+
+            public FetchNamedArgumentAccessor(string name, bool required, string defaultValue)
+            {
+                _name = name;
+                _required = required;
+                _defaultValue = defaultValue;
+            }
+
+            public IEnumerable<IArgument> Access(IArguments args)
+            {
+                var arg = args.Get(_name);
+                if (arg.Exists())
+                {
+                    arg.MarkConsumed();
+                    return new[] { new NamedArgument(_name, arg.AsString(string.Empty)) };
+                }
+                if (!_required)
+                    return Enumerable.Empty<IArgument>();
+                if (!string.IsNullOrEmpty(_defaultValue))
+                    return new[] { new NamedArgument(_name, _defaultValue) };
+                throw ArgumentParseException.MissingRequiredArgument(_name);
+            }
+        }
+
+        private class FetchNamedToPositionalArgumentAccessor : IArgumentAccessor
+        {
+            private readonly string _name;
+            private readonly bool _required;
+            private readonly string _defaultValue;
+
+            public FetchNamedToPositionalArgumentAccessor(string name, bool required, string defaultValue)
+            {
+                _name = name;
+                _required = required;
+                _defaultValue = defaultValue;
+            }
+
+            public IEnumerable<IArgument> Access(IArguments args)
+            {
+                var arg = args.Get(_name);
+                if (arg.Exists())
+                {
+                    arg.MarkConsumed();
+                    return new[] { new PositionalArgument(arg.AsString(string.Empty)) };
+                }
+                if (!_required)
+                    return Enumerable.Empty<IArgument>();
+                if (!string.IsNullOrEmpty(_defaultValue))
+                    return new[] { new PositionalArgument(_defaultValue) };
+
+                throw ArgumentParseException.MissingRequiredArgument(_name);
+            }
+        }
+
+        private class FetchPositionalArgumentAccessor : IArgumentAccessor
+        {
+            private readonly int _index;
+            private readonly bool _required;
+            private readonly string _defaultValue;
+
+            public FetchPositionalArgumentAccessor(int index, bool required, string defaultValue)
+            {
+                _index = index;
+                _required = required;
+                _defaultValue = defaultValue;
+            }
+
+            public IEnumerable<IArgument> Access(IArguments args)
+            {
+                var arg = args.Get(_index);
+                if (arg.Exists() && !arg.Consumed)
+                {
+                    arg.MarkConsumed();
+                    return new[] { new PositionalArgument(arg.AsString(string.Empty)) };
+                }
+                if (!_required)
+                    return Enumerable.Empty<IArgument>();
+                if (!string.IsNullOrEmpty(_defaultValue))
+                    return new[] { new PositionalArgument(_defaultValue) };
+
+                throw ArgumentParseException.MissingRequiredArgument(_index);
+            }
+        }
+
+        private class LiteralFlagArgumentAccessor : IArgumentAccessor
+        {
+            private readonly string _name;
+
+            public LiteralFlagArgumentAccessor(string name)
+            {
+                _name = name;
+            }
+
+            public IEnumerable<IArgument> Access(IArguments args)
+                => new[] { new FlagArgument(_name) };
+        }
+
+        private class LiteralNamedArgumentAccessor : IArgumentAccessor
+        {
+            private readonly string _name;
+            private readonly string _value;
+
+            public LiteralNamedArgumentAccessor(string name, string value)
+            {
+                _name = name;
+                _value = value;
+            }
+
+            public IEnumerable<IArgument> Access(IArguments args)
+                => new[] { new NamedArgument(_name, _value) };
+        }
+
+        private class LiteralPositionalArgumentAccessor : IArgumentAccessor
+        {
+            private readonly string _value;
+
+            public LiteralPositionalArgumentAccessor(string value)
+            {
+                _value = value;
+            }
+
+            public IEnumerable<IArgument> Access(IArguments args)
+                => new[] { new PositionalArgument(_value) };
+        }
+
+        private class NamedFetchNamedArgumentAccessor : IArgumentAccessor
+        {
+            private readonly string _newName;
+            private readonly string _oldName;
+            private readonly bool _required;
+            private readonly string _defaultValue;
+
+            public NamedFetchNamedArgumentAccessor(string newName, string oldName, bool required, string defaultValue)
+            {
+                _newName = newName;
+                _oldName = oldName;
+                _required = required;
+                _defaultValue = defaultValue;
+            }
+
+            public IEnumerable<IArgument> Access(IArguments args)
+            {
+                var arg = args.Get(_oldName);
+                if (arg.Exists())
+                {
+                    arg.MarkConsumed();
+                    return new[] { new NamedArgument(_newName, arg.AsString(string.Empty)), };
+                }
+                if (!_required)
+                    return Enumerable.Empty<IArgument>();
+                if (!string.IsNullOrEmpty(_defaultValue))
+                    return new[] { new NamedArgument(_newName, _defaultValue) };
+                throw ArgumentParseException.MissingRequiredArgument(_oldName);
+            }
+        }
+
+        private class NamedFetchPositionalArgumentAccessor : IArgumentAccessor
+        {
+            private readonly string _newName;
+            private readonly int _index;
+            private readonly bool _required;
+            private readonly string _defaultValue;
+
+            public NamedFetchPositionalArgumentAccessor(string newName, int index, bool required, string defaultValue)
+            {
+                _newName = newName;
+                _index = index;
+                _required = required;
+                _defaultValue = defaultValue;
+            }
+
+            public IEnumerable<IArgument> Access(IArguments args)
+            {
+                var arg = args.Get(_index);
+                if (arg.Exists())
+                {
+                    arg.MarkConsumed();
+                    return new[] { new NamedArgument(_newName, arg.AsString(string.Empty)) };
+                }
+                if (!_required)
+                    return Enumerable.Empty<IArgument>();
+                if (!string.IsNullOrEmpty(_defaultValue))
+                    return new[] { new NamedArgument(_newName, _defaultValue) };
+                throw ArgumentParseException.MissingRequiredArgument(_index);
+            }
         }
     }
 }
