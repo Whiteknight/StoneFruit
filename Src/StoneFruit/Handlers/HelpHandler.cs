@@ -30,7 +30,7 @@ namespace StoneFruit.Handlers
         public static string Usage => @"help [-showall]
 Get overview information for all available verbs. The verb Command class must implement
 
-    public static string Description {{ get; }} 
+    public static string Description {{ get; }}
 
 help <verb>
 Get detailed help information for the given verb. The verb Command class must implement
@@ -44,7 +44,7 @@ To see all commands, use the -showall flag
         public void Execute()
         {
             var verb = _args.GetAllPositionals().Select(p => p.AsString()).ToArray();
-            if (verb.Any())
+            if (verb.Length > 0)
             {
                 GetDetail(verb);
                 return;
@@ -57,9 +57,9 @@ To see all commands, use the -showall flag
         private void GetDetail(Verb verb)
         {
             var info = _commands.GetByName(verb);
-            if (info == null)
+            if (!info.HasValue)
                 throw new ExecutionException($"Cannot find command named '{verb}'");
-            _output.WriteLine(info.Usage);
+            _output.WriteLine(info.Value.Usage);
         }
 
         private void GetOverview(bool showAll)
@@ -67,7 +67,7 @@ To see all commands, use the -showall flag
             var infoList = _commands.GetAll();
             if (!showAll)
                 infoList = infoList.Where(i => i.ShouldShowInHelp);
-            int maxCommandLength = infoList.Select(c => c.Verb.ToString().Length).Max();
+            int maxCommandLength = infoList.Max(c => c.Verb.ToString().Length);
 
             var infoGroups = infoList.GroupBy(v => v.Group ?? "").ToDictionary(g => g.Key, g => g.ToList());
 

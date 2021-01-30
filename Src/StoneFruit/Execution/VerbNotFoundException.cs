@@ -14,20 +14,24 @@ namespace StoneFruit.Execution
         public VerbNotFoundException(string message)
             : base(message)
         {
+            Verb = string.Empty;
         }
 
         protected VerbNotFoundException(
             SerializationInfo info,
             StreamingContext context) : base(info, context)
         {
+            Verb = string.Empty;
         }
 
         public VerbNotFoundException() : base()
         {
+            Verb = string.Empty;
         }
 
         public VerbNotFoundException(string message, Exception innerException) : base(message, innerException)
         {
+            Verb = string.Empty;
         }
 
         public static VerbNotFoundException FromArguments(IArguments arguments)

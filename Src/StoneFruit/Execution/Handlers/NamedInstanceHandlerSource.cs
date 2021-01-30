@@ -18,18 +18,18 @@ namespace StoneFruit.Execution.Handlers
             _verbs = new VerbTrie<VerbInfo>();
         }
 
-        public void Add(Verb verb, IHandlerBase handlerObject, string description = null, string usage = null, string group = null)
+        public void Add(Verb verb, IHandlerBase handlerObject, string? description = null, string? usage = null, string? group = null)
         {
-            var info = new VerbInfo(verb, handlerObject, description, usage, group);
+            var info = new VerbInfo(verb, handlerObject, description ?? string.Empty, usage ?? string.Empty, group ?? string.Empty);
             _verbs.Insert(verb, info);
         }
 
-        public IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher)
-            => _verbs.Get(arguments)?.HandlerObject;
+        public IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
+            => _verbs.Get(arguments).Transform(info => info.HandlerObject);
 
         public IEnumerable<IVerbInfo> GetAll() => _verbs.GetAll().Select(kvp => kvp.Value);
 
-        public IVerbInfo GetByName(Verb verb) => _verbs.Get(verb);
+        public IResult<IVerbInfo> GetByName(Verb verb) => _verbs.Get(verb);
 
         public int Count => _verbs.Count;
 

@@ -69,7 +69,7 @@ namespace StoneFruit.Execution
 
         /// <summary>
         /// Find and execute the appropriate handler for the given unparsed command string. Use
-        /// this overload if you have the raw text of a command to execute and do not want to 
+        /// this overload if you have the raw text of a command to execute and do not want to
         /// parse it out yourself
         /// </summary>
         /// <param name="commandString"></param>
@@ -105,7 +105,10 @@ namespace StoneFruit.Execution
         {
             Assert.ArgumentNotNull(arguments, nameof(arguments));
             State.CurrentArguments = arguments;
-            var handler = Handlers.GetInstance(arguments, this) ?? throw VerbNotFoundException.FromArguments(arguments);
+            var handlerResult = Handlers.GetInstance(arguments, this);
+            if (!handlerResult.HasValue)
+                throw VerbNotFoundException.FromArguments(arguments);
+            var handler = handlerResult.Value;
             if (handler is IHandler syncHandler)
             {
                 syncHandler.Execute();
@@ -126,7 +129,7 @@ namespace StoneFruit.Execution
         /// <summary>
         /// Find and execute the appropriate handler for the given arguments object or
         /// unparsed command string. This overload is mostly intended for internal use. If you have
-        /// a raw unparsed command string or a parsed IArguments object, you should call one of 
+        /// a raw unparsed command string or a parsed IArguments object, you should call one of
         /// those overloads instead.
         /// </summary>
         /// <param name="argsOrString"></param>
@@ -138,7 +141,7 @@ namespace StoneFruit.Execution
             if (argsOrString.Arguments != null)
                 return ExecuteAsync(argsOrString.Arguments, token);
             if (!string.IsNullOrEmpty(argsOrString.String))
-                return ExecuteAsync(argsOrString.String, token);
+                return ExecuteAsync(argsOrString.String!, token);
             return Task.CompletedTask;
         }
 
@@ -183,7 +186,10 @@ namespace StoneFruit.Execution
         {
             Assert.ArgumentNotNull(arguments, nameof(arguments));
             State.CurrentArguments = arguments;
-            var handler = Handlers.GetInstance(arguments, this) ?? throw VerbNotFoundException.FromArguments(arguments);
+            var handlerResult = Handlers.GetInstance(arguments, this);
+            if (!handlerResult.HasValue)
+                throw VerbNotFoundException.FromArguments(arguments);
+            var handler = handlerResult.Value;
             if (handler is IHandler syncHandler)
             {
                 syncHandler.Execute();

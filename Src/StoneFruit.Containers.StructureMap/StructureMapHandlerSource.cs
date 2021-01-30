@@ -35,22 +35,13 @@ namespace StoneFruit.Containers.StructureMap
                 .ToVerbTrie(h => h.Verb, h => h.Type);
         }
 
-        public IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher)
-        {
-            var type = _types.Get(arguments);
-            return type == null ? null : ResolveHandler(type);
-        }
+        public IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
+            => _types.Get(arguments).Transform(type => ResolveHandler(type));
 
         public IEnumerable<IVerbInfo> GetAll()
             => _types.GetAll().Select(kvp => new VerbInfo(kvp.Key, kvp.Value));
 
-        public IVerbInfo GetByName(Verb verb)
-        {
-            var type = _types.Get(verb);
-            if (type == null)
-                return null;
-            return new VerbInfo(verb, type);
-        }
+        public IResult<IVerbInfo> GetByName(Verb verb) => _types.Get(verb).Transform(type => new VerbInfo(verb, type));
 
         private IHandlerBase ResolveHandler(Type type)
         {

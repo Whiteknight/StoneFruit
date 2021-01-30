@@ -16,7 +16,7 @@ namespace StoneFruit
         /// <param name="command"></param>
         /// <param name="dispatcher"></param>
         /// <returns></returns>
-        IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher);
+        IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher);
 
         /// <summary>
         /// Get metadata information about all verbs registered with this source
@@ -30,6 +30,6 @@ namespace StoneFruit
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        IVerbInfo GetByName(Verb verb);
+        IResult<IVerbInfo> GetByName(Verb verb);
     }
 }

@@ -26,7 +26,8 @@ namespace StoneFruit.Tests.Execution.HandlerSources
             var target = new NamedInstanceHandlerSource();
             target.Add("test", new TestCommandHandler());
             var result = target.GetInstance(SyntheticArguments.From("test"), null);
-            result.Should().BeOfType<TestCommandHandler>();
+            result.HasValue.Should().BeTrue();
+            result.Value.Should().BeOfType<TestCommandHandler>();
         }
     }
 }

@@ -33,21 +33,13 @@ namespace StoneFruit.Containers.Lamar
                 .ToVerbTrie(x => x.Verb, x => x.Type);
         }
 
-        public IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher)
-        {
-            var type = _handlers.Get(arguments);
-            return type == null ? null : ResolveHandler(type);
-        }
+        public IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
+            => _handlers.Get(arguments).Transform(type => ResolveHandler(type));
 
         public IEnumerable<IVerbInfo> GetAll() => _handlers.GetAll().Select(kvp => new VerbInfo(kvp.Key, kvp.Value));
 
-        public IVerbInfo GetByName(Verb verb)
-        {
-            var type = _handlers.Get(verb);
-            if (type == null)
-                return null;
-            return new VerbInfo(verb, type);
-        }
+        public IResult<IVerbInfo> GetByName(Verb verb)
+            => _handlers.Get(verb).Transform(type => new VerbInfo(verb, type));
 
         private IHandlerBase ResolveHandler(Type type)
         {
