@@ -18,7 +18,7 @@ namespace StoneFruit.Utility
             _token = token;
         }
 
-        public object GetValue(Type type, string name, int index)
+        public object? GetValue(Type type, string name, int index)
         {
             if (type == typeof(CancellationToken))
                 return _token;

@@ -2,7 +2,6 @@
 using FluentAssertions;
 using NUnit.Framework;
 using ParserObjects;
-using ParserObjects.Parsers;
 using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.Tests.Execution.Arguments
@@ -23,7 +22,7 @@ namespace StoneFruit.Tests.Execution.Arguments
             result.Shift().Value.Should().Be("a");
             result.Shift().Value.Should().Be("b");
             result.Shift().Value.Should().Be("c");
-            result.Shift().Value.Should().Be(null);
+            result.Shift().Value.Should().Be("");
         }
 
         [Test]

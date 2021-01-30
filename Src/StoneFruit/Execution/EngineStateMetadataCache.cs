@@ -30,8 +30,8 @@ namespace StoneFruit.Execution
             _metadata.Add(name, value);
         }
 
-        public object Get(string name)
-            => _metadata.ContainsKey(name) ? _metadata[name] : null;
+        public IResult<object> Get(string name)
+            => _metadata.ContainsKey(name) ? new SuccessResult<object>(_metadata[name]) : FailureResult<object>.Instance;
 
         public IEnumerator<KeyValuePair<string, object>> GetEnumerator() => _metadata.GetEnumerator();
 

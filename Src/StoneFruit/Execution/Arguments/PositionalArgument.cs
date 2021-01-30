@@ -14,7 +14,7 @@
 
         public bool Consumed { get; set; }
 
-        public string AsString(string defaultValue = null) => string.IsNullOrEmpty(Value) ? defaultValue : Value;
+        public string AsString(string defaultValue = "") => Value;
 
         public bool AsBool(bool defaultValue = false) => this.As(bool.Parse, defaultValue);
 

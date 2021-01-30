@@ -35,7 +35,7 @@ namespace StoneFruit.Execution
         public EngineStateMetadataCache Metadata { get; }
         public IEngineStateCommandCounter CommandCounter { get; set; }
         public EngineSettings Settings { get; set; }
-        public IArguments CurrentArguments { get; set; }
+        public IArguments? CurrentArguments { get; set; }
 
         /// <summary>
         /// Signal the runloop that it should exit immediately and stop executing commands.

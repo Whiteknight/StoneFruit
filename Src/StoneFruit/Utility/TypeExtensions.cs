@@ -12,7 +12,7 @@ namespace StoneFruit.Utility
         /// <param name="type"></param>
         /// <returns></returns>
         public static string GetDescription(this Type type)
-            => GetPublicStaticStringPropertyValue(type, "Description");
+            => GetPublicStaticStringPropertyValue(type, "Description") ?? string.Empty;
 
         /// <summary>
         /// Attempt to get the Usage of an IHandlerBase class
@@ -28,9 +28,9 @@ namespace StoneFruit.Utility
         /// <param name="type"></param>
         /// <returns></returns>
         public static string GetGroup(this Type type)
-            => GetPublicStaticStringPropertyValue(type, "Group");
+            => GetPublicStaticStringPropertyValue(type, "Group") ?? string.Empty;
 
-        private static string GetPublicStaticStringPropertyValue(Type type, string name)
+        private static string? GetPublicStaticStringPropertyValue(Type type, string name)
         {
             var property = type.GetProperty(name, BindingFlags.Public | BindingFlags.Static | BindingFlags.IgnoreCase);
             if (property != null && property.PropertyType == typeof(string))
@@ -50,7 +50,7 @@ namespace StoneFruit.Utility
             var attrs = type.GetCustomAttributes<VerbAttribute>().ToList();
 
             // If there are no attributes, we're using a class name and we always show it
-            if (!attrs.Any())
+            if (attrs.Count == 0)
                 return true;
 
             return attrs.Any(a => a.Verb.Equals(verb) && !a.Hide);

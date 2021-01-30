@@ -62,7 +62,7 @@ namespace StoneFruit.Execution
                 Execute(argsOrString.Arguments, token);
             else if (!string.IsNullOrEmpty(argsOrString.String))
             {
-                var command = Parser.ParseCommand(argsOrString.String);
+                var command = Parser.ParseCommand(argsOrString.String!);
                 Execute(command, token);
             }
         }

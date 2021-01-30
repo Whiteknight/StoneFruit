@@ -38,13 +38,13 @@ namespace StoneFruit.Execution
             _additionalCommands.AddFirst(argsOrString);
         }
 
-        public ArgumentsOrString GetNext()
+        public IResult<ArgumentsOrString> GetNext()
         {
             if (_additionalCommands.Count == 0)
-                return null;
+                return FailureResult<ArgumentsOrString>.Instance;
             var next = _additionalCommands.First.Value;
             _additionalCommands.RemoveFirst();
-            return next;
+            return new SuccessResult<ArgumentsOrString>(next);
         }
 
         public void Clear() => _additionalCommands.Clear();
