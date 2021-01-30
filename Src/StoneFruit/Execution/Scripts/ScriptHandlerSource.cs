@@ -17,24 +17,19 @@ namespace StoneFruit.Execution.Scripts
             _scripts = new VerbTrie<Script>();
         }
 
-        public IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher)
-        {
-            var script = _scripts.Get(arguments);
-            if (script == null)
-                return null;
-            return new ScriptHandler(dispatcher.Parser, script, arguments, dispatcher.State);
-        }
+        public IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
+            => _scripts.Get(arguments).Transform(script => new ScriptHandler(dispatcher.Parser, script, arguments, dispatcher.State));
 
         public IEnumerable<IVerbInfo> GetAll() => _scripts.GetAll().Select(kvp => kvp.Value);
 
-        public IVerbInfo GetByName(Verb verb) => _scripts.Get(verb);
+        public IResult<IVerbInfo> GetByName(Verb verb) => _scripts.Get(verb);
 
-        public void AddScript(Verb verb, IEnumerable<string> lines, string description = null, string usage = null, string group = null)
+        public void AddScript(Verb verb, IEnumerable<string> lines, string? description = null, string? usage = null, string? group = null)
         {
             var scriptLines = lines.OrEmptyIfNull().ToList();
             if (scriptLines.Count == 0)
                 return;
-            var script = new Script(verb, scriptLines, description, usage, group);
+            var script = new Script(verb, scriptLines, description ?? string.Empty, usage ?? string.Empty, group ?? string.Empty);
             _scripts.Insert(verb, script);
         }
 
@@ -50,7 +45,7 @@ namespace StoneFruit.Execution.Scripts
         private class Script : IVerbInfo
         {
             private readonly IReadOnlyList<string> _lines;
-            private IReadOnlyList<CommandFormat> _formats;
+            private IReadOnlyList<CommandFormat>? _formats;
 
             public Script(Verb verb, IReadOnlyList<string> lines, string description, string usage, string group)
             {

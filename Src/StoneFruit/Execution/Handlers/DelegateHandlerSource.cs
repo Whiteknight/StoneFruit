@@ -21,33 +21,34 @@ namespace StoneFruit.Execution.Handlers
 
         public int Count => _handlers.Count;
 
-        public IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher)
+        public IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
         {
             var factory = _handlers.Get(arguments);
             if (factory == null)
-                return null;
-            return factory.Create(arguments, dispatcher);
+                return FailureResult<IHandlerBase>.Instance;
+            var handler = factory.Value.Create(arguments, dispatcher);
+            return new SuccessResult<IHandlerBase>(handler);
         }
 
         public IEnumerable<IVerbInfo> GetAll() => _handlers.GetAll().Select(kvp => kvp.Value);
 
-        public IVerbInfo GetByName(Verb verb) => _handlers.Get(verb);
+        public IResult<IVerbInfo> GetByName(Verb verb) => _handlers.Get(verb);
 
-        public DelegateHandlerSource Add(Verb verb, Action<IArguments, CommandDispatcher> act, string description = null, string usage = null, string group = null)
+        public DelegateHandlerSource Add(Verb verb, Action<IArguments, CommandDispatcher> act, string? description = null, string? usage = null, string? group = null)
         {
-            var factory = new SyncHandlerFactory(act, verb, description, usage, group);
+            var factory = new SyncHandlerFactory(act, verb, description ?? string.Empty, usage ?? description ?? string.Empty, group ?? string.Empty);
             _handlers.Insert(verb, factory);
             return this;
         }
 
-        public DelegateHandlerSource AddAsync(Verb verb, Func<IArguments, CommandDispatcher, Task> func, string description = null, string usage = null, string group = null)
+        public DelegateHandlerSource AddAsync(Verb verb, Func<IArguments, CommandDispatcher, Task> func, string? description = null, string? usage = null, string? group = null)
         {
-            _handlers.Insert(verb, new AsyncHandlerFactory(func, verb, description, usage, group));
+            _handlers.Insert(verb, new AsyncHandlerFactory(func, verb, description ?? string.Empty, usage ?? description ?? string.Empty, group ?? string.Empty));
             return this;
         }
 
         // We need to return an IHandler instance which has the IArguments from the current command
-        // injected already into the constructor. So when we register the delegate we store a 
+        // injected already into the constructor. So when we register the delegate we store a
         // factory to create an IHandler. The factory takes the IArguments from the current command
         // and creates a new IHandler instance with the IArguments injected into the constructor.
 
@@ -56,8 +57,8 @@ namespace StoneFruit.Execution.Handlers
             protected HandlerFactory(Verb verb, string description, string usage, string group)
             {
                 Verb = verb;
-                Description = description ?? string.Empty;
-                Usage = usage ?? Description;
+                Description = description;
+                Usage = usage;
                 Group = group;
             }
 
@@ -80,7 +81,6 @@ namespace StoneFruit.Execution.Handlers
                 _act = act;
             }
 
-
             public override IHandlerBase Create(IArguments arguments, CommandDispatcher dispatcher)
             {
                 return new SyncHandler(_act, arguments, dispatcher);
@@ -98,9 +98,7 @@ namespace StoneFruit.Execution.Handlers
             }
 
             public override IHandlerBase Create(IArguments arguments, CommandDispatcher dispatcher)
-            {
-                return new AsyncHandler(_func, arguments, dispatcher);
-            }
+                => new AsyncHandler(_func, arguments, dispatcher);
         }
 
         private class SyncHandler : IHandler
@@ -136,9 +134,7 @@ namespace StoneFruit.Execution.Handlers
             }
 
             public Task ExecuteAsync(CancellationToken cancellation)
-            {
-                return _func(_arguments, _dispatcher);
-            }
+                => _func(_arguments, _dispatcher);
         }
     }
 }

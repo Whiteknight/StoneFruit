@@ -13,7 +13,7 @@ namespace StoneFruit.Tests.Execution
         {
             var source = new ScriptHandlerSource();
             var instance = source.GetInstance(SyntheticArguments.From("X"), null);
-            instance.Should().BeNull();
+            instance.HasValue.Should().BeFalse();
         }
 
         [Test]
@@ -22,7 +22,7 @@ namespace StoneFruit.Tests.Execution
             var target = new ScriptHandlerSource();
             target.AddScript("test", new[] { "echo 'test'" });
             var result = target.GetInstance(SyntheticArguments.From("test"), new CommandDispatcher(null, null, null, null, null));
-            result.Should().NotBeNull();
+            result.HasValue.Should().BeTrue();
         }
     }
 }

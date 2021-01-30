@@ -48,24 +48,25 @@ namespace StoneFruit.Execution.Handlers
             });
         }
 
-        public IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher)
+        public IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
         {
             var verbInfo = _types.Get(arguments);
-            if (verbInfo?.Type == null)
-                return null;
-            return ResolveInstance(arguments, dispatcher, verbInfo.Type);
+            if (!verbInfo.HasValue)
+                return FailureResult<IHandlerBase>.Instance;
+            var instance = ResolveInstance(arguments, dispatcher, verbInfo.Value.Type);
+            return instance == null ? FailureResult<IHandlerBase>.Instance : new SuccessResult<IHandlerBase>(instance);
         }
 
-        public IHandlerBase GetInstance<TCommand>(IArguments command, CommandDispatcher dispatcher)
-            where TCommand : class, IHandlerBase
-            => ResolveInstance(command, dispatcher, typeof(TCommand));
+        //public IHandlerBase GetInstance<TCommand>(IArguments command, CommandDispatcher dispatcher)
+        //    where TCommand : class, IHandlerBase
+        //    => ResolveInstance(command, dispatcher, typeof(TCommand));
 
-        private IHandlerBase ResolveInstance(IArguments command, CommandDispatcher dispatcher, Type commandType)
+        private IHandlerBase? ResolveInstance(IArguments command, CommandDispatcher dispatcher, Type commandType)
             => _resolver(commandType, command, dispatcher) as IHandlerBase;
 
         public IEnumerable<IVerbInfo> GetAll() => _types.GetAll().Select(kvp => kvp.Value);
 
-        public IVerbInfo GetByName(Verb verb) => _types.Get(verb);
+        public IResult<IVerbInfo> GetByName(Verb verb) => _types.Get(verb);
 
         private class VerbInfo : IVerbInfo
         {

@@ -16,16 +16,12 @@ namespace StoneFruit.Execution.Handlers
             _sources = sources.Where(s => s != null).ToList();
         }
 
-        public IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher)
+        public IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
         {
             Assert.ArgumentNotNull(arguments, nameof(arguments));
-            foreach (var source in _sources)
-            {
-                var handler = source.GetInstance(arguments, dispatcher);
-                if (handler != null)
-                    return handler;
-            }
-            return null;
+            return _sources
+                .Select(source => source.GetInstance(arguments, dispatcher))
+                .FirstOrDefault(result => result.HasValue) ?? FailureResult<IHandlerBase>.Instance;
         }
 
         public IEnumerable<IVerbInfo> GetAll()
@@ -37,11 +33,9 @@ namespace StoneFruit.Execution.Handlers
             return allVerbs.Values;
         }
 
-        public IVerbInfo GetByName(Verb verb)
-        {
-            return _sources
+        public IResult<IVerbInfo> GetByName(Verb verb)
+            => _sources
                 .Select(source => source.GetByName(verb))
-                .FirstOrDefault(info => info != null);
-        }
+                .FirstOrDefault(result => result.HasValue) ?? FailureResult<IVerbInfo>.Instance;
     }
 }

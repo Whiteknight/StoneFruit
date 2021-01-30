@@ -53,18 +53,20 @@ namespace StoneFruit.Containers.Microsoft
                 .ToVerbTrie(i => i.Verb);
         }
 
-        public IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher)
+        public IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
         {
             var serviceType = _verbs.Get(arguments);
-            if (serviceType == null)
-                return null;
+            if (!serviceType.HasValue)
+                return FailureResult<IHandlerBase>.Instance;
+
             using var scope = _getProvider().CreateScope();
-            return scope.ServiceProvider.GetService(serviceType.Type) as IHandlerBase;
+            var instance = scope.ServiceProvider.GetService(serviceType.Value.Type) as IHandlerBase;
+            return instance == null ? FailureResult<IHandlerBase>.Instance : new SuccessResult<IHandlerBase>(instance);
         }
 
         public IEnumerable<IVerbInfo> GetAll() => _verbs.GetAll().Select(kvp => kvp.Value);
 
-        public IVerbInfo GetByName(Verb verb) => _verbs.Get(verb);
+        public IResult<IVerbInfo> GetByName(Verb verb) => _verbs.Get(verb);
 
         private class VerbInfo : IVerbInfo
         {

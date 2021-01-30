@@ -17,9 +17,9 @@
             String = null;
         }
 
-        public IArguments Arguments { get; }
+        public IArguments? Arguments { get; }
 
-        public string String { get; }
+        public string? String { get; }
 
         public bool IsValid => !string.IsNullOrEmpty(String) || Arguments != null;
 

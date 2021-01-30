@@ -29,30 +29,31 @@ namespace StoneFruit.Utility
 
         public int Count { get; private set; }
 
-        public TValue Get(IArguments args)
+        public IResult<TValue> Get(IArguments args)
         {
-            var argsWithVerb = args as IVerbSource;
-            if (argsWithVerb == null)
-                return default;
+            if (args is not IVerbSource argsWithVerb)
+                return FailureResult<TValue>.Instance;
 
             var node = GetNode(argsWithVerb);
-            if (node == null)
-                return default;
+            if (node?.Value == null)
+                return FailureResult<TValue>.Instance;
 
-            return node.Value;
+            return new SuccessResult<TValue>(node.Value);
         }
 
-        public TValue Get(IEnumerable<string> keys)
+        public IResult<TValue> Get(IEnumerable<string> keys)
         {
             var current = _root;
             foreach (var key in keys)
             {
                 var node = current.GetChild(key);
                 if (node == null)
-                    return null;
+                    return FailureResult<TValue>.Instance;
                 current = node;
             }
-            return current.Value;
+            if (current?.Value == null)
+                return FailureResult<TValue>.Instance;
+            return new SuccessResult<TValue>(current.Value);
         }
 
         public IReadOnlyList<KeyValuePair<Verb, TValue>> GetAll()
@@ -62,7 +63,7 @@ namespace StoneFruit.Utility
             return values;
         }
 
-        private Node GetNode(IVerbSource args)
+        private Node? GetNode(IVerbSource args)
         {
             var keys = args.GetVerbCandidatePositionals();
             if (keys.Count == 0)
@@ -86,7 +87,7 @@ namespace StoneFruit.Utility
             // Start from the end of the list looping forwards. Keep looking until we find a
             // value. Once we find a value, mark all remaining args as consumed and return the
             // value
-            Node targetNode = null;
+            Node? targetNode = null;
             int foundIndex = -1;
             for (int index = foundNodes.Count - 1; index >= 0; index--)
             {
@@ -114,12 +115,10 @@ namespace StoneFruit.Utility
                 _children = new Dictionary<string, Node>();
             }
 
-            public TValue Value { get; set; }
+            public TValue? Value { get; set; }
 
-            public Node GetChild(string key)
-            {
-                return _children.ContainsKey(key) ? _children[key] : null;
-            }
+            public Node? GetChild(string key)
+                => _children.ContainsKey(key) ? _children[key] : null;
 
             public Node GetOrInsertChild(string key)
             {

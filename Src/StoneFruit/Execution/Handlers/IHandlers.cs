@@ -15,7 +15,7 @@ namespace StoneFruit.Execution.Handlers
         /// <param name="arguments"></param>
         /// <param name="dispatcher"></param>
         /// <returns></returns>
-        IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher);
+        IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher);
 
         /// <summary>
         /// Return help information for all handlers. Used mostly by the  "help" handler to display
@@ -30,6 +30,6 @@ namespace StoneFruit.Execution.Handlers
         /// </summary>
         /// <param name="verb"></param>
         /// <returns></returns>
-        IVerbInfo GetByName(Verb verb);
+        IResult<IVerbInfo> GetByName(Verb verb);
     }
 }

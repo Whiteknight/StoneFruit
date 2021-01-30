@@ -37,18 +37,18 @@ namespace StoneFruit.Execution.Handlers
                 .ToVerbTrie(x => x.Verb, x => x.Method);
         }
 
-        public IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher)
+        public IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
         {
             var method = _methods.Get(arguments);
-            if (method == null)
-                return null;
+            if (!method.HasValue)
+                return FailureResult<IHandlerBase>.Instance;
 
-            if (method.ReturnType == typeof(void))
-                return new SyncHandlerWrapper(_instance, method, arguments, dispatcher);
-            if (method.ReturnType == typeof(Task))
-                return new AsyncHandlerWrapper(_instance, method, arguments, dispatcher);
+            if (method.Value.ReturnType == typeof(void))
+                return new SuccessResult<IHandlerBase>(new SyncHandlerWrapper(_instance, method.Value, arguments, dispatcher));
+            if (method.Value.ReturnType == typeof(Task))
+                return new SuccessResult<IHandlerBase>(new AsyncHandlerWrapper(_instance, method.Value, arguments, dispatcher));
 
-            return null;
+            return FailureResult<IHandlerBase>.Instance;
         }
 
         public IEnumerable<IVerbInfo> GetAll()
@@ -57,12 +57,12 @@ namespace StoneFruit.Execution.Handlers
 
         // Since we're using the name of a method as the verb, and you can't nest methods, the
         // verb must only be a single string. Anything else is a non-match
-        public IVerbInfo GetByName(Verb verb)
+        public IResult<IVerbInfo> GetByName(Verb verb)
         {
             var method = _methods.Get(verb);
-            if (method == null)
-                return null;
-            return new MethodInfoVerbInfo(verb, _getDescription, _getUsage, _getGroup);
+            if (!method.HasValue)
+                return FailureResult<IVerbInfo>.Instance;
+            return new SuccessResult<IVerbInfo>(new MethodInfoVerbInfo(verb, _getDescription, _getUsage, _getGroup));
         }
 
         private static object InvokeMethod(object instance, MethodInfo method, ParameterInfo[] parameters, IArguments command, CommandDispatcher dispatcher, CancellationToken token)
@@ -147,9 +147,9 @@ namespace StoneFruit.Execution.Handlers
             {
                 var parameters = _method.GetParameters();
                 if (parameters.Length == 0)
-                    return _method.Invoke(_instance, new object[0]) as Task;
+                    return (Task)_method.Invoke(_instance, new object[0]);
 
-                return InvokeMethod(_instance, _method, parameters, _command, _dispatcher, cancellation) as Task;
+                return (Task)InvokeMethod(_instance, _method, parameters, _command, _dispatcher, cancellation);
             }
         }
     }
