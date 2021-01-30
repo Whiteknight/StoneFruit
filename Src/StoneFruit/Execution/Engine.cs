@@ -204,8 +204,7 @@ namespace StoneFruit.Execution
             // Environment.CommandLine includes the name of the exe invoked, so strip that
             // off the front. Luckily it seems like quotes are stripped for us.
             var exeName = Environment.GetCommandLineArgs()[0];
-            var firstCommand = Environment.CommandLine.Substring(exeName.Length).Trim();
-            return firstCommand;
+            return Environment.CommandLine.Substring(exeName.Length).Trim();
         }
 
         // See if the given commandLine starts with a valid environment name. If so,
@@ -224,7 +223,7 @@ namespace StoneFruit.Execution
 
         // Pulls commands from the command source until the source is empty or an exit
         // signal is received. Each command is added to the command queue and the queue
-        // is drained. 
+        // is drained.
         private int RunLoop(CommandSourceCollection sources)
         {
             try
@@ -244,7 +243,7 @@ namespace StoneFruit.Execution
                 // Get a command. If we have one in the state use that. Otherwise try to
                 // get one from the sources. If null, we're all done so exit
                 var command = _state.Commands.GetNext() ?? sources.GetNextCommand();
-                if (command == null || !command.IsValid)
+                if (command?.IsValid != true)
                     return Constants.ExitCodeOk;
 
                 // Check the counter to make sure that we are not in a runaway loop
@@ -278,7 +277,7 @@ namespace StoneFruit.Execution
                     HandleError(e, _state.EventCatalog.EngineError, args);
                 }
 
-                // If exit is signaled, return. 
+                // If exit is signaled, return.
                 if (_state.ShouldExit)
                     return _state.ExitCode;
             }

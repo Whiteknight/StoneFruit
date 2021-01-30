@@ -17,22 +17,21 @@ namespace StoneFruit.Execution
 
         public void Add(string name, object value, bool allowOverwrite = true)
         {
-            if (_metadata.ContainsKey(name))
+            if (!_metadata.ContainsKey(name))
             {
-                if (!allowOverwrite)
-                    return;
-                _metadata.Remove(name);
+                _metadata.Add(name, value);
+                return;
             }
 
+            if (!allowOverwrite)
+                return;
+
+            _metadata.Remove(name);
             _metadata.Add(name, value);
         }
 
         public object Get(string name)
-        {
-            if (!_metadata.ContainsKey(name))
-                return null;
-            return _metadata[name];
-        }
+            => _metadata.ContainsKey(name) ? _metadata[name] : null;
 
         public IEnumerator<KeyValuePair<string, object>> GetEnumerator() => _metadata.GetEnumerator();
 
