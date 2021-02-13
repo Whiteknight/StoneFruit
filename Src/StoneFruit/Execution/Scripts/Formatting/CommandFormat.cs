@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.Execution.Scripts.Formatting
@@ -19,11 +18,17 @@ namespace StoneFruit.Execution.Scripts.Formatting
 
         public IArguments Format(IArguments args)
         {
-            var argsList = _args
-                .SelectMany(a => a.Access(args))
-                .Where(a => a != null)
-                .ToList();
-            return new SyntheticArguments(argsList);
+            var argList = new List<IArgument>();
+            foreach (var a in _args)
+            {
+                foreach (var newArg in a.Access(args))
+                {
+                    if (newArg != null)
+                        argList.Add(newArg);
+                }
+                args.ResetAllArguments();
+            }
+            return new SyntheticArguments(argList);
         }
     }
 }

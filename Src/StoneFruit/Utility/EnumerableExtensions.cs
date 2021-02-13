@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace StoneFruit.Utility
@@ -13,5 +14,17 @@ namespace StoneFruit.Utility
         /// <returns></returns>
         public static IEnumerable<T> OrEmptyIfNull<T>(this IEnumerable<T> source)
             => source ?? Enumerable.Empty<T>();
+
+        public static IEnumerable<T> Tap<T>(this IEnumerable<T> source, Action<T> onEach)
+        {
+            Assert.ArgumentNotNull(source, nameof(source));
+            Assert.ArgumentNotNull(onEach, nameof(onEach));
+
+            foreach (var item in source)
+            {
+                onEach(item);
+                yield return item;
+            }
+        }
     }
 }
