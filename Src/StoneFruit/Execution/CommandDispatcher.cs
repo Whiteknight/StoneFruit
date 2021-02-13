@@ -18,8 +18,8 @@ namespace StoneFruit.Execution
             Parser = parser;
             Handlers = handlers;
             Environments = environments;
-            State = state;
             Output = output;
+            State = state;
         }
 
         /// <summary>

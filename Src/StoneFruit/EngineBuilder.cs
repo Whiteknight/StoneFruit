@@ -132,7 +132,7 @@ namespace StoneFruit
         public static void SetupEngineRegistrations(IServiceCollection services)
         {
             // Register the Engine and the things that the Engine provides
-            services.AddSingleton(provider => new EngineAccessor());
+            services.AddSingleton(_ => new EngineAccessor());
             services.AddSingleton(provider =>
             {
                 var accessor = provider.GetRequiredService<EngineAccessor>();
@@ -146,8 +146,8 @@ namespace StoneFruit
                 accessor.SetEngine(e);
                 return e;
             });
-            services.AddScoped(provider => provider.GetRequiredService<EngineAccessor>().Engine.GetCurrentState());
-            services.AddScoped(provider => provider.GetRequiredService<EngineAccessor>().Engine.GetCurrentDispatcher());
+            services.AddSingleton(provider => provider.GetRequiredService<EngineAccessor>().Engine.State);
+            services.AddSingleton(provider => provider.GetRequiredService<EngineAccessor>().Engine.Dispatcher);
             services.AddScoped(provider => provider.GetRequiredService<EngineState>().CurrentArguments);
         }
 
