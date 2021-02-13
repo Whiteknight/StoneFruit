@@ -18,9 +18,6 @@ namespace StoneFruit
         private readonly EngineSettings _settings;
         private readonly ICommandParser _parser;
 
-        private EngineState? _state;
-        private CommandDispatcher? _dispatcher;
-
         public Engine(IHandlers handlers, IEnvironmentCollection environments, ICommandParser parser, IOutput output, EngineEventCatalog eventCatalog, EngineSettings settings)
         {
             Assert.ArgumentNotNull(handlers, nameof(handlers));
@@ -35,25 +32,11 @@ namespace StoneFruit
             _settings = settings;
             _parser = parser;
             Output = output;
+            State = new EngineState(_eventCatalog, _settings);
+            Dispatcher = new CommandDispatcher(_parser, _handlers, Environments, State, Output);
         }
 
-        private void SetupState(bool headless)
-        {
-            if (_state != null)
-                throw new ExecutionException("Cannot Run while the engine is already running.");
-            _state = new EngineState(headless, _eventCatalog, _settings);
-            _dispatcher = new CommandDispatcher(_parser, _handlers, Environments, _state, Output);
-        }
-
-        private void ClearState()
-        {
-            _state = null;
-            _dispatcher = null;
-        }
-
-        public EngineState GetCurrentState() => _state ?? throw new InvalidOperationException("Cannot access State, one has not been created");
-
-        public CommandDispatcher GetCurrentDispatcher() => _dispatcher ?? throw new InvalidOperationException("Cannot access Dispatcher, one has not been created");
+        public EngineState State { get; }
 
         /// <summary>
         /// The set of configured environments
@@ -64,6 +47,8 @@ namespace StoneFruit
         /// The configured output channel
         /// </summary>
         public IOutput Output { get; }
+
+        public CommandDispatcher Dispatcher { get; }
 
         /// <summary>
         /// Selects the appropriate run mode and executes it based on the raw command line
@@ -117,14 +102,14 @@ namespace StoneFruit
         /// <returns></returns>
         public int RunHeadless(string commandLine)
         {
-            SetupState(true);
+            State.SetRunMode(EngineRunMode.Headless);
             var sources = new CommandSourceCollection();
 
             // If we have a single argument "help", run the help script and exit. We don't
             // require a valid environment to run help
             if (commandLine == "help")
             {
-                sources.AddToEnd(_state!.EventCatalog.HeadlessHelp, _parser,
+                sources.AddToEnd(State.EventCatalog.HeadlessHelp, _parser,
                     ("exitcode", Constants.ExitCodeHeadlessHelp.ToString())
                 );
                 return RunLoop(sources);
@@ -138,7 +123,7 @@ namespace StoneFruit
             // If there is no commandline left, run the HeadlessNoArgs script
             if (string.IsNullOrWhiteSpace(commandLine))
             {
-                sources.AddToEnd(_state!.EventCatalog.HeadlessNoArgs, _parser,
+                sources.AddToEnd(State.EventCatalog.HeadlessNoArgs, _parser,
                     ("exitcode", Constants.ExitCodeHeadlessNoVerb.ToString())
                 );
                 return RunLoop(sources);
@@ -146,11 +131,11 @@ namespace StoneFruit
 
             // Setup the Headless start script, an environment change command if any, the
             // user command, and the headless stop script
-            sources.AddToEnd(_state!.EventCatalog.EngineStartHeadless, _parser);
+            sources.AddToEnd(State.EventCatalog.EngineStartHeadless, _parser);
             if (!string.IsNullOrWhiteSpace(startingEnvironment))
                 sources.AddToEnd($"{EnvironmentHandler.Name} '{startingEnvironment}'");
             sources.AddToEnd(commandLine);
-            sources.AddToEnd(_state.EventCatalog.EngineStopHeadless, _parser);
+            sources.AddToEnd(State.EventCatalog.EngineStopHeadless, _parser);
 
             return RunLoop(sources);
         }
@@ -172,7 +157,7 @@ namespace StoneFruit
         /// <param name="environment"></param>
         public int RunInteractively(string? environment)
         {
-            SetupState(false);
+            State.SetRunMode(EngineRunMode.Interactive);
             var source = new CommandSourceCollection();
 
             // Change the environment if necessary. Otherwise the EngineStartInteractive
@@ -180,8 +165,8 @@ namespace StoneFruit
             if (!string.IsNullOrEmpty(environment))
                 source.AddToEnd($"{EnvironmentHandler.Name} '{environment}'");
 
-            source.AddToEnd(_state!.EventCatalog.EngineStartInteractive, _parser);
-            source.AddToEnd(new PromptCommandSource(Output, Environments, _state));
+            source.AddToEnd(State.EventCatalog.EngineStartInteractive, _parser);
+            source.AddToEnd(new PromptCommandSource(Output, Environments, State));
 
             return RunLoop(source);
         }
@@ -217,13 +202,15 @@ namespace StoneFruit
         // is drained.
         private int RunLoop(CommandSourceCollection sources)
         {
+            if (State.RunMode == EngineRunMode.Idle)
+                throw new ExecutionException("Cannot run the engine in Idle mode. Must enter Headless or Interactive mode first.");
             try
             {
                 return RunLoopInternal(sources);
             }
             finally
             {
-                ClearState();
+                State.SetRunMode(EngineRunMode.Idle);
             }
         }
 
@@ -233,7 +220,7 @@ namespace StoneFruit
             {
                 // Get a command. If we have one in the state use that. Otherwise try to
                 // get one from the sources. If null, we're all done so exit
-                IResult<ArgumentsOrString> commandResult = _state!.Commands.GetNext();
+                IResult<ArgumentsOrString> commandResult = State.Commands.GetNext();
                 if (!commandResult.HasValue)
                     commandResult = sources.GetNextCommand();
                 if (!commandResult.HasValue)
@@ -246,48 +233,53 @@ namespace StoneFruit
                 // Check the counter to make sure that we are not in a runaway loop
                 // If we are in a loop, the counter will setup the command queue to handle
                 // it
-                var canExecute = _state.CommandCounter.VerifyCanExecuteNextCommand(_parser, Output);
+                var canExecute = State.CommandCounter.VerifyCanExecuteNextCommand(_parser, Output);
                 if (!canExecute)
                     continue;
 
-                try
-                {
-                    // Get a cancellation token source, configured according to state Command
-                    // settings, and use that to dispatch the command
-                    using var tokenSource = _state.GetConfiguredCancellationSource();
-                    _dispatcher!.Execute(command, tokenSource.Token);
-                }
-                catch (VerbNotFoundException vnf)
-                {
-                    // The verb was not found. Execute the VerbNotFound script
-                    var args = SyntheticArguments.From(("verb", vnf.Verb));
-                    HandleError(vnf, _state.EventCatalog.VerbNotFound, args);
-                }
-                catch (Exception e)
-                {
-                    // We've received some other error. Execute the EngineError script
-                    // and hope for the best
-                    var args = SyntheticArguments.From(
-                        ("message", e.Message),
-                        ("stacktrace", e.StackTrace ?? "")
-                    );
-                    HandleError(e, _state.EventCatalog.EngineError, args);
-                }
+                RunOneCommand(command);
 
                 // If exit is signaled, return.
-                if (_state.ShouldExit)
-                    return _state.ExitCode;
+                if (State.ShouldExit)
+                    return State.ExitCode;
+            }
+        }
+
+        private void RunOneCommand(ArgumentsOrString command)
+        {
+            try
+            {
+                // Get a cancellation token source, configured according to state Command
+                // settings, and use that to dispatch the command
+                using var tokenSource = State.GetConfiguredCancellationSource();
+                Dispatcher.Execute(command, tokenSource.Token);
+            }
+            catch (VerbNotFoundException vnf)
+            {
+                // The verb was not found. Execute the VerbNotFound script
+                var args = SyntheticArguments.From(("verb", vnf.Verb));
+                HandleError(vnf, State.EventCatalog.VerbNotFound, args);
+            }
+            catch (Exception e)
+            {
+                // We've received some other error. Execute the EngineError script
+                // and hope for the best
+                var args = SyntheticArguments.From(
+                    ("message", e.Message),
+                    ("stacktrace", e.StackTrace ?? "")
+                );
+                HandleError(e, State.EventCatalog.EngineError, args);
             }
         }
 
         // Handle an error from the dispatcher.
-        private void HandleError(Exception e, EventScript script, IArguments args)
+        private void HandleError(Exception currentException, EventScript script, IArguments args)
         {
             // If an exception is thrown while handling a previous exception, show an
             // angry error message and exit immediately
-            var currentExceptionResult = _state!.Metadata.Get(Constants.MetadataError);
+            var currentExceptionResult = State.Metadata.Get(Constants.MetadataError);
 
-            if (currentExceptionResult.HasValue && currentExceptionResult.Value is Exception currentException)
+            if (currentExceptionResult.HasValue && currentExceptionResult.Value is Exception previousException)
             {
                 // This isn't scripted because it's critical error-handling code and we
                 // don't want the user to clear/override it
@@ -297,13 +289,13 @@ namespace StoneFruit
                     .WriteLine("This is a fatal condition and the engine will exit")
                     .WriteLine("Make sure you clear the current exception when you are done handling it to avoid these situations")
                     .WriteLine("Current Exception:")
-                    .WriteLine(e.Message)
-                    .WriteLine(e.StackTrace ?? "")
-                    .WriteLine("Previous Exception:")
                     .WriteLine(currentException.Message)
                     .WriteLine(currentException.StackTrace ?? "")
+                    .WriteLine("Previous Exception:")
+                    .WriteLine(previousException.Message)
+                    .WriteLine(previousException.StackTrace ?? "")
                     ;
-                _state.Exit(Constants.ExitCodeCascadeError);
+                State.SignalExit(Constants.ExitCodeCascadeError);
                 return;
             }
 
@@ -312,9 +304,9 @@ namespace StoneFruit
             // from metadata (prepends happen in reverse order from how they're executed)
             // We can't remove metadata in the script, because users might change the script
             // and inadvertantly break loop detection.
-            _state.Metadata.Add(Constants.MetadataError, e, false);
-            _state.Commands.Prepend($"{MetadataHandler.Name} remove {Constants.MetadataError}");
-            _state.Commands.Prepend(script.GetCommands(_parser, args));
+            State.Metadata.Add(Constants.MetadataError, currentException, false);
+            State.Commands.Prepend($"{MetadataHandler.Name} remove {Constants.MetadataError}");
+            State.Commands.Prepend(script.GetCommands(_parser, args));
             // Current command queue:
             // 1. Error-handling script
             // 2. "metadata remove __CURRENT_EXCEPTION"

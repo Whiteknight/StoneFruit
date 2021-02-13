@@ -12,32 +12,43 @@ namespace StoneFruit.Execution
     {
         private IArguments? _arguments;
 
-        public EngineState(bool headless, EngineEventCatalog eventCatalog, EngineSettings settings)
+        public EngineState(EngineEventCatalog eventCatalog, EngineSettings settings)
         {
             Assert.ArgumentNotNull(eventCatalog, nameof(eventCatalog));
             Assert.ArgumentNotNull(settings, nameof(settings));
 
-            Headless = headless;
             EventCatalog = eventCatalog;
             ShouldExit = false;
 
             Settings = settings;
             Commands = new EngineStateCommandQueue();
             Metadata = new EngineStateMetadataCache();
-            CommandCounter = Headless ?
-                new HeadlessEngineStateCommandCounter(Commands, eventCatalog, Settings) :
-                (IEngineStateCommandCounter)new InteractiveEngineStateCommandCounter(Commands, Settings);
+            RunMode = EngineRunMode.Idle;
+            CommandCounter = new NullCommandCounter();
         }
 
-        public bool ShouldExit { get; private set; }
-        public int ExitCode { get; private set; }
-        public bool Headless { get; }
         public EngineEventCatalog EventCatalog { get; }
         public EngineStateCommandQueue Commands { get; }
         public EngineStateMetadataCache Metadata { get; }
-        public IEngineStateCommandCounter CommandCounter { get; set; }
-        public EngineSettings Settings { get; set; }
+        public EngineSettings Settings { get; }
+
+        public bool ShouldExit { get; private set; }
+        public int ExitCode { get; private set; }
+        public EngineRunMode RunMode { get; private set; }
+        public IEngineStateCommandCounter CommandCounter { get; private set; }
+
         public IArguments CurrentArguments => _arguments ?? throw new InvalidOperationException("Attempt to access IArguments when there are no current arguments set");
+
+        public void SetRunMode(EngineRunMode runMode)
+        {
+            RunMode = runMode;
+            CommandCounter = runMode switch
+            {
+                EngineRunMode.Headless => new HeadlessEngineStateCommandCounter(Commands, EventCatalog, Settings),
+                EngineRunMode.Interactive => new InteractiveEngineStateCommandCounter(Commands, Settings),
+                _ => new NullCommandCounter()
+            };
+        }
 
         public void SetCurrentArguments(IArguments arguments)
         {
@@ -53,7 +64,7 @@ namespace StoneFruit.Execution
         /// Signal the runloop that it should exit immediately and stop executing commands.
         /// </summary>
         /// <param name="exitCode"></param>
-        public void Exit(int exitCode = Constants.ExitCodeOk)
+        public void SignalExit(int exitCode = Constants.ExitCodeOk)
         {
             ShouldExit = true;
             ExitCode = exitCode;

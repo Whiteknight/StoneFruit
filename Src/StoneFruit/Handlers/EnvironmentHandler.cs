@@ -114,7 +114,7 @@ Change the current environment, only if any are configured but none are set.
         private void PromptUserForEnvironment()
         {
             // In headless mode we can't prompt, so at this point we just throw an exception
-            if (_state.Headless)
+            if (_state.RunMode == EngineRunMode.Headless)
                 throw new ExecutionException("Environment not specified in headless mode");
 
             // Use the env-list verb to show the list, then prompt the user to make a selection. Loop until

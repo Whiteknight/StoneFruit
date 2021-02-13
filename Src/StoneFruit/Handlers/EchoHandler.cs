@@ -33,7 +33,7 @@ Appends a new-line to the end unless -nonewline is specified
         public void Execute()
         {
             // Some messages, especially internal ones, don't want to display in headless
-            if (_args.HasFlag("noheadless") && _state.Headless)
+            if (_args.HasFlag("noheadless") && _state.RunMode == EngineRunMode.Headless)
                 return;
 
             var output = _output;
