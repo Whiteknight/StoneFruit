@@ -27,14 +27,16 @@ namespace StoneFruit.Execution
             CommandCounter = new NullCommandCounter();
         }
 
-        public bool ShouldExit { get; private set; }
-        public int ExitCode { get; private set; }
         public EngineEventCatalog EventCatalog { get; }
         public EngineStateCommandQueue Commands { get; }
         public EngineStateMetadataCache Metadata { get; }
+        public EngineSettings Settings { get; }
+
+        public bool ShouldExit { get; private set; }
+        public int ExitCode { get; private set; }
         public EngineRunMode RunMode { get; private set; }
         public IEngineStateCommandCounter CommandCounter { get; private set; }
-        public EngineSettings Settings { get; set; }
+
         public IArguments CurrentArguments => _arguments ?? throw new InvalidOperationException("Attempt to access IArguments when there are no current arguments set");
 
         public void SetRunMode(EngineRunMode runMode)
@@ -62,7 +64,7 @@ namespace StoneFruit.Execution
         /// Signal the runloop that it should exit immediately and stop executing commands.
         /// </summary>
         /// <param name="exitCode"></param>
-        public void Exit(int exitCode = Constants.ExitCodeOk)
+        public void SignalExit(int exitCode = Constants.ExitCodeOk)
         {
             ShouldExit = true;
             ExitCode = exitCode;

@@ -295,7 +295,7 @@ namespace StoneFruit
                     .WriteLine(previousException.Message)
                     .WriteLine(previousException.StackTrace ?? "")
                     ;
-                State.Exit(Constants.ExitCodeCascadeError);
+                State.SignalExit(Constants.ExitCodeCascadeError);
                 return;
             }
 
