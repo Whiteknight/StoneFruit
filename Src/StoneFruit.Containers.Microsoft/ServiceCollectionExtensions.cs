@@ -41,7 +41,7 @@ namespace StoneFruit.Containers.Microsoft
         /// <summary>
         /// Setup the Engine registrations in the DI container. This method will not scan
         /// for handler classes in your solution, you must have them registered already
-        /// before calling this method.  
+        /// before calling this method.
         /// </summary>
         /// <typeparam name="TEnvironment"></typeparam>
         /// <param name="services"></param>
