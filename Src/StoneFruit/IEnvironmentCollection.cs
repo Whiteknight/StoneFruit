@@ -24,7 +24,7 @@ namespace StoneFruit
         /// <summary>
         /// Returns the name of the current environment
         /// </summary>
-        string CurrentName { get; }
+        string? CurrentName { get; }
 
         /// <summary>
         /// Returns true if this is a valid environment name
@@ -36,7 +36,7 @@ namespace StoneFruit
         /// <summary>
         /// The current environment object, if any.
         /// </summary>
-        object Current { get; }
+        object? Current { get; }
     }
 
     public static class EnvironmentCollectionExtensions

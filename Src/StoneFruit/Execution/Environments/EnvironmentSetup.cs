@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
+using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Environments
 {
@@ -10,54 +11,44 @@ namespace StoneFruit.Execution.Environments
     {
         private IEnvironmentCollection _environments;
 
+        public EnvironmentSetup()
+        {
+            _environments = new InstanceEnvironmentCollection();
+        }
+
         public void BuildUp(IServiceCollection services)
         {
             var environments = Build();
             services.AddSingleton(environments);
         }
 
-        public IEnvironmentCollection Build()
-            => _environments ?? new InstanceEnvironmentCollection(null);
+        public IEnvironmentCollection Build() => _environments;
 
         public IEnvironmentSetup UseFactory(IEnvironmentFactory factory)
         {
-            if (factory == null)
-            {
-                _environments = null;
-                return this;
-            }
-
-            EnsureEnvironmentsNotSet();
+            Assert.ArgumentNotNull(factory, nameof(factory));
             _environments = new FactoryEnvironmentCollection(factory);
             return this;
         }
 
         public IEnvironmentSetup UseInstance(object environment)
         {
-            EnsureEnvironmentsNotSet();
+            Assert.ArgumentNotNull(environment, nameof(environment));
             _environments = new InstanceEnvironmentCollection(environment);
             return this;
         }
 
         public IEnvironmentSetup UseInstances(IReadOnlyDictionary<string, object> environments)
         {
-            if (environments == null)
-            {
-                _environments = null;
-                return this;
-            }
-
-            EnsureEnvironmentsNotSet();
+            Assert.ArgumentNotNull(environments, nameof(environments));
             _environments = new FactoryEnvironmentCollection(new DictionaryEnvironmentFactory(environments));
             return this;
         }
 
-        public IEnvironmentSetup None() => UseInstance(null);
-
-        private void EnsureEnvironmentsNotSet()
+        public IEnvironmentSetup None()
         {
-            if (_environments != null)
-                throw new EngineBuildException("Environments are already configured for this builder. You cannot set environments again");
+            _environments = new InstanceEnvironmentCollection();
+            return this;
         }
     }
 }

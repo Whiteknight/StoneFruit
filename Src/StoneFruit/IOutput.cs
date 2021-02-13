@@ -61,7 +61,7 @@ namespace StoneFruit
             Assert.ArgumentNotNull(output, nameof(output));
             if (obj == null)
                 return output;
-            return output.Write(obj.ToString());
+            return output.Write(obj!.ToString()!);
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace StoneFruit
             Assert.ArgumentNotNull(output, nameof(output));
             if (obj == null)
                 return output;
-            return output.WriteLine(obj.ToString());
+            return output.WriteLine(obj!.ToString()!);
         }
 
         /// <summary>

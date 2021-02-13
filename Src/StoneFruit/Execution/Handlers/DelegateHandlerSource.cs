@@ -34,16 +34,16 @@ namespace StoneFruit.Execution.Handlers
 
         public IResult<IVerbInfo> GetByName(Verb verb) => _handlers.Get(verb);
 
-        public DelegateHandlerSource Add(Verb verb, Action<IArguments, CommandDispatcher> act, string? description = null, string? usage = null, string? group = null)
+        public DelegateHandlerSource Add(Verb verb, Action<IArguments, CommandDispatcher> act, string description = "", string usage = "", string group = "")
         {
-            var factory = new SyncHandlerFactory(act, verb, description ?? string.Empty, usage ?? description ?? string.Empty, group ?? string.Empty);
+            var factory = new SyncHandlerFactory(act, verb, description, usage, group);
             _handlers.Insert(verb, factory);
             return this;
         }
 
-        public DelegateHandlerSource AddAsync(Verb verb, Func<IArguments, CommandDispatcher, Task> func, string? description = null, string? usage = null, string? group = null)
+        public DelegateHandlerSource AddAsync(Verb verb, Func<IArguments, CommandDispatcher, Task> func, string description = "", string usage = "", string group = "")
         {
-            _handlers.Insert(verb, new AsyncHandlerFactory(func, verb, description ?? string.Empty, usage ?? description ?? string.Empty, group ?? string.Empty));
+            _handlers.Insert(verb, new AsyncHandlerFactory(func, verb, description, usage, group));
             return this;
         }
 
@@ -58,7 +58,7 @@ namespace StoneFruit.Execution.Handlers
             {
                 Verb = verb;
                 Description = description;
-                Usage = usage;
+                Usage = string.IsNullOrEmpty(usage) ? description : usage;
                 Group = group;
             }
 

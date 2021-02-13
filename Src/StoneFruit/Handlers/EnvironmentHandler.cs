@@ -136,7 +136,7 @@ Change the current environment, only if any are configured but none are set.
         private void OnEnvironmentChanged()
         {
             var script = _state.EventCatalog.EnvironmentChanged;
-            var args = SyntheticArguments.From(("environment", _environments.CurrentName));
+            var args = SyntheticArguments.From(("environment", _environments.CurrentName ?? ""));
             _state.Commands.Prepend(script.GetCommands(_dispatcher.Parser, args));
         }
 

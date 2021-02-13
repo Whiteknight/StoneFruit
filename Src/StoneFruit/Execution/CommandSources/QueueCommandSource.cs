@@ -14,12 +14,13 @@ namespace StoneFruit.Execution.CommandSources
             _commands = new Queue<string>(commands);
         }
 
-        public ArgumentsOrString GetNextCommand()
+        public IResult<ArgumentsOrString> GetNextCommand()
         {
             if (_commands.Count == 0)
-                return null;
+                return FailureResult<ArgumentsOrString>.Instance;
             var value = _commands.Dequeue();
-            return value;
+            var result = new ArgumentsOrString(value);
+            return Result.Success(result);
         }
     }
 }

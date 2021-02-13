@@ -21,7 +21,7 @@ namespace StoneFruit.Containers.StructureMap.Tests.Integration
 
         public class MyEnvironmentFactory : IEnvironmentFactory
         {
-            public object Create(string name) => new MyEnvironment(name);
+            public IResult<object> Create(string name) => Result.Success(new MyEnvironment(name));
 
             public IReadOnlyCollection<string> ValidEnvironments => new[] { "A", "B", "C" };
         }

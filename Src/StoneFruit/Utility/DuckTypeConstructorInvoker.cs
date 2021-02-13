@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -10,7 +11,7 @@ namespace StoneFruit.Utility
     /// </summary>
     public static class DuckTypeConstructorInvoker
     {
-        public static object? TryConstruct(Type typeToConstruct, object[] availableArguments)
+        public static object? TryConstruct(Type typeToConstruct, IReadOnlyList<object> availableArguments)
         {
             var constructors = typeToConstruct.GetConstructors().OrderByDescending(ci => ci.GetParameters().Length).ToList();
             return constructors
@@ -18,7 +19,7 @@ namespace StoneFruit.Utility
                 .FirstOrDefault(result => result != null);
         }
 
-        private static object? TryConstruct(ConstructorInfo constructor, object[] availableArguments)
+        private static object? TryConstruct(ConstructorInfo constructor, IReadOnlyList<object> availableArguments)
         {
             var parameters = constructor.GetParameters();
             var arguments = new object[parameters.Length];
@@ -34,7 +35,7 @@ namespace StoneFruit.Utility
             return constructor.Invoke(arguments);
         }
 
-        private static object? TryGetValue(Type parameterType, object[] availableArguments)
+        private static object? TryGetValue(Type parameterType, IReadOnlyList<object> availableArguments)
             => availableArguments
                 .Where(arg => arg != null)
                 .FirstOrDefault(parameterType.IsInstanceOfType);

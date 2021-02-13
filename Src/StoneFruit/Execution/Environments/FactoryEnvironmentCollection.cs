@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using StoneFruit.Utility;
 
@@ -27,9 +28,9 @@ namespace StoneFruit.Execution.Environments
             _validNames = new HashSet<string>(environments);
         }
 
-        public object Current { get; private set; }
+        public object? Current { get; private set; }
 
-        public string CurrentName { get; private set; }
+        public string? CurrentName { get; private set; }
 
         public IReadOnlyList<string> GetNames() => _nameList;
 
@@ -44,21 +45,28 @@ namespace StoneFruit.Execution.Environments
         {
             if (name == null)
                 return;
+            var result = Get(name);
+            if (!result.HasValue)
+                throw new InvalidOperationException($"Environment {name} does not exist");
             CurrentName = name;
-            Current = Get(name);
+            Current = result.Value;
         }
 
-        private object Get(string name)
+        private IResult<object> Get(string name)
         {
             if (name == null)
-                return default;
+                return FailureResult<object>.Instance;
             if (_namedCache.ContainsKey(name))
-                return _namedCache[name];
+                return Result.Success(_namedCache[name]);
             if (!_validNames.Contains(name))
-                return default;
+                return FailureResult<object>.Instance;
             var env = _environmentFactory.Create(name);
-            _namedCache.Add(name, env);
-            return env;
+            if (env.HasValue)
+            {
+                _namedCache.Add(name, env.Value);
+                return env;
+            }
+            return FailureResult<object>.Instance;
         }
     }
 }

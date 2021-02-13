@@ -16,11 +16,13 @@
             _state = state;
         }
 
-        public ArgumentsOrString GetNextCommand()
+        public IResult<ArgumentsOrString> GetNextCommand()
         {
             var str = _output.Prompt($"{_environments.CurrentName}");
             _state.CommandCounter.ReceiveUserInput();
-            return str;
+            if (string.IsNullOrEmpty(str))
+                return FailureResult<ArgumentsOrString>.Instance;
+            return Result.Success(new ArgumentsOrString(str));
         }
     }
 }

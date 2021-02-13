@@ -10,7 +10,7 @@ namespace StoneFruit.Tests.Execution.CommandSources
         public void GetNextCommand_Empty()
         {
             var target = new CommandSourceCollection();
-            target.GetNextCommand().Should().Be(null);
+            target.GetNextCommand().HasValue.Should().BeFalse();
         }
 
         [Test]
@@ -19,9 +19,9 @@ namespace StoneFruit.Tests.Execution.CommandSources
             var target = new CommandSourceCollection();
             target.AddToEnd(new QueueCommandSource("test1"));
             target.AddToEnd(new QueueCommandSource("test2"));
-            target.GetNextCommand().String.Should().Be("test1");
-            target.GetNextCommand().String.Should().Be("test2");
-            target.GetNextCommand().Should().Be(null);
+            target.GetNextCommand().Value.String.Should().Be("test1");
+            target.GetNextCommand().Value.String.Should().Be("test2");
+            target.GetNextCommand().HasValue.Should().BeFalse();
         }
     }
 }

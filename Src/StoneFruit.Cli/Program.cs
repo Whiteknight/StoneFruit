@@ -34,9 +34,9 @@ namespace StoneFruit.Cli
         }
     }
 
-    static class Program
+    internal static class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             //var engine = NoneMain();
             //var engine = StructureMapMain();
@@ -167,7 +167,6 @@ namespace StoneFruit.Cli
             {
                 while (!cancellation.IsCancellationRequested)
                 {
-
                     Console.Write(".");
                     Thread.Sleep(100);
                 }
@@ -179,10 +178,8 @@ namespace StoneFruit.Cli
 
     public class MyEnvironmentFactory : IEnvironmentFactory
     {
-        public object Create(string name)
-        {
-            return new MyEnvironment(name);
-        }
+        public IResult<object> Create(string name)
+            => Result.Success(new MyEnvironment(name));
 
         public IReadOnlyCollection<string> ValidEnvironments => new[] { "Local", "Testing", "Production" };
     }

@@ -104,7 +104,7 @@ namespace StoneFruit.Execution
         public void Execute(IArguments arguments, CancellationToken token = default)
         {
             Assert.ArgumentNotNull(arguments, nameof(arguments));
-            State.CurrentArguments = arguments;
+            State.SetCurrentArguments(arguments);
             var handlerResult = Handlers.GetInstance(arguments, this);
             if (!handlerResult.HasValue)
                 throw VerbNotFoundException.FromArguments(arguments);
@@ -112,7 +112,7 @@ namespace StoneFruit.Execution
             if (handler is IHandler syncHandler)
             {
                 syncHandler.Execute();
-                State.CurrentArguments = null;
+                State.ClearCurrentArguments();
                 return;
             }
 
@@ -122,7 +122,7 @@ namespace StoneFruit.Execution
                     .ConfigureAwait(false)
                     .GetAwaiter()
                     .GetResult();
-                State.CurrentArguments = null;
+                State.ClearCurrentArguments();
             }
         }
 
@@ -185,7 +185,7 @@ namespace StoneFruit.Execution
         public async Task ExecuteAsync(IArguments arguments, CancellationToken token = default)
         {
             Assert.ArgumentNotNull(arguments, nameof(arguments));
-            State.CurrentArguments = arguments;
+            State.SetCurrentArguments(arguments);
             var handlerResult = Handlers.GetInstance(arguments, this);
             if (!handlerResult.HasValue)
                 throw VerbNotFoundException.FromArguments(arguments);
@@ -193,14 +193,14 @@ namespace StoneFruit.Execution
             if (handler is IHandler syncHandler)
             {
                 syncHandler.Execute();
-                State.CurrentArguments = null;
+                State.ClearCurrentArguments();
                 return;
             }
 
             if (handler is IAsyncHandler asyncHandler)
             {
                 await asyncHandler.ExecuteAsync(token);
-                State.CurrentArguments = null;
+                State.ClearCurrentArguments();
             }
         }
     }

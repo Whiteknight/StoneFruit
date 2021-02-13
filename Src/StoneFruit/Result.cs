@@ -10,6 +10,12 @@ namespace StoneFruit
         IResult<TOut> Transform<TOut>(Func<T, TOut> transform);
     }
 
+    public static class Result
+    {
+        public static IResult<T> Success<T>(T value)
+            => new SuccessResult<T>(value);
+    }
+
     public class SuccessResult<T> : IResult<T>
     {
         public SuccessResult(T value)
