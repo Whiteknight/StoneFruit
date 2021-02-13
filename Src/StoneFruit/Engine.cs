@@ -250,29 +250,7 @@ namespace StoneFruit
                 if (!canExecute)
                     continue;
 
-                try
-                {
-                    // Get a cancellation token source, configured according to state Command
-                    // settings, and use that to dispatch the command
-                    using var tokenSource = _state.GetConfiguredCancellationSource();
-                    _dispatcher!.Execute(command, tokenSource.Token);
-                }
-                catch (VerbNotFoundException vnf)
-                {
-                    // The verb was not found. Execute the VerbNotFound script
-                    var args = SyntheticArguments.From(("verb", vnf.Verb));
-                    HandleError(vnf, _state.EventCatalog.VerbNotFound, args);
-                }
-                catch (Exception e)
-                {
-                    // We've received some other error. Execute the EngineError script
-                    // and hope for the best
-                    var args = SyntheticArguments.From(
-                        ("message", e.Message),
-                        ("stacktrace", e.StackTrace ?? "")
-                    );
-                    HandleError(e, _state.EventCatalog.EngineError, args);
-                }
+                RunOneCommand(_state!, command);
 
                 // If exit is signaled, return.
                 if (_state.ShouldExit)
@@ -280,14 +258,41 @@ namespace StoneFruit
             }
         }
 
+        private void RunOneCommand(EngineState state, ArgumentsOrString command)
+        {
+            try
+            {
+                // Get a cancellation token source, configured according to state Command
+                // settings, and use that to dispatch the command
+                using var tokenSource = state.GetConfiguredCancellationSource();
+                _dispatcher!.Execute(command, tokenSource.Token);
+            }
+            catch (VerbNotFoundException vnf)
+            {
+                // The verb was not found. Execute the VerbNotFound script
+                var args = SyntheticArguments.From(("verb", vnf.Verb));
+                HandleError(vnf, state.EventCatalog.VerbNotFound, args);
+            }
+            catch (Exception e)
+            {
+                // We've received some other error. Execute the EngineError script
+                // and hope for the best
+                var args = SyntheticArguments.From(
+                    ("message", e.Message),
+                    ("stacktrace", e.StackTrace ?? "")
+                );
+                HandleError(e, state.EventCatalog.EngineError, args);
+            }
+        }
+
         // Handle an error from the dispatcher.
-        private void HandleError(Exception e, EventScript script, IArguments args)
+        private void HandleError(Exception currentException, EventScript script, IArguments args)
         {
             // If an exception is thrown while handling a previous exception, show an
             // angry error message and exit immediately
             var currentExceptionResult = _state!.Metadata.Get(Constants.MetadataError);
 
-            if (currentExceptionResult.HasValue && currentExceptionResult.Value is Exception currentException)
+            if (currentExceptionResult.HasValue && currentExceptionResult.Value is Exception previousException)
             {
                 // This isn't scripted because it's critical error-handling code and we
                 // don't want the user to clear/override it
@@ -297,11 +302,11 @@ namespace StoneFruit
                     .WriteLine("This is a fatal condition and the engine will exit")
                     .WriteLine("Make sure you clear the current exception when you are done handling it to avoid these situations")
                     .WriteLine("Current Exception:")
-                    .WriteLine(e.Message)
-                    .WriteLine(e.StackTrace ?? "")
-                    .WriteLine("Previous Exception:")
                     .WriteLine(currentException.Message)
                     .WriteLine(currentException.StackTrace ?? "")
+                    .WriteLine("Previous Exception:")
+                    .WriteLine(previousException.Message)
+                    .WriteLine(previousException.StackTrace ?? "")
                     ;
                 _state.Exit(Constants.ExitCodeCascadeError);
                 return;
@@ -312,7 +317,7 @@ namespace StoneFruit
             // from metadata (prepends happen in reverse order from how they're executed)
             // We can't remove metadata in the script, because users might change the script
             // and inadvertantly break loop detection.
-            _state.Metadata.Add(Constants.MetadataError, e, false);
+            _state.Metadata.Add(Constants.MetadataError, currentException, false);
             _state.Commands.Prepend($"{MetadataHandler.Name} remove {Constants.MetadataError}");
             _state.Commands.Prepend(script.GetCommands(_parser, args));
             // Current command queue:
