@@ -37,7 +37,7 @@ namespace StoneFruit.Execution
             );
 
             // We're executing basic help command headlessly
-            // Has argument 'exitcode' with the intended exit code 
+            // Has argument 'exitcode' with the intended exit code
             HeadlessHelp = new EventScript(
                 $"{HelpHandler.Name}",
 
@@ -57,7 +57,8 @@ namespace StoneFruit.Execution
             // Attempt to execute an unknown verb
             // Has argument 'verb' with the name of the verb
             VerbNotFound = new EventScript(
-                $"{EchoHandler.Name} Verb ['verb'] not found. Please check your spelling or help output and try again."
+                $"{EchoHandler.Name} Verb ['verb'] not found. Please check your spelling or help output and try again.",
+                $"{HelpHandler.Name} -startswith ['verb']"
             );
 
             MaximumHeadlessCommands = new EventScript(
@@ -113,7 +114,7 @@ namespace StoneFruit.Execution
         public EventScript EngineError { get; }
 
         /// <summary>
-        /// A maximum number of commands have been executed without user input. 
+        /// A maximum number of commands have been executed without user input.
         /// </summary>
         public EventScript MaximumHeadlessCommands { get; }
     }

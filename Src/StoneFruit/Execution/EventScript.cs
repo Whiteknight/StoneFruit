@@ -39,6 +39,7 @@ namespace StoneFruit.Execution
                 .Where(l => !string.IsNullOrEmpty(l))
                 .Select(parser.ParseScript)
                 .Select(format => format.Format(args))
+                .Tap(_ => args.ResetAllArguments())
                 .Select(c => new ArgumentsOrString(c));
         }
 

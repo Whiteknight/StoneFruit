@@ -28,30 +28,39 @@ namespace StoneFruit.Handlers
         public static string Description => "List all commands or get detailed information for a single command";
 
         public static string Usage => @"help [-showall]
-Get overview information for all available verbs. The verb Command class must implement
+    Get overview information for all available verbs. The verb Command class must implement
 
-    public static string Description {{ get; }}
+        public static string Description {{ get; }}
+
+    The help command by default hides some internal commands which are not necessary for normal
+    user interaction. To see all commands, use the -showall flag.
 
 help <verb>
-Get detailed help information for the given verb. The verb Command class must implement
+    Get detailed help information for the given verb. The verb Command class must implement
 
-    public static string Usage {{ get; }}
+        public static string Usage {{ get; }}
 
-The help command by default hides some internal commands which are not necessary for normal user interaction.
-To see all commands, use the -showall flag
+help -startswith <word>
+    Get overview information for all handlers whose verbs start with the given word. The verb
+    Command class must implement the Description property, described above.
 ";
 
         public void Execute()
         {
             var verb = _args.GetAllPositionals().Select(p => p.AsString()).ToArray();
-            if (verb.Length > 0)
+            if (verb.Length == 0)
             {
-                GetDetail(verb);
+                GetOverview(_args.HasFlag("showall"));
                 return;
             }
 
-            var showAll = _args.HasFlag("showall");
-            GetOverview(showAll);
+            if (_args.HasFlag("startswith"))
+            {
+                GetOverviewStartingWith(verb[0]);
+                return;
+            }
+
+            GetDetail(verb);
         }
 
         private void GetDetail(Verb verb)
@@ -67,6 +76,18 @@ To see all commands, use the -showall flag
             var infoList = _commands.GetAll();
             if (!showAll)
                 infoList = infoList.Where(i => i.ShouldShowInHelp);
+            ShowOverview(infoList);
+        }
+
+        private void GetOverviewStartingWith(string word)
+        {
+            var infoList = _commands.GetAll()
+                .Where(i => i.ShouldShowInHelp && i.Verb[0].StartsWith(word, StringComparison.OrdinalIgnoreCase));
+            ShowOverview(infoList);
+        }
+
+        private void ShowOverview(IEnumerable<IVerbInfo> infoList)
+        {
             int maxCommandLength = infoList.Max(c => c.Verb.ToString().Length);
 
             var infoGroups = infoList.GroupBy(v => v.Group ?? "").ToDictionary(g => g.Key, g => g.ToList());
