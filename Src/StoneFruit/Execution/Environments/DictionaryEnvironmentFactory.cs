@@ -16,8 +16,12 @@ namespace StoneFruit.Execution.Environments
             ValidEnvironments = _environments.Keys.ToList();
         }
 
-        public object Create(string name)
-            => _environments.ContainsKey(name) ? _environments[name] : null;
+        public IResult<object> Create(string name)
+        {
+            if (_environments.ContainsKey(name))
+                return Result.Success(_environments[name]);
+            return FailureResult<object>.Instance;
+        }
 
         public IReadOnlyCollection<string> ValidEnvironments { get; }
     }

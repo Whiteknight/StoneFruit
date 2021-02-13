@@ -13,7 +13,7 @@ namespace StoneFruit.Tests.Execution.Environments
         {
             var instance = new object();
             var target = new DictionaryEnvironmentFactory(new Dictionary<string, object> { { "test", instance } });
-            target.Create("test").Should().BeSameAs(instance);
+            target.Create("test").Value.Should().BeSameAs(instance);
         }
 
         [Test]
@@ -21,14 +21,14 @@ namespace StoneFruit.Tests.Execution.Environments
         {
             var instance = new object();
             var target = new DictionaryEnvironmentFactory(new Dictionary<string, object> { { "test", instance } });
-            target.Create("GARBAGE").Should().BeNull();
+            target.Create("GARBAGE").HasValue.Should().BeFalse();
         }
 
         [Test]
         public void ValidEnvironments_Test()
         {
             var instance = new object();
-            var target = new DictionaryEnvironmentFactory(new Dictionary<string, object> { 
+            var target = new DictionaryEnvironmentFactory(new Dictionary<string, object> {
                 { "a", instance },
                 { "b", instance },
                 { "c", instance }

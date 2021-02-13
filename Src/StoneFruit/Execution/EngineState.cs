@@ -10,6 +10,8 @@ namespace StoneFruit.Execution
     /// </summary>
     public class EngineState
     {
+        private IArguments? _arguments;
+
         public EngineState(bool headless, EngineEventCatalog eventCatalog, EngineSettings settings)
         {
             Assert.ArgumentNotNull(eventCatalog, nameof(eventCatalog));
@@ -35,7 +37,17 @@ namespace StoneFruit.Execution
         public EngineStateMetadataCache Metadata { get; }
         public IEngineStateCommandCounter CommandCounter { get; set; }
         public EngineSettings Settings { get; set; }
-        public IArguments? CurrentArguments { get; set; }
+        public IArguments CurrentArguments => _arguments ?? throw new InvalidOperationException("Attempt to access IArguments when there are no current arguments set");
+
+        public void SetCurrentArguments(IArguments arguments)
+        {
+            _arguments = arguments;
+        }
+
+        public void ClearCurrentArguments()
+        {
+            _arguments = null;
+        }
 
         /// <summary>
         /// Signal the runloop that it should exit immediately and stop executing commands.

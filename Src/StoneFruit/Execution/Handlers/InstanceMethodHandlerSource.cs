@@ -20,7 +20,7 @@ namespace StoneFruit.Execution.Handlers
         private readonly Func<string, string> _getGroup;
         private readonly VerbTrie<MethodInfo> _methods;
 
-        public InstanceMethodHandlerSource(object instance, Func<string, string> getDescription, Func<string, string> getUsage, Func<string, string> getGroup, IVerbExtractor verbExtractor)
+        public InstanceMethodHandlerSource(object instance, Func<string, string>? getDescription, Func<string, string>? getUsage, Func<string, string>? getGroup, IVerbExtractor verbExtractor)
         {
             Assert.ArgumentNotNull(instance, nameof(instance));
             _instance = instance;
@@ -65,14 +65,14 @@ namespace StoneFruit.Execution.Handlers
             return new SuccessResult<IVerbInfo>(new MethodInfoVerbInfo(verb, _getDescription, _getUsage, _getGroup));
         }
 
-        private static object InvokeMethod(object instance, MethodInfo method, ParameterInfo[] parameters, IArguments command, CommandDispatcher dispatcher, CancellationToken token)
+        private static object? InvokeMethod(object instance, MethodInfo method, ParameterInfo[] parameters, IArguments command, CommandDispatcher dispatcher, CancellationToken token)
         {
-            var args = new object[parameters.Length];
+            var args = new object?[parameters.Length];
             var fetcher = new ArgumentValueFetcher(command, dispatcher, token);
             for (int i = 0; i < parameters.Length; i++)
             {
                 var parameter = parameters[i];
-                args[i] = fetcher.GetValue(parameter.ParameterType, parameter.Name, i);
+                args[i] = fetcher.GetValue(parameter.ParameterType, parameter.Name ?? "", i);
             }
 
             return method.Invoke(instance, args);
@@ -147,9 +147,12 @@ namespace StoneFruit.Execution.Handlers
             {
                 var parameters = _method.GetParameters();
                 if (parameters.Length == 0)
-                    return (Task)_method.Invoke(_instance, new object[0]);
+                {
+                    var result = _method.Invoke(_instance, new object[0]);
+                    return (result as Task) ?? Task.CompletedTask;
+                }
 
-                return (Task)InvokeMethod(_instance, _method, parameters, _command, _dispatcher, cancellation);
+                return (InvokeMethod(_instance, _method, parameters, _command, _dispatcher, cancellation) as Task) ?? Task.CompletedTask;
             }
         }
     }

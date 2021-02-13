@@ -45,17 +45,17 @@ namespace StoneFruit.Execution.CommandSources
             _sources.AddFirst(source);
         }
 
-        public ArgumentsOrString GetNextCommand()
+        public IResult<ArgumentsOrString> GetNextCommand()
         {
             while (true)
             {
                 if (_sources.Count == 0)
-                    return null;
+                    return FailureResult<ArgumentsOrString>.Instance;
 
-                var firstSource = _sources.First.Value;
+                var firstSource = _sources!.First!.Value;
 
                 var next = firstSource.GetNextCommand();
-                if (next != null)
+                if (next.HasValue)
                     return next;
 
                 _sources.RemoveFirst();

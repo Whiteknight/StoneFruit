@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using StoneFruit.Execution;
 using TestUtilities;
@@ -23,7 +21,7 @@ namespace StoneFruit.Containers.Autofac.Tests.Integration
 
         private class MyEnvironmentFactory : IEnvironmentFactory
         {
-            public object Create(string name) => new MyEnvironment(name);
+            public IResult<object> Create(string name) => Result.Success(new MyEnvironment(name));
 
             public IReadOnlyCollection<string> ValidEnvironments => new[] { "A", "B", "C" };
         }

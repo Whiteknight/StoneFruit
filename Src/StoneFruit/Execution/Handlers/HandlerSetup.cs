@@ -25,6 +25,7 @@ namespace StoneFruit.Execution.Handlers
             _delegates = new DelegateHandlerSource();
             _scripts = new ScriptHandlerSource();
             _instances = new NamedInstanceHandlerSource();
+            _verbExtractor = PriorityVerbExtractor.DefaultInstance;
         }
 
         public void BuildUp(IServiceCollection services)
@@ -32,7 +33,7 @@ namespace StoneFruit.Execution.Handlers
             var verbExtractor = _verbExtractor ?? PriorityVerbExtractor.DefaultInstance;
             services.AddSingleton(verbExtractor);
 
-            // Register these sources only if they have entries. 
+            // Register these sources only if they have entries.
             if (_delegates.Count > 0)
                 services.AddSingleton<IHandlerSource>(_delegates);
             if (_scripts.Count > 0)
@@ -96,7 +97,7 @@ namespace StoneFruit.Execution.Handlers
             return this;
         }
 
-        public IHandlerSetup Add(Verb verb, Action<IArguments, CommandDispatcher> handle, string description = null, string usage = null, string group = null)
+        public IHandlerSetup Add(Verb verb, Action<IArguments, CommandDispatcher> handle, string description = "", string usage = "", string group = "")
         {
             Assert.ArgumentNotNull(verb, nameof(verb));
             Assert.ArgumentNotNull(handle, nameof(handle));
@@ -104,7 +105,7 @@ namespace StoneFruit.Execution.Handlers
             return this;
         }
 
-        public IHandlerSetup Add(Verb verb, IHandlerBase handler, string description = null, string usage = null, string group = null)
+        public IHandlerSetup Add(Verb verb, IHandlerBase handler, string description = "", string usage = "", string group = "")
         {
             Assert.ArgumentNotNull(verb, nameof(verb));
             Assert.ArgumentNotNull(handler, nameof(handler));
@@ -112,7 +113,7 @@ namespace StoneFruit.Execution.Handlers
             return this;
         }
 
-        public IHandlerSetup AddAsync(Verb verb, Func<IArguments, CommandDispatcher, Task> handleAsync, string description = null, string usage = null, string group = null)
+        public IHandlerSetup AddAsync(Verb verb, Func<IArguments, CommandDispatcher, Task> handleAsync, string description = "", string usage = "", string group = "")
         {
             Assert.ArgumentNotNull(verb, nameof(verb));
             Assert.ArgumentNotNull(handleAsync, nameof(handleAsync));
@@ -120,7 +121,7 @@ namespace StoneFruit.Execution.Handlers
             return this;
         }
 
-        public IHandlerSetup AddScript(Verb verb, IEnumerable<string> lines, string description = null, string usage = null, string group = null)
+        public IHandlerSetup AddScript(Verb verb, IEnumerable<string> lines, string description = "", string usage = "", string group = "")
         {
             Assert.ArgumentNotNull(verb, nameof(verb));
             Assert.ArgumentNotNull(lines, nameof(lines));
@@ -138,7 +139,7 @@ namespace StoneFruit.Execution.Handlers
                 typeof(HelpHandler),
                 typeof(MetadataHandler),
             };
-            return new TypeListConstructSource(requiredHandlers, null, context.VerbExtractor);
+            return new TypeListConstructSource(requiredHandlers, context.VerbExtractor);
         }
     }
 }

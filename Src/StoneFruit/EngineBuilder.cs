@@ -20,8 +20,9 @@ namespace StoneFruit
         private readonly IParserSetup _parsers;
         private readonly EngineSettings _settings;
 
-        public EngineBuilder(IHandlerSetup handlers = null, IOutputSetup output = null, IEnvironmentSetup environments = null, IParserSetup parsers = null, EngineEventCatalog events = null, EngineSettings settings = null)
+        public EngineBuilder(IHandlerSetup? handlers = null, IOutputSetup? output = null, IEnvironmentSetup? environments = null, IParserSetup? parsers = null, EngineEventCatalog? events = null, EngineSettings? settings = null)
         {
+            // TODO: Assert that these objects, if provided, implement the necessary ISetupBuildable<>
             _handlers = handlers ?? new HandlerSetup();
             _eventCatalog = events ?? new EngineEventCatalog();
             _output = output ?? new OutputSetup();
@@ -102,12 +103,12 @@ namespace StoneFruit
         /// <returns></returns>
         public void BuildUp(IServiceCollection services)
         {
-            (_handlers as ISetupBuildable<IHandlers>).BuildUp(services);
+            (_handlers as ISetupBuildable<IHandlers>)?.BuildUp(services);
             services.AddSingleton(_eventCatalog);
             services.AddSingleton(_settings);
-            (_environments as ISetupBuildable<IEnvironmentCollection>).BuildUp(services);
-            (_parsers as ISetupBuildable<ICommandParser>).BuildUp(services);
-            (_output as ISetupBuildable<IOutput>).BuildUp(services);
+            (_environments as ISetupBuildable<IEnvironmentCollection>)?.BuildUp(services);
+            (_parsers as ISetupBuildable<ICommandParser>)?.BuildUp(services);
+            (_output as ISetupBuildable<IOutput>)?.BuildUp(services);
         }
 
         /// <summary>
@@ -134,34 +135,41 @@ namespace StoneFruit
             services.AddSingleton(provider => new EngineAccessor());
             services.AddSingleton(provider =>
             {
-                var accessor = provider.GetService<EngineAccessor>();
-                var handlers = provider.GetService<IHandlers>();
-                var environments = provider.GetService<IEnvironmentCollection>();
-                var parser = provider.GetService<ICommandParser>();
-                var output = provider.GetService<IOutput>();
-                var engineCatalog = provider.GetService<EngineEventCatalog>();
-                var engineSettings = provider.GetService<EngineSettings>();
+                var accessor = provider.GetRequiredService<EngineAccessor>();
+                var handlers = provider.GetRequiredService<IHandlers>();
+                var environments = provider.GetRequiredService<IEnvironmentCollection>();
+                var parser = provider.GetRequiredService<ICommandParser>();
+                var output = provider.GetRequiredService<IOutput>();
+                var engineCatalog = provider.GetRequiredService<EngineEventCatalog>();
+                var engineSettings = provider.GetRequiredService<EngineSettings>();
                 var e = new Engine(handlers, environments, parser, output, engineCatalog, engineSettings);
                 accessor.SetEngine(e);
                 return e;
             });
-            services.AddScoped(provider => provider.GetService<EngineAccessor>().Engine.GetCurrentState());
-            services.AddScoped(provider => provider.GetService<EngineAccessor>().Engine.GetCurrentDispatcher());
-            services.AddScoped(provider => provider.GetService<EngineState>().CurrentArguments);
+            services.AddScoped(provider => provider.GetRequiredService<EngineAccessor>().Engine.GetCurrentState());
+            services.AddScoped(provider => provider.GetRequiredService<EngineAccessor>().Engine.GetCurrentDispatcher());
+            services.AddScoped(provider => provider.GetRequiredService<EngineState>().CurrentArguments);
         }
 
         public static void SetupExplicitEnvironmentRegistration<TEnvironment>(IServiceCollection services)
             where TEnvironment : class
         {
-            services.AddScoped(provider => provider.GetService<IEnvironmentCollection>().Current as TEnvironment);
+            services.AddScoped(provider =>
+            {
+                var current = provider.GetRequiredService<IEnvironmentCollection>().Current;
+                if (current == null)
+                    throw new InvalidCastException($"Invalid environment. Expected environment {typeof(TEnvironment)} but found null.");
+                var env = current as TEnvironment;
+                return env ?? throw new InvalidCastException($"Invalid cast. Expected environment {typeof(TEnvironment)} but found {current.GetType()}");
+            });
         }
 
         public Engine Build()
         {
-            var handlers = (_handlers as ISetupBuildable<IHandlers>).Build();
-            var environments = (_environments as ISetupBuildable<IEnvironmentCollection>).Build();
-            var parser = (_parsers as ISetupBuildable<ICommandParser>).Build();
-            var output = (_output as ISetupBuildable<IOutput>).Build();
+            var handlers = (_handlers as ISetupBuildable<IHandlers>)!.Build();
+            var environments = (_environments as ISetupBuildable<IEnvironmentCollection>)!.Build();
+            var parser = (_parsers as ISetupBuildable<ICommandParser>)!.Build();
+            var output = (_output as ISetupBuildable<IOutput>)!.Build();
 
             return new Engine(handlers, environments, parser, output, _eventCatalog, _settings);
         }

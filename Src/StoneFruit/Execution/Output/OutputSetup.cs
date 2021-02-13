@@ -42,7 +42,7 @@ namespace StoneFruit.Execution.Output
                     return new NullOutput();
                 if (_secondaries.Count == 1)
                     return _secondaries[0];
-                return new CombinedOutput(null, _secondaries);
+                return new CombinedOutput(_secondaries);
             }
 
             if (_secondaries.Count == 0)

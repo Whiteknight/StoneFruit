@@ -70,10 +70,7 @@ namespace StoneFruit.Tests.Integration
 
         public class TestEnvironmentFactory : IEnvironmentFactory
         {
-            public object Create(string name)
-            {
-                return new TestEnvironment(name);
-            }
+            public IResult<object> Create(string name) => Result.Success(new TestEnvironment(name));
 
             public IReadOnlyCollection<string> ValidEnvironments => new[] { "A", "B", "C" };
         }

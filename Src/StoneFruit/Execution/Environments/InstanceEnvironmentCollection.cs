@@ -7,6 +7,12 @@ namespace StoneFruit.Execution.Environments
     /// </summary>
     public class InstanceEnvironmentCollection : IEnvironmentCollection
     {
+        public InstanceEnvironmentCollection()
+        {
+            Current = new object();
+            CurrentName = "";
+        }
+
         public InstanceEnvironmentCollection(object environment)
         {
             Current = environment ?? new object();

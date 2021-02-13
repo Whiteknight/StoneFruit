@@ -46,7 +46,7 @@ namespace StoneFruit.Execution.Output
 
         public readonly Brush Invert() => new Brush(Foreground.Invert(), Background.Invert());
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             => obj is Brush other && Equals(other);
 
         public readonly bool Equals(Brush other)

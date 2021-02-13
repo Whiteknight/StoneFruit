@@ -33,7 +33,7 @@ namespace StoneFruit
         /// <param name="description"></param>
         /// <param name="usage"></param>
         /// <returns></returns>
-        IHandlerSetup Add(Verb verb, Action<IArguments, CommandDispatcher> handle, string description = null, string usage = null, string group = null);
+        IHandlerSetup Add(Verb verb, Action<IArguments, CommandDispatcher> handle, string description = "", string usage = "", string group = "");
 
         /// <summary>
         /// Add a pre-existing handler instance with the given verb
@@ -43,7 +43,7 @@ namespace StoneFruit
         /// <param name="description"></param>
         /// <param name="usage"></param>
         /// <returns></returns>
-        IHandlerSetup Add(Verb verb, IHandlerBase handler, string description = null, string usage = null, string group = null);
+        IHandlerSetup Add(Verb verb, IHandlerBase handler, string description = "", string usage = "", string group = "");
 
         /// <summary>
         /// Add a function delegate as a handler for asynchronous invokation
@@ -53,7 +53,7 @@ namespace StoneFruit
         /// <param name="description"></param>
         /// <param name="usage"></param>
         /// <returns></returns>
-        IHandlerSetup AddAsync(Verb verb, Func<IArguments, CommandDispatcher, Task> handleAsync, string description = null, string usage = null, string group = null);
+        IHandlerSetup AddAsync(Verb verb, Func<IArguments, CommandDispatcher, Task> handleAsync, string description = "", string usage = "", string group = "");
 
         /// <summary>
         /// Add a script with a verb and zero or more commands to execute
@@ -63,7 +63,7 @@ namespace StoneFruit
         /// <param name="description"></param>
         /// <param name="usage"></param>
         /// <returns></returns>
-        IHandlerSetup AddScript(Verb verb, IEnumerable<string> lines, string description = null, string usage = null, string group = null);
+        IHandlerSetup AddScript(Verb verb, IEnumerable<string> lines, string description = "", string usage = "", string group = "");
     }
 
     public class HandlerSourceBuildContext
@@ -96,7 +96,7 @@ namespace StoneFruit
         /// <param name="handlers"></param>
         /// <param name="instance"></param>
         /// <returns></returns>
-        public static IHandlerSetup UsePublicMethodsAsHandlers(this IHandlerSetup handlers, object instance, Func<string, string> getDescription = null, Func<string, string> getUsage = null, Func<string, string> getGroup = null)
+        public static IHandlerSetup UsePublicMethodsAsHandlers(this IHandlerSetup handlers, object instance, Func<string, string>? getDescription = null, Func<string, string>? getUsage = null, Func<string, string>? getGroup = null)
         {
             Assert.ArgumentNotNull(handlers, nameof(handlers));
             return handlers.AddSource(ctx => new InstanceMethodHandlerSource(instance, getDescription, getUsage, getGroup, ctx.VerbExtractor));
@@ -125,7 +125,7 @@ namespace StoneFruit
         /// <param name="resolver"></param>
         /// <param name="verbExtractor"></param>
         /// <returns></returns>
-        public static IHandlerSetup UseHandlerTypes(this IHandlerSetup handlers, IEnumerable<Type> commandTypes, TypeInstanceResolver resolver = null)
+        public static IHandlerSetup UseHandlerTypes(this IHandlerSetup handlers, IEnumerable<Type> commandTypes, TypeInstanceResolver? resolver = null)
         {
             Assert.ArgumentNotNull(handlers, nameof(handlers));
             Assert.ArgumentNotNull(commandTypes, nameof(commandTypes));

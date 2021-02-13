@@ -13,7 +13,7 @@ namespace StoneFruit.Execution.CommandSources
         private int _index;
 
         public ScriptCommandSource(EventScript script, ICommandParser parser, params IArgument[] args)
-            : this (script, parser, new SyntheticArguments(args))
+            : this(script, parser, new SyntheticArguments(args))
         {
         }
 
@@ -23,11 +23,12 @@ namespace StoneFruit.Execution.CommandSources
             _index = 0;
         }
 
-        public ArgumentsOrString GetNextCommand()
+        public IResult<ArgumentsOrString> GetNextCommand()
         {
             if (_index >= _script.Length)
-                return null;
-            return _script[_index++];
+                return FailureResult<ArgumentsOrString>.Instance;
+            ArgumentsOrString value = _script[_index++];
+            return Result.Success(value);
         }
     }
 }

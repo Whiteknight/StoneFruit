@@ -10,6 +10,12 @@ namespace StoneFruit.Execution.Output
         private readonly IOutput _primary;
         private readonly IReadOnlyList<IOutput> _secondaries;
 
+        public CombinedOutput(IEnumerable<IOutput> secondaries)
+        {
+            _primary = new NullOutput();
+            _secondaries = secondaries.OrEmptyIfNull().ToList();
+        }
+
         public CombinedOutput(IOutput primary, IEnumerable<IOutput> secondaries)
         {
             _primary = primary;

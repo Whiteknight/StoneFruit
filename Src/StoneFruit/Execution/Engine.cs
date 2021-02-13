@@ -244,8 +244,13 @@ namespace StoneFruit.Execution
             {
                 // Get a command. If we have one in the state use that. Otherwise try to
                 // get one from the sources. If null, we're all done so exit
-                var commandResult = _state!.Commands.GetNext();
-                var command = commandResult.HasValue ? commandResult.Value : sources.GetNextCommand();
+                IResult<ArgumentsOrString> commandResult = _state!.Commands.GetNext();
+                if (!commandResult.HasValue)
+                    commandResult = sources.GetNextCommand();
+                if (!commandResult.HasValue)
+                    return Constants.ExitCodeOk;
+
+                var command = commandResult.Value;
                 if (command?.IsValid != true)
                     return Constants.ExitCodeOk;
 
@@ -275,7 +280,7 @@ namespace StoneFruit.Execution
                     // and hope for the best
                     var args = SyntheticArguments.From(
                         ("message", e.Message),
-                        ("stacktrace", e.StackTrace)
+                        ("stacktrace", e.StackTrace ?? "")
                     );
                     HandleError(e, _state.EventCatalog.EngineError, args);
                 }
@@ -304,10 +309,10 @@ namespace StoneFruit.Execution
                     .WriteLine("Make sure you clear the current exception when you are done handling it to avoid these situations")
                     .WriteLine("Current Exception:")
                     .WriteLine(e.Message)
-                    .WriteLine(e.StackTrace)
+                    .WriteLine(e.StackTrace ?? "")
                     .WriteLine("Previous Exception:")
                     .WriteLine(currentException.Message)
-                    .WriteLine(currentException.StackTrace)
+                    .WriteLine(currentException.StackTrace ?? "")
                     ;
                 _state.Exit(Constants.ExitCodeCascadeError);
                 return;

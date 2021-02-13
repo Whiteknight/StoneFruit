@@ -42,7 +42,7 @@ namespace StoneFruit.Execution
         {
             if (_additionalCommands.Count == 0)
                 return FailureResult<ArgumentsOrString>.Instance;
-            var next = _additionalCommands.First.Value;
+            ArgumentsOrString next = _additionalCommands!.First!.Value;
             _additionalCommands.RemoveFirst();
             return new SuccessResult<ArgumentsOrString>(next);
         }
