@@ -24,7 +24,7 @@ namespace StoneFruit.Execution.Handlers
         public IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
         {
             var factory = _handlers.Get(arguments);
-            if (factory == null)
+            if (!factory.HasValue)
                 return FailureResult<IHandlerBase>.Instance;
             var handler = factory.Value.Create(arguments, dispatcher);
             return new SuccessResult<IHandlerBase>(handler);
