@@ -148,7 +148,7 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                    // 'b' is required but not provided. 
+                    // 'b' is required but not provided.
                     .AddScript("test", new[] { "args a=['b']!" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
