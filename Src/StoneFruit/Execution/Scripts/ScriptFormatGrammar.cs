@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using ParserObjects;
 using StoneFruit.Execution.Arguments;
+using StoneFruit.Execution.Scripts.Formatting;
 using static ParserObjects.CStyleParserMethods;
 using static ParserObjects.ParserMethods;
 using static ParserObjects.ParserMethods<char>;
 
-namespace StoneFruit.Execution.Scripts.Formatting
+namespace StoneFruit.Execution.Scripts
 {
     public static class ScriptFormatGrammar
     {

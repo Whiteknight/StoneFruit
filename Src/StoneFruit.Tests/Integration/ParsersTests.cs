@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using ParserObjects;
 using StoneFruit.Execution.Arguments;
-using StoneFruit.Execution.Scripts.Formatting;
+using StoneFruit.Execution.Scripts;
 using TestUtilities;
 
 namespace StoneFruit.Tests.Integration

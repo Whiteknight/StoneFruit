@@ -35,7 +35,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoneFruit.Containers.Unity
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Containers.Autofac", "StoneFruit.Containers.Autofac\StoneFruit.Containers.Autofac.csproj", "{2021CDF3-8EBB-4D0F-A1F8-4F7D7719B789}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoneFruit.Containers.Autofac.Tests", "StoneFruit.Containers.Autofac.Tests\StoneFruit.Containers.Autofac.Tests.csproj", "{BB0415FD-8DC7-4C26-B093-28551FC03FAD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Containers.Autofac.Tests", "StoneFruit.Containers.Autofac.Tests\StoneFruit.Containers.Autofac.Tests.csproj", "{BB0415FD-8DC7-4C26-B093-28551FC03FAD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FD4D52DA-932C-4DFB-B65A-3A898C959185}"
+	ProjectSection(SolutionItems) = preProject
+		ARCHITECTURE.md = ARCHITECTURE.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

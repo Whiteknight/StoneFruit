@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace StoneFruit.Execution.Scripts.Formatting
+namespace StoneFruit.Execution.Scripts
 {
     public interface IArgumentAccessor
     {
