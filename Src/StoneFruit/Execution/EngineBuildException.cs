@@ -19,7 +19,7 @@ namespace StoneFruit.Execution
         {
         }
 
-        public EngineBuildException() : base()
+        public EngineBuildException()
         {
         }
 

@@ -52,6 +52,8 @@ namespace StoneFruit.Execution.Scripts
                 (_, v) => new RequiredValue(v.GetValueOrDefault(""))
             ).Optional();
 
+            // TODO: Syntax to add all remaining unconsumed arguments, regardless of type?
+
             // A literal flag which is passed without modification
             // literalFlagArg := '-' <names>
             var literalFlagArg = Rule(

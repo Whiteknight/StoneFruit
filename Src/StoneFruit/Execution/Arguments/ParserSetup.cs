@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using ParserObjects;
 using StoneFruit.Execution.Scripts;
 using StoneFruit.Execution.Scripts.Formatting;
@@ -17,8 +18,8 @@ namespace StoneFruit.Execution.Arguments
         public void BuildUp(IServiceCollection services)
         {
             // What if the service collection already has a parser registered?
-            var parser = Build();
-            services.AddSingleton(parser);
+            ICommandParser parser = Build();
+            services.TryAddSingleton(parser);
         }
 
         public ICommandParser Build()

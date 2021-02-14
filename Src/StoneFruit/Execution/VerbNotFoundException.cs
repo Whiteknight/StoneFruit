@@ -24,7 +24,7 @@ namespace StoneFruit.Execution
             Verb = string.Empty;
         }
 
-        public VerbNotFoundException() : base()
+        public VerbNotFoundException()
         {
             Verb = string.Empty;
         }

@@ -1,12 +1,9 @@
 ﻿using System;
-using StoneFruit.Execution.Arguments;
-using StoneFruit.Execution.CommandSources;
-using StoneFruit.Execution.Handlers;
-using StoneFruit.Handlers;
-using StoneFruit.Utility;
 
 namespace StoneFruit.Execution
 {
+    // Accessor object to deal with circular references in the DI container before the Engine
+    // is registered
     public class EngineAccessor
     {
         private Engine? _engine;

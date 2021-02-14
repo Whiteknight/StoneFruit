@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace StoneFruit.Execution.Output
 {
@@ -30,7 +31,7 @@ namespace StoneFruit.Execution.Output
         public void BuildUp(IServiceCollection services)
         {
             var output = Build();
-            services.AddSingleton(output);
+            services.TryAddSingleton(output);
         }
 
         public IOutput Build()

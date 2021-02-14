@@ -8,7 +8,8 @@ namespace StoneFruit.Execution
     public class EngineEventCatalog
     {
         /// <summary>
-        /// The engine has been run in headless mode without a command.
+        /// The engine has been run in headless mode without a command. This is the default
+        /// behavior when no arguments are provided.
         /// </summary>
         public EventScript HeadlessNoArgs { get; } = new EventScript(
                 // Has argument 'exitcode' with the intended exit code

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using StoneFruit.Execution;
 
-namespace StoneFruit.Execution.Handlers
+namespace StoneFruit
 {
     /// <summary>
     /// Represents all the handlers known by the system. Handlers may be of different types and

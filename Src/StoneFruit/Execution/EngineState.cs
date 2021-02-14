@@ -64,7 +64,7 @@ namespace StoneFruit.Execution
         /// Signal the runloop that it should exit immediately and stop executing commands.
         /// </summary>
         /// <param name="exitCode"></param>
-        public void SignalExit(int exitCode = Constants.ExitCodeOk)
+        public void SignalExit(int exitCode = Constants.ExitCode.Ok)
         {
             ShouldExit = true;
             ExitCode = exitCode;

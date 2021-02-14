@@ -35,6 +35,8 @@ namespace StoneFruit.Execution
 
         public IEnumerable<ArgumentsOrString> GetCommands(ICommandParser parser, IArguments args)
         {
+            Assert.ArgumentNotNull(parser, nameof(parser));
+            Assert.ArgumentNotNull(args, nameof(args));
             return _lines
                 .Where(l => !string.IsNullOrEmpty(l))
                 .Select(parser.ParseScript)

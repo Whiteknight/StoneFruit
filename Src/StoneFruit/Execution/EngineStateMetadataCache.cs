@@ -4,7 +4,8 @@ using System.Collections.Generic;
 namespace StoneFruit.Execution
 {
     /// <summary>
-    /// Metadata storage for the EngineState
+    /// Metadata storage for the EngineState. Can be used to hold temporary data items between
+    /// command execution
     /// </summary>
     public class EngineStateMetadataCache : IEnumerable<KeyValuePair<string, object>>
     {
