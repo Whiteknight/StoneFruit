@@ -16,7 +16,7 @@ namespace StoneFruit.Execution
         {
         }
 
-        public ParseException() : base()
+        public ParseException()
         {
         }
 

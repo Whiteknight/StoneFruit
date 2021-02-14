@@ -54,7 +54,7 @@ namespace StoneFruit.Execution
 
             var args = SyntheticArguments.From(
                 ("limit", limit.ToString()),
-                ("exitcode", Constants.ExitCodeMaximumCommands.ToString())
+                ("exitcode", Constants.ExitCode.MaximumCommands.ToString())
             );
             _commands.Prepend(_events.MaximumHeadlessCommands.GetCommands(parser, args));
 

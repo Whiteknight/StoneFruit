@@ -2,7 +2,6 @@
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.CommandSources;
-using StoneFruit.Execution.Handlers;
 using StoneFruit.Handlers;
 using StoneFruit.Utility;
 
@@ -110,7 +109,7 @@ namespace StoneFruit
             if (commandLine == "help")
             {
                 sources.AddToEnd(State.EventCatalog.HeadlessHelp, _parser,
-                    ("exitcode", Constants.ExitCodeHeadlessHelp.ToString())
+                    ("exitcode", Constants.ExitCode.HeadlessHelp.ToString())
                 );
                 return RunLoop(sources);
             }
@@ -124,7 +123,7 @@ namespace StoneFruit
             if (string.IsNullOrWhiteSpace(commandLine))
             {
                 sources.AddToEnd(State.EventCatalog.HeadlessNoArgs, _parser,
-                    ("exitcode", Constants.ExitCodeHeadlessNoVerb.ToString())
+                    ("exitcode", Constants.ExitCode.HeadlessNoVerb.ToString())
                 );
                 return RunLoop(sources);
             }
@@ -224,11 +223,11 @@ namespace StoneFruit
                 if (!commandResult.HasValue)
                     commandResult = sources.GetNextCommand();
                 if (!commandResult.HasValue)
-                    return Constants.ExitCodeOk;
+                    return Constants.ExitCode.Ok;
 
                 var command = commandResult.Value;
                 if (command?.IsValid != true)
-                    return Constants.ExitCodeOk;
+                    return Constants.ExitCode.Ok;
 
                 // Check the counter to make sure that we are not in a runaway loop
                 // If we are in a loop, the counter will setup the command queue to handle
@@ -295,7 +294,7 @@ namespace StoneFruit
                     .WriteLine(previousException.Message)
                     .WriteLine(previousException.StackTrace ?? "")
                     ;
-                State.SignalExit(Constants.ExitCodeCascadeError);
+                State.SignalExit(Constants.ExitCode.CascadeError);
                 return;
             }
 

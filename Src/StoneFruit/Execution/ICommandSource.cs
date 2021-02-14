@@ -1,7 +1,8 @@
 ﻿namespace StoneFruit.Execution
 {
     /// <summary>
-    /// Source for commands to be executed
+    /// Source for commands to be executed. Command sources are forward-only and are expected to
+    /// only be modified by the user, not internally by the Engine.
     /// </summary>
     public interface ICommandSource
     {
