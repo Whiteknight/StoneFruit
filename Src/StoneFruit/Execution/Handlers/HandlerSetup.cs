@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using StoneFruit.Execution.Scripts;
 using StoneFruit.Handlers;
 using StoneFruit.Utility;
@@ -31,9 +32,10 @@ namespace StoneFruit.Execution.Handlers
         public void BuildUp(IServiceCollection services)
         {
             var verbExtractor = _verbExtractor ?? PriorityVerbExtractor.DefaultInstance;
-            services.AddSingleton(verbExtractor);
+            services.TryAddSingleton(verbExtractor);
 
-            // Register these sources only if they have entries.
+            // Register these sources only if they have entries. We don't care about pre-existing
+            // registrations, because IHandlerSource is expected to exist in multiples
             if (_delegates.Count > 0)
                 services.AddSingleton<IHandlerSource>(_delegates);
             if (_scripts.Count > 0)
@@ -51,7 +53,8 @@ namespace StoneFruit.Execution.Handlers
             }
 
             // Add the IHandlers, which gets the list of all IHandlerSource instances from the DI
-            services.AddSingleton<IHandlers>(provider =>
+            // This one may be registered by the user already so don't overwrite
+            services.TryAddSingleton<IHandlers>(provider =>
             {
                 var sources = provider.GetServices<IHandlerSource>();
                 return new HandlerSourceCollection(sources);

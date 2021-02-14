@@ -6,7 +6,7 @@ using StoneFruit.Utility;
 namespace StoneFruit
 {
     /// <summary>
-    /// Collection of parsed arguments. All names are case-invariant.
+    /// Collection of parsed arguments. All names are case-insensitive.
     /// </summary>
     public interface IArguments
     {

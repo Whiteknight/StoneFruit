@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Environments;
@@ -131,7 +132,9 @@ namespace StoneFruit
         /// <param name="services"></param>
         public static void SetupEngineRegistrations(IServiceCollection services)
         {
-            // Register the Engine and the things that the Engine provides
+            // Register the Engine and the things that the Engine provides. These registrations
+            // are required, the user is not expected to inject their own Engine, State or
+            // Dispatcher
             services.AddSingleton(_ => new EngineAccessor());
             services.AddSingleton(provider =>
             {
@@ -154,7 +157,8 @@ namespace StoneFruit
         public static void SetupExplicitEnvironmentRegistration<TEnvironment>(IServiceCollection services)
             where TEnvironment : class
         {
-            services.AddScoped(provider =>
+            // The user may already have their own registration, so don't overwrite it.
+            services.TryAddScoped(provider =>
             {
                 var current = provider.GetRequiredService<IEnvironmentCollection>().Current;
                 if (current == null)
@@ -164,6 +168,10 @@ namespace StoneFruit
             });
         }
 
+        /// <summary>
+        /// Build the Engine directly without using a DI container
+        /// </summary>
+        /// <returns></returns>
         public Engine Build()
         {
             var handlers = (_handlers as ISetupBuildable<IHandlers>)!.Build();
