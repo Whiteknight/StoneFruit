@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
 using StoneFruit.Execution.Arguments;
-using StoneFruit.Execution.Scripts.Formatting;
+using StoneFruit.Execution.Scripts;
 
 namespace StoneFruit.Tests.Execution
 {

@@ -23,13 +23,14 @@ namespace StoneFruit.Handlers
 
         public static string Group => HelpHandler.BuiltinsGroup;
         public static string Description => "Work with internal metadata";
+
         public static string Usage => @"metadata ...
 
-metadata remove <keys>... 
-Remove a list of metadata items by name
+metadata remove <keys>...
+    Remove a list of metadata items by name
 
 metadata list
-List all available metadata entries
+    List all available metadata entries
 ";
 
         public void Execute()
