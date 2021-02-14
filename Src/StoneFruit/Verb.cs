@@ -11,18 +11,25 @@ namespace StoneFruit
 
         public Verb(string verb)
         {
+            if (string.IsNullOrEmpty(verb))
+                throw new InvalidOperationException("Verb must contain at least one word");
             if (verb.Contains(' '))
                 _verb = verb.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             else
                 _verb = new[] { verb };
+            if (_verb.Count == 0)
+                throw new InvalidOperationException("Verb must contain at least one word");
         }
 
         public Verb(string[] verb)
         {
-            if (verb.Length == 1 && verb[0].Contains(' '))
-                _verb = verb[0].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            else
-                _verb = verb;
+            if (verb == null || verb.Length == 0)
+                throw new InvalidOperationException("Verb must contain at least one word");
+            _verb = verb
+                .SelectMany(w => (w ?? "").Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
+                .ToArray();
+            if (_verb.Count == 0)
+                throw new InvalidOperationException("Verb must contain at least one word");
         }
 
         public static implicit operator Verb(string s) => new Verb(s);
@@ -33,7 +40,7 @@ namespace StoneFruit
 
         public int Count => _verb.Count;
 
-        public IEnumerator<string> GetEnumerator() => (_verb ?? Enumerable.Empty<string>()).GetEnumerator();
+        public IEnumerator<string> GetEnumerator() => _verb.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)(_verb ?? Enumerable.Empty<string>())).GetEnumerator();
 
