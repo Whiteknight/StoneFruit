@@ -12,7 +12,7 @@ namespace StoneFruit.Utility
         /// <param name="type"></param>
         /// <returns></returns>
         public static string GetDescription(this Type type)
-            => GetPublicStaticStringPropertyValue(type, "Description") ?? string.Empty;
+            => GetPublicStaticStringPropertyValue(type, "Description") ?? GetDescriptionAttributeValue(type) ?? string.Empty;
 
         /// <summary>
         /// Attempt to get the Usage of an IHandlerBase class
@@ -20,7 +20,7 @@ namespace StoneFruit.Utility
         /// <param name="type"></param>
         /// <returns></returns>
         public static string GetUsage(this Type type)
-            => GetPublicStaticStringPropertyValue(type, "Usage") ?? GetDescription(type);
+            => GetPublicStaticStringPropertyValue(type, "Usage") ?? GetUsageAttributeValue(type) ?? GetDescription(type);
 
         /// <summary>
         /// Get the group of the IHandlerBase class
@@ -28,7 +28,7 @@ namespace StoneFruit.Utility
         /// <param name="type"></param>
         /// <returns></returns>
         public static string GetGroup(this Type type)
-            => GetPublicStaticStringPropertyValue(type, "Group") ?? string.Empty;
+            => GetPublicStaticStringPropertyValue(type, "Group") ?? GetGroupAttributeValue(type) ?? string.Empty;
 
         private static string? GetPublicStaticStringPropertyValue(Type type, string name)
         {
@@ -37,6 +37,19 @@ namespace StoneFruit.Utility
                 return property.GetValue(null) as string;
             return null;
         }
+
+        public static string? GetDescriptionAttributeValue(this MemberInfo type)
+            =>
+            type.GetCustomAttribute<DescriptionAttribute>()?.Description ??
+            type.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>()?.Description;
+
+        public static string? GetUsageAttributeValue(this MemberInfo type)
+            => type.GetCustomAttribute<UsageAttribute>()?.Usage;
+
+        public static string? GetGroupAttributeValue(this MemberInfo type)
+            =>
+            type.GetCustomAttribute<GroupAttribute>()?.Group ??
+            type.GetCustomAttribute<System.ComponentModel.CategoryAttribute>()?.Category;
 
         /// <summary>
         /// Return true if the given verb should display in the Help output for the given handler. False

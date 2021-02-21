@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -15,19 +14,13 @@ namespace StoneFruit.Execution.Handlers
     public class InstanceMethodHandlerSource : IHandlerSource
     {
         private readonly object _instance;
-        private readonly Func<string, string> _getDescription;
-        private readonly Func<string, string> _getUsage;
-        private readonly Func<string, string> _getGroup;
         private readonly VerbTrie<MethodInfo> _methods;
         private readonly IHandlerMethodInvoker _invoker;
 
-        public InstanceMethodHandlerSource(object instance, Func<string, string>? getDescription, Func<string, string>? getUsage, Func<string, string>? getGroup, IHandlerMethodInvoker invoker, IVerbExtractor verbExtractor)
+        public InstanceMethodHandlerSource(object instance, IHandlerMethodInvoker invoker, IVerbExtractor verbExtractor)
         {
             Assert.ArgumentNotNull(instance, nameof(instance));
             _instance = instance;
-            _getDescription = getDescription ?? (_ => string.Empty);
-            _getUsage = getUsage ?? (_ => string.Empty);
-            _getGroup = getGroup ?? (_ => string.Empty);
             _methods = _instance.GetType()
                 .GetMethods(BindingFlags.Instance | BindingFlags.Public)
                 .Where(m => m.ReturnType == typeof(void) || m.ReturnType == typeof(Task))
@@ -55,7 +48,7 @@ namespace StoneFruit.Execution.Handlers
 
         public IEnumerable<IVerbInfo> GetAll()
             => _methods.GetAll()
-                .Select(kvp => new MethodInfoVerbInfo(kvp.Key, _getDescription, _getUsage, _getGroup));
+                .Select(kvp => new MethodInfoVerbInfo(kvp.Key, kvp.Value));
 
         // Since we're using the name of a method as the verb, and you can't nest methods, the
         // verb must only be a single string. Anything else is a non-match
@@ -64,27 +57,23 @@ namespace StoneFruit.Execution.Handlers
             var method = _methods.Get(verb);
             if (!method.HasValue)
                 return FailureResult<IVerbInfo>.Instance;
-            return new SuccessResult<IVerbInfo>(new MethodInfoVerbInfo(verb, _getDescription, _getUsage, _getGroup));
+            return new SuccessResult<IVerbInfo>(new MethodInfoVerbInfo(verb, method.Value));
         }
 
         private class MethodInfoVerbInfo : IVerbInfo
         {
-            private readonly Func<string, string> _getDescription;
-            private readonly Func<string, string> _getUsage;
-            private readonly Func<string, string> _getGroup;
+            private readonly MethodInfo _method;
 
-            public MethodInfoVerbInfo(Verb verb, Func<string, string> getDescription, Func<string, string> getUsage, Func<string, string> getGroup)
+            public MethodInfoVerbInfo(Verb verb, MethodInfo method)
             {
                 Verb = verb;
-                _getDescription = getDescription;
-                _getUsage = getUsage;
-                _getGroup = getGroup;
+                _method = method;
             }
 
             public Verb Verb { get; }
-            public string Description => _getDescription(Verb.ToString());
-            public string Usage => _getUsage(Verb.ToString());
-            public string Group => _getGroup(Verb.ToString());
+            public string Description => _method.GetDescriptionAttributeValue() ?? string.Empty;
+            public string Usage => _method.GetUsageAttributeValue() ?? Description;
+            public string Group => _method.GetGroupAttributeValue() ?? string.Empty;
             public bool ShouldShowInHelp => true;
         }
 

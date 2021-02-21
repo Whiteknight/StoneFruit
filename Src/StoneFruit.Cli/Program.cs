@@ -52,7 +52,7 @@ namespace StoneFruit.Cli
         {
             builder
                 .SetupHandlers(h => h
-                    .UsePublicMethodsAsHandlers(new MyObject(), getGroup: s => "public-methods")
+                    .UsePublicMethodsAsHandlers(new MyObject())
                     .Add("testf", (c, d) => d.Output.WriteLine("F"), description: "do F things", usage: "testf ...", group: "delegates")
                     .AddScript("testg", new[] { "echo test", "echo g" }, group: "scripts")
                     .AddScript("testh", new[] { "echo [0]", "echo ['a']" }, group: "scripts")
@@ -196,11 +196,17 @@ namespace StoneFruit.Cli
 
     public class MyObject
     {
+        [Group("public-methods")]
+        [Description("do D things")]
+        [Usage("test d <name>")]
         public void TestD(IOutput output, string name)
         {
             output.WriteLine($"{name}: D");
         }
 
+        [Group("public-methods")]
+        [Description("do E things")]
+        [Usage("test e")]
         public Task TestE(IOutput output, CancellationToken token)
         {
             output.WriteLine("E");

@@ -100,10 +100,10 @@ namespace StoneFruit
         /// <param name="handlers"></param>
         /// <param name="instance"></param>
         /// <returns></returns>
-        public static IHandlerSetup UsePublicMethodsAsHandlers(this IHandlerSetup handlers, object instance, Func<string, string>? getDescription = null, Func<string, string>? getUsage = null, Func<string, string>? getGroup = null)
+        public static IHandlerSetup UsePublicMethodsAsHandlers(this IHandlerSetup handlers, object instance)
         {
             Assert.ArgumentNotNull(handlers, nameof(handlers));
-            return handlers.AddSource(ctx => new InstanceMethodHandlerSource(instance, getDescription, getUsage, getGroup, ctx.MethodInvoker, ctx.VerbExtractor));
+            return handlers.AddSource(ctx => new InstanceMethodHandlerSource(instance, ctx.MethodInvoker, ctx.VerbExtractor));
         }
 
         /// <summary>

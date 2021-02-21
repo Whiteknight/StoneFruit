@@ -32,17 +32,146 @@ namespace StoneFruit.Tests.Integration
             output.Lines.Should().Contain("echo");
         }
 
-        //[Test]
-        //public void Help_Alias()
-        //{
-        //    var output = new TestOutput();
-        //    var engine = new EngineBuilder()
-        //        .SetupHandlers(h => h.AddAlias("help", "help-alias"))
-        //        .SetupOutput(o => o.DoNotUseConsole().Add(output))
-        //        .Build();
-        //    engine.RunHeadless("help");
-        //    output.Lines.Should().Contain("help");
-        //    output.Lines.Should().Contain("help-alias");
-        //}
+        private class TestInstanceMethodsAttrs
+        {
+            [Description("Test1Description")]
+            [Usage("Test1Usage")]
+            [Group("Test1Group")]
+            public void Test1()
+            {
+            }
+
+            [Description("Test2Description")]
+            [Usage("Test2Usage")]
+            [Group("Test2Group")]
+            public void Test2()
+            {
+            }
+        }
+
+        [Test]
+        public void Help_InstanceMethodAttributes_GroupDescription()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .SetupHandlers(h => h
+                    .UsePublicMethodsAsHandlers(new TestInstanceMethodsAttrs())
+                )
+                .Build();
+            engine.RunHeadless("help");
+            output.Lines.Should().Contain("Test1Description");
+            output.Lines.Should().Contain("Test1Group");
+            output.Lines.Should().Contain("Test2Description");
+            output.Lines.Should().Contain("Test2Group");
+        }
+
+        [Test]
+        public void Help_InstanceMethodAttributes_Usage()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .SetupHandlers(h => h
+                    .UsePublicMethodsAsHandlers(new TestInstanceMethodsAttrs())
+                )
+                .Build();
+            engine.RunHeadless("help test 1");
+            output.Lines.Should().Contain("Test1Usage");
+        }
+
+        [Description("AttrDescription")]
+        [Usage("AttrUsage")]
+        [Group("AttrGroup")]
+        private class AttributesHelpHandler : IHandler
+        {
+            public void Execute()
+            {
+                throw new System.NotImplementedException();
+            }
+        }
+
+        [Test]
+        public void Help_HandlerAttributes_GroupDescription()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .SetupHandlers(h => h
+                    .Add("test-attrs", new AttributesHelpHandler())
+                )
+                .Build();
+            engine.RunHeadless("help");
+            output.Lines.Should().Contain("AttrDescription");
+            output.Lines.Should().Contain("AttrGroup");
+        }
+
+        [Test]
+        public void Help_HandlerAttributes_Usage()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .SetupHandlers(h => h
+                    .Add("test-attrs", new AttributesHelpHandler())
+                )
+                .Build();
+            engine.RunHeadless("help test-attrs");
+            output.Lines.Should().Contain("AttrUsage");
+        }
+
+        [Test]
+        public void Help_HandlerAttributes_OverrideGroupDescription()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .SetupHandlers(h => h
+                    .Add("test-attrs", new AttributesHelpHandler(), description: "OverrideDescription", group: "OverrideGroup")
+                )
+                .Build();
+            engine.RunHeadless("help");
+            output.Lines.Should().Contain("OverrideDescription");
+            output.Lines.Should().Contain("OverrideGroup");
+        }
+
+        [Test]
+        public void Help_HandlerAttributes_OverrideUsage()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .SetupHandlers(h => h
+                    .Add("test-attrs", new AttributesHelpHandler(), usage: "OverrideUsage")
+                )
+                .Build();
+            engine.RunHeadless("help test-attrs");
+            output.Lines.Should().Contain("OverrideUsage");
+        }
+
+        [System.ComponentModel.Description("AttrDescription")]
+        [System.ComponentModel.Category("AttrGroup")]
+        private class ComponentModelAttributesHelpHandler : IHandler
+        {
+            public void Execute()
+            {
+                throw new System.NotImplementedException();
+            }
+        }
+
+        [Test]
+        public void Help_ComponentModelAttributes_GroupDescription()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .SetupHandlers(h => h
+                    .Add("test-attrs", new ComponentModelAttributesHelpHandler())
+                )
+                .Build();
+            engine.RunHeadless("help");
+            output.Lines.Should().Contain("AttrDescription");
+            output.Lines.Should().Contain("AttrGroup");
+        }
     }
 }
