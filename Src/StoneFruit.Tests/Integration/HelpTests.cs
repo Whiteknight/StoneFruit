@@ -14,8 +14,11 @@ namespace StoneFruit.Tests.Integration
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
             engine.RunHeadless("help");
+            // 'exit' and 'help' are always visible
             output.Lines.Should().Contain("exit");
             output.Lines.Should().Contain("help");
+
+            // 'echo' is hidden by default
             output.Lines.Should().NotContain("echo");
         }
 
@@ -172,6 +175,100 @@ namespace StoneFruit.Tests.Integration
             engine.RunHeadless("help");
             output.Lines.Should().Contain("AttrDescription");
             output.Lines.Should().Contain("AttrGroup");
+        }
+
+        [System.ComponentModel.Description("BrowseableFalse")]
+        [System.ComponentModel.Browsable(false)]
+        private class ComponentModelBrowseableAttributeFalseHandler : IHandler
+        {
+            public void Execute()
+            {
+                throw new System.NotImplementedException();
+            }
+        }
+
+        [Test]
+        public void Help_ComponentModelAttributes_Browsable_False()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .SetupHandlers(h => h
+                    .Add("test-attrs", new ComponentModelBrowseableAttributeFalseHandler())
+                )
+                .Build();
+            engine.RunHeadless("help");
+            output.Lines.Should().NotContain("BrowseableFalse");
+        }
+
+        [System.ComponentModel.Description("BrowseableTrue")]
+        [System.ComponentModel.Browsable(true)]
+        private class ComponentModelBrowseableAttributeTrueHandler : IHandler
+        {
+            public void Execute()
+            {
+                throw new System.NotImplementedException();
+            }
+        }
+
+        [Test]
+        public void Help_ComponentModelAttributes_Browsable_True()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .SetupHandlers(h => h
+                    .Add("test-attrs", new ComponentModelBrowseableAttributeTrueHandler())
+                )
+                .Build();
+            engine.RunHeadless("help");
+            output.Lines.Should().Contain("BrowseableTrue");
+        }
+
+        [Verb("hidden-handler", Hide = true)]
+        private class VerbAttributeHideHandler : IHandler
+        {
+            public void Execute()
+            {
+                throw new System.NotImplementedException();
+            }
+        }
+
+        [Test]
+        public void Help_VerbAttribute_Hide_True()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .SetupHandlers(h => h
+                    .Add("hidden-handler", new VerbAttributeHideHandler())
+                )
+                .Build();
+            engine.RunHeadless("help");
+            output.Lines.Should().NotContain("hidden-handler");
+        }
+
+        [Verb("visible-handler", Hide = false)]
+        private class VerbAttributeShowHandler : IHandler
+        {
+            public void Execute()
+            {
+                throw new System.NotImplementedException();
+            }
+        }
+
+        [Test]
+        public void Help_VerbAttribute_Hide_False()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .SetupHandlers(h => h
+                    .Add("visible-handler", new VerbAttributeShowHandler())
+                )
+                .Build();
+            engine.RunHeadless("help");
+            output.Lines.Should().Contain("visible-handler");
         }
     }
 }
