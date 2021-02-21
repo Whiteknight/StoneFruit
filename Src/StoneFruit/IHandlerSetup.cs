@@ -17,6 +17,8 @@ namespace StoneFruit
         /// <returns></returns>
         IHandlerSetup UseVerbExtractor(IVerbExtractor verbExtractor);
 
+        IHandlerSetup UseMethodInvoker(IHandlerMethodInvoker invoker);
+
         /// <summary>
         /// Add a new handler source to the list of sources. Sources are stored in order, sources
         /// added first will be searched first for a matching handler.
@@ -66,14 +68,16 @@ namespace StoneFruit
         IHandlerSetup AddScript(Verb verb, IEnumerable<string> lines, string description = "", string usage = "", string group = "");
     }
 
-    public class HandlerSourceBuildContext
+    public struct HandlerSourceBuildContext
     {
-        public HandlerSourceBuildContext(IVerbExtractor verbExtractor)
+        public HandlerSourceBuildContext(IVerbExtractor verbExtractor, IHandlerMethodInvoker invoker)
         {
             VerbExtractor = verbExtractor;
+            MethodInvoker = invoker;
         }
 
         public IVerbExtractor VerbExtractor { get; }
+        public IHandlerMethodInvoker MethodInvoker { get; }
     }
 
     public static class HandlerSetupExtensions
@@ -99,7 +103,7 @@ namespace StoneFruit
         public static IHandlerSetup UsePublicMethodsAsHandlers(this IHandlerSetup handlers, object instance, Func<string, string>? getDescription = null, Func<string, string>? getUsage = null, Func<string, string>? getGroup = null)
         {
             Assert.ArgumentNotNull(handlers, nameof(handlers));
-            return handlers.AddSource(ctx => new InstanceMethodHandlerSource(instance, getDescription, getUsage, getGroup, ctx.VerbExtractor));
+            return handlers.AddSource(ctx => new InstanceMethodHandlerSource(instance, getDescription, getUsage, getGroup, ctx.MethodInvoker, ctx.VerbExtractor));
         }
 
         /// <summary>

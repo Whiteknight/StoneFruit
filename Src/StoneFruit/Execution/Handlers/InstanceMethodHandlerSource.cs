@@ -19,8 +19,9 @@ namespace StoneFruit.Execution.Handlers
         private readonly Func<string, string> _getUsage;
         private readonly Func<string, string> _getGroup;
         private readonly VerbTrie<MethodInfo> _methods;
+        private readonly IHandlerMethodInvoker _invoker;
 
-        public InstanceMethodHandlerSource(object instance, Func<string, string>? getDescription, Func<string, string>? getUsage, Func<string, string>? getGroup, IVerbExtractor verbExtractor)
+        public InstanceMethodHandlerSource(object instance, Func<string, string>? getDescription, Func<string, string>? getUsage, Func<string, string>? getGroup, IHandlerMethodInvoker invoker, IVerbExtractor verbExtractor)
         {
             Assert.ArgumentNotNull(instance, nameof(instance));
             _instance = instance;
@@ -35,6 +36,7 @@ namespace StoneFruit.Execution.Handlers
                     .Select(v => (Method: m, Verb: v))
                 )
                 .ToVerbTrie(x => x.Verb, x => x.Method);
+            _invoker = invoker;
         }
 
         public IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
@@ -44,9 +46,9 @@ namespace StoneFruit.Execution.Handlers
                 return FailureResult<IHandlerBase>.Instance;
 
             if (method.Value.ReturnType == typeof(void))
-                return new SuccessResult<IHandlerBase>(new SyncHandlerWrapper(_instance, method.Value, arguments, dispatcher));
+                return new SuccessResult<IHandlerBase>(new SyncHandlerWrapper(_instance, method.Value, arguments, dispatcher, _invoker));
             if (method.Value.ReturnType == typeof(Task))
-                return new SuccessResult<IHandlerBase>(new AsyncHandlerWrapper(_instance, method.Value, arguments, dispatcher));
+                return new SuccessResult<IHandlerBase>(new AsyncHandlerWrapper(_instance, method.Value, arguments, dispatcher, _invoker));
 
             return FailureResult<IHandlerBase>.Instance;
         }
@@ -63,19 +65,6 @@ namespace StoneFruit.Execution.Handlers
             if (!method.HasValue)
                 return FailureResult<IVerbInfo>.Instance;
             return new SuccessResult<IVerbInfo>(new MethodInfoVerbInfo(verb, _getDescription, _getUsage, _getGroup));
-        }
-
-        private static object? InvokeMethod(object instance, MethodInfo method, ParameterInfo[] parameters, IArguments command, CommandDispatcher dispatcher, CancellationToken token)
-        {
-            var args = new object?[parameters.Length];
-            var fetcher = new ArgumentValueFetcher(command, dispatcher, token);
-            for (int i = 0; i < parameters.Length; i++)
-            {
-                var parameter = parameters[i];
-                args[i] = fetcher.GetValue(parameter.ParameterType, parameter.Name ?? "", i);
-            }
-
-            return method.Invoke(instance, args);
         }
 
         private class MethodInfoVerbInfo : IVerbInfo
@@ -105,25 +94,20 @@ namespace StoneFruit.Execution.Handlers
             private readonly MethodInfo _method;
             private readonly IArguments _command;
             private readonly CommandDispatcher _dispatcher;
+            private readonly IHandlerMethodInvoker _invoker;
 
-            public SyncHandlerWrapper(object instance, MethodInfo method, IArguments command, CommandDispatcher dispatcher)
+            public SyncHandlerWrapper(object instance, MethodInfo method, IArguments command, CommandDispatcher dispatcher, IHandlerMethodInvoker invoker)
             {
                 _instance = instance;
                 _method = method;
                 _command = command;
                 _dispatcher = dispatcher;
+                _invoker = invoker;
             }
 
             public void Execute()
             {
-                var parameters = _method.GetParameters();
-                if (parameters.Length == 0)
-                {
-                    _method.Invoke(_instance, new object[0]);
-                    return;
-                }
-
-                InvokeMethod(_instance, _method, parameters, _command, _dispatcher, CancellationToken.None);
+                _invoker.Invoke(_instance, _method, _command, _dispatcher, CancellationToken.None);
             }
         }
 
@@ -133,27 +117,20 @@ namespace StoneFruit.Execution.Handlers
             private readonly MethodInfo _method;
             private readonly IArguments _command;
             private readonly CommandDispatcher _dispatcher;
+            private readonly IHandlerMethodInvoker _invoker;
 
-            public AsyncHandlerWrapper(object instance, MethodInfo method, IArguments command, CommandDispatcher dispatcher)
+            public AsyncHandlerWrapper(object instance, MethodInfo method, IArguments command, CommandDispatcher dispatcher, IHandlerMethodInvoker invoker)
             {
                 Debug.Assert(method.ReturnType == typeof(Task));
                 _instance = instance;
                 _method = method;
                 _command = command;
                 _dispatcher = dispatcher;
+                _invoker = invoker;
             }
 
             public Task ExecuteAsync(CancellationToken cancellation)
-            {
-                var parameters = _method.GetParameters();
-                if (parameters.Length == 0)
-                {
-                    var result = _method.Invoke(_instance, new object[0]);
-                    return (result as Task) ?? Task.CompletedTask;
-                }
-
-                return (InvokeMethod(_instance, _method, parameters, _command, _dispatcher, cancellation) as Task) ?? Task.CompletedTask;
-            }
+                => _invoker.InvokeAsync(_instance, _method, _command, _dispatcher, cancellation);
         }
     }
 }
