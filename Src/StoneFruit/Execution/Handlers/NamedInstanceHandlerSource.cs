@@ -20,7 +20,7 @@ namespace StoneFruit.Execution.Handlers
 
         public void Add(Verb verb, IHandlerBase handlerObject, string? description = null, string? usage = null, string? group = null)
         {
-            var info = new VerbInfo(verb, handlerObject, description ?? string.Empty, usage ?? string.Empty, group ?? string.Empty);
+            var info = new VerbInfo(verb, handlerObject, description, usage, group);
             _verbs.Insert(verb, info);
         }
 
@@ -35,21 +35,53 @@ namespace StoneFruit.Execution.Handlers
 
         private class VerbInfo : IVerbInfo
         {
-            public VerbInfo(Verb verb, IHandlerBase handlerObject, string description, string help, string group)
+            private readonly string? _description;
+            private readonly string? _usage;
+            private readonly string? _group;
+
+            public VerbInfo(Verb verb, IHandlerBase handlerObject, string? description, string? usage, string? group)
             {
                 Verb = verb;
                 HandlerObject = handlerObject;
-                Description = description;
-                Usage = help;
-                Group = group;
+                _description = description;
+                _usage = usage;
+                _group = group;
             }
 
             public IHandlerBase HandlerObject { get; }
             public Verb Verb { get; }
-            public string Description { get; }
-            public string Usage { get; }
-            public string Group { get; }
-            public bool ShouldShowInHelp => true;
+
+            public string Description
+            {
+                get
+                {
+                    if (!string.IsNullOrEmpty(_description))
+                        return _description!;
+                    return HandlerObject.GetType().GetDescription() ?? string.Empty;
+                }
+            }
+
+            public string Usage
+            {
+                get
+                {
+                    if (!string.IsNullOrEmpty(_usage))
+                        return _usage!;
+                    return HandlerObject.GetType().GetUsage() ?? Description;
+                }
+            }
+
+            public string Group
+            {
+                get
+                {
+                    if (!string.IsNullOrEmpty(_group))
+                        return _group!;
+                    return HandlerObject.GetType().GetGroup() ?? string.Empty;
+                }
+            }
+
+            public bool ShouldShowInHelp => HandlerObject.GetType().ShouldShowInHelp(Verb);
         }
     }
 }
