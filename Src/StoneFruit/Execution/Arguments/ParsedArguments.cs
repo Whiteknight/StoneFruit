@@ -262,8 +262,7 @@ namespace StoneFruit.Execution.Arguments
                 return _accessedFlags[name].Consumed ? MissingArgument.FlagConsumed(name) : _accessedFlags[name];
 
             // Loop through unaccessed args looking for a matching flag.
-            var match = AccessFlagsUntil(n => n == name, () => true);
-            return match ?? MissingArgument.FlagMissing(name);
+            return AccessFlagsUntil(name, n => n == name, () => true);
         }
 
         public bool HasFlag(string name, bool markConsumed = false)
@@ -271,55 +270,48 @@ namespace StoneFruit.Execution.Arguments
             name = name.ToLowerInvariant();
             if (_accessedFlags.ContainsKey(name))
                 return true;
-            var arg = AccessFlagsUntil(n => n == name, () => true);
-            return arg?.Exists() == true;
+            return AccessFlagsUntil(name, n => n == name, () => true).Exists();
         }
 
         public IEnumerable<IFlagArgument> GetAllFlags()
         {
-            AccessFlagsUntil(_ => true, () => false);
+            AccessFlagsUntil("", _ => true, () => false);
             return _accessedFlags.Values.Where(a => !a.Consumed);
         }
 
-        private IFlagArgument? AccessFlagsUntil(Func<string, bool> isMatch, Func<bool> isComplete)
+        private IFlagArgument AccessFlagsUntil(string name, Func<string, bool> isMatch, Func<bool> isComplete)
         {
             for (int i = 0; i < _rawArguments.Count; i++)
             {
-                var accessor = GetFlagAccessorForArgument(i, isMatch);
-                if (accessor != null && isComplete())
-                    return accessor;
+                var arg = _rawArguments[i];
+                if (arg.Access == AccessType.Accessed || arg.Access == AccessType.AccessedAsFlag)
+                    continue;
+
+                if (arg.Argument is ParsedFlagArgument f && isMatch(f.Name))
+                {
+                    var accessor = new FlagArgument(f.Name);
+                    _rawArguments[i].Access = AccessType.Accessed;
+                    _accessedFlags.Add(f.Name, accessor);
+                    if (isComplete())
+                        return accessor;
+                    continue;
+                }
+
+                if (arg.Argument is ParsedFlagPositionalOrNamedArgument fp && isMatch(fp.Name))
+                {
+                    var accessor = new FlagArgument(fp.Name);
+                    _accessedFlags.Add(fp.Name, accessor);
+                    if (arg.Access == AccessType.AccessedAsPositional)
+                        arg.Access = AccessType.Accessed;
+                    else
+                        arg.Access = AccessType.AccessedAsFlag;
+                    if (isComplete())
+                        return accessor;
+                    continue;
+                }
             }
 
-            return null;
-        }
-
-        private FlagArgument? GetFlagAccessorForArgument(int i, Func<string, bool> isMatch)
-        {
-            var arg = _rawArguments[i];
-            if (arg.Access == AccessType.Accessed || arg.Access == AccessType.AccessedAsFlag)
-                return null;
-
-            if (arg.Argument is ParsedFlagArgument f && isMatch(f.Name))
-            {
-                var accessor = new FlagArgument(f.Name);
-                _rawArguments[i].Access = AccessType.Accessed;
-                _accessedFlags.Add(f.Name, accessor);
-                return accessor;
-            }
-
-            if (arg.Argument is ParsedFlagPositionalOrNamedArgument fp && isMatch(fp.Name))
-            {
-                var accessor = new FlagArgument(fp.Name);
-                _accessedFlags.Add(fp.Name, accessor);
-                if (arg.Access == AccessType.AccessedAsPositional)
-                    arg.Access = AccessType.Accessed;
-                else
-                    arg.Access = AccessType.AccessedAsFlag;
-
-                return accessor;
-            }
-
-            return null;
+            return MissingArgument.FlagMissing(name);
         }
 
         // We access verbs before we access any args, so we can work entirely out of the
