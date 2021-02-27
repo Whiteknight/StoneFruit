@@ -12,7 +12,7 @@ namespace StoneFruit.Execution.Arguments
     /// </summary>
     public class ParsedArguments : IArguments, IVerbSource
     {
-        private readonly List<IParsedArgument?> _rawArguments;
+        private readonly List<RawArg> _rawArguments;
         private readonly List<IPositionalArgument> _accessedPositionals;
         private readonly Dictionary<string, List<INamedArgument>> _accessedNameds;
         private readonly Dictionary<string, IFlagArgument> _accessedFlags;
@@ -31,8 +31,28 @@ namespace StoneFruit.Execution.Arguments
                     MultiParsedFlagArgument mp => mp.ToIndividualArgs(),
                     _ => new[] { a }
                 })
-                .Cast<IParsedArgument?>()
+                .Select(a => new RawArg(a))
                 .ToList();
+        }
+
+        private enum AccessType
+        {
+            Unaccessed,
+            Accessed,
+            AccessedAsFlag,
+            AccessedAsPositional
+        }
+
+        private class RawArg
+        {
+            public RawArg(IParsedArgument arg)
+            {
+                Argument = arg;
+                Access = AccessType.Unaccessed;
+            }
+
+            public IParsedArgument Argument { get; }
+            public AccessType Access { get; set; }
         }
 
         public string Raw { get; }
@@ -41,14 +61,17 @@ namespace StoneFruit.Execution.Arguments
         {
             get
             {
+                // We need to find all raw arguments which are not accessed, or all accessed
+                // arguments which are marked unconsumed.
+
                 var fromRaw = _rawArguments
-                .Where(a => a != null)
-                .Select(u => u switch
+                .Where(raw => raw.Access != AccessType.Accessed)
+                .Select(raw => raw.Argument switch
                 {
                     ParsedPositionalArgument p => p.Value,
                     ParsedNamedArgument n => $"'{n.Name}' = {n.Value}",
                     ParsedFlagArgument f => $"flag {f.Name}",
-                    ParsedFlagPositionalOrNamedArgument fp => $"'{fp.Name}', {fp.Value}",
+                    ParsedFlagPositionalOrNamedArgument fp => GetUnconsumedMessage(raw, fp),
                     _ => "Unknown"
                 });
 
@@ -68,14 +91,24 @@ namespace StoneFruit.Execution.Arguments
             }
         }
 
+        private string GetUnconsumedMessage(RawArg raw, ParsedFlagPositionalOrNamedArgument fp)
+        {
+            return raw.Access switch
+            {
+                AccessType.AccessedAsFlag => fp.Value,
+                AccessType.AccessedAsPositional => $"flag {fp.Name}",
+                _ => $"'{fp.Name}', {fp.Value}"
+            };
+        }
+
         public void ResetAllArguments()
         {
-            foreach (var p in _accessedPositionals)
-                p.MarkConsumed(false);
-            foreach (var n in _accessedNameds.Values.SelectMany(x => x))
-                n.MarkConsumed(false);
-            foreach (var f in _accessedFlags.Values)
-                f.MarkConsumed(false);
+            _accessedPositionals.Clear();
+            _accessedNameds.Clear();
+            _accessedFlags.Clear();
+
+            foreach (var raw in _rawArguments)
+                raw.Access = AccessType.Unaccessed;
         }
 
         public IPositionalArgument Shift() => AccessPositionalsUntil(() => true);
@@ -102,7 +135,7 @@ namespace StoneFruit.Execution.Arguments
             {
                 var firstAvailable = _accessedNameds[name].FirstOrDefault(a => !a.Consumed);
                 if (firstAvailable != null)
-                    return _accessedNameds[name].First();
+                    return firstAvailable;
             }
 
             // Loop through all unaccessed args looking for the first one with the given
@@ -117,7 +150,7 @@ namespace StoneFruit.Execution.Arguments
             return _accessedPositionals.Where(a => !a.Consumed);
         }
 
-        // Loop over all raw positional arguments, accessing each one until a condition is satisfied.
+        // Loop over all unconsumed raw positional arguments, accessing each one until a condition is satisfied.
         // When the condition is matched, return the current item.
         private IPositionalArgument AccessPositionalsUntil(Func<bool> match)
         {
@@ -125,21 +158,29 @@ namespace StoneFruit.Execution.Arguments
             {
                 var i = _lastRawPositionalIndex;
                 var arg = _rawArguments[i];
-                if (arg is ParsedPositionalArgument pa)
+                if (arg.Access == AccessType.Accessed || arg.Access == AccessType.AccessedAsPositional)
+                    continue;
+
+                if (arg.Argument is ParsedPositionalArgument pa)
                 {
                     var accessor = new PositionalArgument(pa.Value);
-                    _rawArguments[i] = null;
+                    _rawArguments[i].Access = AccessType.Accessed;
                     _accessedPositionals.Add(accessor);
                     if (match())
                         return accessor;
                 }
 
-                if (arg is ParsedFlagPositionalOrNamedArgument fp)
+                if (arg.Argument is ParsedFlagPositionalOrNamedArgument fp)
                 {
                     var accessor = new PositionalArgument(fp.Value);
                     _accessedPositionals.Add(accessor);
-                    // Replace the Flag+Positional arg with just a flag, the positional is consumed
-                    _rawArguments[i] = new ParsedFlagArgument(fp.Name);
+
+                    // If we have already consumed the flag portion, mark the whole arg consumed
+                    // otherwise, mark that we have only consumed the positional portion.
+                    if (arg.Access == AccessType.AccessedAsFlag)
+                        arg.Access = AccessType.Accessed;
+                    else
+                        arg.Access = AccessType.AccessedAsPositional;
                     if (match())
                         return accessor;
                 }
@@ -179,18 +220,23 @@ namespace StoneFruit.Execution.Arguments
         private NamedArgument? GetNamedAccessorForArgument(int i, Func<string, bool> shouldAccess)
         {
             var arg = _rawArguments[i];
-            if (arg is ParsedNamedArgument n && shouldAccess(n.Name))
+
+            // Any consumption at all means it can't be a named value
+            if (arg.Access != AccessType.Unaccessed)
+                return null;
+
+            if (arg.Argument is ParsedNamedArgument n && shouldAccess(n.Name))
             {
                 var accessor = new NamedArgument(n.Name, n.Value);
-                _rawArguments[i] = null;
+                _rawArguments[i].Access = AccessType.Accessed;
                 AccessNamed(accessor);
                 return accessor;
             }
 
-            if (arg is ParsedFlagPositionalOrNamedArgument n2 && shouldAccess(n2.Name))
+            if (arg.Argument is ParsedFlagPositionalOrNamedArgument n2 && shouldAccess(n2.Name))
             {
                 var accessor = new NamedArgument(n2.Name, n2.Value);
-                _rawArguments[i] = null;
+                _rawArguments[i].Access = AccessType.Accessed;
                 AccessNamed(accessor);
                 return accessor;
             }
@@ -250,19 +296,26 @@ namespace StoneFruit.Execution.Arguments
         private FlagArgument? GetFlagAccessorForArgument(int i, Func<string, bool> isMatch)
         {
             var arg = _rawArguments[i];
-            if (arg is ParsedFlagArgument f && isMatch(f.Name))
+            if (arg.Access == AccessType.Accessed || arg.Access == AccessType.AccessedAsFlag)
+                return null;
+
+            if (arg.Argument is ParsedFlagArgument f && isMatch(f.Name))
             {
                 var accessor = new FlagArgument(f.Name);
-                _rawArguments[i] = null;
+                _rawArguments[i].Access = AccessType.Accessed;
                 _accessedFlags.Add(f.Name, accessor);
                 return accessor;
             }
 
-            if (arg is ParsedFlagPositionalOrNamedArgument fp && isMatch(fp.Name))
+            if (arg.Argument is ParsedFlagPositionalOrNamedArgument fp && isMatch(fp.Name))
             {
                 var accessor = new FlagArgument(fp.Name);
                 _accessedFlags.Add(fp.Name, accessor);
-                _rawArguments[i] = new ParsedPositionalArgument(fp.Value);
+                if (arg.Access == AccessType.AccessedAsPositional)
+                    arg.Access = AccessType.Accessed;
+                else
+                    arg.Access = AccessType.AccessedAsFlag;
+
                 return accessor;
             }
 
@@ -276,11 +329,15 @@ namespace StoneFruit.Execution.Arguments
             var candidates = new List<IPositionalArgument>();
             for (int i = 0; i < _rawArguments.Count; i++)
             {
+                var arg = _rawArguments[i];
+                if (arg.Access == AccessType.Accessed || arg.Access == AccessType.AccessedAsPositional)
+                    continue;
+
                 // In some cases we're going to double-convert an arg. We'll pull more positionals
                 // than we need, decide that some of them are not part of the verb, and put back
                 // the rest. It's a small price to pay to avoid the complexity of conditionally
                 // caching them.
-                if (_rawArguments[i] is ParsedPositionalArgument pa)
+                if (arg.Argument is ParsedPositionalArgument pa)
                     candidates.Add(new PositionalArgument(pa.Value));
             }
             return candidates;
