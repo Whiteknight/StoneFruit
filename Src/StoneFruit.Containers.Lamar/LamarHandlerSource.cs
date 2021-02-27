@@ -39,7 +39,7 @@ namespace StoneFruit.Containers.Lamar
         public IEnumerable<IVerbInfo> GetAll() => _handlers.GetAll().Select(kvp => new VerbInfo(kvp.Key, kvp.Value));
 
         public IResult<IVerbInfo> GetByName(Verb verb)
-            => _handlers.Get(verb).Transform(type => new VerbInfo(verb, type));
+            => _handlers.Get(verb).Transform(type => (IVerbInfo)new VerbInfo(verb, type));
 
         private IHandlerBase ResolveHandler(Type type)
         {

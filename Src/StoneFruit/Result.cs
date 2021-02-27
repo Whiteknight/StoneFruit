@@ -2,10 +2,14 @@
 
 namespace StoneFruit
 {
-    public interface IResult<out T>
+    public interface IResult<T>
     {
         bool HasValue { get; }
         T Value { get; }
+
+        bool Equals(T value);
+
+        T GetValueOrDefault(T defaultValue);
 
         IResult<TOut> Transform<TOut>(Func<T, TOut> transform);
     }
@@ -26,6 +30,11 @@ namespace StoneFruit
         public bool HasValue => true;
         public T Value { get; }
 
+        public bool Equals(T value)
+            => Value!.Equals(value);
+
+        public T GetValueOrDefault(T defaultValue) => Value;
+
         public IResult<TOut> Transform<TOut>(Func<T, TOut> transform)
         {
             var newValue = transform(Value);
@@ -39,6 +48,10 @@ namespace StoneFruit
 
         public bool HasValue => false;
         public T Value => throw new InvalidOperationException("Cannot access value of failure result");
+
+        public bool Equals(T value) => false;
+
+        public T GetValueOrDefault(T defaultValue) => defaultValue;
 
         public IResult<TOut> Transform<TOut>(Func<T, TOut> transform) => FailureResult<TOut>.Instance;
     }

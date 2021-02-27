@@ -160,10 +160,10 @@ namespace StoneFruit
             // The user may already have their own registration, so don't overwrite it.
             services.TryAddScoped(provider =>
             {
-                var current = provider.GetRequiredService<IEnvironmentCollection>().Current;
-                if (current == null)
-                    throw new InvalidCastException($"Invalid environment. Expected environment {typeof(TEnvironment)} but found null.");
-                var env = current as TEnvironment;
+                var current = provider.GetRequiredService<IEnvironmentCollection>().GetCurrent();
+                if (!current.HasValue)
+                    throw new InvalidCastException($"Invalid environment. Expected environment {typeof(TEnvironment)} but none found.");
+                var env = current.Value as TEnvironment;
                 return env ?? throw new InvalidCastException($"Invalid cast. Expected environment {typeof(TEnvironment)} but found {current.GetType()}");
             });
         }

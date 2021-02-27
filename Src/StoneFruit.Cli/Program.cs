@@ -179,7 +179,7 @@ namespace StoneFruit.Cli
     public class MyEnvironmentFactory : IEnvironmentFactory
     {
         public IResult<object> Create(string name)
-            => Result.Success(new MyEnvironment(name));
+            => Result.Success<object>(new MyEnvironment(name));
 
         public IReadOnlyCollection<string> ValidEnvironments => new[] { "Local", "Testing", "Production" };
     }

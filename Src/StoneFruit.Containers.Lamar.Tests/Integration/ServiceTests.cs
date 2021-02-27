@@ -3,7 +3,6 @@ using FluentAssertions;
 using Lamar;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using StoneFruit.Execution;
 using TestUtilities;
 
 namespace StoneFruit.Containers.Lamar.Tests.Integration
@@ -22,7 +21,7 @@ namespace StoneFruit.Containers.Lamar.Tests.Integration
 
         private class MyEnvironmentFactory : IEnvironmentFactory
         {
-            public IResult<object> Create(string name) => Result.Success(new MyEnvironment(name));
+            public IResult<object> Create(string name) => Result.Success<object>(new MyEnvironment(name));
 
             public IReadOnlyCollection<string> ValidEnvironments => new[] { "A", "B", "C" };
         }

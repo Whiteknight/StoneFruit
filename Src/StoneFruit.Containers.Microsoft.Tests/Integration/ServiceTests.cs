@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using StoneFruit.Execution;
 using TestUtilities;
 
 namespace StoneFruit.Containers.Microsoft.Tests.Integration
@@ -20,7 +19,7 @@ namespace StoneFruit.Containers.Microsoft.Tests.Integration
 
     public class MyEnvironmentFactory : IEnvironmentFactory
     {
-        public IResult<object> Create(string name) => Result.Success(new MyEnvironment(name));
+        public IResult<object> Create(string name) => Result.Success<object>(new MyEnvironment(name));
 
         public IReadOnlyCollection<string> ValidEnvironments => new[] { "A", "B", "C" };
     }

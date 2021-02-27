@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using FluentAssertions;
 using NUnit.Framework;
-using StoneFruit.Execution;
 using StructureMap;
 using TestUtilities;
 
@@ -21,7 +20,7 @@ namespace StoneFruit.Containers.StructureMap.Tests.Integration
 
         public class MyEnvironmentFactory : IEnvironmentFactory
         {
-            public IResult<object> Create(string name) => Result.Success(new MyEnvironment(name));
+            public IResult<object> Create(string name) => Result.Success<object>(new MyEnvironment(name));
 
             public IReadOnlyCollection<string> ValidEnvironments => new[] { "A", "B", "C" };
         }

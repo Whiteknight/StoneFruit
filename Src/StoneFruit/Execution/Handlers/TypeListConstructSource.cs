@@ -50,8 +50,9 @@ namespace StoneFruit.Execution.Handlers
                 // transient objects
                 arguments
             };
-            if (dispatcher.Environments.Current != null)
-                objects.Add(dispatcher.Environments.Current);
+            var currentEnv = dispatcher.Environments.GetCurrent();
+            if (currentEnv.HasValue)
+                objects.Add(currentEnv.Value);
             return DuckTypeConstructorInvoker.TryConstruct(commandType, objects);
         }
 
@@ -73,7 +74,7 @@ namespace StoneFruit.Execution.Handlers
 
         public IEnumerable<IVerbInfo> GetAll() => _types.GetAll().Select(kvp => kvp.Value);
 
-        public IResult<IVerbInfo> GetByName(Verb verb) => _types.Get(verb);
+        public IResult<IVerbInfo> GetByName(Verb verb) => _types.Get(verb).Transform(i => (IVerbInfo)i);
 
         private class VerbInfo : IVerbInfo
         {

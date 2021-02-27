@@ -2,7 +2,6 @@
 using Autofac;
 using FluentAssertions;
 using NUnit.Framework;
-using StoneFruit.Execution;
 using TestUtilities;
 
 namespace StoneFruit.Containers.Autofac.Tests.Integration
@@ -21,7 +20,7 @@ namespace StoneFruit.Containers.Autofac.Tests.Integration
 
         private class MyEnvironmentFactory : IEnvironmentFactory
         {
-            public IResult<object> Create(string name) => Result.Success(new MyEnvironment(name));
+            public IResult<object> Create(string name) => Result.Success<object>(new MyEnvironment(name));
 
             public IReadOnlyCollection<string> ValidEnvironments => new[] { "A", "B", "C" };
         }

@@ -18,7 +18,10 @@
 
         public IResult<ArgumentsOrString> GetNextCommand()
         {
-            var str = _output.Prompt($"{_environments.CurrentName}");
+            var currentNameResult = _environments.GetCurrentName();
+            var currentName = currentNameResult.HasValue ? currentNameResult.Value : "";
+
+            var str = _output.Prompt($"{currentName}");
             _state.CommandCounter.ReceiveUserInput();
             if (string.IsNullOrEmpty(str))
                 return FailureResult<ArgumentsOrString>.Instance;
