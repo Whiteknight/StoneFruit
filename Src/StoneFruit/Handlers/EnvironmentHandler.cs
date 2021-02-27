@@ -51,7 +51,7 @@ Change the current environment, only if any are configured but none are set.
         {
             if (_args.HasFlag("notset"))
             {
-                if (_environments.Current != null)
+                if (_environments.GetCurrent().HasValue)
                     return;
                 ChangeEnvironment();
                 return;
@@ -70,6 +70,8 @@ Change the current environment, only if any are configured but none are set.
         {
             var highlight = new Brush(ConsoleColor.Black, ConsoleColor.Cyan);
             var envList = _environments.GetNames();
+            var currentEnvNameResult = _environments.GetCurrentName();
+            var currentEnv = currentEnvNameResult.HasValue ? currentEnvNameResult.Value : "";
             for (int i = 0; i < envList.Count; i++)
             {
                 var index = i + 1;
@@ -78,7 +80,7 @@ Change the current environment, only if any are configured but none are set.
                 _output
                     .Color(ConsoleColor.White).Write(index.ToString())
                     .Color(ConsoleColor.DarkGray).Write(") ")
-                    .Color(env == _environments.CurrentName ? highlight : ConsoleColor.Cyan).Write(env)
+                    .Color(env == currentEnv ? highlight : ConsoleColor.Cyan).Write(env)
                     .WriteLine();
             }
         }
@@ -91,7 +93,7 @@ Change the current environment, only if any are configured but none are set.
             if (target.Exists())
             {
                 var envName = target.AsString();
-                if (envName == _environments.CurrentName)
+                if (_environments.GetCurrentName().Equals(envName))
                     return;
                 if (!TrySetEnvironment(envName))
                     throw new ExecutionException($"Could not set environment {envName}");
@@ -136,7 +138,8 @@ Change the current environment, only if any are configured but none are set.
         private void OnEnvironmentChanged()
         {
             var script = _state.EventCatalog.EnvironmentChanged;
-            var args = SyntheticArguments.From(("environment", _environments.CurrentName ?? ""));
+            var currentEnvName = _environments.GetCurrentName().GetValueOrDefault("");
+            var args = SyntheticArguments.From(("environment", currentEnvName));
             _state.Commands.Prepend(script.GetCommands(_dispatcher.Parser, args));
         }
 

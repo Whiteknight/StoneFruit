@@ -29,7 +29,7 @@ namespace StoneFruit.Execution.Handlers
 
         public IEnumerable<IVerbInfo> GetAll() => _verbs.GetAll().Select(kvp => kvp.Value);
 
-        public IResult<IVerbInfo> GetByName(Verb verb) => _verbs.Get(verb);
+        public IResult<IVerbInfo> GetByName(Verb verb) => _verbs.Get(verb).Transform(i => (IVerbInfo)i);
 
         public int Count => _verbs.Count;
 

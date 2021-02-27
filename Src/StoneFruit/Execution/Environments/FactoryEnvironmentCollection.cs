@@ -16,6 +16,9 @@ namespace StoneFruit.Execution.Environments
         private readonly IReadOnlyList<string> _nameList;
         private readonly HashSet<string> _validNames;
 
+        private IResult<object> _current;
+        private IResult<string> _currentName;
+
         public FactoryEnvironmentCollection(IEnvironmentFactory environmentFactory)
         {
             Assert.ArgumentNotNull(environmentFactory, nameof(environmentFactory));
@@ -26,11 +29,13 @@ namespace StoneFruit.Execution.Environments
             _namedCache = new Dictionary<string, object>();
             _nameList = environments.ToList();
             _validNames = new HashSet<string>(environments);
+            _current = FailureResult<object>.Instance;
+            _currentName = FailureResult<string>.Instance;
         }
 
-        public object? Current { get; private set; }
+        public IResult<object> GetCurrent() => _current;
 
-        public string? CurrentName { get; private set; }
+        public IResult<string> GetCurrentName() => _currentName;
 
         public IReadOnlyList<string> GetNames() => _nameList;
 
@@ -48,8 +53,8 @@ namespace StoneFruit.Execution.Environments
             var result = Get(name);
             if (!result.HasValue)
                 throw new InvalidOperationException($"Environment {name} does not exist");
-            CurrentName = name;
-            Current = result.Value;
+            _currentName = Result.Success(name);
+            _current = result;
         }
 
         private IResult<object> Get(string name)

@@ -18,11 +18,11 @@ namespace StoneFruit.Execution.Scripts
         }
 
         public IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
-            => _scripts.Get(arguments).Transform(script => new ScriptHandler(dispatcher.Parser, script, arguments, dispatcher.State));
+            => _scripts.Get(arguments).Transform(script => (IHandlerBase)new ScriptHandler(dispatcher.Parser, script, arguments, dispatcher.State));
 
         public IEnumerable<IVerbInfo> GetAll() => _scripts.GetAll().Select(kvp => kvp.Value);
 
-        public IResult<IVerbInfo> GetByName(Verb verb) => _scripts.Get(verb);
+        public IResult<IVerbInfo> GetByName(Verb verb) => _scripts.Get(verb).Transform(i => (IVerbInfo)i);
 
         public void AddScript(Verb verb, IEnumerable<string> lines, string? description = null, string? usage = null, string? group = null)
         {

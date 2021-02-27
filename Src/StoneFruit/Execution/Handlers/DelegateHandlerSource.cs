@@ -32,7 +32,7 @@ namespace StoneFruit.Execution.Handlers
 
         public IEnumerable<IVerbInfo> GetAll() => _handlers.GetAll().Select(kvp => kvp.Value);
 
-        public IResult<IVerbInfo> GetByName(Verb verb) => _handlers.Get(verb);
+        public IResult<IVerbInfo> GetByName(Verb verb) => _handlers.Get(verb).Transform(i => (IVerbInfo)i);
 
         public DelegateHandlerSource Add(Verb verb, Action<IArguments, CommandDispatcher> act, string description = "", string usage = "", string group = "")
         {

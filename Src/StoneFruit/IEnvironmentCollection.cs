@@ -22,21 +22,15 @@ namespace StoneFruit
         void SetCurrent(string name);
 
         /// <summary>
-        /// Returns the name of the current environment
-        /// </summary>
-        string? CurrentName { get; }
-
-        /// <summary>
         /// Returns true if this is a valid environment name
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
         bool IsValid(string name);
 
-        /// <summary>
-        /// The current environment object, if any.
-        /// </summary>
-        object? Current { get; }
+        IResult<object> GetCurrent();
+
+        IResult<string> GetCurrentName();
     }
 
     public static class EnvironmentCollectionExtensions

@@ -41,7 +41,7 @@ namespace StoneFruit.Containers.StructureMap
         public IEnumerable<IVerbInfo> GetAll()
             => _types.GetAll().Select(kvp => new VerbInfo(kvp.Key, kvp.Value));
 
-        public IResult<IVerbInfo> GetByName(Verb verb) => _types.Get(verb).Transform(type => new VerbInfo(verb, type));
+        public IResult<IVerbInfo> GetByName(Verb verb) => _types.Get(verb).Transform(type => (IVerbInfo)new VerbInfo(verb, type));
 
         private IHandlerBase ResolveHandler(Type type)
         {

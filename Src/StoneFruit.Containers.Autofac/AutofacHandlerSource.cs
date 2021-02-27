@@ -31,7 +31,7 @@ namespace StoneFruit.Containers.Autofac
 
         public IEnumerable<IVerbInfo> GetAll() => _handlers.GetAll().Select(kvp => new VerbInfo(kvp.Key, kvp.Value));
 
-        public IResult<IVerbInfo> GetByName(Verb verb) => _handlers.Get(verb).Transform(type => new VerbInfo(verb, type));
+        public IResult<IVerbInfo> GetByName(Verb verb) => _handlers.Get(verb).Transform(type => (IVerbInfo)new VerbInfo(verb, type));
 
         public IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
             => _handlers.Get(arguments).Transform(type => ResolveHandler(type));
