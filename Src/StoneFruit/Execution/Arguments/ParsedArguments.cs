@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace StoneFruit.Execution.Arguments
 {
@@ -38,9 +37,11 @@ namespace StoneFruit.Execution.Arguments
 
         public string Raw { get; }
 
-        public void VerifyAllAreConsumed()
+        public IReadOnlyList<string> Unconsumed
         {
-            var fromRaw = _rawArguments
+            get
+            {
+                var fromRaw = _rawArguments
                 .Where(a => a != null)
                 .Select(u => u switch
                 {
@@ -51,28 +52,20 @@ namespace StoneFruit.Execution.Arguments
                     _ => "Unknown"
                 });
 
-            var fromAccessed = _accessedPositionals.Cast<IArgument>()
-                .Concat(_accessedNameds.SelectMany(kvp => kvp.Value))
-                .Concat(_accessedFlags.Values)
-                .Where(p => !p.Consumed)
-                .Select(u => u switch
-                {
-                    IPositionalArgument p => p.Value,
-                    INamedArgument n => $"'{n.Name}' = {n.Value}",
-                    IFlagArgument f => $"flag {f.Name}",
-                    _ => "Unknown"
-                });
+                var fromAccessed = _accessedPositionals.Cast<IArgument>()
+                    .Concat(_accessedNameds.SelectMany(kvp => kvp.Value))
+                    .Concat(_accessedFlags.Values)
+                    .Where(p => !p.Consumed)
+                    .Select(u => u switch
+                    {
+                        IPositionalArgument p => p.Value,
+                        INamedArgument n => $"'{n.Name}' = {n.Value}",
+                        IFlagArgument f => $"flag {f.Name}",
+                        _ => "Unknown"
+                    });
 
-            var fromAll = fromRaw.Concat(fromAccessed).ToList();
-            if (fromAll.Count == 0)
-                return;
-
-            var sb = new StringBuilder();
-            sb.AppendLine("Arguments were provided which were not consumed.");
-            sb.AppendLine();
-            foreach (var line in fromAll)
-                sb.AppendLine(line);
-            throw new ArgumentParseException(sb.ToString());
+                return fromRaw.Concat(fromAccessed).ToList();
+            }
         }
 
         public void ResetAllArguments()

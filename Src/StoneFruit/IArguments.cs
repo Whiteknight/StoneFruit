@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Utility;
 
@@ -89,11 +90,7 @@ namespace StoneFruit
         /// <returns></returns>
         IEnumerable<INamedArgument> GetAllNamed();
 
-        /// <summary>
-        /// Throw an exception if any arguments have not been consumed. Useful to alert
-        /// the user if extra/unnecessary arguments have been passed.
-        /// </summary>
-        void VerifyAllAreConsumed();
+        IReadOnlyList<string> Unconsumed { get; }
     }
 
     public static class ArgumentsExtensions
@@ -171,6 +168,25 @@ namespace StoneFruit
                 .Concat(args.GetAllNamed())
                 .Concat(args.GetAllFlags())
                 .Where(p => !p.Consumed);
+        }
+
+        /// <summary>
+        /// Throw an exception if any arguments have not been consumed. Useful to alert
+        /// the user if extra/unnecessary arguments have been passed.
+        /// </summary>
+        public static void VerifyAllAreConsumed(this IArguments args)
+        {
+            Assert.ArgumentNotNull(args, nameof(args));
+            var unconsumed = args.Unconsumed;
+            if (!unconsumed.Any())
+                return;
+
+            var sb = new StringBuilder();
+            sb.AppendLine("Arguments were provided which were not consumed.");
+            sb.AppendLine();
+            foreach (var line in unconsumed)
+                sb.AppendLine(line);
+            throw new ArgumentParseException(sb.ToString());
         }
     }
 }
