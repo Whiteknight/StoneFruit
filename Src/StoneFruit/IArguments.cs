@@ -21,7 +21,7 @@ namespace StoneFruit
         /// Resets the Consumed state of all arguments. Useful if the arguments object is
         /// going to be reused.
         /// </summary>
-        void ResetAllArguments();
+        void Reset();
 
         /// <summary>
         /// Get the next positional value in order without regard to whether the argument
