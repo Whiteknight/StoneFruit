@@ -46,7 +46,7 @@ namespace StoneFruit.Execution.Arguments
 
         public bool HasFlag(string name, bool markConsumed = false) => _inner.HasFlag(name, markConsumed);
 
-        public void ResetAllArguments() => _inner.ResetAllArguments();
+        public void Reset() => _inner.Reset();
 
         public IPositionalArgument Shift() => _inner.Shift();
     }

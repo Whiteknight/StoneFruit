@@ -95,7 +95,7 @@ namespace StoneFruit.Execution.Arguments
             return new SyntheticArguments(argsList);
         }
 
-        public void ResetAllArguments()
+        public void Reset()
         {
             foreach (var p in _positionals.Skip(_verbCount))
                 p.MarkConsumed(false);

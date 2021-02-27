@@ -101,7 +101,7 @@ namespace StoneFruit.Execution.Arguments
             };
         }
 
-        public void ResetAllArguments()
+        public void Reset()
         {
             _accessedPositionals.Clear();
             _accessedNameds.Clear();

@@ -98,7 +98,7 @@ namespace StoneFruit.Execution.Scripts
                 {
                     // Fill in arguments to the formats to create the command
                     var formattedArguments = lineFormat.Format(_arguments);
-                    _arguments.ResetAllArguments();
+                    _arguments.Reset();
 
                     // Add the command to the EngineState for execution after this
                     _state.Commands.Append(new ArgumentsOrString(formattedArguments));
