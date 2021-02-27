@@ -1,9 +1,11 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using ParserObjects;
 using ParserObjects.Sequences;
 using StoneFruit.Execution.Scripts;
 using StoneFruit.Execution.Scripts.Formatting;
 using StoneFruit.Utility;
+using static ParserObjects.ParserMethods;
+using static ParserObjects.ParserMethods<char>;
 
 namespace StoneFruit.Execution.Arguments
 {
@@ -13,7 +15,7 @@ namespace StoneFruit.Execution.Arguments
     /// </summary>
     public class CommandParser : ICommandParser
     {
-        private readonly IParser<char, IParsedArgument> _argsParser;
+        private readonly IParser<char, IReadOnlyList<IParsedArgument>> _argsParser;
         private readonly IParser<char, CommandFormat> _scriptParser;
 
         public CommandParser(IParser<char, IParsedArgument> argParser, IParser<char, CommandFormat> scriptParser)
@@ -21,7 +23,12 @@ namespace StoneFruit.Execution.Arguments
             Assert.ArgumentNotNull(argParser, nameof(argParser));
             Assert.ArgumentNotNull(scriptParser, nameof(scriptParser));
 
-            _argsParser = argParser;
+            var whitespace = OptionalWhitespace();
+            _argsParser = Rule(
+                argParser.List(),
+                whitespace,
+                (args, _) => args
+            );
             _scriptParser = scriptParser;
         }
 
@@ -47,7 +54,7 @@ namespace StoneFruit.Execution.Arguments
                 return SyntheticArguments.Empty();
 
             var sequence = new StringCharacterSequence(command);
-            var argsList = _argsParser.List().Parse(sequence).Value.ToList();
+            var argsList = _argsParser.Parse(sequence).Value;
             if (!sequence.IsAtEnd)
             {
                 var remainder = sequence.GetRemainder();
