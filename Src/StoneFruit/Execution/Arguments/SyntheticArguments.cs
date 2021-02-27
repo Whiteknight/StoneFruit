@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace StoneFruit.Execution.Arguments
 {
@@ -40,6 +39,22 @@ namespace StoneFruit.Execution.Arguments
         /// </summary>
         public string Raw => string.Empty;
 
+        public IReadOnlyList<string> Unconsumed
+            => _positionals
+                .Skip(_verbCount)
+                .Where(p => !p.Consumed)
+                .Cast<IArgument>()
+                .Concat(_nameds.SelectMany(kvp => kvp.Value).Where(n => !n.Consumed))
+                .Concat(_flags.Values.Where(f => !f.Consumed))
+                .Select(a => a switch
+                {
+                    PositionalArgument p => p.AsString(),
+                    NamedArgument n => $"'{n.Name}' = {n.AsString()}",
+                    FlagArgument f => $"flag {f.Name}",
+                    _ => "Unknown"
+                })
+                .ToList();
+
         /// <summary>
         /// Create an empty arguments object
         /// </summary>
@@ -78,36 +93,6 @@ namespace StoneFruit.Execution.Arguments
                 .Select(s => new PositionalArgument(s))
                 .ToList();
             return new SyntheticArguments(argsList);
-        }
-
-        public void VerifyAllAreConsumed()
-        {
-            var sb = new StringBuilder();
-            sb.AppendLine("Arguments were provided which were not consumed.");
-            sb.AppendLine();
-            var unconsumed = _positionals
-                .Skip(_verbCount)
-                .Where(p => !p.Consumed)
-                .Cast<IArgument>()
-                .Concat(_nameds.SelectMany(kvp => kvp.Value).Where(n => !n.Consumed))
-                .Concat(_flags.Values.Where(f => !f.Consumed))
-                .ToList();
-            if (unconsumed.Count == 0)
-                return;
-
-            foreach (var u in unconsumed)
-            {
-                var str = u switch
-                {
-                    PositionalArgument p => p.AsString(),
-                    NamedArgument n => $"'{n.Name}' = {n.AsString()}",
-                    FlagArgument f => $"flag {f.Name}",
-                    _ => "Unknown"
-                };
-                sb.AppendLine(str);
-            }
-
-            throw new ArgumentParseException(sb.ToString());
         }
 
         public void ResetAllArguments()
