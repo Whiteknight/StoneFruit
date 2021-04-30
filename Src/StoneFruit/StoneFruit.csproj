@@ -6,7 +6,7 @@
     <RootNamespace>StoneFruit</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <LangVersion>9.0</LangVersion>
-    <Version>2.0.0-alpha1</Version>
+    <Version>2.0.0-alpha2</Version>
     <Authors>Andrew F. Whitworth</Authors>
     <Company />
     <Description>CLI Commandlet host and execution engine</Description>
