@@ -12,27 +12,19 @@ namespace StoneFruit
     /// </summary>
     public class Engine
     {
-        private readonly IHandlers _handlers;
-        private readonly EngineEventCatalog _eventCatalog;
-        private readonly EngineSettings _settings;
         private readonly ICommandParser _parser;
 
         public Engine(IHandlers handlers, IEnvironmentCollection environments, ICommandParser parser, IOutput output, EngineEventCatalog eventCatalog, EngineSettings settings)
         {
-            Assert.ArgumentNotNull(handlers, nameof(handlers));
             Assert.ArgumentNotNull(environments, nameof(environments));
             Assert.ArgumentNotNull(parser, nameof(parser));
             Assert.ArgumentNotNull(output, nameof(output));
-            Assert.ArgumentNotNull(eventCatalog, nameof(eventCatalog));
 
             Environments = environments;
-            _handlers = handlers;
-            _eventCatalog = eventCatalog;
-            _settings = settings;
             _parser = parser;
             Output = output;
-            State = new EngineState(_eventCatalog, _settings);
-            Dispatcher = new CommandDispatcher(_parser, _handlers, Environments, State, Output);
+            State = new EngineState(eventCatalog, settings);
+            Dispatcher = new CommandDispatcher(_parser, handlers, Environments, State, Output);
         }
 
         public EngineState State { get; }

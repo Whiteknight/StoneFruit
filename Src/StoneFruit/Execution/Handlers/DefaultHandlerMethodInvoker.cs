@@ -13,7 +13,7 @@ namespace StoneFruit.Execution.Handlers
             var parameters = method.GetParameters();
             if (parameters.Length == 0)
             {
-                method.Invoke(instance, new object[0]);
+                method.Invoke(instance, Array.Empty<object>());
                 return;
             }
 
@@ -32,7 +32,7 @@ namespace StoneFruit.Execution.Handlers
             var parameters = method.GetParameters();
             if (parameters.Length == 0)
             {
-                var resulta = method.Invoke(instance, new object[0]);
+                var resulta = method.Invoke(instance, Array.Empty<object>());
                 return (resulta as Task) ?? Task.CompletedTask;
             }
 
@@ -47,7 +47,7 @@ namespace StoneFruit.Execution.Handlers
             return (resultb as Task) ?? Task.CompletedTask;
         }
 
-        private object? GetValue(IArguments arguments, CommandDispatcher dispatcher, Type type, string name, int index, CancellationToken cancellationToken)
+        private static object? GetValue(IArguments arguments, CommandDispatcher dispatcher, Type type, string name, int index, CancellationToken cancellationToken)
         {
             if (type == typeof(CancellationToken))
                 return cancellationToken;

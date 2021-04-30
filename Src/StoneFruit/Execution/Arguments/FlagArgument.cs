@@ -13,13 +13,5 @@
         public string Name { get; }
 
         public bool Consumed { get; set; }
-
-        public string AsString(string _ = "") => bool.TrueString;
-
-        public bool AsBool(bool _ = false) => true;
-
-        public int AsInt(int _ = 0) => 1;
-
-        public long AsLong(long _ = 0) => 1L;
     }
 }

@@ -46,6 +46,15 @@ namespace StoneFruit
 
         public override string ToString() => string.Join(" ", _verb);
 
+        public override int GetHashCode() => _verb.GetHashCode();
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is Verb asVerb)
+                return Equals(asVerb);
+            return false;
+        }
+
         public bool Equals(Verb other)
         {
             if (Count != other.Count)
@@ -57,5 +66,9 @@ namespace StoneFruit
             }
             return true;
         }
+
+        public static bool operator ==(Verb a, Verb b) => a.Equals(b);
+
+        public static bool operator !=(Verb a, Verb b) => !a.Equals(b);
     }
 }

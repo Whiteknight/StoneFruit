@@ -27,7 +27,7 @@ namespace StoneFruit.Execution.Handlers
             return GetVerbs(method.Name);
         }
 
-        private IReadOnlyList<Verb> GetVerbs(string name)
+        private static IReadOnlyList<Verb> GetVerbs(string name)
         {
             name = name
                 .RemoveSuffix("verb")

@@ -57,48 +57,40 @@ namespace StoneFruit.Execution.Arguments
 
         public string Raw { get; }
 
-        public IReadOnlyList<string> Unconsumed
+        public IReadOnlyList<string> GetUnconsumed()
         {
-            get
-            {
-                // We need to find all raw arguments which are not accessed, or all accessed
-                // arguments which are marked unconsumed.
+            // We need to find all raw arguments which are not accessed, or all accessed
+            // arguments which are marked unconsumed.
 
-                var fromRaw = _rawArguments
-                .Where(raw => raw.Access != AccessType.Accessed)
-                .Select(raw => raw.Argument switch
+            var fromRaw = _rawArguments
+            .Where(raw => raw.Access != AccessType.Accessed)
+            .Select(raw => raw.Argument switch
+            {
+                ParsedPositionalArgument p => p.Value,
+                ParsedNamedArgument n => $"'{n.Name}' = {n.Value}",
+                ParsedFlagArgument f => $"flag {f.Name}",
+                ParsedFlagPositionalOrNamedArgument fp => raw.Access switch
                 {
-                    ParsedPositionalArgument p => p.Value,
-                    ParsedNamedArgument n => $"'{n.Name}' = {n.Value}",
-                    ParsedFlagArgument f => $"flag {f.Name}",
-                    ParsedFlagPositionalOrNamedArgument fp => GetUnconsumedMessage(raw, fp),
+                    AccessType.AccessedAsFlag => fp.Value,
+                    AccessType.AccessedAsPositional => $"flag {fp.Name}",
+                    _ => $"'{fp.Name}', {fp.Value}"
+                },
+                _ => "Unknown"
+            });
+
+            var fromAccessed = _accessedPositionals.Cast<IArgument>()
+                .Concat(_accessedNameds.SelectMany(kvp => kvp.Value))
+                .Concat(_accessedFlags.Values)
+                .Where(p => !p.Consumed)
+                .Select(u => u switch
+                {
+                    IPositionalArgument p => p.Value,
+                    INamedArgument n => $"'{n.Name}' = {n.Value}",
+                    IFlagArgument f => $"flag {f.Name}",
                     _ => "Unknown"
                 });
 
-                var fromAccessed = _accessedPositionals.Cast<IArgument>()
-                    .Concat(_accessedNameds.SelectMany(kvp => kvp.Value))
-                    .Concat(_accessedFlags.Values)
-                    .Where(p => !p.Consumed)
-                    .Select(u => u switch
-                    {
-                        IPositionalArgument p => p.Value,
-                        INamedArgument n => $"'{n.Name}' = {n.Value}",
-                        IFlagArgument f => $"flag {f.Name}",
-                        _ => "Unknown"
-                    });
-
-                return fromRaw.Concat(fromAccessed).ToList();
-            }
-        }
-
-        private string GetUnconsumedMessage(RawArg raw, ParsedFlagPositionalOrNamedArgument fp)
-        {
-            return raw.Access switch
-            {
-                AccessType.AccessedAsFlag => fp.Value,
-                AccessType.AccessedAsPositional => $"flag {fp.Name}",
-                _ => $"'{fp.Name}', {fp.Value}"
-            };
+            return fromRaw.Concat(fromAccessed).ToList();
         }
 
         public void Reset()

@@ -20,7 +20,7 @@ namespace StoneFruit
             => new SuccessResult<T>(value);
     }
 
-    public class SuccessResult<T> : IResult<T>
+    public sealed class SuccessResult<T> : IResult<T>
     {
         public SuccessResult(T value)
         {
@@ -42,7 +42,7 @@ namespace StoneFruit
         }
     }
 
-    public class FailureResult<T> : IResult<T>
+    public sealed class FailureResult<T> : IResult<T>
     {
         public static IResult<T> Instance { get; } = new FailureResult<T>();
 

@@ -14,6 +14,12 @@ namespace StoneFruit.Execution
     {
         public CommandDispatcher(ICommandParser parser, IHandlers handlers, IEnvironmentCollection environments, EngineState state, IOutput output)
         {
+            Assert.ArgumentNotNull(parser, nameof(parser));
+            Assert.ArgumentNotNull(handlers, nameof(handlers));
+            Assert.ArgumentNotNull(environments, nameof(environments));
+            Assert.ArgumentNotNull(output, nameof(output));
+            Assert.ArgumentNotNull(state, nameof(state));
+
             Parser = parser;
             Handlers = handlers;
             Environments = environments;

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using StoneFruit.Execution;
-using StoneFruit.Execution.Handlers;
 
 namespace StoneFruit.Handlers
 {
@@ -108,7 +107,7 @@ help -startswith <word>
             _output.WriteLine("Type 'help <command-name>' to get more information, if available.");
         }
 
-        private int GetConsoleWidth()
+        private static int GetConsoleWidth()
         {
             try
             {

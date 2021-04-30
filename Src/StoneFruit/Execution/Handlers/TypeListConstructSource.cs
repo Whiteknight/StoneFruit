@@ -65,10 +65,6 @@ namespace StoneFruit.Execution.Handlers
             return instance == null ? FailureResult<IHandlerBase>.Instance : new SuccessResult<IHandlerBase>(instance);
         }
 
-        //public IHandlerBase GetInstance<TCommand>(IArguments command, CommandDispatcher dispatcher)
-        //    where TCommand : class, IHandlerBase
-        //    => ResolveInstance(command, dispatcher, typeof(TCommand));
-
         private IHandlerBase? ResolveInstance(IArguments command, CommandDispatcher dispatcher, Type commandType)
             => _resolver(commandType, command, dispatcher) as IHandlerBase;
 
