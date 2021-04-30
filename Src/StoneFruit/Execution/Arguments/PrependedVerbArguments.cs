@@ -28,7 +28,7 @@ namespace StoneFruit.Execution.Arguments
 
         public string Raw => _inner.Raw;
 
-        public IReadOnlyList<string> Unconsumed => _inner.Unconsumed;
+        public IReadOnlyList<string> GetUnconsumed() => _inner.GetUnconsumed();
 
         public IPositionalArgument Get(int index) => _inner.Get(index);
 

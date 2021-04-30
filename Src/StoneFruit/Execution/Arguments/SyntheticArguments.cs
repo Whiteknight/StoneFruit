@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace StoneFruit.Execution.Arguments
@@ -39,7 +40,7 @@ namespace StoneFruit.Execution.Arguments
         /// </summary>
         public string Raw => string.Empty;
 
-        public IReadOnlyList<string> Unconsumed
+        public IReadOnlyList<string> GetUnconsumed()
             => _positionals
                 .Skip(_verbCount)
                 .Where(p => !p.Consumed)
@@ -59,7 +60,7 @@ namespace StoneFruit.Execution.Arguments
         /// Create an empty arguments object
         /// </summary>
         /// <returns></returns>
-        public static SyntheticArguments Empty() => new SyntheticArguments(new IArgument[0]);
+        public static SyntheticArguments Empty() => new SyntheticArguments(Array.Empty<IArgument>());
 
         /// <summary>
         /// Create named arguments from a list of name/value tuples

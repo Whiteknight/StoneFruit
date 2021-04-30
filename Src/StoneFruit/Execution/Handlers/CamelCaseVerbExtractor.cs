@@ -25,7 +25,7 @@ namespace StoneFruit.Execution.Handlers
 
         public IReadOnlyList<Verb> GetVerbs(MethodInfo method) => GetVerbs(method.Name);
 
-        private IReadOnlyList<Verb> GetVerbs(string name)
+        private static IReadOnlyList<Verb> GetVerbs(string name)
         {
             if (string.IsNullOrEmpty(name))
                 return Array.Empty<Verb>();

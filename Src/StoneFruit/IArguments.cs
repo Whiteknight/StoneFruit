@@ -90,7 +90,7 @@ namespace StoneFruit
         /// <returns></returns>
         IEnumerable<INamedArgument> GetAllNamed();
 
-        IReadOnlyList<string> Unconsumed { get; }
+        IReadOnlyList<string> GetUnconsumed();
     }
 
     public static class ArgumentsExtensions
@@ -177,7 +177,7 @@ namespace StoneFruit
         public static void VerifyAllAreConsumed(this IArguments args)
         {
             Assert.ArgumentNotNull(args, nameof(args));
-            var unconsumed = args.Unconsumed;
+            var unconsumed = args.GetUnconsumed();
             if (!unconsumed.Any())
                 return;
 
