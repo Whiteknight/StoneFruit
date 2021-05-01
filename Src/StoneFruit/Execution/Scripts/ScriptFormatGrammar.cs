@@ -12,7 +12,6 @@ namespace StoneFruit.Execution.Scripts
 {
     public static class ScriptFormatGrammar
     {
-        private static readonly RequiredValue _noRequiredValue = new RequiredValue("");
         private static readonly Lazy<IParser<char, CommandFormat>> _instance = new Lazy<IParser<char, CommandFormat>>(GetParserInternal);
 
         public static IParser<char, CommandFormat> GetParser() => _instance.Value;
@@ -34,7 +33,7 @@ namespace StoneFruit.Execution.Scripts
                 singleQuotedString
             );
 
-            var unquotedValue = Match(c => char.IsLetterOrDigit(c) || char.IsPunctuation(c))
+            var unquotedValue = Match(c => c != ':' && (char.IsLetterOrDigit(c) || char.IsPunctuation(c)))
                 .List(true)
                 .Transform(c => new string(c.ToArray()));
 
@@ -45,14 +44,33 @@ namespace StoneFruit.Execution.Scripts
                 unquotedValue
             );
 
-            var requiredOrDefaultValue = Rule(
-                Match('!'),
-                values.Optional(),
+            // Default values get wedged into [] or {} brackets, or at the end of a flag name, so they are more
+            // restricted in terms of values they can take without quoting.
+            var unquotedDefaultValue = Match(c => char.IsLetterOrDigit(c) || (char.IsPunctuation(c) && c != ']' && c != '}'))
+                .List(true)
+                .Transform(c => new string(c.ToArray()));
 
-                (_, v) => new RequiredValue(v.GetValueOrDefault(""))
-            ).Optional();
+            var possibleDefaultValue = First(
+                doubleQuotedString,
+                singleQuotedString,
+                unquotedDefaultValue
+            );
 
-            // TODO: Syntax to add all remaining unconsumed arguments, regardless of type?
+            var optionalDefaultValue = Rule(
+               Match(':'),
+               possibleDefaultValue,
+               (_, value) => value
+           ).Optional();
+
+            var maybeRequired = First(
+                Match('!').Transform(_ => true),
+                Produce(() => false)
+            );
+
+            // We cannot have a * syntax for all remaining unconsumed args, because some IArguments
+            // like ParsedArguments contain ambiguities, and we can't just consume an arg without
+            // knowing whether it is a positional, named, or flag. If you want all, you can append
+            // "-* {*} [*]" to the end of your pattern, or in whatever order you want ambiguities to be resolved in
 
             // A literal flag which is passed without modification
             // literalFlagArg := '-' <names>
@@ -64,23 +82,18 @@ namespace StoneFruit.Execution.Scripts
             );
 
             // Fetch a flag from the input and rename it on the output if it exists
-            // fetchFlagRenameArg := '?' <name> ':' <name>
-            var fetchFlagRenameArg = Rule(
-                Match('?'),
-                names,
-                Match(':'),
-                names,
-
-                (_, name, _, newName) => new FetchFlagArgumentAccessor(name, newName)
-            );
-
-            // Fetch a flag from the input and reproduce it on the output if it exists
-            // fetchFlagArg := '?' <name>
+            // It doesn't make sense for a flag to be required, so we don't support that syntax here
+            // fetchFlagArg := '?' <name> (':' <name>)?
             var fetchFlagArg = Rule(
                 Match('?'),
                 names,
+                Rule(
+                    Match(':'),
+                    names,
+                    (_, newName) => newName
+                ).Optional(),
 
-                (_, name) => new FetchFlagArgumentAccessor(name, name)
+                (_, name, newName) => new FetchFlagArgumentAccessor(name, newName)
             );
 
             // A literal named arg which is passed without modification
@@ -99,11 +112,12 @@ namespace StoneFruit.Execution.Scripts
                 names,
                 Match('='),
                 Match('['),
-                values,
+                quotedString,
+                optionalDefaultValue,
                 Match(']'),
-                requiredOrDefaultValue,
+                maybeRequired,
 
-                (n, _, _, s, _, rdv) => new NamedFetchNamedArgumentAccessor(n, s, rdv.Success, rdv.GetValueOrDefault(_noRequiredValue).DefaultValue)
+                (n, _, _, s, defaultValue, _, required) => new NamedFetchNamedArgumentAccessor(n, s, required, defaultValue)
             );
 
             // A named argument where the name is a literal but the value is fetched from a positional
@@ -113,10 +127,11 @@ namespace StoneFruit.Execution.Scripts
                 Match('='),
                 Match('['),
                 integers,
+                optionalDefaultValue,
                 Match(']'),
-                requiredOrDefaultValue,
+                maybeRequired,
 
-                (n, _, _, i, _, rdv) => new NamedFetchPositionalArgumentAccessor(n, i, rdv.Success, rdv.GetValueOrDefault(_noRequiredValue).DefaultValue)
+                (n, _, _, i, defaultValue, _, required) => new NamedFetchPositionalArgumentAccessor(n, i, required, defaultValue)
             );
 
             // Fetch a named argument including name and value
@@ -125,10 +140,11 @@ namespace StoneFruit.Execution.Scripts
             var fetchNamedArg = Rule(
                 Match('{'),
                 names,
+                optionalDefaultValue,
                 Match('}'),
-                requiredOrDefaultValue,
+                maybeRequired,
 
-                (_, s, _, rdv) => new FetchNamedArgumentAccessor(s, rdv.Success, rdv.GetValueOrDefault(_noRequiredValue).DefaultValue)
+                (_, s, defaultValue, _, required) => new FetchNamedArgumentAccessor(s, required, defaultValue)
             );
 
             // Fetch all remaining unconsumed named arguments
@@ -150,10 +166,11 @@ namespace StoneFruit.Execution.Scripts
             var fetchPositionalArg = Rule(
                 Match('['),
                 integers,
+                optionalDefaultValue,
                 Match(']'),
-                requiredOrDefaultValue,
+                maybeRequired,
 
-                (_, i, _, rdv) => new FetchPositionalArgumentAccessor(i, rdv.Success, rdv.GetValueOrDefault(_noRequiredValue).DefaultValue)
+                (_, i, defaultValue, _, required) => new FetchPositionalArgumentAccessor(i, required, defaultValue)
             );
 
             // Fetch all remaining unconsumed positional arguments
@@ -180,10 +197,11 @@ namespace StoneFruit.Execution.Scripts
             var fetchNamedToPositionalArg = Rule(
                 Match('['),
                 quotedString,
+                optionalDefaultValue,
                 Match(']'),
-                requiredOrDefaultValue,
+                maybeRequired,
 
-                (_, s, _, rdv) => new FetchNamedToPositionalArgumentAccessor(s, rdv.Success, rdv.GetValueOrDefault(_noRequiredValue).DefaultValue)
+                (_, s, defaultValue, _, required) => new FetchNamedToPositionalArgumentAccessor(s, required, defaultValue)
             );
 
             // All possible args
@@ -197,7 +215,6 @@ namespace StoneFruit.Execution.Scripts
 
                 fetchAllFlagsArg,
                 literalFlagArg,
-                fetchFlagRenameArg,
                 fetchFlagArg,
 
                 fetchAllPositionalsArg,
@@ -284,9 +301,9 @@ namespace StoneFruit.Execution.Scripts
         private class FetchFlagArgumentAccessor : IArgumentAccessor
         {
             private readonly string _name;
-            private readonly string _newName;
+            private readonly IOption<string> _newName;
 
-            public FetchFlagArgumentAccessor(string name, string newName)
+            public FetchFlagArgumentAccessor(string name, IOption<string> newName)
             {
                 _name = name;
                 _newName = newName;
@@ -298,7 +315,8 @@ namespace StoneFruit.Execution.Scripts
                 if (!flag.Exists())
                     return Enumerable.Empty<IArgument>();
                 flag.MarkConsumed();
-                return new[] { new FlagArgument(_newName) };
+                var name = _newName.GetValueOrDefault(_name);
+                return new[] { new FlagArgument(name) };
             }
         }
 
@@ -306,9 +324,9 @@ namespace StoneFruit.Execution.Scripts
         {
             private readonly string _name;
             private readonly bool _required;
-            private readonly string _defaultValue;
+            private readonly IOption<string> _defaultValue;
 
-            public FetchNamedArgumentAccessor(string name, bool required, string defaultValue)
+            public FetchNamedArgumentAccessor(string name, bool required, IOption<string> defaultValue)
             {
                 _name = name;
                 _required = required;
@@ -317,16 +335,23 @@ namespace StoneFruit.Execution.Scripts
 
             public IEnumerable<IArgument> Access(IArguments args)
             {
+                // See if we have the requested value
                 var arg = args.Get(_name);
                 if (arg.Exists())
                 {
                     arg.MarkConsumed();
                     return new[] { new NamedArgument(_name, arg.AsString(string.Empty)) };
                 }
+
+                // See if we have a default value
+                if (_defaultValue.Success)
+                    return new[] { new NamedArgument(_name, _defaultValue.Value) };
+
+                // See if we can ignore it
                 if (!_required)
                     return Enumerable.Empty<IArgument>();
-                if (!string.IsNullOrEmpty(_defaultValue))
-                    return new[] { new NamedArgument(_name, _defaultValue) };
+
+                // We're missing a required value
                 throw ArgumentParseException.MissingRequiredArgument(_name);
             }
         }
@@ -335,9 +360,9 @@ namespace StoneFruit.Execution.Scripts
         {
             private readonly string _name;
             private readonly bool _required;
-            private readonly string _defaultValue;
+            private readonly IOption<string> _defaultValue;
 
-            public FetchNamedToPositionalArgumentAccessor(string name, bool required, string defaultValue)
+            public FetchNamedToPositionalArgumentAccessor(string name, bool required, IOption<string> defaultValue)
             {
                 _name = name;
                 _required = required;
@@ -346,17 +371,23 @@ namespace StoneFruit.Execution.Scripts
 
             public IEnumerable<IArgument> Access(IArguments args)
             {
+                // See if we have the argument
                 var arg = args.Get(_name);
                 if (arg.Exists())
                 {
                     arg.MarkConsumed();
                     return new[] { new PositionalArgument(arg.AsString(string.Empty)) };
                 }
+
+                // See if we have a default value
+                if (_defaultValue.Success)
+                    return new[] { new PositionalArgument(_defaultValue.Value) };
+
+                // See if it's optional
                 if (!_required)
                     return Enumerable.Empty<IArgument>();
-                if (!string.IsNullOrEmpty(_defaultValue))
-                    return new[] { new PositionalArgument(_defaultValue) };
 
+                // We're missing a required argument
                 throw ArgumentParseException.MissingRequiredArgument(_name);
             }
         }
@@ -365,9 +396,9 @@ namespace StoneFruit.Execution.Scripts
         {
             private readonly int _index;
             private readonly bool _required;
-            private readonly string _defaultValue;
+            private readonly IOption<string> _defaultValue;
 
-            public FetchPositionalArgumentAccessor(int index, bool required, string defaultValue)
+            public FetchPositionalArgumentAccessor(int index, bool required, IOption<string> defaultValue)
             {
                 _index = index;
                 _required = required;
@@ -376,17 +407,23 @@ namespace StoneFruit.Execution.Scripts
 
             public IEnumerable<IArgument> Access(IArguments args)
             {
+                // See if we have the value
                 var arg = args.Get(_index);
                 if (arg.Exists() && !arg.Consumed)
                 {
                     arg.MarkConsumed();
                     return new[] { new PositionalArgument(arg.AsString(string.Empty)) };
                 }
+
+                // See if we have a default value
+                if (_defaultValue.Success)
+                    return new[] { new PositionalArgument(_defaultValue.Value) };
+
+                // See if it's optional
                 if (!_required)
                     return Enumerable.Empty<IArgument>();
-                if (!string.IsNullOrEmpty(_defaultValue))
-                    return new[] { new PositionalArgument(_defaultValue) };
 
+                // We're missing a required value
                 throw ArgumentParseException.MissingRequiredArgument(_index);
             }
         }
@@ -437,9 +474,9 @@ namespace StoneFruit.Execution.Scripts
             private readonly string _newName;
             private readonly string _oldName;
             private readonly bool _required;
-            private readonly string _defaultValue;
+            private readonly IOption<string> _defaultValue;
 
-            public NamedFetchNamedArgumentAccessor(string newName, string oldName, bool required, string defaultValue)
+            public NamedFetchNamedArgumentAccessor(string newName, string oldName, bool required, IOption<string> defaultValue)
             {
                 _newName = newName;
                 _oldName = oldName;
@@ -449,16 +486,23 @@ namespace StoneFruit.Execution.Scripts
 
             public IEnumerable<IArgument> Access(IArguments args)
             {
+                // First, see if we have the value
                 var arg = args.Get(_oldName);
                 if (arg.Exists())
                 {
                     arg.MarkConsumed();
                     return new[] { new NamedArgument(_newName, arg.AsString(string.Empty)), };
                 }
+
+                // Second see if we have a default value
+                if (_defaultValue.Success)
+                    return new[] { new NamedArgument(_newName, _defaultValue.Value) };
+
+                // Third, if this value isn't required, return nothing
                 if (!_required)
                     return Enumerable.Empty<IArgument>();
-                if (!string.IsNullOrEmpty(_defaultValue))
-                    return new[] { new NamedArgument(_newName, _defaultValue) };
+
+                // Throw an exception, we're missing something that's required.
                 throw ArgumentParseException.MissingRequiredArgument(_oldName);
             }
         }
@@ -468,9 +512,9 @@ namespace StoneFruit.Execution.Scripts
             private readonly string _newName;
             private readonly int _index;
             private readonly bool _required;
-            private readonly string _defaultValue;
+            private readonly IOption<string> _defaultValue;
 
-            public NamedFetchPositionalArgumentAccessor(string newName, int index, bool required, string defaultValue)
+            public NamedFetchPositionalArgumentAccessor(string newName, int index, bool required, IOption<string> defaultValue)
             {
                 _newName = newName;
                 _index = index;
@@ -480,16 +524,23 @@ namespace StoneFruit.Execution.Scripts
 
             public IEnumerable<IArgument> Access(IArguments args)
             {
+                // See if we have the requested value
                 var arg = args.Get(_index);
                 if (arg.Exists())
                 {
                     arg.MarkConsumed();
                     return new[] { new NamedArgument(_newName, arg.AsString(string.Empty)) };
                 }
+
+                // See if we have a default value
+                if (_defaultValue.Success)
+                    return new[] { new NamedArgument(_newName, _defaultValue.Value) };
+
+                // See if we can ignore it
                 if (!_required)
                     return Enumerable.Empty<IArgument>();
-                if (!string.IsNullOrEmpty(_defaultValue))
-                    return new[] { new NamedArgument(_newName, _defaultValue) };
+
+                // Throw an error that we're missing a required value
                 throw ArgumentParseException.MissingRequiredArgument(_index);
             }
         }
