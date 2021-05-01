@@ -241,18 +241,6 @@ namespace StoneFruit.Execution.Scripts
             );
         }
 
-        // If this object exists at all, the preceeding argument is required. It may have a default
-        // value if one is specified
-        private class RequiredValue
-        {
-            public RequiredValue(string defaultValue)
-            {
-                DefaultValue = defaultValue;
-            }
-
-            public string DefaultValue { get; }
-        }
-
         private class FetchAllFlagsArgumentAccessor : IArgumentAccessor
         {
             public IEnumerable<IArgument> Access(IArguments args)
