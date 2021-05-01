@@ -26,8 +26,6 @@ namespace StoneFruit.Execution.Scripts
 
             var integers = Integer();
 
-            var whitespace = Whitespace().Optional();
-
             var quotedString = First(
                 doubleQuotedString,
                 singleQuotedString
@@ -223,34 +221,14 @@ namespace StoneFruit.Execution.Scripts
                 literalPositionalArg
             );
 
-            // An argument followed by optional whitespace
-            var argAndWhitespace = Rule(
-                args,
-                whitespace,
-
-                (a, _) => a
-            );
-
             // The command with verb and all arguments
             // command := <verb> <argAndWhitespace>* <end>
             return Rule(
-                argAndWhitespace.List(true),
+                args.ListSeparatedBy(Whitespace(), true),
                 If(End(), Produce(() => true)),
 
                 (a, _) => new CommandFormat(a.ToList())
             );
-        }
-
-        // If this object exists at all, the preceeding argument is required. It may have a default
-        // value if one is specified
-        private class RequiredValue
-        {
-            public RequiredValue(string defaultValue)
-            {
-                DefaultValue = defaultValue;
-            }
-
-            public string DefaultValue { get; }
         }
 
         private class FetchAllFlagsArgumentAccessor : IArgumentAccessor

@@ -40,7 +40,7 @@ namespace StoneFruit.Execution
                 $"{EnvironmentHandler.Name} -notset",
 
                 // Show a quick helpful message
-                $"{EchoHandler.Name} -nonewline Enter command ",
+                $"{EchoHandler.Name} -nonewline Enter command",
                 $"{EchoHandler.Name} -nonewline color=DarkGray \" ('help' for help, 'exit' to quit)\"",
                 $"{EchoHandler.Name} ':'"
             );
