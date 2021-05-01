@@ -65,7 +65,39 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                    .AddScript("test", new[] { "args [0]!test" })
+                    .AddScript("test", new[] { "args [0:test]" })
+                )
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .Build();
+            engine.RunHeadless("test");
+            output.Lines.Count.Should().Be(1);
+            output.Lines[0].Should().Be("0: test");
+        }
+
+        [Test]
+        public void AddScript_PositionalIndexed_SingleQuotedDefaultValue()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h
+                    .UseHandlerTypes(typeof(ArgumentDisplayHandler))
+                    .AddScript("test", new[] { "args [0:'test']" })
+                )
+                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+                .Build();
+            engine.RunHeadless("test");
+            output.Lines.Count.Should().Be(1);
+            output.Lines[0].Should().Be("0: test");
+        }
+
+        [Test]
+        public void AddScript_PositionalIndexed_DoubleQuotedDefaultValue()
+        {
+            var output = new TestOutput();
+            var engine = new EngineBuilder()
+                .SetupHandlers(h => h
+                    .UseHandlerTypes(typeof(ArgumentDisplayHandler))
+                    .AddScript("test", new[] { "args [0:\"test\"]" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
@@ -96,7 +128,7 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                    .AddScript("test", new[] { "args ['x']!test" })
+                    .AddScript("test", new[] { "args ['x':test]" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
@@ -164,7 +196,7 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                    .AddScript("test", new[] { "args a=['b']!test" })
+                    .AddScript("test", new[] { "args a=['b':test]" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
@@ -195,7 +227,7 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                    .AddScript("test", new[] { "args d=[0]!test" })
+                    .AddScript("test", new[] { "args d=[0:test]" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
@@ -226,7 +258,7 @@ namespace StoneFruit.Tests.Integration
             var engine = new EngineBuilder()
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                    .AddScript("test", new[] { "args {c}!test" })
+                    .AddScript("test", new[] { "args {c:test}" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .Build();
