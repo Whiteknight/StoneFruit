@@ -72,11 +72,14 @@ namespace StoneFruit.Tests.Execution.Arguments
             [ArgumentIndex(0)]
             public string A { get; set; }
 
-            public string B { get; set; }
+            public int B { get; set; }
 
             public bool C { get; set; }
 
             public bool D { get; set; }
+
+            public long E { get; set; }
+            public bool F { get; set; }
         }
 
         [Test]
@@ -85,14 +88,18 @@ namespace StoneFruit.Tests.Execution.Arguments
             var target = new ParsedArguments(new IParsedArgument[]
             {
                 new ParsedPositionalArgument("test1"),
-                new ParsedNamedArgument("b", "test2"),
-                new ParsedFlagArgument("c")
+                new ParsedNamedArgument("b", "512"),
+                new ParsedFlagArgument("c"),
+                new ParsedNamedArgument("e", "1024"),
+                new ParsedNamedArgument("f", "true")
             });
             var result = target.MapTo<TestArgs1>();
             result.A.Should().Be("test1");
-            result.B.Should().Be("test2");
+            result.B.Should().Be(512);
             result.C.Should().BeTrue();
             result.D.Should().BeFalse();
+            result.E.Should().Be(1024L);
+            result.F.Should().BeTrue();
         }
 
         [Test]
