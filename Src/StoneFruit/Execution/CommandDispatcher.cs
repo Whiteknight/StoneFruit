@@ -63,13 +63,8 @@ namespace StoneFruit.Execution
         public void Execute(ArgumentsOrString argsOrString, CancellationToken token = default)
         {
             Assert.ArgumentNotNull(argsOrString, nameof(argsOrString));
-            if (argsOrString.Arguments != null)
-                Execute(argsOrString.Arguments, token);
-            else if (!string.IsNullOrEmpty(argsOrString.String))
-            {
-                var command = Parser.ParseCommand(argsOrString.String!);
-                Execute(command, token);
-            }
+            var args = argsOrString.GetArguments(Parser);
+            Execute(args, token);
         }
 
         /// <summary>
@@ -143,11 +138,8 @@ namespace StoneFruit.Execution
         public Task ExecuteAsync(ArgumentsOrString argsOrString, CancellationToken token = default)
         {
             Assert.ArgumentNotNull(argsOrString, nameof(argsOrString));
-            if (argsOrString.Arguments != null)
-                return ExecuteAsync(argsOrString.Arguments, token);
-            if (!string.IsNullOrEmpty(argsOrString.String))
-                return ExecuteAsync(argsOrString.String!, token);
-            return Task.CompletedTask;
+            var args = argsOrString.GetArguments(Parser);
+            return ExecuteAsync(args, token);
         }
 
         /// <summary>
