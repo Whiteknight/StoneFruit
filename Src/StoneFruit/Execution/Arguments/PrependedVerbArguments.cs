@@ -4,6 +4,10 @@ using ParserObjects.Utility;
 
 namespace StoneFruit.Execution.Arguments
 {
+    /// <summary>
+    /// Wrapper for IArguments which allows prepending a pre-parsed Verb to the front of the
+    /// arguments.
+    /// </summary>
     public class PrependedVerbArguments : IArguments, IVerbSource
     {
         private readonly IReadOnlyList<string> _verb;
