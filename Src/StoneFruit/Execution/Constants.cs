@@ -31,11 +31,14 @@
             public const int MaximumCommands = 3;
         }
 
-        /// <summary>
-        /// Metadata key for the current exception object, to help keep track oferror
-        /// loops
-        /// </summary>
-        public const string MetadataError = "__CURRENT_EXCEPTION";
+        public static class Metadata
+        {
+            /// <summary>
+            /// Metadata key for the current exception object, to help keep track oferror
+            /// loops
+            /// </summary>
+            public const string Error = "__CURRENT_EXCEPTION";
+        }
 
         /// <summary>
         /// The name of the default environment to use if there are no environments

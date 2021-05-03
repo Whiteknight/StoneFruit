@@ -268,7 +268,7 @@ namespace StoneFruit
         {
             // If an exception is thrown while handling a previous exception, show an
             // angry error message and exit immediately
-            var currentExceptionResult = State.Metadata.Get(Constants.MetadataError);
+            var currentExceptionResult = State.Metadata.Get(Constants.Metadata.Error);
 
             if (currentExceptionResult.HasValue && currentExceptionResult.Value is Exception previousException)
             {
@@ -295,8 +295,8 @@ namespace StoneFruit
             // from metadata (prepends happen in reverse order from how they're executed)
             // We can't remove metadata in the script, because users might change the script
             // and inadvertantly break loop detection.
-            State.Metadata.Add(Constants.MetadataError, currentException, false);
-            State.Commands.Prepend($"{MetadataHandler.Name} remove {Constants.MetadataError}");
+            State.Metadata.Add(Constants.Metadata.Error, currentException, false);
+            State.Commands.Prepend($"{MetadataHandler.Name} remove {Constants.Metadata.Error}");
             State.Commands.Prepend(script.GetCommands(_parser, args));
             // Current command queue:
             // 1. Error-handling script
