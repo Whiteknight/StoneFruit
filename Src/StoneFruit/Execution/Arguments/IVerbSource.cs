@@ -8,7 +8,17 @@ namespace StoneFruit.Execution.Arguments
     /// </summary>
     public interface IVerbSource
     {
+        /// <summary>
+        /// Get a list of leading positionals which are candidates for being part of the verb.
+        /// </summary>
+        /// <returns></returns>
         IReadOnlyList<IPositionalArgument> GetVerbCandidatePositionals();
+
+        /// <summary>
+        /// Mark a number of leading positionals as being the Verb, the remainder are kept as
+        /// positional arguments.
+        /// </summary>
+        /// <param name="count"></param>
         void SetVerbCount(int count);
     }
 }

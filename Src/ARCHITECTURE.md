@@ -108,3 +108,18 @@ Any system which may handle an error should also be able to detect recursion and
 Because StoneFruit is designed to be completely modular, and because it can be hard to construct some of the core pieces without also instantating several dependencies, end-to-end functional tests are generally preferred over simple unit tests. The individual classes and methods are free to change so long as the user experience remains stable.
 
 Extensive integration makes sure that all the defaults and invariants are sane, and also that add-ons work together with the system as a whole.
+
+# Argument Parsing and Verb Dispatch
+
+StoneFruit supports arguments in multiple formats so that a familiar and intuitive interface can be created for diverse teams. Unfortunately some of these syntaxes are inherently ambiguous. For example in a Unix-style system, the sequence `--foo bar` might be interpreted by the application as the flag `--foo` followed by the positional argument `bar`, or it may be a single argument `bar` with name `foo`. 
+
+Because of the ambiguity, argument parsing is done in two phases. First arguments are parsed into a raw form which preserves ambiguities if they exist. Second arguments are identified unambiguously when a handler attempts to access them. From the example above, if we have the ambiguous sequence `--foo bar`, the user can either request the named argument `foo` or it can search for a flag `--foo` (which marks `bar` as a positional) or it can search for the next positional argument (which returns `bar` and marks `--foo` unambiguously as a flag).
+
+When a user send an input command to the engine, the following steps happen:
+
+1. The string is parsed into an `IArguments` which maintains any ambiguities
+2. A list of leading positionals (unambiguous positionals which are not preceeded by a named or flag argument) are pulled out as Verb Candidates
+3. The Verb Candidates are used to try and find a best match in the `IHandlerSource`s
+4. When a best-match handler is found, the matching Verb Candidates are converted into a Verb, and remaining candidates are returned to the front of the `IArguments` as positionals. Positionals are renumbered to ignore the Verb
+5. When the handler executes, it will access arguments which will disambiguate them permanently. 
+
