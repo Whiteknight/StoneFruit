@@ -5,6 +5,9 @@ using System.Linq;
 
 namespace StoneFruit
 {
+    /// <summary>
+    /// A sequence of one or more words which is mapped to a handler
+    /// </summary>
     public struct Verb : IReadOnlyList<string>, IEquatable<Verb>
     {
         private readonly IReadOnlyList<string> _verb;

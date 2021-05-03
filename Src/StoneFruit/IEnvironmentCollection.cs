@@ -28,8 +28,17 @@ namespace StoneFruit
         /// <returns></returns>
         bool IsValid(string name);
 
+        /// <summary>
+        /// Get the current environment. Returns a failure result if a valid environment is not set.
+        /// </summary>
+        /// <returns></returns>
         IResult<object> GetCurrent();
 
+        /// <summary>
+        /// Get the name of the current environment. Returns a failure result if a valid environment
+        /// is not set.
+        /// </summary>
+        /// <returns></returns>
         IResult<string> GetCurrentName();
     }
 

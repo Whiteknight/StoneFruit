@@ -4,7 +4,8 @@ using System.Runtime.Serialization;
 namespace StoneFruit.Execution
 {
     /// <summary>
-    /// Exception we throw during engine build-up
+    /// Exception we throw during engine build-up if conflicting or invalid settings have been
+    /// selected.
     /// </summary>
     [Serializable]
     public class EngineBuildException : Exception
