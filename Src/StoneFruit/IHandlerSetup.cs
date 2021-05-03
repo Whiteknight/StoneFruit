@@ -17,6 +17,12 @@ namespace StoneFruit
         /// <returns></returns>
         IHandlerSetup UseVerbExtractor(IVerbExtractor verbExtractor);
 
+        /// <summary>
+        /// Set the Handler Method Invoker which is used to invoke a handler method on an instance
+        /// object
+        /// </summary>
+        /// <param name="invoker"></param>
+        /// <returns></returns>
         IHandlerSetup UseMethodInvoker(IHandlerMethodInvoker invoker);
 
         /// <summary>
@@ -68,6 +74,9 @@ namespace StoneFruit
         IHandlerSetup AddScript(Verb verb, IEnumerable<string> lines, string description = "", string usage = "", string group = "");
     }
 
+    /// <summary>
+    /// Holds values from the DI container for use with delayed instantiation of handlers
+    /// </summary>
     public struct HandlerSourceBuildContext
     {
         public HandlerSourceBuildContext(IVerbExtractor verbExtractor, IHandlerMethodInvoker invoker)

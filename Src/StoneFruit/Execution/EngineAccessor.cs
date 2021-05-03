@@ -3,8 +3,8 @@
 namespace StoneFruit.Execution
 {
     // Accessor object to deal with circular references in the DI container before the Engine
-    // is registered
-    public class EngineAccessor
+    // is registered. Not intended for general purpose external use.
+    internal class EngineAccessor
     {
         private Engine? _engine;
 

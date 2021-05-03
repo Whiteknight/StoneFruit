@@ -3,6 +3,9 @@ using StoneFruit.Execution;
 
 namespace StoneFruit
 {
+    /// <summary>
+    /// Used for building up an engine and setting all necessary options.
+    /// </summary>
     public interface IEngineBuilder
     {
         /// <summary>

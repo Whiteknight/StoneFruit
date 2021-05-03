@@ -90,6 +90,12 @@ namespace StoneFruit
         /// <returns></returns>
         IEnumerable<INamedArgument> GetAllNamed();
 
+        /// <summary>
+        /// Get the values of all unconsumed arguments, for debug purposes. Notice that unconsumed
+        /// arguments might be ambiguously defined as positional, named or flag arguments, so
+        /// we cannot return a typed IArgument here.
+        /// </summary>
+        /// <returns></returns>
         IReadOnlyList<string> GetUnconsumed();
     }
 

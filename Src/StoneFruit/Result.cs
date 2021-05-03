@@ -2,6 +2,11 @@
 
 namespace StoneFruit
 {
+    /// <summary>
+    /// A result of an operation. On success contains a value. On failure there is no value and
+    /// attempt to access the value will throw an exception.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public interface IResult<T>
     {
         bool HasValue { get; }
@@ -14,12 +19,17 @@ namespace StoneFruit
         IResult<TOut> Transform<TOut>(Func<T, TOut> transform);
     }
 
+    // Static factory class.
     public static class Result
     {
         public static IResult<T> Success<T>(T value)
             => new SuccessResult<T>(value);
     }
 
+    /// <summary>
+    /// Represents a successful result with a valid value.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public sealed class SuccessResult<T> : IResult<T>
     {
         public SuccessResult(T value)
@@ -42,6 +52,10 @@ namespace StoneFruit
         }
     }
 
+    /// <summary>
+    /// Represents a failure result without a valid value.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public sealed class FailureResult<T> : IResult<T>
     {
         public static IResult<T> Instance { get; } = new FailureResult<T>();

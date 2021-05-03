@@ -4,7 +4,8 @@ using System.Linq;
 namespace StoneFruit.Execution
 {
     /// <summary>
-    /// Queue of prepared commands for the engine to execute
+    /// Queue of prepared commands for the engine to execute. Various events and actions in the
+    /// system may add additional commands to the front or end of the list.
     /// </summary>
     public class EngineStateCommandQueue
     {
