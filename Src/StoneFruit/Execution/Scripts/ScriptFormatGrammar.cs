@@ -68,7 +68,8 @@ namespace StoneFruit.Execution.Scripts
             // We cannot have a * syntax for all remaining unconsumed args, because some IArguments
             // like ParsedArguments contain ambiguities, and we can't just consume an arg without
             // knowing whether it is a positional, named, or flag. If you want all, you can append
-            // "-* {*} [*]" to the end of your pattern, or in whatever order you want ambiguities to be resolved in
+            // "-* {*} [*]" to the end of your pattern, or in whatever order you want ambiguities
+            // to be resolved in.
 
             // A literal flag which is passed without modification
             // literalFlagArg := '-' <names>
