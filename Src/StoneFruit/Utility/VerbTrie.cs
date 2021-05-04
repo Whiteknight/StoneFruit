@@ -3,9 +3,12 @@ using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.Utility
 {
-    // Trie to lookup handlers or handler-related types using a set of positional arguments from
-    // IArguments. Lookup tries to greedily consume as many positional arguments from the front
-    // of the IArguments to get the most specific handler it can find.
+    /// <summary>
+    /// Trie to lookup handlers or handler-related types using a set of positional arguments from
+    /// IArguments. Lookup tries to greedily consume as many positional arguments from the front
+    /// of the IArguments to get the most specific handler it can find.
+    /// </summary>
+    /// <typeparam name="TValue"></typeparam>
     public class VerbTrie<TValue>
         where TValue : class
     {

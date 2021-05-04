@@ -23,9 +23,7 @@
 
             var str = _output.Prompt($"{currentName}");
             _state.CommandCounter.ReceiveUserInput();
-            if (string.IsNullOrEmpty(str))
-                return FailureResult<ArgumentsOrString>.Instance;
-            return Result.Success(new ArgumentsOrString(str));
+            return string.IsNullOrEmpty(str) ? FailureResult<ArgumentsOrString>.Instance : Result.Success(new ArgumentsOrString(str));
         }
     }
 }

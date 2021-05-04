@@ -5,7 +5,7 @@ using StoneFruit.Execution.Arguments;
 namespace StoneFruit.Execution.CommandSources
 {
     /// <summary>
-    /// Ordered collection of ICommandSources. A source is drained and then removed from
+    /// Ordered collection of ICommandSources. The first source is drained and then removed from
     /// the list.
     /// </summary>
     public class CommandSourceCollection
