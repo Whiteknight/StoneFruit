@@ -6,7 +6,10 @@
     [System.Serializable]
     public class TrieException : System.Exception
     {
-        public TrieException(string message) : base(message) { }
+        public TrieException(string message) : base(message)
+        {
+        }
+
         protected TrieException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }

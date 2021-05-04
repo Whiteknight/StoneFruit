@@ -5,7 +5,8 @@ namespace StoneFruit.Utility
     public static class StringExtensions
     {
         /// <summary>
-        /// If the string ends in the given suffix, remove the suffix and return the remaining substring.
+        /// If the string ends in the given suffix, remove the suffix and return the remaining
+        /// substring.
         /// </summary>
         /// <param name="s"></param>
         /// <param name="suffix"></param>

@@ -6,6 +6,10 @@ using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.Execution.Handlers
 {
+    /// <summary>
+    /// Default implementation of IHAndlerMethodInvoker, attempts to invoke the given method by
+    /// mapping parameters from built-in values and argument values.
+    /// </summary>
     public class DefaultHandlerMethodInvoker : IHandlerMethodInvoker
     {
         public void Invoke(object instance, MethodInfo method, IArguments arguments, CommandDispatcher dispatcher, CancellationToken token)

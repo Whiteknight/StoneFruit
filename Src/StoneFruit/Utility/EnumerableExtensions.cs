@@ -15,6 +15,13 @@ namespace StoneFruit.Utility
         public static IEnumerable<T> OrEmptyIfNull<T>(this IEnumerable<T> source)
             => source ?? Enumerable.Empty<T>();
 
+        /// <summary>
+        /// During enumeration, execute a callback on every item.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="onEach"></param>
+        /// <returns></returns>
         public static IEnumerable<T> Tap<T>(this IEnumerable<T> source, Action<T> onEach)
         {
             Assert.ArgumentNotNull(source, nameof(source));

@@ -2,6 +2,9 @@
 
 namespace StoneFruit.Execution.Scripts
 {
+    /// <summary>
+    /// Accessor to pull an argument out of IArguments based on some criteria
+    /// </summary>
     public interface IArgumentAccessor
     {
         /// <summary>
