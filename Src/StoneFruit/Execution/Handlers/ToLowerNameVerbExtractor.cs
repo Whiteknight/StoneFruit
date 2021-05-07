@@ -14,7 +14,7 @@ namespace StoneFruit.Execution.Handlers
         public IReadOnlyList<Verb> GetVerbs(Type type)
         {
             if (type == null || !typeof(IHandlerBase).IsAssignableFrom(type))
-                return new List<Verb>();
+                return Array.Empty<Verb>();
 
             return GetVerbs(type.Name);
         }
@@ -22,7 +22,7 @@ namespace StoneFruit.Execution.Handlers
         public IReadOnlyList<Verb> GetVerbs(MethodInfo method)
         {
             if (method == null)
-                return new List<Verb>();
+                return Array.Empty<Verb>();
 
             return GetVerbs(method.Name);
         }

@@ -12,7 +12,8 @@ namespace StoneFruit
     {
         /// <summary>
         /// Set the Command parser instance. Notice that you may not set a Command parser
-        /// at the same time as Verb/Argument/Script parsers.
+        /// at the same time as Verb/Argument/Script parsers. If null is passed, the default
+        /// command parser will be used.
         /// </summary>
         /// <param name="parser"></param>
         /// <returns></returns>
@@ -20,7 +21,8 @@ namespace StoneFruit
 
         /// <summary>
         /// Specify an argument parser to use. Notice that you cannot set an Argument
-        /// parser if you specify a Command parser.
+        /// parser if you specify a Command parser. If null is passed the default argument
+        /// parser will be used.
         /// </summary>
         /// <param name="argParser"></param>
         /// <returns></returns>
@@ -28,7 +30,8 @@ namespace StoneFruit
 
         /// <summary>
         /// Specify a parser to use for scripts. Notice that you cannot set a Script
-        /// parser if you specify a Command parser.
+        /// parser if you specify a Command parser. If null is passed the default script parser
+        /// will be used.
         /// </summary>
         /// <param name="scriptParser"></param>
         /// <returns></returns>

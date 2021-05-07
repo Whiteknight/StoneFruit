@@ -14,19 +14,19 @@
         }
 
         public static MissingArgument NoPositionals()
-            => new MissingArgument("Cannot get next positional argument, there are none left. Either you did not pass enough or you consumed them all already.");
+            => new("Cannot get next positional argument, there are none left. Either you did not pass enough or you consumed them all already.");
 
         public static MissingArgument PositionalConsumed(int index)
-            => new MissingArgument($"Cannot get argument at position {index}. The value has already been consumed.");
+            => new($"Cannot get argument at position {index}. The value has already been consumed.");
 
         public static MissingArgument NoneNamed(string name)
-            => new MissingArgument($"Cannot get argument named '{name}'. You either don't have this argument or you already consumed it");
+            => new($"Cannot get argument named '{name}'. You either don't have this argument or you already consumed it");
 
         public static MissingArgument FlagConsumed(string name)
-            => new MissingArgument($"Cannot get flag named '{name}'. You have already consumed it.");
+            => new($"Cannot get flag named '{name}'. You have already consumed it.");
 
         public static MissingArgument FlagMissing(string name)
-            => new MissingArgument($"Cannot get flag named '{name}'");
+            => new($"Cannot get flag named '{name}'");
 
         public string Value => string.Empty;
 
