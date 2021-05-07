@@ -14,16 +14,15 @@ namespace StoneFruit
     /// </summary>
     public class EngineBuilder : IEngineBuilder
     {
-        private readonly IHandlerSetup _handlers;
-        private readonly IOutputSetup _output;
+        private readonly ISetupBuildable<IHandlers> _handlers;
+        private readonly ISetupBuildable<IOutput> _output;
         private readonly EngineEventCatalog _eventCatalog;
-        private readonly IEnvironmentSetup _environments;
-        private readonly IParserSetup _parsers;
+        private readonly ISetupBuildable<IEnvironmentCollection> _environments;
+        private readonly ISetupBuildable<ICommandParser> _parsers;
         private readonly EngineSettings _settings;
 
-        public EngineBuilder(IHandlerSetup? handlers = null, IOutputSetup? output = null, IEnvironmentSetup? environments = null, IParserSetup? parsers = null, EngineEventCatalog? events = null, EngineSettings? settings = null)
+        public EngineBuilder(ISetupBuildable<IHandlers>? handlers = null, ISetupBuildable<IOutput>? output = null, ISetupBuildable<IEnvironmentCollection>? environments = null, ISetupBuildable<ICommandParser>? parsers = null, EngineEventCatalog? events = null, EngineSettings? settings = null)
         {
-            // TODO: Assert that these objects, if provided, implement the necessary ISetupBuildable<>
             _handlers = handlers ?? new HandlerSetup();
             _eventCatalog = events ?? new EngineEventCatalog();
             _output = output ?? new OutputSetup();
@@ -39,7 +38,9 @@ namespace StoneFruit
         /// <returns></returns>
         public EngineBuilder SetupHandlers(Action<IHandlerSetup> setup)
         {
-            setup?.Invoke(_handlers);
+            if (_handlers is not IHandlerSetup handlerSetup)
+                throw new EngineBuildException("The provided Handlers Setup does not support custom setup callbacks.");
+            setup?.Invoke(handlerSetup);
             return this;
         }
 
@@ -50,7 +51,9 @@ namespace StoneFruit
         /// <returns></returns>
         public EngineBuilder SetupEnvironments(Action<IEnvironmentSetup> setup)
         {
-            setup?.Invoke(_environments);
+            if (_environments is not IEnvironmentSetup environmentSetup)
+                throw new EngineBuildException("The provided Environment Setup does not support custom setup callbacks.");
+            setup?.Invoke(environmentSetup);
             return this;
         }
 
@@ -61,7 +64,9 @@ namespace StoneFruit
         /// <returns></returns>
         public EngineBuilder SetupArguments(Action<IParserSetup> setup)
         {
-            setup?.Invoke(_parsers);
+            if (_parsers is not IParserSetup parserSetup)
+                throw new EngineBuildException("The provided Parser Setup does not support custom setup callbacks.");
+            setup?.Invoke(parserSetup);
             return this;
         }
 
@@ -72,7 +77,9 @@ namespace StoneFruit
         /// <returns></returns>
         public EngineBuilder SetupOutput(Action<IOutputSetup> setup)
         {
-            setup?.Invoke(_output);
+            if (_output is not IOutputSetup outputSetup)
+                throw new EngineBuildException("The provided Output Setup does not support custom setup callbacks.");
+            setup?.Invoke(outputSetup);
             return this;
         }
 
@@ -104,12 +111,12 @@ namespace StoneFruit
         /// <returns></returns>
         public void BuildUp(IServiceCollection services)
         {
-            (_handlers as ISetupBuildable<IHandlers>)?.BuildUp(services);
+            _handlers.BuildUp(services);
             services.AddSingleton(_eventCatalog);
             services.AddSingleton(_settings);
-            (_environments as ISetupBuildable<IEnvironmentCollection>)?.BuildUp(services);
-            (_parsers as ISetupBuildable<ICommandParser>)?.BuildUp(services);
-            (_output as ISetupBuildable<IOutput>)?.BuildUp(services);
+            _environments.BuildUp(services);
+            _parsers.BuildUp(services);
+            _output.BuildUp(services);
         }
 
         /// <summary>
@@ -174,10 +181,10 @@ namespace StoneFruit
         /// <returns></returns>
         public Engine Build()
         {
-            var handlers = (_handlers as ISetupBuildable<IHandlers>)!.Build();
-            var environments = (_environments as ISetupBuildable<IEnvironmentCollection>)!.Build();
-            var parser = (_parsers as ISetupBuildable<ICommandParser>)!.Build();
-            var output = (_output as ISetupBuildable<IOutput>)!.Build();
+            var handlers = _handlers.Build();
+            var environments = _environments.Build();
+            var parser = _parsers.Build();
+            var output = _output.Build();
 
             return new Engine(handlers, environments, parser, output, _eventCatalog, _settings);
         }

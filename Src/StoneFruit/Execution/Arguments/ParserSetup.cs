@@ -18,7 +18,7 @@ namespace StoneFruit.Execution.Arguments
         public void BuildUp(IServiceCollection services)
         {
             // What if the service collection already has a parser registered?
-            ICommandParser parser = Build();
+            var parser = Build();
             services.TryAddSingleton(parser);
         }
 
