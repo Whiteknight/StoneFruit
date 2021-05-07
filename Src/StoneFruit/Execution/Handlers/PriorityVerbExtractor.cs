@@ -36,27 +36,27 @@ namespace StoneFruit.Execution.Handlers
         public IReadOnlyList<Verb> GetVerbs(Type type)
         {
             if (type == null || !typeof(IHandlerBase).IsAssignableFrom(type))
-                return new List<Verb>();
+                return Array.Empty<Verb>();
             foreach (var extractor in _extractors)
             {
                 var verbs = extractor.GetVerbs(type);
                 if (verbs?.Count > 0)
                     return verbs;
             }
-            return new List<Verb>();
+            return Array.Empty<Verb>();
         }
 
         public IReadOnlyList<Verb> GetVerbs(MethodInfo method)
         {
             if (method == null)
-                return new List<Verb>();
+                return Array.Empty<Verb>();
             foreach (var extractor in _extractors)
             {
                 var verbs = extractor.GetVerbs(method);
                 if (verbs?.Count > 0)
                     return verbs;
             }
-            return new List<Verb>();
+            return Array.Empty<Verb>();
         }
     }
 }

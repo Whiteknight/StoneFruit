@@ -23,10 +23,9 @@ namespace StoneFruit.Execution.Arguments
             Assert.ArgumentNotNull(argParser, nameof(argParser));
             Assert.ArgumentNotNull(scriptParser, nameof(scriptParser));
 
-            var whitespace = OptionalWhitespace();
             _argsParser = Rule(
                 argParser.List(),
-                whitespace,
+                OptionalWhitespace(),
                 (args, _) => args
             );
             _scriptParser = scriptParser;
@@ -55,13 +54,11 @@ namespace StoneFruit.Execution.Arguments
 
             var sequence = new StringCharacterSequence(command);
             var argsList = _argsParser.Parse(sequence).Value;
-            if (!sequence.IsAtEnd)
-            {
-                var remainder = sequence.GetRemainder();
-                throw new ParseException($"Could not parse all arguments. '{remainder}' fails at {sequence.CurrentLocation}");
-            }
+            if (sequence.IsAtEnd)
+                return new ParsedArguments(argsList, command);
 
-            return new ParsedArguments(argsList, command);
+            var remainder = sequence.GetRemainder();
+            throw new ParseException($"Could not parse all arguments. '{remainder}' fails at {sequence.CurrentLocation}");
         }
 
         /// <summary>

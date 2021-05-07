@@ -57,12 +57,10 @@ namespace StoneFruit.Execution.Arguments
                 flagArg,
                 namedArg,
                 values.Transform(v => new ParsedPositionalArgument(v))
-            ).Named("Argument");
-
-            var whitespace = OptionalWhitespace();
+            ).Named("Argument"); ;
 
             return Rule(
-                whitespace,
+                OptionalWhitespace(),
                 args,
 
                 (_, arg) => arg

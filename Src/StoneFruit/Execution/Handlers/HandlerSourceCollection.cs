@@ -13,6 +13,7 @@ namespace StoneFruit.Execution.Handlers
 
         public HandlerSourceCollection(IEnumerable<IHandlerSource> sources)
         {
+            Assert.ArgumentNotNull(sources, nameof(sources));
             _sources = sources.Where(s => s != null).ToList();
         }
 
@@ -25,13 +26,11 @@ namespace StoneFruit.Execution.Handlers
         }
 
         public IEnumerable<IVerbInfo> GetAll()
-        {
-            var allVerbs = _sources.SelectMany(s => s.GetAll())
+            => _sources.SelectMany(s => s.GetAll())
                 .GroupBy(info => info.Verb)
                 .Select(g => g.First())
-                .ToDictionary(v => v.Verb);
-            return allVerbs.Values;
-        }
+                .ToDictionary(v => v.Verb)
+                .Values;
 
         public IResult<IVerbInfo> GetByName(Verb verb)
             => _sources

@@ -156,8 +156,17 @@ namespace StoneFruit
                 accessor.SetEngine(e);
                 return e;
             });
+
+            // The Engine creates the EngineState and CommandDispatcher, so those things can be accessed
+            // by getting the Engine. We use EngineAccessor here, because we will have circular references
+            // with a few Engine dependencies otherwise. Circular references only need to be resolved
+            // after the Engine.Run() or variants are called.
             services.AddSingleton(provider => provider.GetRequiredService<EngineAccessor>().Engine.State);
             services.AddSingleton(provider => provider.GetRequiredService<EngineAccessor>().Engine.Dispatcher);
+
+            // The CurrentArguments only exist when the Engine.Run() or a variant is called, and an
+            // input command has been entered. We access it from the EngineState, which comes from
+            // the Engine, and we do all this to avoid circular references in the DI.
             services.AddScoped(provider => provider.GetRequiredService<EngineState>().CurrentArguments);
         }
 

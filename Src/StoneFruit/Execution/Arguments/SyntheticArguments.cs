@@ -35,9 +35,6 @@ namespace StoneFruit.Execution.Arguments
             _verbCount = 0;
         }
 
-        /// <summary>
-        /// The raw, unparsed argument string if available
-        /// </summary>
         public string Raw => string.Empty;
 
         public IReadOnlyList<string> GetUnconsumed()
@@ -88,6 +85,11 @@ namespace StoneFruit.Execution.Arguments
             return new SyntheticArguments(argsList);
         }
 
+        /// <summary>
+        /// Create from a list of strings to be treated as positional arguments.
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static SyntheticArguments From(params string[] args)
         {
             var argsList = args
