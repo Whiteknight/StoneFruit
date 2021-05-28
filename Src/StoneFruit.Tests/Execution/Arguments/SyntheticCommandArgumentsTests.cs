@@ -106,7 +106,7 @@ namespace StoneFruit.Tests.Execution.Arguments
                 new NamedArgument("a", "1"),
                 new NamedArgument("a", "2")
             });
-            var result = target.GetAll("a").Cast<INamedArgument>().ToList();
+            var result = target.GetAllNamed("a").Cast<INamedArgument>().ToList();
             result.Count.Should().Be(2);
             result[0].Value.Should().Be("1");
             result[1].Value.Should().Be("2");
@@ -120,7 +120,7 @@ namespace StoneFruit.Tests.Execution.Arguments
                 new NamedArgument("a", "1"),
                 new NamedArgument("a", "2")
             });
-            var result = target.GetAll("XXX").ToList();
+            var result = target.GetAllNamed("XXX").ToList();
             result.Count.Should().Be(0);
         }
 

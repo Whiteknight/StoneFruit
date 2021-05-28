@@ -38,7 +38,7 @@ namespace StoneFruit.Execution.Arguments
 
         public INamedArgument Get(string name) => _inner.Get(name);
 
-        public IEnumerable<IArgument> GetAll(string name) => _inner.GetAll(name);
+        public IEnumerable<INamedArgument> GetAllNamed(string name) => _inner.GetAllNamed(name);
 
         public IEnumerable<IFlagArgument> GetAllFlags() => _inner.GetAllFlags();
 

@@ -140,10 +140,10 @@ namespace StoneFruit.Execution.Arguments
         public IEnumerable<IPositionalArgument> GetAllPositionals()
             => _positionals.Skip(_verbCount).Where(a => !a.Consumed);
 
-        public IEnumerable<IArgument> GetAll(string name)
+        public IEnumerable<INamedArgument> GetAllNamed(string name)
         {
             name = name.ToLowerInvariant();
-            return _nameds.ContainsKey(name) ? _nameds[name].Where(a => !a.Consumed) : Enumerable.Empty<IArgument>();
+            return _nameds.ContainsKey(name) ? _nameds[name].Where(a => !a.Consumed) : Enumerable.Empty<INamedArgument>();
         }
 
         public IEnumerable<INamedArgument> GetAllNamed()

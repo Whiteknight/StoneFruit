@@ -25,6 +25,18 @@ namespace StoneFruit.Containers.Lamar
         }
 
         /// <summary>
+        /// Register the Engine and all dependencies with the Lamar container. This method will
+        /// automatically scan your solution assemblies for Handler types. If you have additional
+        /// handler types to add which are not found during the scan, you can register them with
+        /// the ServiceRegistry yourself. This variant is used when you do not have an environment
+        /// object.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static ServiceRegistry SetupEngine(this ServiceRegistry services)
+            => SetupEngine(services, builder => { });
+
+        /// <summary>
         /// Register the Engine and all dependencies with the Lamar container. This method will automatically
         /// scan your solution assemblies for Handler types. If you have additional handler types to add which
         /// are not found during the scan, register them with the ServiceRegistry yourself. This variant is

@@ -77,12 +77,11 @@ namespace StoneFruit
         IEnumerable<IFlagArgument> GetAllFlags();
 
         /// <summary>
-        /// Get all remaining unconsumed arguments of all types. Arguments which are
-        /// ambiguous will be resolved in the order positional, named, flags.
+        /// Get all remaining unconsumed named arguments with the given name.
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        IEnumerable<IArgument> GetAll(string name);
+        IEnumerable<INamedArgument> GetAllNamed(string name);
 
         /// <summary>
         /// Get all remaining unconsumed named arguments.
@@ -174,6 +173,15 @@ namespace StoneFruit
                 .Concat(args.GetAllNamed())
                 .Concat(args.GetAllFlags())
                 .Where(p => !p.Consumed);
+        }
+
+        public static IPositionalArgument GetAllUnconsumedPositionalsAsOne(this IArguments args)
+        {
+            Assert.ArgumentNotNull(args, nameof(args));
+            var remainingPositionals = args.GetAllPositionals().ToList();
+            if (remainingPositionals.Count == 0)
+                return MissingArgument.NoPositionals();
+            return new DelimitedMultiPositionalArgument(remainingPositionals);
         }
 
         /// <summary>

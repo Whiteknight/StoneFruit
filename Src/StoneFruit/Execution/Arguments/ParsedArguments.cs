@@ -181,11 +181,11 @@ namespace StoneFruit.Execution.Arguments
             return MissingArgument.NoPositionals();
         }
 
-        public IEnumerable<IArgument> GetAll(string name)
+        public IEnumerable<INamedArgument> GetAllNamed(string name)
         {
             name = name.ToLowerInvariant();
             AccessNamedUntil(n => n == name, () => false);
-            return _accessedNameds.ContainsKey(name) ? _accessedNameds[name].Where(a => !a.Consumed) : Enumerable.Empty<IArgument>();
+            return _accessedNameds.ContainsKey(name) ? _accessedNameds[name].Where(a => !a.Consumed) : Enumerable.Empty<INamedArgument>();
         }
 
         public IEnumerable<INamedArgument> GetAllNamed()
