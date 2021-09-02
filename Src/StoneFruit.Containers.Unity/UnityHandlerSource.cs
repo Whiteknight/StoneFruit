@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using StoneFruit.Execution;
@@ -10,42 +10,38 @@ namespace StoneFruit.Containers.Unity
     public class UnityHandlerSource : IHandlerSource
     {
         private readonly IUnityContainer _container;
-        private readonly Lazy<IReadOnlyDictionary<string, Type>> _nameMap;
-        private readonly ITypeVerbExtractor _verbExtractor;
+        private readonly VerbTrie<Type> _handlers;
 
-        public UnityHandlerSource(IUnityContainer container, ITypeVerbExtractor verbExtractor)
+        public UnityHandlerSource(IUnityContainer container, IVerbExtractor verbExtractor)
         {
             _container = container ?? throw new ArgumentNullException(nameof(container));
-            _verbExtractor = verbExtractor ?? throw new ArgumentNullException(nameof(verbExtractor));
-            _nameMap = new Lazy<IReadOnlyDictionary<string, Type>>(SetupNameMapping);
-        }
-
-        private IReadOnlyDictionary<string, Type> SetupNameMapping()
-        {
-            var commandTypes = _container.Registrations
+            _handlers = _container.Registrations
                 .Where(r => typeof(IHandlerBase).IsAssignableFrom(r.MappedToType))
                 .Select(r => r.MappedToType ?? r.RegisteredType)
                 .Where(t => t?.IsAbstract == false)
                 .Distinct()
-                .ToList();
-
-            return commandTypes
                 .SelectMany(commandType =>
-                    _verbExtractor.GetVerbs(commandType).Select(verb => (verb, commandType))
+                    verbExtractor
+                        .GetVerbs(commandType)
+                        .Select(verb => (Verb: verb, Type: commandType))
                 )
-                .ToDictionaryUnique();
+                .ToVerbTrie(x => x.Verb, x => x.Type);
         }
 
-        public IEnumerable<IVerbInfo> GetAll() => _nameMap.Value.Select(kvp => new VerbInfo(kvp.Key, kvp.Value));
-
-        public IVerbInfo GetByName(string name)
-            => _nameMap.Value.ContainsKey(name) ? new VerbInfo(name, _nameMap.Value[name]) : null;
-
-        public IHandlerBase GetInstance(Command command, CommandDispatcher dispatcher)
+        public IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher)
         {
-            var verb = command.Verb.ToLowerInvariant();
-            var type = _nameMap.Value.ContainsKey(verb) ? _nameMap.Value[verb] : null;
+            var type = _handlers.Get(arguments);
             return type == null ? null : ResolveHandler(type);
+        }
+
+        public IEnumerable<IVerbInfo> GetAll() => _handlers.GetAll().Select(kvp => new VerbInfo(kvp.Key, kvp.Value));
+
+        public IVerbInfo GetByName(Verb verb)
+        {
+            var type = _handlers.Get(verb);
+            if (type == null)
+                return null;
+            return new VerbInfo(verb, type);
         }
 
         private IHandlerBase ResolveHandler(Type type)
@@ -60,13 +56,13 @@ namespace StoneFruit.Containers.Unity
         {
             private readonly Type _type;
 
-            public VerbInfo(string verb, Type type)
+            public VerbInfo(Verb verb, Type type)
             {
                 _type = type;
                 Verb = verb;
             }
 
-            public string Verb { get; }
+            public Verb Verb { get; }
             public string Description => _type.GetDescription();
             public string Usage => _type.GetUsage();
             public string Group => _type.GetGroup();

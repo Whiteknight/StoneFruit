@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using FluentAssertions;
 using NUnit.Framework;
 using StoneFruit.Execution;
 using TestUtilities;
 using Unity;
-using Unity.Lifetime;
 
 namespace StoneFruit.Containers.Unity.Tests.Integration
 {
@@ -70,7 +69,7 @@ namespace StoneFruit.Containers.Unity.Tests.Integration
                     e.EnvironmentChanged.Clear();
                 })
             );
-            container.RegisterType<MyService>(new TransientLifetimeManager());
+            container.RegisterType<MyService>();
             var engine = container.Resolve<Engine>();
 
             engine.RunHeadless("A test-service");

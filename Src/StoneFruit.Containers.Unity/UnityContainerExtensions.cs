@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Unity;
@@ -24,8 +24,9 @@ namespace StoneFruit.Containers.Unity
 
         public static IUnityContainer SetupEngine(this IUnityContainer container, Action<IEngineBuilder> build)
         {
+            var handlerTypes = AllClasses.FromAssembliesInBasePath().Where(t => !t.IsAbstract && typeof(IHandlerBase).IsAssignableFrom(t)).ToList();
             container.RegisterTypes(
-                AllClasses.FromAssembliesInBasePath().Where(t => t.IsPublic && !t.IsAbstract && typeof(IHandlerBase).IsAssignableFrom(t)),
+                handlerTypes,
                 WithMappings.None,
                 WithName.Default,
                 WithLifetime.Transient
@@ -41,7 +42,7 @@ namespace StoneFruit.Containers.Unity
             EngineBuilder.SetupExplicitEnvironmentRegistration<TEnvironment>(services);
             foreach (var descriptor in services)
                 AddRegistration(container, descriptor);
-            container.RegisterFactory<IHandlerSource>(c => new UnityHandlerSource(c, TypeVerbExtractor.DefaultInstance));
+            container.RegisterFactory<IHandlerSource>(c => new UnityHandlerSource(c, c.Resolve<IVerbExtractor>()));
             return container;
         }
 
@@ -51,7 +52,7 @@ namespace StoneFruit.Containers.Unity
             EngineBuilder.SetupEngineRegistrations(services, build);
             foreach (var descriptor in services)
                 AddRegistration(container, descriptor);
-            container.RegisterFactory<IHandlerSource>(c => new UnityHandlerSource(c, TypeVerbExtractor.DefaultInstance));
+            container.RegisterFactory<IHandlerSource>(c => new UnityHandlerSource(c, c.Resolve<IVerbExtractor>()));
             return container;
         }
 

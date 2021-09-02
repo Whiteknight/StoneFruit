@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using NUnit.Framework;
 using StoneFruit.Execution;
 using TestUtilities;
@@ -13,7 +13,6 @@ namespace StoneFruit.Containers.Unity.Tests.Integration
         {
             var output = new TestOutput();
             var container = new UnityContainer();
-            container.AddExtension(new Diagnostic());
             container.SetupEngine<TestEnvironment>(b => b
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEnvironments(e => e.UseInstance(new TestEnvironment("Single")))
