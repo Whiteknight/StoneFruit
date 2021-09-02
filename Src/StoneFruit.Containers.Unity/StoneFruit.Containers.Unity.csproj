@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>StoneFruit.Containers.Unity</AssemblyName>
+    <RootNamespace>StoneFruit.Containers.Unity</RootNamespace>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <LangVersion>8.0</LangVersion>
+    <Version>0.0.1</Version>
+    <Authors>Andrew F. Whitworth</Authors>
+    <Company />
+    <Description>CLI Commandlet host and execution engine, Unity container bindings</Description>
+    <Copyright>Copyright 2020</Copyright>
+    <PackageProjectUrl>https://github.com/Whiteknight/StoneFruit</PackageProjectUrl>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\StoneFruit\StoneFruit.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="LICENSE" Pack="true" PackagePath="">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.3" />
+    <PackageReference Include="Unity" Version="5.9.0" />
+    <PackageReference Include="Unity.RegistrationByConvention" Version="5.9.0" />
+  </ItemGroup>
+</Project>
