@@ -77,7 +77,6 @@ namespace StoneFruit.Tests.Integration
             output.Lines[2].Should().Be("True");
         }
 
-
         [Test]
         public void UseScriptParser_Test()
         {

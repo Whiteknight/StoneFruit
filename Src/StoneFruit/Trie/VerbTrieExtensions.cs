@@ -6,7 +6,7 @@ namespace StoneFruit.Trie
     public static class VerbTrieExtensions
     {
         /// <summary>
-        /// Convert an enumeration into a VerbTrie
+        /// Convert an enumeration into a VerbTrie.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="TValue"></typeparam>
@@ -24,11 +24,12 @@ namespace StoneFruit.Trie
                 var value = getValue(s);
                 trie.Insert(verb, value);
             }
+
             return trie;
         }
 
         /// <summary>
-        /// Convert an enumeration into a VerbTrie
+        /// Convert an enumeration into a VerbTrie.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>

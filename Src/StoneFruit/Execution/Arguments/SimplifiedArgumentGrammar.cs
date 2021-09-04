@@ -8,7 +8,7 @@ using static ParserObjects.ParserMethods<char>;
 namespace StoneFruit.Execution.Arguments
 {
     /// <summary>
-    /// A grammar for simplified arguments
+    /// A grammar for simplified arguments.
     /// </summary>
     public static class SimplifiedArgumentGrammar
     {
@@ -57,7 +57,7 @@ namespace StoneFruit.Execution.Arguments
                 flagArg,
                 namedArg,
                 values.Transform(v => new ParsedPositionalArgument(v))
-            ).Named("Argument"); ;
+            ).Named("Argument");
 
             return Rule(
                 OptionalWhitespace(),

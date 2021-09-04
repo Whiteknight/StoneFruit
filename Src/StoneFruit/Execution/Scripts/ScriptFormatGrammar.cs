@@ -273,6 +273,7 @@ namespace StoneFruit.Execution.Scripts
                     positional.MarkConsumed();
                     results.Add(new PositionalArgument(positional.Value));
                 }
+
                 return results;
             }
         }

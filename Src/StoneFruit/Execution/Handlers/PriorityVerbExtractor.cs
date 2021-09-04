@@ -28,7 +28,7 @@ namespace StoneFruit.Execution.Handlers
         }
 
         /// <summary>
-        /// Get the default ITypeVerbExtractor instance which will be used if a custom
+        /// Gets the default ITypeVerbExtractor instance which will be used if a custom
         /// one isn't provided.
         /// </summary>
         public static IVerbExtractor DefaultInstance => _default.Value;
@@ -43,6 +43,7 @@ namespace StoneFruit.Execution.Handlers
                 if (verbs?.Count > 0)
                     return verbs;
             }
+
             return Array.Empty<Verb>();
         }
 
@@ -56,6 +57,7 @@ namespace StoneFruit.Execution.Handlers
                 if (verbs?.Count > 0)
                     return verbs;
             }
+
             return Array.Empty<Verb>();
         }
     }

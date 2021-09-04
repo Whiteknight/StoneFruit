@@ -29,7 +29,7 @@ namespace StoneFruit.Containers.Microsoft
         /// Setup the engine registrations for the DI container. Thsi method will automatically
         /// scan the assemblies in your solution for handler types. Any handler types which are not
         /// found during the scan should be manually registered in the ServiceCollection before
-        /// calling this method. This variant does not register an environment object
+        /// calling this method. This variant does not register an environment object.
         /// </summary>
         /// <param name="services"></param>
         /// <param name="build"></param>
@@ -77,7 +77,7 @@ namespace StoneFruit.Containers.Microsoft
         /// <summary>
         /// Setup the engine registrations in the DI container. This method will not scan for
         /// handler classes in your solution, you must have them registered in the ServiceCollection
-        /// separately. This variant does not register an environment object
+        /// separately. This variant does not register an environment object.
         /// </summary>
         /// <param name="services"></param>
         /// <param name="build"></param>

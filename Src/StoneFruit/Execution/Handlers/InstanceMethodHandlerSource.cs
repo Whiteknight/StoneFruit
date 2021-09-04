@@ -10,7 +10,7 @@ using StoneFruit.Utility;
 namespace StoneFruit.Execution.Handlers
 {
     /// <summary>
-    /// Handler source for public methods on a pre-constructed object instance
+    /// Handler source for public methods on a pre-constructed object instance.
     /// </summary>
     public class InstanceMethodHandlerSource : IHandlerSource
     {
@@ -111,7 +111,7 @@ namespace StoneFruit.Execution.Handlers
 
             public AsyncHandlerWrapper(object instance, MethodInfo method, IArguments command, CommandDispatcher dispatcher, IHandlerMethodInvoker invoker)
             {
-                Debug.Assert(method.ReturnType == typeof(Task));
+                Debug.Assert(method.ReturnType == typeof(Task), "Must be using a Task return type");
                 _instance = instance;
                 _method = method;
                 _command = command;

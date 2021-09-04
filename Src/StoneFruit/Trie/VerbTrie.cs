@@ -55,6 +55,7 @@ namespace StoneFruit.Trie
                     return FailureResult<TValue>.Instance;
                 current = node;
             }
+
             if (current?.Value == null)
                 return FailureResult<TValue>.Instance;
             return new SuccessResult<TValue>(current.Value);
@@ -104,6 +105,7 @@ namespace StoneFruit.Trie
                     foundIndex = index;
                 }
             }
+
             if (foundIndex >= 0)
                 args.SetVerbCount(foundIndex + 1);
 

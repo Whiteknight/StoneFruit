@@ -6,9 +6,9 @@ namespace StoneFruit.Containers
 {
     /// <summary>
     /// A simple default implementation of IServiceCollection for DI containers which don't provide
-    /// one of their own
+    /// one of their own.
     /// </summary>
-    public class DefaultServiceCollection : IServiceCollection
+    public sealed class DefaultServiceCollection : IServiceCollection
     {
         private readonly List<ServiceDescriptor> _services;
 
@@ -44,7 +44,7 @@ namespace StoneFruit.Containers
 
         public IEnumerator<ServiceDescriptor> GetEnumerator() => _services.GetEnumerator();
 
-        void ICollection<ServiceDescriptor>.Add(ServiceDescriptor item)
+        public void Add(ServiceDescriptor item)
             => _services.Add(item);
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

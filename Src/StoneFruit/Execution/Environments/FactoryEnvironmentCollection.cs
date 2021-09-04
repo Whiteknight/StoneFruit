@@ -7,7 +7,7 @@ namespace StoneFruit.Execution.Environments
 {
     /// <summary>
     /// An IEnvironmentCollection implementation which uses an IEnvironmentFactory to create environments
-    /// on demand
+    /// on demand.
     /// </summary>
     public class FactoryEnvironmentCollection : IEnvironmentCollection
     {
@@ -71,6 +71,7 @@ namespace StoneFruit.Execution.Environments
                 _namedCache.Add(name, env.Value);
                 return env;
             }
+
             return FailureResult<object>.Instance;
         }
     }

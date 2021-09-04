@@ -324,6 +324,7 @@ namespace StoneFruit.Execution.Arguments
                 if (arg.Argument is ParsedPositionalArgument pa)
                     candidates.Add(new PositionalArgument(pa.Value));
             }
+
             return candidates;
         }
 

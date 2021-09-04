@@ -71,6 +71,7 @@ namespace StoneFruit
                 if (this[i] != other[i])
                     return false;
             }
+
             return true;
         }
 

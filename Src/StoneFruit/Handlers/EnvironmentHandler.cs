@@ -56,6 +56,7 @@ Change the current environment, only if any are configured but none are set.
                 ChangeEnvironment();
                 return;
             }
+
             if (_args.HasFlag("list"))
             {
                 ListEnvironments();

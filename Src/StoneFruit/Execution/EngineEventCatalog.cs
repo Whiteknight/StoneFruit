@@ -1,5 +1,12 @@
 ﻿using StoneFruit.Handlers;
 
+// For purposes of this file, readability increases if we allow space between lines of scripts
+#pragma warning disable SA1114 // Parameter list should follow declaration
+
+// Documentation here doesn't follow standards because we want to explain the purpose of the
+// script, not the purpose of the getter
+#pragma warning disable SA1623 // Property summary documentation should match accessors
+
 namespace StoneFruit.Execution
 {
     /// <summary>
@@ -55,7 +62,7 @@ namespace StoneFruit.Execution
             );
 
         /// <summary>
-        /// The environment has been changed
+        /// The environment has been changed.
         /// </summary>
         public EventScript EnvironmentChanged { get; } = new EventScript(
                 // Has argument 'environment' with name of new environment
@@ -98,3 +105,6 @@ namespace StoneFruit.Execution
             );
     }
 }
+
+#pragma warning restore SA1114 // Parameter list should follow declaration
+#pragma warning restore SA1623 // Property summary documentation should match accessors

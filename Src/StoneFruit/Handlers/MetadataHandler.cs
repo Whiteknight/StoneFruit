@@ -44,13 +44,17 @@ metadata list
                     _output.Write(": ");
                     _output.WriteLine(kvp.Value.GetType().Name);
                 }
+
                 return;
             }
+
             if (subverb == RemoveSubverb)
             {
                 foreach (var name in _args.GetAllPositionals())
                     _state.Metadata.Remove(name.AsString());
             }
+
+            throw new ExecutionException("Unknown arguments");
         }
     }
 }

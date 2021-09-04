@@ -61,8 +61,7 @@ namespace StoneFruit.Containers.Microsoft
                 return FailureResult<IHandlerBase>.Instance;
 
             using var scope = _getProvider().CreateScope();
-            var instance = scope.ServiceProvider.GetService(serviceType.Value.Type) as IHandlerBase;
-            return instance == null ? FailureResult<IHandlerBase>.Instance : new SuccessResult<IHandlerBase>(instance);
+            return scope.ServiceProvider.GetService(serviceType.Value.Type) is IHandlerBase instance ? new SuccessResult<IHandlerBase>(instance) : FailureResult<IHandlerBase>.Instance;
         }
 
         public IEnumerable<IVerbInfo> GetAll() => _verbs.GetAll().Select(kvp => kvp.Value);

@@ -42,6 +42,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FD4D52DA-932C-4DFB-B65A-3A898C959185}"
 	ProjectSection(SolutionItems) = preProject
 		ARCHITECTURE.md = ARCHITECTURE.md
+		Directory.Build.props = Directory.Build.props
+		..\README.md = ..\README.md
+		stylecop.json = stylecop.json
+		StyleCop.ruleset = StyleCop.ruleset
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Containers", "Containers", "{39E3A1BC-3612-4C49-ACD5-53B876B896BB}"

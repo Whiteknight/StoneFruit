@@ -26,7 +26,7 @@ namespace StoneFruit.Tests.Integration
                 .Build();
             engine.RunHeadless("test");
             // Give a pretty wide range here, we don't care exactly what the number is and
-            // we don't want to throw false negatives if it took the threadpool a long 
+            // we don't want to throw false negatives if it took the threadpool a long
             // time to spool up the task.
             output.Lines.Count.Should().BeInRange(1, 30);
         }
