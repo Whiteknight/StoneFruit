@@ -5,6 +5,7 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Execution;
+using StoneFruit.Trie;
 using StoneFruit.Utility;
 
 namespace StoneFruit.Containers.Autofac

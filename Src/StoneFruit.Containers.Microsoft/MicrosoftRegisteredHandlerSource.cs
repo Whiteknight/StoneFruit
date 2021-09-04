@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Execution;
+using StoneFruit.Trie;
 using StoneFruit.Utility;
 
 namespace StoneFruit.Containers.Microsoft

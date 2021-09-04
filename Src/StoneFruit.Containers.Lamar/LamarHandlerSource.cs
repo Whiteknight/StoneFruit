@@ -4,6 +4,7 @@ using System.Linq;
 using Lamar;
 using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Execution;
+using StoneFruit.Trie;
 using StoneFruit.Utility;
 
 namespace StoneFruit.Containers.Lamar

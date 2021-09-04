@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using StoneFruit.Execution;
+using StoneFruit.Trie;
 using StoneFruit.Utility;
 using StructureMap;
 

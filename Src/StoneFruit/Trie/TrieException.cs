@@ -1,4 +1,4 @@
-﻿namespace StoneFruit.Utility
+﻿namespace StoneFruit.Trie
 {
     /// <summary>
     /// Exception that is thrown during trie operations
@@ -15,8 +15,6 @@
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
 
         public static TrieException NoArguments()
-        {
-            return new TrieException("Could not look up an appropriate handler, no verbs were provided");
-        }
+            => new TrieException("Could not look up an appropriate handler, no verbs were provided");
     }
 }

@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using StoneFruit.Execution.Arguments;
+using StoneFruit.Utility;
 
-namespace StoneFruit.Utility
+namespace StoneFruit.Trie
 {
     /// <summary>
     /// Trie to lookup handlers or handler-related types using a set of positional arguments from

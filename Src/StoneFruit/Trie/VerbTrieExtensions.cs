@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace StoneFruit.Utility
+namespace StoneFruit.Trie
 {
     public static class VerbTrieExtensions
     {

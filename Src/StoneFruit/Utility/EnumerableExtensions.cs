@@ -16,7 +16,8 @@ namespace StoneFruit.Utility
             => source ?? Enumerable.Empty<T>();
 
         /// <summary>
-        /// During enumeration, execute a callback on every item.
+        /// During enumeration, execute a callback on every item without returning a different
+        /// item or modifying the enumeration.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>

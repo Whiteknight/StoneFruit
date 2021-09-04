@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using StoneFruit.Execution.Scripts.Formatting;
+using StoneFruit.Trie;
 using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Scripts

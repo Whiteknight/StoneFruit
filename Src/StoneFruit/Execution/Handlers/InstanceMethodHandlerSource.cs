@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using StoneFruit.Trie;
 using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Handlers
