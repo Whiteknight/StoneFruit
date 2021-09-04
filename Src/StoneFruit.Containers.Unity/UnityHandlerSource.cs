@@ -28,20 +28,24 @@ namespace StoneFruit.Containers.Unity
                 .ToVerbTrie(x => x.Verb, x => x.Type);
         }
 
-        public IHandlerBase GetInstance(IArguments arguments, CommandDispatcher dispatcher)
+        public IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
         {
             var type = _handlers.Get(arguments);
-            return type == null ? null : ResolveHandler(type);
+            if (!type.HasValue)
+                return FailureResult<IHandlerBase>.Instance;
+            var handler = ResolveHandler(type.Value);
+            return Result.Success(handler);
         }
 
         public IEnumerable<IVerbInfo> GetAll() => _handlers.GetAll().Select(kvp => new VerbInfo(kvp.Key, kvp.Value));
 
-        public IVerbInfo GetByName(Verb verb)
+        public IResult<IVerbInfo> GetByName(Verb verb)
         {
             var type = _handlers.Get(verb);
-            if (type == null)
-                return null;
-            return new VerbInfo(verb, type);
+            if (!type.HasValue)
+                return FailureResult<IVerbInfo>.Instance;
+            var verbInfo = new VerbInfo(verb, type.Value);
+            return Result.Success<IVerbInfo>(verbInfo);
         }
 
         private IHandlerBase ResolveHandler(Type type)

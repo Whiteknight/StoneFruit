@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using FluentAssertions;
 using NUnit.Framework;
-using StoneFruit.Execution;
 using TestUtilities;
 using Unity;
 
@@ -21,7 +20,11 @@ namespace StoneFruit.Containers.Unity.Tests.Integration
 
         private class MyEnvironmentFactory : IEnvironmentFactory
         {
-            public object Create(string name) => new MyEnvironment(name);
+            public IResult<object> Create(string name)
+            {
+                var env = new MyEnvironment(name);
+                return Result.Success<object>(env);
+            }
 
             public IReadOnlyCollection<string> ValidEnvironments => new[] { "A", "B", "C" };
         }
