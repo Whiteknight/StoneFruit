@@ -1,7 +1,7 @@
 ﻿namespace StoneFruit
 {
     /// <summary>
-    ///  Information about a registered verb.
+    /// Information about a registered verb.
     /// </summary>
     public interface IVerbInfo
     {

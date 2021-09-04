@@ -5,24 +5,24 @@ namespace StoneFruit
 {
     /// <summary>
     /// Manages the list of possible environments. Environments are cached after creation, each environment
-    /// is only created once. Environments are ordered and can be accessed by name or number
+    /// is only created once. Environments are ordered and can be accessed by name or number.
     /// </summary>
     public interface IEnvironmentCollection
     {
         /// <summary>
-        /// Gets a list of valid environment names
+        /// Gets a list of valid environment names.
         /// </summary>
         /// <returns></returns>
         IReadOnlyList<string> GetNames();
 
         /// <summary>
-        /// Sets the current environment by name
+        /// Sets the current environment by name.
         /// </summary>
         /// <param name="name"></param>
         void SetCurrent(string name);
 
         /// <summary>
-        /// Returns true if this is a valid environment name
+        /// Returns true if this is a valid environment name.
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
@@ -45,7 +45,7 @@ namespace StoneFruit
     public static class EnvironmentCollectionExtensions
     {
         /// <summary>
-        /// Sets the current environment by position
+        /// Sets the current environment by position.
         /// </summary>
         /// <param name="environments"></param>
         /// <param name="index"></param>
@@ -59,7 +59,7 @@ namespace StoneFruit
         }
 
         /// <summary>
-        /// Returns true if this is a valid environment position
+        /// Returns true if this is a valid environment position.
         /// </summary>
         /// <param name="environments"></param>
         /// <param name="index"></param>

@@ -26,7 +26,7 @@ namespace StoneFruit
     /// <summary>
     /// An asynchronous handler. Handlers are invoked in response to specific verbs
     /// depending on registrations and mapping rules. Any dependencies of the handler are
-    /// expected to be injected in the handler during creation
+    /// expected to be injected in the handler during creation.
     /// </summary>
     public interface IAsyncHandler : IHandlerBase
     {

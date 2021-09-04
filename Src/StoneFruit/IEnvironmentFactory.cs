@@ -3,7 +3,7 @@
 namespace StoneFruit
 {
     /// <summary>
-    /// Provides a list of valid environments and creates environments by name
+    /// Provides a list of valid environments and creates environments by name.
     /// </summary>
     public interface IEnvironmentFactory
     {
@@ -16,7 +16,7 @@ namespace StoneFruit
 
         /// <summary>
         /// Returns a list of valid environment names which can be passed to Create without
-        /// causing a problem
+        /// causing a problem.
         /// </summary>
         IReadOnlyCollection<string> ValidEnvironments { get; }
     }

@@ -101,7 +101,7 @@ namespace StoneFruit
     public static class ArgumentsExtensions
     {
         /// <summary>
-        /// Get the positional argument at the given index, and mark it consumed
+        /// Get the positional argument at the given index, and mark it consumed.
         /// </summary>
         /// <param name="args"></param>
         /// <param name="index"></param>
@@ -113,7 +113,7 @@ namespace StoneFruit
         }
 
         /// <summary>
-        /// Get the flag argument with the given name and mark it consumed
+        /// Get the flag argument with the given name and mark it consumed.
         /// </summary>
         /// <param name="args"></param>
         /// <param name="name"></param>
@@ -125,7 +125,7 @@ namespace StoneFruit
         }
 
         /// <summary>
-        /// Get the named argument with the given name and mark it consumed
+        /// Get the named argument with the given name and mark it consumed.
         /// </summary>
         /// <param name="args"></param>
         /// <param name="name"></param>
@@ -138,7 +138,7 @@ namespace StoneFruit
 
         /// <summary>
         /// Create a new instance of type T and attempt to map argument values into the
-        /// public properties of the new object
+        /// public properties of the new object.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
@@ -163,7 +163,7 @@ namespace StoneFruit
         }
 
         /// <summary>
-        /// Get a list of all argument objects
+        /// Get a list of all argument objects.
         /// </summary>
         /// <returns></returns>
         public static IEnumerable<IArgument> GetAllArguments(this IArguments args)

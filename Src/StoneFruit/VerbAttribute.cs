@@ -3,8 +3,8 @@
 namespace StoneFruit
 {
     /// <summary>
-    /// Specify a custom verb to use if the correct verb cannot be automatically determined
-    /// from the class name
+    /// Specify a custom verb to use instead of automatically deriving the verb from the name of
+    /// the class or method
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
     public class VerbAttribute : Attribute

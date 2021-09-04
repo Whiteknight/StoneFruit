@@ -11,7 +11,7 @@ namespace StoneFruit
     {
         /// <summary>
         /// Given a list of arguments, find a handler with a matching verb. Returns null if no
-        /// matching handler is found
+        /// matching handler is found.
         /// </summary>
         /// <param name="arguments"></param>
         /// <param name="dispatcher"></param>
@@ -20,7 +20,7 @@ namespace StoneFruit
 
         /// <summary>
         /// Return help information for all handlers. Used mostly by the  "help" handler to display
-        /// help information
+        /// help information.
         /// </summary>
         /// <returns></returns>
         IEnumerable<IVerbInfo> GetAll();

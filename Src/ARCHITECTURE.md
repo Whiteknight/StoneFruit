@@ -39,7 +39,13 @@ At the root of the `StoneFruit` project are the `Engine`, `EngineBuilder` and im
 
 ## StoneFruit/Utility
 
-This directory contains utility and cross-cutting code which is not specifically related to any particular subsystem. Extension methods, Guard methods, basic data structures and algorithms all live here.
+This directory contains utility and cross-cutting code which is not specifically related to any particular subsystem. Extension methods, Guard methods, basic data structures and algorithms all may live here. 
+
+**Note**: There is a tendency for this folder to become a dumping ground for all sorts of unrelated code. When possible, code from this folder should be moved to someplace more specific/appropriate.
+
+## StoneFruit/Trie
+
+This directory contains code related to the `VerbTrie` and related classes.
 
 ## StoneFruit/Handlers
 
@@ -93,6 +99,10 @@ The Microsoft.Extensions.DependencyInjection bindings
 
 The StructureMap bindings
 
+## StoneFruit.Containers.Unity
+
+The Unity bindings
+
 # Scripts and Handlers
 
 All handler types should generally be interchangable. Handlers which are implemented as classes, instance methods, or scripts should be able to be swapped for one another without any degredation in user experience or capability. 
@@ -101,19 +111,19 @@ All handler types should generally be interchangable. Handlers which are impleme
 
 Being completely modular, care must be taken to make sure error conditions are handled even in the presence of configuration or scripting errors by the user. Several error events will cause a user-modifiable script to be invoked, and those scripts may themselves trigger additional errors. 
 
-Any system which may handle an error should also be able to detect recursion and avoid additional errors which occur during handling from creating an infinite loop. The exception-handling script should not be invoked again if it causes another execution to be thrown. The command-limit script should not recurse if it contains more commands than the limit. Etc.
+**Invariant**: Any system which may handle an error should also be able to detect recursion and avoid additional errors which occur during handling from creating an infinite loop. The exception-handling script should not be invoked again if it causes another execution to be thrown. The command-limit script should not recurse if it contains more commands than the limit. Etc.
 
 # Testing
 
 Because StoneFruit is designed to be completely modular, and because it can be hard to construct some of the core pieces without also instantating several dependencies, end-to-end functional tests are generally preferred over simple unit tests. The individual classes and methods are free to change so long as the user experience remains stable.
 
-Extensive integration makes sure that all the defaults and invariants are sane, and also that add-ons work together with the system as a whole.
+Extensive integration testing makes sure that all the defaults and invariants are sane, and also that add-ons work together with the system as a whole.
 
 # Argument Parsing and Verb Dispatch
 
 StoneFruit supports arguments in multiple formats so that a familiar and intuitive interface can be created for diverse teams. Unfortunately some of these syntaxes are inherently ambiguous. For example in a Unix-style system, the sequence `--foo bar` might be interpreted by the application as the flag `--foo` followed by the positional argument `bar`, or it may be a single argument `bar` with name `foo`. 
 
-Because of the ambiguity, argument parsing is done in two phases. First arguments are parsed into a raw form which preserves ambiguities if they exist. Second arguments are identified unambiguously when a handler attempts to access them. From the example above, if we have the ambiguous sequence `--foo bar`, the user can either request the named argument `foo` or it can search for a flag `--foo` (which marks `bar` as a positional) or it can search for the next positional argument (which returns `bar` and marks `--foo` unambiguously as a flag).
+Because of the ambiguity, argument parsing is done in two phases. First, arguments are parsed into a raw form which preserves ambiguities if they exist. Second, arguments are identified unambiguously when a handler attempts to access them. From the example above, if we have the ambiguous sequence `--foo bar`, the user can either request the named argument `foo` or it can search for a flag `--foo` (which marks `bar` as a positional) or it can search for the next positional argument (which returns `bar` and marks `--foo` unambiguously as a flag).
 
 When a user send an input command to the engine, the following steps happen:
 

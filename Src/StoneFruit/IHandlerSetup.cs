@@ -11,7 +11,7 @@ namespace StoneFruit
     {
         /// <summary>
         /// Set the Verb Extractor to use to get verbs from classes and methods where verbs are
-        /// not explicitly supplied
+        /// not explicitly supplied.
         /// </summary>
         /// <param name="verbExtractor"></param>
         /// <returns></returns>
@@ -19,7 +19,7 @@ namespace StoneFruit
 
         /// <summary>
         /// Set the Handler Method Invoker which is used to invoke a handler method on an instance
-        /// object
+        /// object.
         /// </summary>
         /// <param name="invoker"></param>
         /// <returns></returns>
@@ -34,7 +34,7 @@ namespace StoneFruit
         IHandlerSetup AddSource(Func<HandlerSourceBuildContext, IHandlerSource> getSource);
 
         /// <summary>
-        /// Add a function delegate as a handler
+        /// Add a function delegate as a handler.
         /// </summary>
         /// <param name="verb"></param>
         /// <param name="handle"></param>
@@ -44,7 +44,7 @@ namespace StoneFruit
         IHandlerSetup Add(Verb verb, Action<IArguments, CommandDispatcher> handle, string description = "", string usage = "", string group = "");
 
         /// <summary>
-        /// Add a pre-existing handler instance with the given verb
+        /// Add a pre-existing handler instance with the given verb.
         /// </summary>
         /// <param name="verb"></param>
         /// <param name="handler"></param>
@@ -54,7 +54,7 @@ namespace StoneFruit
         IHandlerSetup Add(Verb verb, IHandlerBase handler, string description = "", string usage = "", string group = "");
 
         /// <summary>
-        /// Add a function delegate as a handler for asynchronous invokation
+        /// Add a function delegate as a handler for asynchronous invocation.
         /// </summary>
         /// <param name="verb"></param>
         /// <param name="handleAsync"></param>
@@ -64,7 +64,7 @@ namespace StoneFruit
         IHandlerSetup AddAsync(Verb verb, Func<IArguments, CommandDispatcher, Task> handleAsync, string description = "", string usage = "", string group = "");
 
         /// <summary>
-        /// Add a script with a verb and zero or more commands to execute
+        /// Add a script with a verb and zero or more commands to execute.
         /// </summary>
         /// <param name="verb"></param>
         /// <param name="lines"></param>
@@ -75,7 +75,7 @@ namespace StoneFruit
     }
 
     /// <summary>
-    /// Holds values from the DI container for use with delayed instantiation of handlers
+    /// Holds values from the DI container for use with delayed instantiation of handlers.
     /// </summary>
     public struct HandlerSourceBuildContext
     {
@@ -92,7 +92,7 @@ namespace StoneFruit
     public static class HandlerSetupExtensions
     {
         /// <summary>
-        /// Add a handler source where handlers can be looked up
+        /// Add a handler source where handlers can be looked up.
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
@@ -104,7 +104,7 @@ namespace StoneFruit
         }
 
         /// <summary>
-        /// Use the public methods of an instance object as handlers
+        /// Use the public methods of an instance object as handlers.
         /// </summary>
         /// <param name="handlers"></param>
         /// <param name="instance"></param>
@@ -117,7 +117,7 @@ namespace StoneFruit
 
         /// <summary>
         /// Use the specified list of handler types, with the default instance resolver and
-        /// default verb extractor
+        /// default verb extractor.
         /// </summary>
         /// <param name="handlers"></param>
         /// <param name="commandTypes"></param>

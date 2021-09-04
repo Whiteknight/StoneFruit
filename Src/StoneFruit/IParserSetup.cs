@@ -41,7 +41,7 @@ namespace StoneFruit
     public static class ParserSetupExtensions
     {
         /// <summary>
-        /// Use the StoneFruit simplified argument syntax
+        /// Use the StoneFruit simplified argument syntax.
         /// </summary>
         /// <param name="setup"></param>
         /// <returns></returns>
@@ -52,7 +52,7 @@ namespace StoneFruit
         }
 
         /// <summary>
-        /// Use a POSIX-style argument syntax similar to many existing POSIX utilities
+        /// Use a POSIX-style argument syntax similar to many existing POSIX utilities.
         /// </summary>
         /// <param name="setup"></param>
         /// <returns></returns>
@@ -63,7 +63,7 @@ namespace StoneFruit
         }
 
         /// <summary>
-        /// Use a Windows PowerShell syntax for arguments
+        /// Use a Windows PowerShell syntax for arguments.
         /// </summary>
         /// <param name="setup"></param>
         /// <returns></returns>
@@ -74,7 +74,7 @@ namespace StoneFruit
         }
 
         /// <summary>
-        /// Use a class Windows-CMD syntax for arguments
+        /// Use a class Windows-CMD syntax for arguments.
         /// </summary>
         /// <param name="setup"></param>
         /// <returns></returns>

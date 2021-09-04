@@ -10,7 +10,7 @@ namespace StoneFruit.Utility
         /// <param name="foreground"></param>
         /// <param name="background"></param>
         /// <returns></returns>
-        public static byte ColorsToByte(ConsoleColor foreground, ConsoleColor background) 
+        public static byte ColorsToByte(ConsoleColor foreground, ConsoleColor background)
             => (byte)(((byte)foreground << 4) | (byte)background);
 
         /// <summary>

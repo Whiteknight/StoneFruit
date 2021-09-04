@@ -5,26 +5,26 @@ using StoneFruit.Utility;
 namespace StoneFruit
 {
     /// <summary>
-    /// Abstraction for output
+    /// Abstraction for output.
     /// </summary>
     public interface IOutput
     {
         /// <summary>
         /// Get a new output using the given color palette. If the output does not support
-        /// color this will be a no-op
+        /// color this will be a no-op.
         /// </summary>
         /// <param name="changeBrush"></param>
         /// <returns></returns>
         IOutput Color(Func<Brush, Brush> changeBrush);
 
         /// <summary>
-        /// Write a linebreak to the output
+        /// Write a linebreak to the output.
         /// </summary>
         /// <returns></returns>
         IOutput WriteLine();
 
         /// <summary>
-        /// Write the given text followed by a line break to the output
+        /// Write the given text followed by a line break to the output.
         /// </summary>
         /// <param name="line"></param>
         /// <returns></returns>
@@ -39,7 +39,7 @@ namespace StoneFruit
 
         /// <summary>
         /// Show a prompt to the user to request input. For non-interactive outputs, this
-        /// will be a no-op
+        /// will be a no-op.
         /// </summary>
         /// <param name="prompt"></param>
         /// <param name="mustProvide"></param>
@@ -51,7 +51,7 @@ namespace StoneFruit
     public static class OutputExtensions
     {
         /// <summary>
-        /// Write the string representation of the object to the output
+        /// Write the string representation of the object to the output.
         /// </summary>
         /// <param name="output"></param>
         /// <param name="obj"></param>
@@ -80,7 +80,7 @@ namespace StoneFruit
         }
 
         /// <summary>
-        /// WriteLine with a format string and arguments
+        /// WriteLine with a format string and arguments.
         /// </summary>
         /// <param name="output"></param>
         /// <param name="fmt"></param>
@@ -95,7 +95,7 @@ namespace StoneFruit
         }
 
         /// <summary>
-        /// Write with a format string and arguments
+        /// Write with a format string and arguments.
         /// </summary>
         /// <param name="output"></param>
         /// <param name="fmt"></param>
@@ -111,7 +111,7 @@ namespace StoneFruit
 
         /// <summary>
         /// Get a new output with the given color for text and the current background color
-        /// unchanged. If the implementation does not support color this will be a no-op
+        /// unchanged. If the implementation does not support color this will be a no-op.
         /// </summary>
         /// <param name="output"></param>
         /// <param name="color"></param>

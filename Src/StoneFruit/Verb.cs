@@ -6,10 +6,14 @@ using System.Linq;
 namespace StoneFruit
 {
     /// <summary>
-    /// A sequence of one or more words which is mapped to a handler
+    /// A sequence of one or more words which is mapped to a handler.
     /// </summary>
     public struct Verb : IReadOnlyList<string>, IEquatable<Verb>
     {
+        // Verb is just a wrapper around a List of string. The constructors assert that the
+        // list is non-null, not empty, and that all the entries in the list are also non-null
+        // and non-empty
+
         private readonly IReadOnlyList<string> _verb;
 
         public Verb(string verb)

@@ -19,11 +19,27 @@ namespace StoneFruit
         IResult<TOut> Transform<TOut>(Func<T, TOut> transform);
     }
 
-    // Static factory class.
+    /// <summary>
+    /// Static class for result factory methods.
+    /// </summary>
     public static class Result
     {
+        /// <summary>
+        /// Create a success result from the given value.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static IResult<T> Success<T>(T value)
             => new SuccessResult<T>(value);
+
+        /// <summary>
+        /// Create a failure result of the given type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static IResult<T> Fail<T>()
+            => FailureResult<T>.Instance;
     }
 
     /// <summary>
@@ -38,6 +54,7 @@ namespace StoneFruit
         }
 
         public bool HasValue => true;
+
         public T Value { get; }
 
         public bool Equals(T value)
@@ -61,6 +78,7 @@ namespace StoneFruit
         public static IResult<T> Instance { get; } = new FailureResult<T>();
 
         public bool HasValue => false;
+
         public T Value => throw new InvalidOperationException("Cannot access value of failure result");
 
         public bool Equals(T value) => false;
