@@ -17,7 +17,7 @@ namespace StoneFruit.Containers.StructureMap
         public static void SetupEngine<TEnvironment>(this IContainer container, Action<IEngineBuilder> build)
             where TEnvironment : class
         {
-            var services = new StructureMapServiceCollection();
+            var services = new DefaultServiceCollection();
             EngineBuilder.SetupEngineRegistrations(services, build);
             EngineBuilder.SetupExplicitEnvironmentRegistration<TEnvironment>(services);
 

@@ -10,7 +10,7 @@ namespace StoneFruit.Containers.Autofac
         public static ContainerBuilder SetupEngine<TEnvironment>(this ContainerBuilder containerBuilder, Action<IEngineBuilder> build)
             where TEnvironment : class
         {
-            var serviceCollection = new AutofacServiceCollection();
+            var serviceCollection = new DefaultServiceCollection();
             EngineBuilder.SetupEngineRegistrations(serviceCollection, build);
             EngineBuilder.SetupExplicitEnvironmentRegistration<TEnvironment>(serviceCollection);
             serviceCollection.AddSingleton<IHandlerSource>(provider =>

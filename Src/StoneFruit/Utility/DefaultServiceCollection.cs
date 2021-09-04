@@ -2,13 +2,17 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace StoneFruit.Containers.Unity
+namespace StoneFruit.Containers
 {
-    public class UnityServiceCollection : IServiceCollection
+    /// <summary>
+    /// A simple default implementation of IServiceCollection for DI containers which don't provide
+    /// one of their own
+    /// </summary>
+    public class DefaultServiceCollection : IServiceCollection
     {
         private readonly List<ServiceDescriptor> _services;
 
-        public UnityServiceCollection()
+        public DefaultServiceCollection()
         {
             _services = new List<ServiceDescriptor>();
         }

@@ -37,7 +37,7 @@ namespace StoneFruit.Containers.Unity
         public static IUnityContainer SetupEngineScannerless<TEnvironment>(this IUnityContainer container, Action<IEngineBuilder> build)
             where TEnvironment : class
         {
-            var services = new UnityServiceCollection();
+            var services = new DefaultServiceCollection();
             EngineBuilder.SetupEngineRegistrations(services, build);
             EngineBuilder.SetupExplicitEnvironmentRegistration<TEnvironment>(services);
             foreach (var descriptor in services)
@@ -48,7 +48,7 @@ namespace StoneFruit.Containers.Unity
 
         public static IUnityContainer SetupEngineScannerless(this IUnityContainer container, Action<IEngineBuilder> build)
         {
-            var services = new UnityServiceCollection();
+            var services = new DefaultServiceCollection();
             EngineBuilder.SetupEngineRegistrations(services, build);
             foreach (var descriptor in services)
                 AddRegistration(container, descriptor);
@@ -95,22 +95,13 @@ namespace StoneFruit.Containers.Unity
             throw new InvalidOperationException("Unsupported registration type");
         }
 
-        internal static LifetimeManager GetLifetime(this ServiceDescriptor serviceDescriptor)
-        {
-            switch (serviceDescriptor.Lifetime)
+        private static LifetimeManager GetLifetime(this ServiceDescriptor serviceDescriptor)
+            => serviceDescriptor.Lifetime switch
             {
-                case ServiceLifetime.Scoped:
-                    return new HierarchicalLifetimeManager();
-
-                case ServiceLifetime.Singleton:
-                    return new SingletonLifetimeManager();
-
-                case ServiceLifetime.Transient:
-                    return new TransientLifetimeManager();
-
-                default:
-                    throw new InvalidOperationException("Unsupported lifetime");
-            }
-        }
+                ServiceLifetime.Scoped => new HierarchicalLifetimeManager(),
+                ServiceLifetime.Singleton => new SingletonLifetimeManager(),
+                ServiceLifetime.Transient => new TransientLifetimeManager(),
+                _ => throw new InvalidOperationException("Unsupported lifetime"),
+            };
     }
 }
