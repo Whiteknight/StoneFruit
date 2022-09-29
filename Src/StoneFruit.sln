@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29411.108
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32002.185
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit", "StoneFruit\StoneFruit.csproj", "{FEFFBA16-C605-4801-8E59-27CDC0AB73DD}"
 EndProject
@@ -29,15 +29,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Containers.Micro
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Containers.Unity", "StoneFruit.Containers.Unity\StoneFruit.Containers.Unity.csproj", "{6F3BFE3D-E9E4-4B49-80D6-7666E4E54E7E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoneFruit.Containers.Unity.Tests", "StoneFruit.Containers.Unity.Tests\StoneFruit.Containers.Unity.Tests.csproj", "{39F30584-26EF-481E-A469-DDBC45F4EF00}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Containers.Unity.Tests", "StoneFruit.Containers.Unity.Tests\StoneFruit.Containers.Unity.Tests.csproj", "{39F30584-26EF-481E-A469-DDBC45F4EF00}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Containers.Autofac", "StoneFruit.Containers.Autofac\StoneFruit.Containers.Autofac.csproj", "{2021CDF3-8EBB-4D0F-A1F8-4F7D7719B789}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Containers.Autofac.Tests", "StoneFruit.Containers.Autofac.Tests\StoneFruit.Containers.Autofac.Tests.csproj", "{BB0415FD-8DC7-4C26-B093-28551FC03FAD}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Containers.Unity", "StoneFruit.Containers.Unity\StoneFruit.Containers.Unity.csproj", "{D2C4D119-C51C-4700-87D4-F67A6D4FE2B9}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit.Containers.Unity.Tests", "StoneFruit.Containers.Unity.Tests\StoneFruit.Containers.Unity.Tests.csproj", "{8ECB8A0B-3E2C-481C-BE3C-18DF6102D413}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FD4D52DA-932C-4DFB-B65A-3A898C959185}"
 	ProjectSection(SolutionItems) = preProject
@@ -116,14 +112,6 @@ Global
 		{BB0415FD-8DC7-4C26-B093-28551FC03FAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB0415FD-8DC7-4C26-B093-28551FC03FAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB0415FD-8DC7-4C26-B093-28551FC03FAD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D2C4D119-C51C-4700-87D4-F67A6D4FE2B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D2C4D119-C51C-4700-87D4-F67A6D4FE2B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D2C4D119-C51C-4700-87D4-F67A6D4FE2B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D2C4D119-C51C-4700-87D4-F67A6D4FE2B9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8ECB8A0B-3E2C-481C-BE3C-18DF6102D413}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8ECB8A0B-3E2C-481C-BE3C-18DF6102D413}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8ECB8A0B-3E2C-481C-BE3C-18DF6102D413}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8ECB8A0B-3E2C-481C-BE3C-18DF6102D413}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -137,12 +125,11 @@ Global
 		{DE356F6C-E062-4BF1-B3F5-250E51C4BADE} = {9D2EB7CA-4C3D-4D2B-AC90-6F9DA5FA21B1}
 		{78C87A5B-C727-4596-85CF-FEDE8D15D3F8} = {39E3A1BC-3612-4C49-ACD5-53B876B896BB}
 		{533164EF-C5B2-403A-B646-9B9B8672944B} = {9D2EB7CA-4C3D-4D2B-AC90-6F9DA5FA21B1}
-		{8C110CB3-0999-45E0-94BF-4779F72BC4E4} = {7ECB8D3B-1ADA-4102-8AD0-0EF5229EF502}
-		{39F30584-26EF-481E-A469-DDBC45F4EF00} = {7ECB8D3B-1ADA-4102-8AD0-0EF5229EF502}
-		{BB0415FD-8DC7-4C26-B093-28551FC03FAD} = {7ECB8D3B-1ADA-4102-8AD0-0EF5229EF502}
-		{8ECB8A0B-3E2C-481C-BE3C-18DF6102D413} = {7ECB8D3B-1ADA-4102-8AD0-0EF5229EF502}
+		{8C110CB3-0999-45E0-94BF-4779F72BC4E4} = {39E3A1BC-3612-4C49-ACD5-53B876B896BB}
+		{6F3BFE3D-E9E4-4B49-80D6-7666E4E54E7E} = {39E3A1BC-3612-4C49-ACD5-53B876B896BB}
+		{39F30584-26EF-481E-A469-DDBC45F4EF00} = {39E3A1BC-3612-4C49-ACD5-53B876B896BB}
 		{2021CDF3-8EBB-4D0F-A1F8-4F7D7719B789} = {39E3A1BC-3612-4C49-ACD5-53B876B896BB}
-		{D2C4D119-C51C-4700-87D4-F67A6D4FE2B9} = {39E3A1BC-3612-4C49-ACD5-53B876B896BB}
+		{BB0415FD-8DC7-4C26-B093-28551FC03FAD} = {39E3A1BC-3612-4C49-ACD5-53B876B896BB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1C3F9AD9-B506-4995-9D1A-F855E1B280FA}
