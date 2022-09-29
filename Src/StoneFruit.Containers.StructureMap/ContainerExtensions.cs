@@ -18,9 +18,17 @@ namespace StoneFruit.Containers.StructureMap
         public static IContainer SetupEngine<TEnvironment>(this IContainer container, Action<IEngineBuilder> build)
             where TEnvironment : class
         {
-            ScanForHandlers(container);
+            var services = new DefaultServiceCollection();
+            EngineBuilder.SetupEngineRegistrations(services, build, () => ScanForHandlers(container));
+            EngineBuilder.SetupExplicitEnvironmentRegistration<TEnvironment>(services);
 
-            return SetupEngineScannerless<TEnvironment>(container, build);
+            services.AddSingleton<IHandlerSource>(provider =>
+            {
+                var verbExtractor = provider.GetService<IVerbExtractor>();
+                return new StructureMapHandlerSource(provider, verbExtractor);
+            });
+            container.Populate(services);
+            return container;
         }
 
         /// <summary>
@@ -34,48 +42,8 @@ namespace StoneFruit.Containers.StructureMap
         /// <returns></returns>
         public static IContainer SetupEngine(this IContainer container, Action<IEngineBuilder> build)
         {
-            ScanForHandlers(container);
-
-            return SetupEngineScannerless(container, build);
-        }
-
-        /// <summary>
-        /// Setup Engine registrations in the StructureMap container. This method will not scan
-        /// assemblies in your solution for Handler types. You must register Handler types with
-        /// the container separately. This variant uses an environment object.
-        /// </summary>
-        /// <typeparam name="TEnvironment"></typeparam>
-        /// <param name="container"></param>
-        /// <param name="build"></param>
-        /// <returns></returns>
-        public static IContainer SetupEngineScannerless<TEnvironment>(this IContainer container, Action<IEngineBuilder> build)
-            where TEnvironment : class
-        {
             var services = new DefaultServiceCollection();
-            EngineBuilder.SetupEngineRegistrations(services, build);
-            EngineBuilder.SetupExplicitEnvironmentRegistration<TEnvironment>(services);
-
-            services.AddSingleton<IHandlerSource>(provider =>
-            {
-                var verbExtractor = provider.GetService<IVerbExtractor>();
-                return new StructureMapHandlerSource(provider, verbExtractor);
-            });
-            container.Populate(services);
-            return container;
-        }
-
-        /// <summary>
-        /// Setup Engine registrations in the StructureMap container. This method will not scan
-        /// assemblies in your solution for Handler types. You must register Handler types with the
-        /// container separately. This variant does not use an environment object.
-        /// </summary>
-        /// <param name="container"></param>
-        /// <param name="build"></param>
-        /// <returns></returns>
-        public static IContainer SetupEngineScannerless(this IContainer container, Action<IEngineBuilder> build)
-        {
-            var services = new DefaultServiceCollection();
-            EngineBuilder.SetupEngineRegistrations(services, build);
+            EngineBuilder.SetupEngineRegistrations(services, build, () => ScanForHandlers(container));
 
             services.AddSingleton<IHandlerSource>(provider =>
             {

@@ -22,6 +22,7 @@ namespace StoneFruit.Containers.Lamar.Tests.Integration
             var output = new TestOutput();
             var services = new ServiceRegistry();
             services.SetupEngine(b => b
+                .SetupHandlers(h => h.Scan())
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
             );
             var container = new Container(services);
@@ -37,6 +38,7 @@ namespace StoneFruit.Containers.Lamar.Tests.Integration
             var output = new TestOutput();
             var services = new ServiceRegistry();
             services.SetupEngine(b => b
+                .SetupHandlers(h => h.Scan())
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
             );
             var container = new Container(services);

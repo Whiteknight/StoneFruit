@@ -1,7 +1,6 @@
 ﻿using Autofac;
 using FluentAssertions;
 using NUnit.Framework;
-using StoneFruit.Execution;
 using TestUtilities;
 
 namespace StoneFruit.Containers.Autofac.Tests.Integration
@@ -14,6 +13,7 @@ namespace StoneFruit.Containers.Autofac.Tests.Integration
             var output = new TestOutput();
             var containerBuilder = new ContainerBuilder();
             containerBuilder.SetupEngine<TestEnvironment>(b => b
+                .SetupHandlers(h => h.Scan())
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEnvironments(e => e.UseInstance(new TestEnvironment("Single")))
             );

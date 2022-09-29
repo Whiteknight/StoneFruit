@@ -18,11 +18,11 @@ namespace StoneFruit.Execution.Handlers
         private readonly DelegateHandlerSource _delegates;
         private readonly ScriptHandlerSource _scripts;
         private readonly NamedInstanceHandlerSource _instances;
-
+        private readonly Action _scanForHandlers;
         private IVerbExtractor _verbExtractor;
         private IHandlerMethodInvoker _methodInvoker;
 
-        public HandlerSetup()
+        public HandlerSetup(Action scanForHandlers)
         {
             _sourceFactories = new List<Func<HandlerSourceBuildContext, IHandlerSource>>();
             _delegates = new DelegateHandlerSource();
@@ -30,6 +30,7 @@ namespace StoneFruit.Execution.Handlers
             _instances = new NamedInstanceHandlerSource();
             _verbExtractor = PriorityVerbExtractor.DefaultInstance;
             _methodInvoker = new DefaultHandlerMethodInvoker();
+            _scanForHandlers = scanForHandlers ?? (() => { });
         }
 
         public void BuildUp(IServiceCollection services)
@@ -161,6 +162,12 @@ namespace StoneFruit.Execution.Handlers
                 typeof(MetadataHandler),
             };
             return new TypeListConstructSource(requiredHandlers, verbExtractor);
+        }
+
+        public IHandlerSetup Scan()
+        {
+            _scanForHandlers();
+            return this;
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
-using StoneFruit.Execution;
 using StructureMap;
 using TestUtilities;
 
@@ -14,6 +13,7 @@ namespace StoneFruit.Containers.StructureMap.Tests.Integration
             var output = new TestOutput();
             var container = new Container();
             container.SetupEngine<TestEnvironment>(builder => builder
+                .SetupHandlers(h => h.Scan())
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEnvironments(e => e.UseInstance(new TestEnvironment("Single")))
             );

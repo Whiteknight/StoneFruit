@@ -72,6 +72,13 @@ namespace StoneFruit
         /// <param name="usage"></param>
         /// <returns></returns>
         IHandlerSetup AddScript(Verb verb, IEnumerable<string> lines, string description = "", string usage = "", string group = "");
+
+        /// <summary>
+        /// Scan currently-linked assemblies in the current AppDomain for all classes of type
+        /// IHandler or IAsyncHandler.
+        /// </summary>
+        /// <returns></returns>
+        IHandlerSetup Scan();
     }
 
     /// <summary>

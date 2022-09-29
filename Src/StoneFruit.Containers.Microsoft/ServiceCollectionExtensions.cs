@@ -20,45 +20,9 @@ namespace StoneFruit.Containers.Microsoft
         public static IServiceCollection SetupEngine<TEnvironment>(this IServiceCollection services, Action<IEngineBuilder> build, Func<IServiceProvider> getProvider)
             where TEnvironment : class
         {
-            ScanForHandlers(services);
-
-            return SetupEngineScannerless<TEnvironment>(services, build, getProvider);
-        }
-
-        /// <summary>
-        /// Setup the engine registrations for the DI container. Thsi method will automatically
-        /// scan the assemblies in your solution for handler types. Any handler types which are not
-        /// found during the scan should be manually registered in the ServiceCollection before
-        /// calling this method. This variant does not register an environment object.
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="build"></param>
-        /// <param name="getProvider"></param>
-        /// <returns></returns>
-        public static IServiceCollection SetupEngine(this IServiceCollection services, Action<IEngineBuilder> build, Func<IServiceProvider> getProvider)
-        {
-            ScanForHandlers(services);
-
-            return SetupEngineScannerless(services, build, getProvider);
-        }
-
-        /// <summary>
-        /// Setup the Engine registrations in the DI container. This method will not scan
-        /// for handler classes in your solution, you must have them registered in the
-        /// ServiceCollection separately. This variant registers an environment object of the
-        /// given type.
-        /// </summary>
-        /// <typeparam name="TEnvironment"></typeparam>
-        /// <param name="services"></param>
-        /// <param name="build"></param>
-        /// <param name="getProvider"></param>
-        /// <returns></returns>
-        public static IServiceCollection SetupEngineScannerless<TEnvironment>(this IServiceCollection services, Action<IEngineBuilder> build, Func<IServiceProvider> getProvider)
-            where TEnvironment : class
-        {
             // Setup a custom resolver for manually-specified types, and use that in the
             // buildup
-            var handlersBuilder = new HandlerSetup();
+            var handlersBuilder = new HandlerSetup(() => ScanForHandlers(services));
             var builder = new EngineBuilder(handlers: handlersBuilder);
             build?.Invoke(builder);
             EngineBuilder.SetupEngineRegistrations(services);
@@ -75,19 +39,20 @@ namespace StoneFruit.Containers.Microsoft
         }
 
         /// <summary>
-        /// Setup the engine registrations in the DI container. This method will not scan for
-        /// handler classes in your solution, you must have them registered in the ServiceCollection
-        /// separately. This variant does not register an environment object.
+        /// Setup the engine registrations for the DI container. Thsi method will automatically
+        /// scan the assemblies in your solution for handler types. Any handler types which are not
+        /// found during the scan should be manually registered in the ServiceCollection before
+        /// calling this method. This variant does not register an environment object.
         /// </summary>
         /// <param name="services"></param>
         /// <param name="build"></param>
         /// <param name="getProvider"></param>
         /// <returns></returns>
-        public static IServiceCollection SetupEngineScannerless(this IServiceCollection services, Action<IEngineBuilder> build, Func<IServiceProvider> getProvider)
+        public static IServiceCollection SetupEngine(this IServiceCollection services, Action<IEngineBuilder> build, Func<IServiceProvider> getProvider)
         {
             // Setup a custom resolver for manually-specified types, and use that in the
             // buildup
-            var handlersBuilder = new HandlerSetup();
+            var handlersBuilder = new HandlerSetup(() => ScanForHandlers(services));
             var builder = new EngineBuilder(handlers: handlersBuilder);
             build?.Invoke(builder);
             EngineBuilder.SetupEngineRegistrations(services);

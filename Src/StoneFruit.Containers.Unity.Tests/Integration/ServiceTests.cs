@@ -65,6 +65,7 @@ namespace StoneFruit.Containers.Unity.Tests.Integration
             var output = new TestOutput();
             var container = new UnityContainer();
             container.SetupEngine<MyEnvironment>(b => b
+                .SetupHandlers(h => h.Scan())
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEnvironments(e => e.UseFactory(new MyEnvironmentFactory()))
                 .SetupEvents(e =>

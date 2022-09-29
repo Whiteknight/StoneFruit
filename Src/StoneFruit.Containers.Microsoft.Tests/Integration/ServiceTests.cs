@@ -63,6 +63,7 @@ namespace StoneFruit.Containers.Microsoft.Tests.Integration
             var services = new ServiceCollection();
             IServiceProvider provider = null;
             services.SetupEngine<MyEnvironment>(b => b
+                .SetupHandlers(h => h.Scan())
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEnvironments(e => e.UseFactory(new MyEnvironmentFactory()))
                 .SetupEvents(e =>

@@ -21,9 +21,16 @@ namespace StoneFruit.Containers.Autofac
         public static ContainerBuilder SetupEngine<TEnvironment>(this ContainerBuilder containerBuilder, Action<IEngineBuilder> build)
             where TEnvironment : class
         {
-            ScanForHandlers(containerBuilder);
-
-            return SetupEngineScannerless<TEnvironment>(containerBuilder, build);
+            var serviceCollection = new DefaultServiceCollection();
+            EngineBuilder.SetupEngineRegistrations(serviceCollection, build, () => ScanForHandlers(containerBuilder));
+            EngineBuilder.SetupExplicitEnvironmentRegistration<TEnvironment>(serviceCollection);
+            serviceCollection.AddSingleton<IHandlerSource>(provider =>
+            {
+                var verbExtractor = provider.GetService<IVerbExtractor>();
+                return new AutofacHandlerSource(provider, verbExtractor);
+            });
+            containerBuilder.Populate(serviceCollection);
+            return containerBuilder;
         }
 
         /// <summary>
@@ -36,47 +43,8 @@ namespace StoneFruit.Containers.Autofac
         /// <returns></returns>
         public static ContainerBuilder SetupEngine(this ContainerBuilder containerBuilder, Action<IEngineBuilder> build)
         {
-            ScanForHandlers(containerBuilder);
-
-            return SetupEngineScannerless(containerBuilder, build);
-        }
-
-        /// <summary>
-        /// Setup Engine registrations in the container. Does not scan for Handlers automatically.
-        /// You must register Handlers with the container separately. This variant uses an
-        /// environment object.
-        /// </summary>
-        /// <typeparam name="TEnvironment"></typeparam>
-        /// <param name="containerBuilder"></param>
-        /// <param name="build"></param>
-        /// <returns></returns>
-        public static ContainerBuilder SetupEngineScannerless<TEnvironment>(this ContainerBuilder containerBuilder, Action<IEngineBuilder> build)
-            where TEnvironment : class
-        {
             var serviceCollection = new DefaultServiceCollection();
-            EngineBuilder.SetupEngineRegistrations(serviceCollection, build);
-            EngineBuilder.SetupExplicitEnvironmentRegistration<TEnvironment>(serviceCollection);
-            serviceCollection.AddSingleton<IHandlerSource>(provider =>
-            {
-                var verbExtractor = provider.GetService<IVerbExtractor>();
-                return new AutofacHandlerSource(provider, verbExtractor);
-            });
-            containerBuilder.Populate(serviceCollection);
-            return containerBuilder;
-        }
-
-        /// <summary>
-        /// Setup Engine registrations in the container. Does not scan for Handlers automatically.
-        /// You must register Handlers with the container separately. This variant does not use an
-        /// environment object.
-        /// </summary>
-        /// <param name="containerBuilder"></param>
-        /// <param name="build"></param>
-        /// <returns></returns>
-        public static ContainerBuilder SetupEngineScannerless(this ContainerBuilder containerBuilder, Action<IEngineBuilder> build)
-        {
-            var serviceCollection = new DefaultServiceCollection();
-            EngineBuilder.SetupEngineRegistrations(serviceCollection, build);
+            EngineBuilder.SetupEngineRegistrations(serviceCollection, build, () => ScanForHandlers(containerBuilder));
             serviceCollection.AddSingleton<IHandlerSource>(provider =>
             {
                 var verbExtractor = provider.GetService<IVerbExtractor>();

@@ -21,9 +21,9 @@ namespace StoneFruit
         private readonly ISetupBuildable<ICommandParser> _parsers;
         private readonly EngineSettings _settings;
 
-        public EngineBuilder(ISetupBuildable<IHandlers>? handlers = null, ISetupBuildable<IOutput>? output = null, ISetupBuildable<IEnvironmentCollection>? environments = null, ISetupBuildable<ICommandParser>? parsers = null, EngineEventCatalog? events = null, EngineSettings? settings = null)
+        public EngineBuilder(ISetupBuildable<IHandlers>? handlers = null, ISetupBuildable<IOutput>? output = null, ISetupBuildable<IEnvironmentCollection>? environments = null, ISetupBuildable<ICommandParser>? parsers = null, EngineEventCatalog? events = null, EngineSettings? settings = null, Action scanForHandlers = null)
         {
-            _handlers = handlers ?? new HandlerSetup();
+            _handlers = handlers ?? new HandlerSetup(scanForHandlers ?? ThrowIfScanRequestedButScannerNotProvided);
             _eventCatalog = events ?? new EngineEventCatalog();
             _output = output ?? new OutputSetup();
             _environments = environments ?? new EnvironmentSetup();
@@ -125,9 +125,9 @@ namespace StoneFruit
         /// </summary>
         /// <param name="services"></param>
         /// <param name="build"></param>
-        public static void SetupEngineRegistrations(IServiceCollection services, Action<EngineBuilder> build)
+        public static void SetupEngineRegistrations(IServiceCollection services, Action<EngineBuilder> build, Action scanForHandlers)
         {
-            var builder = new EngineBuilder();
+            var builder = new EngineBuilder(scanForHandlers: scanForHandlers);
             build?.Invoke(builder);
             SetupEngineRegistrations(services);
             builder.BuildUp(services);
@@ -196,6 +196,11 @@ namespace StoneFruit
             var output = _output.Build();
 
             return new Engine(handlers, environments, parser, output, _eventCatalog, _settings);
+        }
+
+        private void ThrowIfScanRequestedButScannerNotProvided()
+        {
+            throw new EngineBuildException(".Scan() requested but no scanner registered. Are you using a DI container?");
         }
     }
 }

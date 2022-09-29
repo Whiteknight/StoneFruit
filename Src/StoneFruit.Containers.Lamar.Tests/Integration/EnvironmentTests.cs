@@ -1,9 +1,8 @@
 ﻿using FluentAssertions;
 using Lamar;
-using NUnit.Framework;
-using StoneFruit.Execution;
-using TestUtilities;
 using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
+using TestUtilities;
 
 namespace StoneFruit.Containers.Lamar.Tests.Integration
 {
@@ -15,6 +14,7 @@ namespace StoneFruit.Containers.Lamar.Tests.Integration
             var output = new TestOutput();
             var services = new ServiceRegistry();
             services.SetupEngine<TestEnvironment>(b => b
+                .SetupHandlers(h => h.Scan())
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEnvironments(e => e.UseInstance(new TestEnvironment("Single")))
             );

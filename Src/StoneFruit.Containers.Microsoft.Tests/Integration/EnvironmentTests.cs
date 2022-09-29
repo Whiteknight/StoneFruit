@@ -1,9 +1,8 @@
 ﻿using System;
 using FluentAssertions;
-using NUnit.Framework;
-using StoneFruit.Execution;
-using TestUtilities;
 using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
+using TestUtilities;
 
 namespace StoneFruit.Containers.Microsoft.Tests.Integration
 {
@@ -16,6 +15,7 @@ namespace StoneFruit.Containers.Microsoft.Tests.Integration
             var services = new ServiceCollection();
             IServiceProvider provider = null;
             services.SetupEngine<TestEnvironment>(b => b
+                .SetupHandlers(h => h.Scan())
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEnvironments(e => e.UseInstance(new TestEnvironment("Single"))),
                 () => provider

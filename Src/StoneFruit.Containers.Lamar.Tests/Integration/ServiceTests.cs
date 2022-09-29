@@ -62,6 +62,7 @@ namespace StoneFruit.Containers.Lamar.Tests.Integration
             var output = new TestOutput();
             var services = new ServiceRegistry();
             services.SetupEngine<MyEnvironment>(b => b
+                .SetupHandlers(h => h.Scan())
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEnvironments(e => e.UseFactory(new MyEnvironmentFactory()))
                 .SetupEvents(e =>

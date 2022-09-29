@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
-using StoneFruit.Execution;
 using TestUtilities;
 using Unity;
 
@@ -22,6 +21,7 @@ namespace StoneFruit.Containers.Unity.Tests.Integration
             var output = new TestOutput();
             var container = new UnityContainer();
             container.SetupEngine(b => b
+                .SetupHandlers(h => h.Scan())
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
             );
             var engine = container.Resolve<Engine>();
@@ -36,6 +36,7 @@ namespace StoneFruit.Containers.Unity.Tests.Integration
             var output = new TestOutput();
             var container = new UnityContainer();
             container.SetupEngine(b => b
+                .SetupHandlers(h => h.Scan())
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
             );
             var engine = container.Resolve<Engine>();

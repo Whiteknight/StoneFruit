@@ -38,11 +38,11 @@ namespace StoneFruit.Cli
     {
         private static void Main(string[] args)
         {
-            //var engine = NoneMain();
+            var engine = NoneMain();
             //var engine = StructureMapMain();
             //var engine = LamarMain();
             //var engine = MicrosoftMain();
-            var engine = AutofacMain();
+            //var engine = AutofacMain();
             Environment.ExitCode = engine.RunWithCommandLineArguments();
 
             Console.ReadKey();
@@ -52,6 +52,7 @@ namespace StoneFruit.Cli
         {
             builder
                 .SetupHandlers(h => h
+                    .Scan()
                     .UsePublicMethodsAsHandlers(new MyObject())
                     .Add("testf", (c, d) => d.Output.WriteLine("F"), description: "do F things", usage: "testf ...", group: "delegates")
                     .AddScript("testg", new[] { "echo test", "echo g" }, group: "scripts")
@@ -63,6 +64,7 @@ namespace StoneFruit.Cli
                         "echo 3",
                         "echo 4"
                     }, group: "scripts")
+                    .Add(new[] { "test", "j" }, (c, d) => d.Output.WriteLine("J"), description: "do J things", usage: "test j")
                 //.AddAlias("testf", "testf-alias")
                 )
                 .SetupEnvironments(e => e.UseFactory(new MyEnvironmentFactory()))

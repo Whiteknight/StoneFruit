@@ -23,14 +23,13 @@ namespace StoneFruit.Containers.Unity
         public static IUnityContainer SetupEngine<TEnvironment>(this IUnityContainer container, Action<IEngineBuilder> build)
             where TEnvironment : class
         {
-            var handlerTypes = AllClasses.FromAssembliesInBasePath().Where(t => !t.IsAbstract && typeof(IHandlerBase).IsAssignableFrom(t)).ToList();
-            container.RegisterTypes(
-                handlerTypes,
-                WithMappings.None,
-                WithName.Default,
-                WithLifetime.Transient
-            );
-            return SetupEngineScannerless<TEnvironment>(container, build);
+            var services = new DefaultServiceCollection();
+            EngineBuilder.SetupEngineRegistrations(services, build, () => ScanForHandlers(container));
+            EngineBuilder.SetupExplicitEnvironmentRegistration<TEnvironment>(services);
+            foreach (var descriptor in services)
+                AddRegistration(container, descriptor);
+            container.RegisterFactory<IHandlerSource>(c => new UnityHandlerSource(c, c.Resolve<IVerbExtractor>()));
+            return container;
         }
 
         /// <summary>
@@ -42,53 +41,25 @@ namespace StoneFruit.Containers.Unity
         /// <returns></returns>
         public static IUnityContainer SetupEngine(this IUnityContainer container, Action<IEngineBuilder> build)
         {
-            var handlerTypes = AllClasses.FromAssembliesInBasePath().Where(t => !t.IsAbstract && typeof(IHandlerBase).IsAssignableFrom(t)).ToList();
+            var services = new DefaultServiceCollection();
+            EngineBuilder.SetupEngineRegistrations(services, build, () => ScanForHandlers(container));
+            foreach (var descriptor in services)
+                AddRegistration(container, descriptor);
+            container.RegisterFactory<IHandlerSource>(c => new UnityHandlerSource(c, c.Resolve<IVerbExtractor>()));
+            return container;
+        }
+
+        private static void ScanForHandlers(IUnityContainer container)
+        {
+            var handlerTypes = AllClasses.FromAssembliesInBasePath()
+                .Where(t => !t.IsAbstract && typeof(IHandlerBase).IsAssignableFrom(t))
+                .ToList();
             container.RegisterTypes(
                 handlerTypes,
                 WithMappings.None,
                 WithName.Default,
                 WithLifetime.Transient
             );
-            return SetupEngineScannerless(container, build);
-        }
-
-        /// <summary>
-        /// Setup registrations for the Engine. Does not scan assemblies for Handler types
-        /// automatically. You must register Handler types with the container separately. This
-        /// variant uses an environment object.
-        /// </summary>
-        /// <typeparam name="TEnvironment"></typeparam>
-        /// <param name="container"></param>
-        /// <param name="build"></param>
-        /// <returns></returns>
-        public static IUnityContainer SetupEngineScannerless<TEnvironment>(this IUnityContainer container, Action<IEngineBuilder> build)
-            where TEnvironment : class
-        {
-            var services = new DefaultServiceCollection();
-            EngineBuilder.SetupEngineRegistrations(services, build);
-            EngineBuilder.SetupExplicitEnvironmentRegistration<TEnvironment>(services);
-            foreach (var descriptor in services)
-                AddRegistration(container, descriptor);
-            container.RegisterFactory<IHandlerSource>(c => new UnityHandlerSource(c, c.Resolve<IVerbExtractor>()));
-            return container;
-        }
-
-        /// <summary>
-        /// Setup registrations for the Engine. Does not scan assemblies for Handler types
-        /// automatically. You must register Handler types with the container separately. This
-        /// variant does not use an environment object.
-        /// </summary>
-        /// <param name="container"></param>
-        /// <param name="build"></param>
-        /// <returns></returns>
-        public static IUnityContainer SetupEngineScannerless(this IUnityContainer container, Action<IEngineBuilder> build)
-        {
-            var services = new DefaultServiceCollection();
-            EngineBuilder.SetupEngineRegistrations(services, build);
-            foreach (var descriptor in services)
-                AddRegistration(container, descriptor);
-            container.RegisterFactory<IHandlerSource>(c => new UnityHandlerSource(c, c.Resolve<IVerbExtractor>()));
-            return container;
         }
 
         private static void AddRegistration(IUnityContainer container, ServiceDescriptor serviceDescriptor)

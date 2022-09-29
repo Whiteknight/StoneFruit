@@ -2,7 +2,6 @@
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using StoneFruit.Execution;
 using TestUtilities;
 
 namespace StoneFruit.Containers.Microsoft.Tests.Integration
@@ -32,7 +31,7 @@ namespace StoneFruit.Containers.Microsoft.Tests.Integration
             var services = new ServiceCollection();
             services.AddTransient<TestResolveHandler>();
             IServiceProvider provider = null;
-            services.SetupEngineScannerless<TestEnvironment>(b => b
+            services.SetupEngine<TestEnvironment>(b => b
                     .SetupOutput(o => o.DoNotUseConsole().Add(output))
                     .SetupEnvironments(e => e.UseInstance(new TestEnvironment("Single"))),
                 () => provider
@@ -52,7 +51,7 @@ namespace StoneFruit.Containers.Microsoft.Tests.Integration
             var instance = new TestResolveHandler(output);
             services.AddSingleton(instance);
             IServiceProvider provider = null;
-            services.SetupEngineScannerless<TestEnvironment>(b => b
+            services.SetupEngine<TestEnvironment>(b => b
                     .SetupOutput(o => o.DoNotUseConsole().Add(output))
                     .SetupEnvironments(e => e.UseInstance(new TestEnvironment("Single"))),
                 () => provider
@@ -71,7 +70,7 @@ namespace StoneFruit.Containers.Microsoft.Tests.Integration
             var services = new ServiceCollection();
             services.AddTransient(p => new TestResolveHandler(output));
             IServiceProvider provider = null;
-            services.SetupEngineScannerless<TestEnvironment>(b => b
+            services.SetupEngine<TestEnvironment>(b => b
                     .SetupOutput(o => o.DoNotUseConsole().Add(output))
                     .SetupEnvironments(e => e.UseInstance(new TestEnvironment("Single"))),
                 () => provider
