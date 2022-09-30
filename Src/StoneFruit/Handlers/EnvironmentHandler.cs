@@ -51,7 +51,7 @@ Change the current environment, only if any are configured but none are set.
         {
             if (_args.HasFlag("notset"))
             {
-                if (_environments.GetCurrent().HasValue)
+                if (_environments.GetCurrentName().HasValue)
                     return;
                 ChangeEnvironment();
                 return;
