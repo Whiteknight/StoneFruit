@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0" />
     <PackageReference Include="structuremap" Version="4.7.1" />
   </ItemGroup>
 
@@ -14,6 +15,7 @@
     <ProjectReference Include="..\StoneFruit.Containers.Autofac\StoneFruit.Containers.Autofac.csproj" />
     <ProjectReference Include="..\StoneFruit.Containers.Lamar\StoneFruit.Containers.Lamar.csproj" />
     <ProjectReference Include="..\StoneFruit.Containers.StructureMap\StoneFruit.Containers.StructureMap.csproj" />
+    <ProjectReference Include="..\StoneFruit.Hosting\StoneFruit.Hosting.csproj" />
     <ProjectReference Include="..\StoneFruit\StoneFruit.csproj" />
   </ItemGroup>
 

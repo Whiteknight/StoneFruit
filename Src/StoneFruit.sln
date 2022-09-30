@@ -44,6 +44,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Containers", "Containers", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{651D19FA-9799-47D9-BD5D-8601DC2AF462}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoneFruit.Hosting", "StoneFruit.Hosting\StoneFruit.Hosting.csproj", "{268953B9-6F76-40B1-AC9A-277C280F4C06}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -102,6 +104,10 @@ Global
 		{BB0415FD-8DC7-4C26-B093-28551FC03FAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB0415FD-8DC7-4C26-B093-28551FC03FAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB0415FD-8DC7-4C26-B093-28551FC03FAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{268953B9-6F76-40B1-AC9A-277C280F4C06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{268953B9-6F76-40B1-AC9A-277C280F4C06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{268953B9-6F76-40B1-AC9A-277C280F4C06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{268953B9-6F76-40B1-AC9A-277C280F4C06}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

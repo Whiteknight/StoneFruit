@@ -1,6 +1,21 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Autofac;
+using Lamar;
+using Microsoft.Extensions.DependencyInjection;
+using StoneFruit.Containers.Autofac;
+using StoneFruit.Containers.Lamar;
+using StoneFruit.Containers.Microsoft;
+using StoneFruit.Containers.StructureMap;
+using Autofac;
+using Lamar;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using StoneFruit.Containers.Autofac;
+using StoneFruit.Containers.Lamar;
+using StoneFruit.Containers.Microsoft;
+using StoneFruit.Containers.StructureMap;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 
@@ -30,11 +45,13 @@ namespace StoneFruit.Cli
     {
         private static void Main(string[] args)
         {
-            var engine = NoneMain();
-            //var engine = StructureMapMain();
+            //var engine = NoneMain();
+            var engine = StructureMapMain();
             //var engine = LamarMain();
             //var engine = MicrosoftMain();
             //var engine = AutofacMain();
+            //var host = CreateHostBuilder().Build();
+            //host.Run();
             Environment.ExitCode = engine.RunWithCommandLineArguments();
 
             Console.ReadKey();
@@ -75,6 +92,9 @@ namespace StoneFruit.Cli
                     s.MaxExecuteTimeout = TimeSpan.FromSeconds(5);
                 });
         }
+        private static IHostBuilder CreateHostBuilder()
+            => Host.CreateDefaultBuilder()
+            .UseStoneFruit(Build);
 
         private static Engine NoneMain()
         {
@@ -179,6 +199,8 @@ namespace StoneFruit.Cli
             Name = name;
             InvokedTimes = 0;
         }
+
+        public int CalledTimes { get; set; }
     }
 
     public class MyObject
