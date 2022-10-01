@@ -107,16 +107,16 @@ namespace StoneFruit
         public static Engine Build(Action<IEngineBuilder> build)
         {
             var services = new ServiceCollection();
-            var handlersBuilder = new HandlerSetup(() => ScanForHandlers(services));
-            var engineBuilder = new EngineBuilder(services);
+            var engineBuilder = new EngineBuilder(services, () => ScanForHandlers(services));
             build?.Invoke(engineBuilder);
             SetupCoreEngineRegistrations(services);
+            IServiceProvider provider = null;
+            engineBuilder.SetupHandlers(h => h.AddSource(ctx => new ServiceProviderHandlerSource(services, () => provider, ctx.VerbExtractor)));
 
             // Build up the final Engine registrations. This involves resolving some
             // dependencies which were setup previously
             engineBuilder.BuildUp(services);
-            handlersBuilder.AddSource(ctx => new ServiceProviderHandlerSource(services, () => services.BuildServiceProvider(), ctx.VerbExtractor));
-            var provider = services.BuildServiceProvider();
+            provider = services.BuildServiceProvider();
             return provider.GetRequiredService<Engine>();
         }
 

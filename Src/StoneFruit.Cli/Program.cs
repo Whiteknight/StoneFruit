@@ -132,7 +132,8 @@ namespace StoneFruit.Cli
 
         public void Execute()
         {
-            _output.WriteLine($"TESTA: {_environment.Name}");
+            _environment.InvokedTimes++;
+            _output.WriteLine($"TESTA: {_environment.Name} invoked {_environment.InvokedTimes} times");
         }
     }
 
@@ -171,9 +172,12 @@ namespace StoneFruit.Cli
     {
         public string Name { get; }
 
+        public int InvokedTimes { get; set; }
+
         public MyEnvironment(string name)
         {
             Name = name;
+            InvokedTimes = 0;
         }
     }
 

@@ -20,6 +20,7 @@ namespace StoneFruit.Execution.Environments
 
         public void BuildUp(IServiceCollection services)
         {
+            _services.AddSingleton<EnvironmentObjectCache>();
             _services.TryAddSingleton(new EnvironmentsList(_defaultNamesList));
             _services.TryAddSingleton<IEnvironmentCollection>(new InstanceEnvironmentCollection());
         }
@@ -40,14 +41,20 @@ namespace StoneFruit.Execution.Environments
             _services.AddSingleton(factory);
             _services.AddScoped(services =>
             {
-                var factory = services.GetRequiredService<IEnvironmentFactory<T>>();
                 var environments = services.GetRequiredService<IEnvironmentCollection>();
                 var currentEnvName = environments.GetCurrentName();
                 if (!currentEnvName.HasValue)
                     throw new EngineBuildException("Attempt to get environment context object without setting a valid environment");
+                var objectCache = services.GetRequiredService<EnvironmentObjectCache>();
+                var cached = objectCache.Get<T>(currentEnvName.Value);
+                if (cached.HasValue)
+                    return cached.Value;
+
+                var factory = services.GetRequiredService<IEnvironmentFactory<T>>();
                 var obj = factory.Create(currentEnvName.Value);
                 if (!obj.HasValue)
                     throw new EngineBuildException("Could not create valid environment context object for current environment");
+                objectCache.Set<T>(currentEnvName.Value, obj.Value);
                 return obj.Value;
             });
             return this;
@@ -72,15 +79,5 @@ namespace StoneFruit.Execution.Environments
             _services.AddSingleton<IEnvironmentCollection>(new InstanceEnvironmentCollection());
             return this;
         }
-    }
-
-    public sealed class EnvironmentsList
-    {
-        public EnvironmentsList(IReadOnlyList<string> validNames)
-        {
-            ValidNames = validNames;
-        }
-
-        public IReadOnlyList<string> ValidNames { get; }
     }
 }

@@ -23,11 +23,8 @@ namespace StoneFruit.Execution.Environments
                 environments = new[] { Constants.EnvironmentNameDefault };
             _nameList = environments.ToList();
             _validNames = new HashSet<string>(environments);
-            _current = FailureResult<object>.Instance;
             _currentName = FailureResult<string>.Instance;
         }
-
-        public IResult<object> GetCurrent() => _current;
 
         public IResult<string> GetCurrentName() => _currentName;
 
