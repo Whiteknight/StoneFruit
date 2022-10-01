@@ -12,7 +12,7 @@ namespace StoneFruit.Execution.Handlers
     /// <summary>
     /// Setup handlers and handler sources
     /// </summary>
-    public class HandlerSetup : IHandlerSetup, ISetupBuildable<IHandlers>
+    public class HandlerSetup : IHandlerSetup
     {
         private readonly List<Func<HandlerSourceBuildContext, IHandlerSource>> _sourceFactories;
         private readonly DelegateHandlerSource _delegates;

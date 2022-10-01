@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace StoneFruit.Execution.Output
 {
-    public class OutputSetup : IOutputSetup, ISetupBuildable<IOutput>
+    public class OutputSetup : IOutputSetup
     {
         private bool _useConsole;
         private readonly List<IOutput> _secondaries;

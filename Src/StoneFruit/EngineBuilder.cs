@@ -12,25 +12,25 @@ namespace StoneFruit
     /// <summary>
     /// Used to setup all options and dependencies of the Engine.
     /// </summary>
-    public class EngineBuilder : IEngineBuilder
+    public sealed class EngineBuilder : IEngineBuilder
     {
-        private readonly ISetupBuildable<IHandlers> _handlers;
-        private readonly ISetupBuildable<IOutput> _output;
+        private readonly HandlerSetup _handlers;
+        private readonly OutputSetup _output;
         private readonly EngineEventCatalog _eventCatalog;
-        private readonly ISetupBuildable<IEnvironmentCollection> _environments;
-        private readonly ISetupBuildable<ICommandParser> _parsers;
+        private readonly EnvironmentSetup _environments;
+        private readonly ParserSetup _parsers;
         private readonly EngineSettings _settings;
         private readonly IServiceCollection _services;
 
-        public EngineBuilder(ISetupBuildable<IHandlers>? handlers = null, ISetupBuildable<IOutput>? output = null, ISetupBuildable<IEnvironmentCollection>? environments = null, ISetupBuildable<ICommandParser>? parsers = null, EngineEventCatalog? events = null, EngineSettings? settings = null, IServiceCollection? services = null, Action scanForHandlers = null)
+        private EngineBuilder(IServiceCollection? services = null, Action scanForHandlers = null)
         {
-            _handlers = handlers ?? new HandlerSetup(scanForHandlers ?? ThrowIfScanRequestedButScannerNotProvided);
-            _eventCatalog = events ?? new EngineEventCatalog();
-            _output = output ?? new OutputSetup();
-            _environments = environments ?? new EnvironmentSetup();
-            _parsers = parsers ?? new ParserSetup();
-            _settings = settings ?? new EngineSettings();
-            _services = services ?? new ServiceCollection();
+            _handlers = new HandlerSetup(scanForHandlers ?? ThrowIfScanRequestedButScannerNotProvided);
+            _eventCatalog = new EngineEventCatalog();
+            _output = new OutputSetup();
+            _environments = new EnvironmentSetup();
+            _parsers = new ParserSetup();
+            _settings = new EngineSettings();
+            _services = new ServiceCollection();
         }
 
         /// <summary>
@@ -40,9 +40,7 @@ namespace StoneFruit
         /// <returns></returns>
         public EngineBuilder SetupHandlers(Action<IHandlerSetup> setup)
         {
-            if (_handlers is not IHandlerSetup handlerSetup)
-                throw new EngineBuildException("The provided Handlers Setup does not support custom setup callbacks.");
-            setup?.Invoke(handlerSetup);
+            setup?.Invoke(_handlers);
             return this;
         }
 
@@ -53,9 +51,7 @@ namespace StoneFruit
         /// <returns></returns>
         public EngineBuilder SetupEnvironments(Action<IEnvironmentSetup> setup)
         {
-            if (_environments is not IEnvironmentSetup environmentSetup)
-                throw new EngineBuildException("The provided Environment Setup does not support custom setup callbacks.");
-            setup?.Invoke(environmentSetup);
+            setup?.Invoke(_environments);
             return this;
         }
 
@@ -66,9 +62,7 @@ namespace StoneFruit
         /// <returns></returns>
         public EngineBuilder SetupArguments(Action<IParserSetup> setup)
         {
-            if (_parsers is not IParserSetup parserSetup)
-                throw new EngineBuildException("The provided Parser Setup does not support custom setup callbacks.");
-            setup?.Invoke(parserSetup);
+            setup?.Invoke(_parsers);
             return this;
         }
 
@@ -79,9 +73,7 @@ namespace StoneFruit
         /// <returns></returns>
         public EngineBuilder SetupOutput(Action<IOutputSetup> setup)
         {
-            if (_output is not IOutputSetup outputSetup)
-                throw new EngineBuildException("The provided Output Setup does not support custom setup callbacks.");
-            setup?.Invoke(outputSetup);
+            setup?.Invoke(_output);
             return this;
         }
 
@@ -127,7 +119,7 @@ namespace StoneFruit
         /// </summary>
         /// <param name="services"></param>
         /// <param name="build"></param>
-        public static void SetupEngineRegistrations(IServiceCollection services, Action<EngineBuilder> build, Action scanForHandlers)
+        public static void SetupEngineRegistrations(IServiceCollection services, Action<IEngineBuilder> build, Action scanForHandlers)
         {
             var builder = new EngineBuilder(scanForHandlers: scanForHandlers);
             build?.Invoke(builder);
@@ -186,7 +178,7 @@ namespace StoneFruit
             });
         }
 
-        public static Engine Build(Action<EngineBuilder> build)
+        public static Engine Build(Action<IEngineBuilder> build)
         {
             var services = new ServiceCollection();
             var handlersBuilder = new HandlerSetup(() => ScanForHandlers(services));

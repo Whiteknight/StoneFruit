@@ -8,7 +8,7 @@ namespace StoneFruit.Execution.Environments
     /// <summary>
     /// Sets up the environment mechanism
     /// </summary>
-    public class EnvironmentSetup : IEnvironmentSetup, ISetupBuildable<IEnvironmentCollection>
+    public class EnvironmentSetup : IEnvironmentSetup
     {
         private IEnvironmentCollection _environments;
 
