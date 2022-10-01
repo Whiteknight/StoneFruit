@@ -13,7 +13,7 @@ namespace StoneFruit.Tests.Integration
             // Script with 4 commands. Loop limit of 2. Engine executes 2 commands and
             // then terminates with an error message
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(EchoHandler), typeof(ExitHandler))
@@ -28,7 +28,7 @@ namespace StoneFruit.Tests.Integration
                 {
                     s.MaxInputlessCommands = 2;
                 })
-                .Build();
+            );
             engine.RunHeadless("test");
             output.Lines.Count.Should().Be(3);
             output.Lines[0].Should().Be("1");
@@ -42,7 +42,7 @@ namespace StoneFruit.Tests.Integration
             // Script with 4 commands. Loop limit of 4. Engine executes all 4 commands
             // without issue
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(EchoHandler), typeof(ExitHandler))
@@ -57,7 +57,7 @@ namespace StoneFruit.Tests.Integration
                 {
                     s.MaxInputlessCommands = 4;
                 })
-                .Build();
+            );
             engine.RunHeadless("test");
             output.Lines.Count.Should().Be(4);
             output.Lines[0].Should().Be("1");

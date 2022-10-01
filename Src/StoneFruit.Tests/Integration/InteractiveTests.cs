@@ -11,7 +11,7 @@ namespace StoneFruit.Tests.Integration
         public void StartAndStopEvents_Test()
         {
             var output = new TestOutput("echo 'test'");
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(EchoHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEvents(c =>
@@ -21,7 +21,7 @@ namespace StoneFruit.Tests.Integration
                     c.EngineStartInteractive.Add("echo start");
                     //c.EngineStopInteractive.Add("echo stop");
                 })
-                .Build();
+            );
             engine.RunInteractively();
             output.Lines.Count.Should().Be(2);
             output.Lines[0].Should().Be("start");

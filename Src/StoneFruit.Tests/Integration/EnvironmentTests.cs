@@ -39,11 +39,11 @@ namespace StoneFruit.Tests.Integration
         public void Instance_Test()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(TestEnvironmentHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEnvironments(e => e.UseInstance(new TestEnvironment("Single")))
-                .Build();
+            );
             engine.RunHeadless("test");
             output.Lines.Count.Should().Be(1);
             output.Lines[0].Should().Be("Single");
@@ -53,7 +53,7 @@ namespace StoneFruit.Tests.Integration
         public void Dictionary_Test()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 // We need env-change handler, so we can select one on startup
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(TestEnvironmentHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
@@ -62,7 +62,7 @@ namespace StoneFruit.Tests.Integration
                     { "B", new TestEnvironment("B")}
                 }))
                 .SetupEvents(e => { e.EnvironmentChanged.Clear(); })
-                .Build();
+            );
             engine.RunHeadless("B test");
             output.Lines.Count.Should().Be(1);
             output.Lines[0].Should().Be("B");
@@ -79,13 +79,13 @@ namespace StoneFruit.Tests.Integration
         public void Factory_Test()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 // We need env-change handler, so we can select one on startup
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(TestEnvironmentHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEnvironments(e => e.UseFactory(new TestEnvironmentFactory()))
                 .SetupEvents(e => { e.EnvironmentChanged.Clear(); })
-                .Build();
+            );
             engine.RunHeadless("B test");
             output.Lines.Count.Should().Be(1);
             output.Lines[0].Should().Be("B");
@@ -95,7 +95,7 @@ namespace StoneFruit.Tests.Integration
         public void Factory_Interactive()
         {
             var output = new TestOutput("test");
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(TestEnvironmentHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEnvironments(e => e.UseFactory(new TestEnvironmentFactory()))
@@ -106,7 +106,7 @@ namespace StoneFruit.Tests.Integration
                     c.EngineStartInteractive.Clear();
                     //c.EngineStopInteractive.Clear();
                 })
-                .Build();
+            );
             engine.RunInteractively("C");
             output.Lines.Count.Should().Be(1);
             output.Lines[0].Should().Be("C");
@@ -116,7 +116,7 @@ namespace StoneFruit.Tests.Integration
         public void Factory_NotSet()
         {
             var output = new TestOutput("env -notset B", "test");
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(TestEnvironmentHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEnvironments(e => e.UseFactory(new TestEnvironmentFactory()))
@@ -125,7 +125,7 @@ namespace StoneFruit.Tests.Integration
                     c.EngineStartInteractive.Clear();
                     c.EnvironmentChanged.Clear();
                 })
-                .Build();
+            );
             engine.RunInteractively();
             output.Lines.Count.Should().Be(1);
             output.Lines[0].Should().Be("B");
@@ -135,7 +135,7 @@ namespace StoneFruit.Tests.Integration
         public void Factory_NotSet_AlreadySet()
         {
             var output = new TestOutput("env A", "env -notset B", "test");
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(TestEnvironmentHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEnvironments(e => e.UseFactory(new TestEnvironmentFactory()))
@@ -144,7 +144,7 @@ namespace StoneFruit.Tests.Integration
                     c.EngineStartInteractive.Clear();
                     c.EnvironmentChanged.Clear();
                 })
-                .Build();
+            );
             engine.RunInteractively();
             output.Lines.Count.Should().Be(1);
             output.Lines[0].Should().Be("A");
@@ -154,7 +154,7 @@ namespace StoneFruit.Tests.Integration
         public void Factory_SetByIndex()
         {
             var output = new TestOutput("env 2", "test");
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(TestEnvironmentHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEnvironments(e => e.UseFactory(new TestEnvironmentFactory()))
@@ -163,7 +163,7 @@ namespace StoneFruit.Tests.Integration
                     c.EngineStartInteractive.Clear();
                     c.EnvironmentChanged.Clear();
                 })
-                .Build();
+            );
             engine.RunInteractively();
             output.Lines.Count.Should().Be(1);
             output.Lines[0].Should().Be("B");
@@ -173,7 +173,7 @@ namespace StoneFruit.Tests.Integration
         public void Factory_List()
         {
             var output = new TestOutput("env -list");
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(TestEnvironmentHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEnvironments(e => e.UseFactory(new TestEnvironmentFactory()))
@@ -182,7 +182,7 @@ namespace StoneFruit.Tests.Integration
                     c.EngineStartInteractive.Clear();
                     c.EnvironmentChanged.Clear();
                 })
-                .Build();
+            );
             engine.RunInteractively();
             output.Lines.Should().Contain("A");
             output.Lines.Should().Contain("B");
@@ -193,7 +193,7 @@ namespace StoneFruit.Tests.Integration
         public void Factory_Invalid()
         {
             var output = new TestOutput("env D");
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(TestEnvironmentHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEnvironments(e => e.UseFactory(new TestEnvironmentFactory()))
@@ -202,7 +202,7 @@ namespace StoneFruit.Tests.Integration
                     c.EngineStartInteractive.Clear();
                     c.EnvironmentChanged.Clear();
                 })
-                .Build();
+            );
             engine.RunInteractively();
             output.Lines[0].Should().Be("Unknown environment 'D'");
         }
@@ -211,7 +211,7 @@ namespace StoneFruit.Tests.Integration
         public void Factory_Prompt_Name()
         {
             var output = new TestOutput("env", "B", "test");
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(TestEnvironmentHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEnvironments(e => e.UseFactory(new TestEnvironmentFactory()))
@@ -220,7 +220,7 @@ namespace StoneFruit.Tests.Integration
                     c.EngineStartInteractive.Clear();
                     c.EnvironmentChanged.Clear();
                 })
-                .Build();
+            );
             engine.RunInteractively();
             output.Lines[output.Lines.Count - 1].Should().Be("B");
         }
@@ -229,7 +229,7 @@ namespace StoneFruit.Tests.Integration
         public void Factory_Prompt_Index()
         {
             var output = new TestOutput("env", "2", "test");
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(TestEnvironmentHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEnvironments(e => e.UseFactory(new TestEnvironmentFactory()))
@@ -238,7 +238,7 @@ namespace StoneFruit.Tests.Integration
                     c.EngineStartInteractive.Clear();
                     c.EnvironmentChanged.Clear();
                 })
-                .Build();
+            );
             engine.RunInteractively();
             output.Lines[output.Lines.Count - 1].Should().Be("B");
         }

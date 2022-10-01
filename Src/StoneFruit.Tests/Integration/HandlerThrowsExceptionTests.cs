@@ -12,10 +12,10 @@ namespace StoneFruit.Tests.Integration
         public void Test()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(EchoHandler), typeof(TestHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .Build();
+            );
             engine.RunHeadless("test");
             output.Lines[0].Should().Be("TEST");
         }

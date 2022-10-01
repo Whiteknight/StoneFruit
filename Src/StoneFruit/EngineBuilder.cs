@@ -20,8 +20,9 @@ namespace StoneFruit
         private readonly ISetupBuildable<IEnvironmentCollection> _environments;
         private readonly ISetupBuildable<ICommandParser> _parsers;
         private readonly EngineSettings _settings;
+        private readonly IServiceCollection _services;
 
-        public EngineBuilder(ISetupBuildable<IHandlers>? handlers = null, ISetupBuildable<IOutput>? output = null, ISetupBuildable<IEnvironmentCollection>? environments = null, ISetupBuildable<ICommandParser>? parsers = null, EngineEventCatalog? events = null, EngineSettings? settings = null, Action scanForHandlers = null)
+        public EngineBuilder(ISetupBuildable<IHandlers>? handlers = null, ISetupBuildable<IOutput>? output = null, ISetupBuildable<IEnvironmentCollection>? environments = null, ISetupBuildable<ICommandParser>? parsers = null, EngineEventCatalog? events = null, EngineSettings? settings = null, IServiceCollection? services = null, Action scanForHandlers = null)
         {
             _handlers = handlers ?? new HandlerSetup(scanForHandlers ?? ThrowIfScanRequestedButScannerNotProvided);
             _eventCatalog = events ?? new EngineEventCatalog();
@@ -29,6 +30,7 @@ namespace StoneFruit
             _environments = environments ?? new EnvironmentSetup();
             _parsers = parsers ?? new ParserSetup();
             _settings = settings ?? new EngineSettings();
+            _services = services ?? new ServiceCollection();
         }
 
         /// <summary>
@@ -184,23 +186,44 @@ namespace StoneFruit
             });
         }
 
-        /// <summary>
-        /// Build the Engine directly without using a DI container
-        /// </summary>
-        /// <returns></returns>
-        public Engine Build()
+        public static Engine Build(Action<EngineBuilder> build)
         {
-            var handlers = _handlers.Build();
-            var environments = _environments.Build();
-            var parser = _parsers.Build();
-            var output = _output.Build();
+            var services = new ServiceCollection();
+            var handlersBuilder = new HandlerSetup(() => ScanForHandlers(services));
+            var engineBuilder = new EngineBuilder(services: services);
+            build?.Invoke(engineBuilder);
+            SetupEngineRegistrations(services);
+            handlersBuilder.AddSource(ctx => new ServiceProviderHandlerSource(services, () => services.BuildServiceProvider(), ctx.VerbExtractor));
 
-            return new Engine(handlers, environments, parser, output, _eventCatalog, _settings);
+            // Build up the final Engine registrations. This involves resolving some
+            // dependencies which were setup previously
+            engineBuilder.BuildUp(services);
+            var provider = services.BuildServiceProvider();
+            return provider.GetRequiredService<Engine>();
         }
 
         private void ThrowIfScanRequestedButScannerNotProvided()
         {
             throw new EngineBuildException(".Scan() requested but no scanner registered. Are you using a DI container?");
+        }
+
+        private static void ScanForHandlers(IServiceCollection services)
+        {
+            // Scan for handler classes in all assemblies, and setup a source to pull those types out of the
+            // provider
+            services.Scan(scanner => scanner
+                .FromApplicationDependencies()
+                .AddClasses(classes => classes.Where(t =>
+                {
+                    if (!typeof(IHandlerBase).IsAssignableFrom(t))
+                        return false;
+                    if (!t.IsPublic)
+                        return false;
+                    return true;
+                }))
+                .AsSelf()
+                .WithTransientLifetime()
+            );
         }
     }
 }

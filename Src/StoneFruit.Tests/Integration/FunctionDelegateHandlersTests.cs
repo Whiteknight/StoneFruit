@@ -12,16 +12,16 @@ namespace StoneFruit.Tests.Integration
         public void Test_Sync()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h.Add("test", (c, d) => d.Output.WriteLine("TEST")))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .Build();
+            );
             engine.RunHeadless("test");
             output.Lines[0].Should().Be("TEST");
         }
 
         [Test]
-        public void Test_Async()
+        public void Test_Asynchronous()
         {
             Task handle(IArguments arguments, CommandDispatcher d)
             {
@@ -30,10 +30,10 @@ namespace StoneFruit.Tests.Integration
             }
 
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h.AddAsync("test", handle))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .Build();
+            );
             engine.RunHeadless("test");
             output.Lines[0].Should().Be("TEST");
         }

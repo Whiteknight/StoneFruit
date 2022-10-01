@@ -10,9 +10,9 @@ namespace StoneFruit.Tests.Integration
         public void Help_Builtins()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .Build();
+            );
             engine.RunHeadless("help");
             // 'exit' and 'help' are always visible
             output.Lines.Should().Contain("exit");
@@ -26,9 +26,9 @@ namespace StoneFruit.Tests.Integration
         public void Help_Builtins_ShowAll()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .Build();
+            );
             engine.RunHeadless("help -showall");
             output.Lines.Should().Contain("exit");
             output.Lines.Should().Contain("help");
@@ -56,12 +56,12 @@ namespace StoneFruit.Tests.Integration
         public void Help_InstanceMethodAttributes_GroupDescription()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupHandlers(h => h
                     .UsePublicMethodsAsHandlers(new TestInstanceMethodsAttrs())
                 )
-                .Build();
+            );
             engine.RunHeadless("help");
             output.Lines.Should().Contain("Test1Description");
             output.Lines.Should().Contain("Test1Group");
@@ -73,12 +73,12 @@ namespace StoneFruit.Tests.Integration
         public void Help_InstanceMethodAttributes_Usage()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupHandlers(h => h
                     .UsePublicMethodsAsHandlers(new TestInstanceMethodsAttrs())
                 )
-                .Build();
+            );
             engine.RunHeadless("help test 1");
             output.Lines.Should().Contain("Test1Usage");
         }
@@ -98,12 +98,12 @@ namespace StoneFruit.Tests.Integration
         public void Help_HandlerAttributes_GroupDescription()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupHandlers(h => h
                     .Add("test-attrs", new AttributesHelpHandler())
                 )
-                .Build();
+            );
             engine.RunHeadless("help");
             output.Lines.Should().Contain("AttrDescription");
             output.Lines.Should().Contain("AttrGroup");
@@ -113,12 +113,12 @@ namespace StoneFruit.Tests.Integration
         public void Help_HandlerAttributes_Usage()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupHandlers(h => h
                     .Add("test-attrs", new AttributesHelpHandler())
                 )
-                .Build();
+            );
             engine.RunHeadless("help test-attrs");
             output.Lines.Should().Contain("AttrUsage");
         }
@@ -127,12 +127,12 @@ namespace StoneFruit.Tests.Integration
         public void Help_HandlerAttributes_OverrideGroupDescription()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupHandlers(h => h
                     .Add("test-attrs", new AttributesHelpHandler(), description: "OverrideDescription", group: "OverrideGroup")
                 )
-                .Build();
+            );
             engine.RunHeadless("help");
             output.Lines.Should().Contain("OverrideDescription");
             output.Lines.Should().Contain("OverrideGroup");
@@ -142,12 +142,12 @@ namespace StoneFruit.Tests.Integration
         public void Help_HandlerAttributes_OverrideUsage()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupHandlers(h => h
                     .Add("test-attrs", new AttributesHelpHandler(), usage: "OverrideUsage")
                 )
-                .Build();
+            );
             engine.RunHeadless("help test-attrs");
             output.Lines.Should().Contain("OverrideUsage");
         }
@@ -166,12 +166,12 @@ namespace StoneFruit.Tests.Integration
         public void Help_ComponentModelAttributes_GroupDescription()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupHandlers(h => h
                     .Add("test-attrs", new ComponentModelAttributesHelpHandler())
                 )
-                .Build();
+            );
             engine.RunHeadless("help");
             output.Lines.Should().Contain("AttrDescription");
             output.Lines.Should().Contain("AttrGroup");
@@ -191,12 +191,12 @@ namespace StoneFruit.Tests.Integration
         public void Help_ComponentModelAttributes_Browsable_False()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupHandlers(h => h
                     .Add("test-attrs", new ComponentModelBrowseableAttributeFalseHandler())
                 )
-                .Build();
+            );
             engine.RunHeadless("help");
             output.Lines.Should().NotContain("BrowseableFalse");
         }
@@ -215,12 +215,12 @@ namespace StoneFruit.Tests.Integration
         public void Help_ComponentModelAttributes_Browsable_True()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupHandlers(h => h
                     .Add("test-attrs", new ComponentModelBrowseableAttributeTrueHandler())
                 )
-                .Build();
+            );
             engine.RunHeadless("help");
             output.Lines.Should().Contain("BrowseableTrue");
         }
@@ -238,12 +238,12 @@ namespace StoneFruit.Tests.Integration
         public void Help_VerbAttribute_Hide_True()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupHandlers(h => h
                     .Add("hidden-handler", new VerbAttributeHideHandler())
                 )
-                .Build();
+            );
             engine.RunHeadless("help");
             output.Lines.Should().NotContain("hidden-handler");
         }
@@ -261,12 +261,12 @@ namespace StoneFruit.Tests.Integration
         public void Help_VerbAttribute_Hide_False()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupHandlers(h => h
                     .Add("visible-handler", new VerbAttributeShowHandler())
                 )
-                .Build();
+            );
             engine.RunHeadless("help");
             output.Lines.Should().Contain("visible-handler");
         }

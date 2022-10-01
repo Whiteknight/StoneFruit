@@ -1,1 +1,1 @@
-all_projects=("StoneFruit" "StoneFruit.Containers.Autofac" "StoneFruit.Containers.Lamar" "StoneFruit.Containers.Microsoft" "StoneFruit.Containers.StructureMap" "StoneFruit.Containers.Unity");
+all_projects=("StoneFruit" "StoneFruit.Containers.Autofac" "StoneFruit.Containers.Lamar" "StoneFruit.Containers.StructureMap" "StoneFruit.Containers.Unity");

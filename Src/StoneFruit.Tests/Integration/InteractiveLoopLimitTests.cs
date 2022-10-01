@@ -13,8 +13,8 @@ namespace StoneFruit.Tests.Integration
             // Script with 4 commands, loop limit of 2. User enters "n" at the prompt to
             // continue. The runloop terminates after executing 2 commands
             var output = new TestOutput("test", "n");
-            var engine = new EngineBuilder()
-                .SetupOutput(o => o.DoNotUseConsole().Add(output))
+            var engine = EngineBuilder.Build(b => b
+                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(EchoHandler))
                     .AddScript("test", new[] {
@@ -33,7 +33,7 @@ namespace StoneFruit.Tests.Integration
                     c.EngineStartInteractive.Clear();
                     //c.EngineStopInteractive.Clear();
                 })
-                .Build();
+            );
             engine.RunInteractively();
             output.Lines.Count.Should().Be(2);
             output.Lines[0].Should().Be("1");
@@ -46,7 +46,7 @@ namespace StoneFruit.Tests.Integration
             // Script with 4 commands, loop limit of 2. User enters "y" at the prompt to
             // continue. The loop continues and executes all commands
             var output = new TestOutput("test", "y");
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(EchoHandler))
@@ -66,7 +66,7 @@ namespace StoneFruit.Tests.Integration
                     c.EngineStartInteractive.Clear();
                     //c.EngineStopInteractive.Clear();
                 })
-                .Build();
+            );
             engine.RunInteractively();
             output.Lines.Count.Should().Be(4);
             output.Lines[0].Should().Be("1");

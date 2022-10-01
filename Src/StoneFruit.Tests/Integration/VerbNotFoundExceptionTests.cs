@@ -10,9 +10,9 @@ namespace StoneFruit.Tests.Integration
         public void Test()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .Build();
+            );
             engine.RunHeadless("does-not-exist");
             output.Lines[0].Should().StartWith("Verb does-not-exist not found.");
         }

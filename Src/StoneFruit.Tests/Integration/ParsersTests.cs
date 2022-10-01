@@ -33,11 +33,11 @@ namespace StoneFruit.Tests.Integration
         public void UseSimplifiedArgumentParser_Test()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupArguments(a => a.UseSimplifiedArgumentParser())
-                .Build();
+            );
             engine.RunHeadless("test a b=x -c");
             output.Lines.Count.Should().Be(3);
             output.Lines[0].Should().Be("a");
@@ -49,11 +49,11 @@ namespace StoneFruit.Tests.Integration
         public void UseParser_Test()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupArguments(a => a.UseParser(new CommandParser(SimplifiedArgumentGrammar.GetParser(), ScriptFormatGrammar.GetParser())))
-                .Build();
+            );
             engine.RunHeadless("test a b=x -c");
             output.Lines.Count.Should().Be(3);
             output.Lines[0].Should().Be("a");
@@ -65,11 +65,11 @@ namespace StoneFruit.Tests.Integration
         public void UseParser_Null()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupArguments(a => a.UseParser(null))
-                .Build();
+            );
             engine.RunHeadless("test a b=x -c");
             output.Lines.Count.Should().Be(3);
             output.Lines[0].Should().Be("a");
@@ -81,11 +81,11 @@ namespace StoneFruit.Tests.Integration
         public void UseScriptParser_Test()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupArguments(a => a.UseScriptParser(ScriptFormatGrammar.GetParser()))
-                .Build();
+            );
             engine.RunHeadless("test a b=x -c");
             output.Lines.Count.Should().Be(3);
             output.Lines[0].Should().Be("a");
@@ -97,11 +97,11 @@ namespace StoneFruit.Tests.Integration
         public void UseArgumentParser_Null1()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupArguments(a => a.UseArgumentParser((IParser<char, IParsedArgument>)null))
-                .Build();
+            );
             engine.RunHeadless("test a b=x -c");
             output.Lines.Count.Should().Be(3);
             output.Lines[0].Should().Be("a");
@@ -113,11 +113,11 @@ namespace StoneFruit.Tests.Integration
         public void UsePosixStyleArgumentParser_Test()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupArguments(a => a.UsePosixStyleArgumentParser())
-                .Build();
+            );
             engine.RunHeadless("test a --b x -c");
             output.Lines.Count.Should().Be(3);
             output.Lines[0].Should().Be("a");
@@ -129,11 +129,11 @@ namespace StoneFruit.Tests.Integration
         public void UsePowershellArgumentParser_Test()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupArguments(a => a.UsePowershellStyleArgumentParser())
-                .Build();
+            );
             engine.RunHeadless("test a -b x -c");
             //output.Lines.Count.Should().Be(3);
             output.Lines[0].Should().Be("a");
@@ -145,11 +145,11 @@ namespace StoneFruit.Tests.Integration
         public void UseWindowsCmdArgumentParser_Test()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupArguments(a => a.UseWindowsCmdArgumentParser())
-                .Build();
+            );
             engine.RunHeadless("test a /b:x /c");
             //output.Lines.Count.Should().Be(3);
             output.Lines[0].Should().Be("a");

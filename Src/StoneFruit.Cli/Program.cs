@@ -7,7 +7,6 @@ using Lamar;
 using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Containers.Autofac;
 using StoneFruit.Containers.Lamar;
-using StoneFruit.Containers.Microsoft;
 using StoneFruit.Containers.StructureMap;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
@@ -81,20 +80,9 @@ namespace StoneFruit.Cli
                 });
         }
 
-        private static Engine MicrosoftMain()
-        {
-            IServiceProvider provider = null;
-            var services = new ServiceCollection();
-            services.SetupEngine<MyEnvironment>(Build, () => provider);
-            provider = services.BuildServiceProvider();
-            return provider.GetService<Engine>();
-        }
-
         private static Engine NoneMain()
         {
-            var builder = new EngineBuilder();
-            Build(builder);
-            return builder.Build();
+            return EngineBuilder.Build(b => Build(b));
         }
 
         private static Engine StructureMapMain()

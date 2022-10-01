@@ -54,7 +54,6 @@ namespace StoneFruit.Tests.Integration
                     var args = new PrependedVerbArguments(new[] { "target" }, _arguments);
                     await _dispatcher.ExecuteAsync(args);
                 }
-
             }
         }
 
@@ -79,10 +78,10 @@ namespace StoneFruit.Tests.Integration
         public void SyncExecute_VerbArgs()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(SyncDispatchHandler), typeof(TargetHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .Build();
+            );
             engine.RunHeadless("sync dispatch test");
             output.Lines[0].Should().Be("invoked: test");
         }
@@ -91,10 +90,10 @@ namespace StoneFruit.Tests.Integration
         public void AsyncExecute_Command()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(AsyncDispatchHandler), typeof(TargetHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .Build();
+            );
             engine.RunHeadless("async dispatch type=string");
             output.Lines[0].Should().Be("invoked: test");
         }
@@ -103,10 +102,10 @@ namespace StoneFruit.Tests.Integration
         public void AsyncExecute_VerbArgs()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(AsyncDispatchHandler), typeof(TargetHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .Build();
+            );
             engine.RunHeadless("async dispatch type=verbargs test");
             output.Lines[0].Should().Be("invoked: test");
         }
@@ -115,10 +114,10 @@ namespace StoneFruit.Tests.Integration
         public void AsyncExecute_Args()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
-                .SetupHandlers(h => h.UseHandlerTypes(typeof(AsyncDispatchHandler), typeof(TargetHandler)))
+            var engine = EngineBuilder.Build(b => b
+                 .SetupHandlers(h => h.UseHandlerTypes(typeof(AsyncDispatchHandler), typeof(TargetHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .Build();
+            );
             engine.RunHeadless("async dispatch type=args test");
             output.Lines[0].Should().Be("invoked: test");
         }

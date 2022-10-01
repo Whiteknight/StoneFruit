@@ -26,13 +26,13 @@ namespace StoneFruit.Tests.Integration
         public void Script_PositionalBecomesSingleVerb()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(Test1Handler))
                     .AddScript("test", new[] { "[0]" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .Build();
+            );
             engine.RunHeadless("test test1");
             output.Lines.Count.Should().Be(1);
             output.Lines[0].Should().Be("invoked");
@@ -58,13 +58,13 @@ namespace StoneFruit.Tests.Integration
         public void Script_PositionalBecomesMultiWordVerb()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h
                     .UseHandlerTypes(typeof(Test2Handler))
                     .AddScript("test", new[] { "test2 [0]" })
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .Build();
+            );
             engine.RunHeadless("test abc");
             output.Lines.Count.Should().Be(1);
             output.Lines[0].Should().Be("invoked");

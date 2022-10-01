@@ -14,7 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\StoneFruit.Containers.Microsoft\StoneFruit.Containers.Microsoft.csproj" />
     <ProjectReference Include="..\StoneFruit\StoneFruit.csproj" />
     <ProjectReference Include="..\TestUtilities\TestUtilities.csproj" />
   </ItemGroup>

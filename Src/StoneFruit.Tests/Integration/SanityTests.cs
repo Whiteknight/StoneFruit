@@ -11,10 +11,10 @@ namespace StoneFruit.Tests.Integration
         public void RunHeadless_Echo()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(EchoHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .Build();
+            );
             engine.RunHeadless("echo 'test'");
             output.Lines.Count.Should().Be(1);
             output.Lines[0].Should().Be("test");

@@ -10,14 +10,14 @@ namespace StoneFruit.Tests.Integration
         public void StartAndStopEvents_Test()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEvents(c =>
                 {
                     c.EngineStartHeadless.Add("echo start");
                     c.EngineStopHeadless.Add("echo stop");
                 })
-                .Build();
+            );
             engine.RunHeadless("echo 'test'");
             output.Lines.Count.Should().Be(3);
             output.Lines[0].Should().Be("start");
@@ -45,7 +45,7 @@ namespace StoneFruit.Tests.Integration
         public void HeadlessHelp_Test()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHelpHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEvents(c =>
@@ -53,7 +53,7 @@ namespace StoneFruit.Tests.Integration
                     c.HeadlessHelp.Clear();
                     c.HeadlessHelp.Add("test-help");
                 })
-                .Build();
+            );
             engine.RunHeadless("help");
             output.Lines.Count.Should().Be(1);
             output.Lines[0].Should().Be("helped");

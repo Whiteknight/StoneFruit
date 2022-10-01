@@ -13,7 +13,7 @@ namespace StoneFruit.Tests.Integration
         public void AsyncTimeout_Test()
         {
             var output = new TestOutput();
-            var engine = new EngineBuilder()
+            var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHandler)))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEvents(c =>
@@ -23,7 +23,7 @@ namespace StoneFruit.Tests.Integration
                 {
                     s.MaxExecuteTimeout = TimeSpan.FromSeconds(2);
                 })
-                .Build();
+            );
             engine.RunHeadless("test");
             // Give a pretty wide range here, we don't care exactly what the number is and
             // we don't want to throw false negatives if it took the threadpool a long
