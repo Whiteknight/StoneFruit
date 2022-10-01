@@ -22,7 +22,7 @@ namespace StoneFruit
         private readonly EngineSettings _settings;
         private readonly IServiceCollection _services;
 
-        private EngineBuilder(IServiceCollection? services = null, Action scanForHandlers = null)
+        private EngineBuilder(IServiceCollection services, Action scanForHandlers = null)
         {
             _handlers = new HandlerSetup(scanForHandlers ?? ThrowIfScanRequestedButScannerNotProvided);
             _eventCatalog = new EngineEventCatalog();
@@ -100,10 +100,57 @@ namespace StoneFruit
         }
 
         /// <summary>
-        /// Build the Engine using configured objects
+        /// Default factory method for StoneFruit Engine. Uses the default DI container to create
+        /// all registrations and build the Engine.
         /// </summary>
+        /// <param name="build"></param>
         /// <returns></returns>
-        public void BuildUp(IServiceCollection services)
+        public static Engine Build(Action<IEngineBuilder> build)
+        {
+            var services = new ServiceCollection();
+            var handlersBuilder = new HandlerSetup(() => ScanForHandlers(services));
+            var engineBuilder = new EngineBuilder(services);
+            build?.Invoke(engineBuilder);
+            SetupCoreEngineRegistrations(services);
+            handlersBuilder.AddSource(ctx => new ServiceProviderHandlerSource(services, () => services.BuildServiceProvider(), ctx.VerbExtractor));
+
+            // Build up the final Engine registrations. This involves resolving some
+            // dependencies which were setup previously
+            engineBuilder.BuildUp(services);
+            var provider = services.BuildServiceProvider();
+            return provider.GetRequiredService<Engine>();
+        }
+
+        /// <summary>
+        /// Setup all dependencies and container registrations to create and execute the
+        /// Engine, using the EngineBuilder. Assumes the user is providing their own DI container
+        /// and scanning/resolving logic for handlers.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="build"></param>
+        public static void SetupEngineRegistrations(IServiceCollection services, Action<IEngineBuilder> build, Action scanForHandlers)
+        {
+            var builder = new EngineBuilder(services, scanForHandlers: scanForHandlers);
+            build?.Invoke(builder);
+            SetupCoreEngineRegistrations(services);
+            builder.BuildUp(services);
+        }
+
+        public static void SetupExplicitEnvironmentRegistration<TEnvironment>(IServiceCollection services)
+            where TEnvironment : class
+        {
+            // The user may already have their own registration, so don't overwrite it.
+            services.TryAddScoped(provider =>
+            {
+                var current = provider.GetRequiredService<IEnvironmentCollection>().GetCurrent();
+                if (!current.HasValue)
+                    throw new InvalidCastException($"Invalid environment. Expected environment {typeof(TEnvironment)} but none found.");
+                var env = current.Value as TEnvironment;
+                return env ?? throw new InvalidCastException($"Invalid cast. Expected environment {typeof(TEnvironment)} but found {current.GetType()}");
+            });
+        }
+
+        private void BuildUp(IServiceCollection services)
         {
             _handlers.BuildUp(services);
             services.AddSingleton(_eventCatalog);
@@ -113,25 +160,7 @@ namespace StoneFruit
             _output.BuildUp(services);
         }
 
-        /// <summary>
-        /// Setup all dependencies and container registrations to create and execute the
-        /// Engine, using the EngineBuilder.
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="build"></param>
-        public static void SetupEngineRegistrations(IServiceCollection services, Action<IEngineBuilder> build, Action scanForHandlers)
-        {
-            var builder = new EngineBuilder(scanForHandlers: scanForHandlers);
-            build?.Invoke(builder);
-            SetupEngineRegistrations(services);
-            builder.BuildUp(services);
-        }
-
-        /// <summary>
-        /// Setup type registrations necessary to create and execute the Engine
-        /// </summary>
-        /// <param name="services"></param>
-        public static void SetupEngineRegistrations(IServiceCollection services)
+        private static void SetupCoreEngineRegistrations(IServiceCollection services)
         {
             // Register the Engine and the things that the Engine provides. These registrations
             // are required, the user is not expected to inject their own Engine, State or
@@ -162,36 +191,6 @@ namespace StoneFruit
             // input command has been entered. We access it from the EngineState, which comes from
             // the Engine, and we do all this to avoid circular references in the DI.
             services.AddScoped(provider => provider.GetRequiredService<EngineState>().CurrentArguments);
-        }
-
-        public static void SetupExplicitEnvironmentRegistration<TEnvironment>(IServiceCollection services)
-            where TEnvironment : class
-        {
-            // The user may already have their own registration, so don't overwrite it.
-            services.TryAddScoped(provider =>
-            {
-                var current = provider.GetRequiredService<IEnvironmentCollection>().GetCurrent();
-                if (!current.HasValue)
-                    throw new InvalidCastException($"Invalid environment. Expected environment {typeof(TEnvironment)} but none found.");
-                var env = current.Value as TEnvironment;
-                return env ?? throw new InvalidCastException($"Invalid cast. Expected environment {typeof(TEnvironment)} but found {current.GetType()}");
-            });
-        }
-
-        public static Engine Build(Action<IEngineBuilder> build)
-        {
-            var services = new ServiceCollection();
-            var handlersBuilder = new HandlerSetup(() => ScanForHandlers(services));
-            var engineBuilder = new EngineBuilder(services: services);
-            build?.Invoke(engineBuilder);
-            SetupEngineRegistrations(services);
-            handlersBuilder.AddSource(ctx => new ServiceProviderHandlerSource(services, () => services.BuildServiceProvider(), ctx.VerbExtractor));
-
-            // Build up the final Engine registrations. This involves resolving some
-            // dependencies which were setup previously
-            engineBuilder.BuildUp(services);
-            var provider = services.BuildServiceProvider();
-            return provider.GetRequiredService<Engine>();
         }
 
         private void ThrowIfScanRequestedButScannerNotProvided()
