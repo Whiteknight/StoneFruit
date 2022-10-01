@@ -12,7 +12,7 @@ namespace StoneFruit.Containers.Unity.Tests.Integration
         {
             var output = new TestOutput();
             var container = new UnityContainer();
-            container.SetupEngine<TestEnvironment>(b => b
+            container.SetupEngine(b => b
                 .SetupHandlers(h => h.Scan())
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupEnvironments(e => e.UseInstance(new TestEnvironment("Single")))

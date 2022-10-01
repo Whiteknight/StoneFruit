@@ -74,6 +74,15 @@ namespace StoneFruit
         IHandlerSetup AddScript(Verb verb, IEnumerable<string> lines, string description = "", string usage = "", string group = "");
 
         /// <summary>
+        /// Specify an explicit list of handler types to register with the Engine. Notice that these types
+        /// may not be constructed using your DI container of choice. If you are using a DI container, you
+        /// should try to register types with the container instead.
+        /// </summary>
+        /// <param name="commandTypes"></param>
+        /// <returns></returns>
+        IHandlerSetup UseHandlerTypes(IEnumerable<Type> commandTypes);
+
+        /// <summary>
         /// Scan currently-linked assemblies in the current AppDomain for all classes of type
         /// IHandler or IAsyncHandler.
         /// </summary>
@@ -133,23 +142,7 @@ namespace StoneFruit
         {
             Assert.ArgumentNotNull(handlers, nameof(handlers));
             Assert.ArgumentNotNull(commandTypes, nameof(commandTypes));
-            return handlers.UseHandlerTypes(commandTypes, null);
-        }
-
-        /// <summary>
-        /// Specify an explicit list of handler types to register with the Engine. Notice that these types
-        /// may not be constructed using your DI container of choice. If you are using a DI container, you
-        /// should try to register types with the container instead.
-        /// </summary>
-        /// <param name="commandTypes"></param>
-        /// <param name="resolver"></param>
-        /// <param name="verbExtractor"></param>
-        /// <returns></returns>
-        public static IHandlerSetup UseHandlerTypes(this IHandlerSetup handlers, IEnumerable<Type> commandTypes, TypeInstanceResolver? resolver = null)
-        {
-            Assert.ArgumentNotNull(handlers, nameof(handlers));
-            Assert.ArgumentNotNull(commandTypes, nameof(commandTypes));
-            return handlers.AddSource(ctx => new TypeListConstructSource(commandTypes, resolver, ctx.VerbExtractor));
+            return handlers.UseHandlerTypes(commandTypes);
         }
     }
 }

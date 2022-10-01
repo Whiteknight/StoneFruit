@@ -1,13 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Autofac;
-using Lamar;
-using Microsoft.Extensions.DependencyInjection;
-using StoneFruit.Containers.Autofac;
-using StoneFruit.Containers.Lamar;
-using StoneFruit.Containers.StructureMap;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 
@@ -66,7 +59,10 @@ namespace StoneFruit.Cli
                     .Add(new[] { "test", "j" }, (c, d) => d.Output.WriteLine("J"), description: "do J things", usage: "test j")
                 //.AddAlias("testf", "testf-alias")
                 )
-                .SetupEnvironments(e => e.UseFactory(new MyEnvironmentFactory()))
+                .SetupEnvironments(e => e
+                    .SetEnvironments(new[] { "Local", "Testing", "Production" })
+                    .UseFactory(new MyEnvironmentFactory())
+                )
                 .SetupEvents(e =>
                 {
                     //e.EngineStartInteractive.Clear();
@@ -85,30 +81,30 @@ namespace StoneFruit.Cli
             return EngineBuilder.Build(b => Build(b));
         }
 
-        private static Engine StructureMapMain()
-        {
-            var container = new StructureMap.Container();
-            container.SetupEngine<MyEnvironment>(Build);
+        //private static Engine StructureMapMain()
+        //{
+        //    var container = new StructureMap.Container();
+        //    container.SetupEngine<MyEnvironment>(Build);
 
-            return container.GetInstance<Engine>();
-        }
+        //    return container.GetInstance<Engine>();
+        //}
 
-        private static Engine LamarMain()
-        {
-            var serviceCollection = new ServiceRegistry()
-                .SetupEngine<MyEnvironment>(Build);
+        //private static Engine LamarMain()
+        //{
+        //    var serviceCollection = new ServiceRegistry()
+        //        .SetupEngine<MyEnvironment>(Build);
 
-            var container = new Container(serviceCollection);
-            return container.GetService<Engine>();
-        }
+        //    var container = new Container(serviceCollection);
+        //    return container.GetService<Engine>();
+        //}
 
-        private static Engine AutofacMain()
-        {
-            var containerBuilder = new Autofac.ContainerBuilder();
-            containerBuilder.SetupEngine<MyEnvironment>(Build);
-            Autofac.IContainer container = containerBuilder.Build();
-            return container.Resolve<Engine>();
-        }
+        //private static Engine AutofacMain()
+        //{
+        //    var containerBuilder = new Autofac.ContainerBuilder();
+        //    containerBuilder.SetupEngine<MyEnvironment>(Build);
+        //    Autofac.IContainer container = containerBuilder.Build();
+        //    return container.Resolve<Engine>();
+        //}
     }
 
     public class TestArgsA
@@ -166,12 +162,9 @@ namespace StoneFruit.Cli
         }
     }
 
-    public class MyEnvironmentFactory : IEnvironmentFactory
+    public class MyEnvironmentFactory : IEnvironmentFactory<MyEnvironment>
     {
-        public IResult<object> Create(string name)
-            => Result.Success<object>(new MyEnvironment(name));
-
-        public IReadOnlyCollection<string> ValidEnvironments => new[] { "Local", "Testing", "Production" };
+        public IResult<MyEnvironment> Create(string name) => Result.Success(new MyEnvironment(name));
     }
 
     public class MyEnvironment

@@ -12,7 +12,7 @@ namespace StoneFruit.Tests.Execution.Environments
         public void Create_ValidName()
         {
             var instance = new object();
-            var target = new DictionaryEnvironmentFactory(new Dictionary<string, object> { { "test", instance } });
+            var target = new DictionaryEnvironmentFactory<object>(new Dictionary<string, object> { { "test", instance } });
             target.Create("test").Value.Should().BeSameAs(instance);
         }
 
@@ -20,7 +20,7 @@ namespace StoneFruit.Tests.Execution.Environments
         public void Create_InvalidName()
         {
             var instance = new object();
-            var target = new DictionaryEnvironmentFactory(new Dictionary<string, object> { { "test", instance } });
+            var target = new DictionaryEnvironmentFactory<object>(new Dictionary<string, object> { { "test", instance } });
             target.Create("GARBAGE").HasValue.Should().BeFalse();
         }
 
@@ -28,7 +28,7 @@ namespace StoneFruit.Tests.Execution.Environments
         public void ValidEnvironments_Test()
         {
             var instance = new object();
-            var target = new DictionaryEnvironmentFactory(new Dictionary<string, object> {
+            var target = new DictionaryEnvironmentFactory<object>(new Dictionary<string, object> {
                 { "a", instance },
                 { "b", instance },
                 { "c", instance }

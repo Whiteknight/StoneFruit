@@ -12,10 +12,10 @@ namespace StoneFruit.Containers.Autofac.Tests.Integration
         {
             var output = new TestOutput();
             var containerBuilder = new ContainerBuilder();
-            containerBuilder.SetupEngine<TestEnvironment>(b => b
+            containerBuilder.SetupEngine(b => b
+                .SetupEnvironments(e => e.UseInstance(new TestEnvironment("Single")))
                 .SetupHandlers(h => h.Scan())
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .SetupEnvironments(e => e.UseInstance(new TestEnvironment("Single")))
             );
             var container = containerBuilder.Build();
             var engine = container.Resolve<Engine>();

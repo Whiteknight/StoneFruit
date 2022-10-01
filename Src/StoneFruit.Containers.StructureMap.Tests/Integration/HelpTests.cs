@@ -20,7 +20,7 @@ namespace StoneFruit.Containers.StructureMap.Tests.Integration
         {
             var output = new TestOutput();
             var container = new Container();
-            container.SetupEngine<object>(builder => builder
+            container.SetupEngine(builder => builder
                 .SetupHandlers(h => h.Scan())
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
             );
@@ -36,7 +36,7 @@ namespace StoneFruit.Containers.StructureMap.Tests.Integration
         {
             var output = new TestOutput();
             var container = new Container();
-            container.SetupEngine<object>(builder => builder
+            container.SetupEngine(builder => builder
                 .SetupHandlers(h => h.Scan())
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
             );

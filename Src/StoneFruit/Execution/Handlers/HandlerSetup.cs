@@ -19,6 +19,16 @@ namespace StoneFruit.Execution.Handlers
         private readonly ScriptHandlerSource _scripts;
         private readonly NamedInstanceHandlerSource _instances;
         private readonly Action _scanForHandlers;
+
+        private readonly List<Type> _handlerTypes = new List<Type>
+        {
+            typeof(EchoHandler),
+            typeof(EnvironmentHandler),
+            typeof(ExitHandler),
+            typeof(HelpHandler),
+            typeof(MetadataHandler),
+        };
+
         private IVerbExtractor _verbExtractor;
         private IHandlerMethodInvoker _methodInvoker;
 
@@ -47,10 +57,15 @@ namespace StoneFruit.Execution.Handlers
             if (_instances.Count > 0)
                 services.AddSingleton<IHandlerSource>(_instances);
 
-            services.AddSingleton(provider =>
+            foreach (var handlerType in _handlerTypes)
+            {
+                services.AddTransient(handlerType);
+            }
+            services.AddSingleton<IHandlerSource>(provider =>
             {
                 var ve = provider.GetRequiredService<IVerbExtractor>();
-                return GetBuiltinHandlerSource(ve);
+                var source = new TypeListConstructSource(_handlerTypes, (t, a, d) => provider.GetRequiredService(t), ve);
+                return source;
             });
 
             foreach (var sourceFactory in _sourceFactories)
@@ -71,31 +86,6 @@ namespace StoneFruit.Execution.Handlers
                 var sources = provider.GetServices<IHandlerSource>();
                 return new HandlerSourceCollection(sources);
             });
-        }
-
-        public IHandlers Build()
-        {
-            var sources = new List<IHandlerSource>();
-
-            // Add these sources only if they have entries
-            if (_delegates.Count > 0)
-                sources.Add(_delegates);
-            if (_scripts.Count > 0)
-                sources.Add(_scripts);
-            if (_instances.Count > 0)
-                sources.Add(_instances);
-
-            // Invoke factory methods to create sources and add them to the list
-            var buildContext = new HandlerSourceBuildContext(_verbExtractor, _methodInvoker);
-            _sourceFactories.Add(ctx => GetBuiltinHandlerSource(ctx.VerbExtractor));
-            foreach (var sourceFactory in _sourceFactories)
-            {
-                var source = sourceFactory(buildContext);
-                sources.Add(source);
-            }
-
-            // Return the source collection
-            return new HandlerSourceCollection(sources);
         }
 
         public IHandlerSetup UseVerbExtractor(IVerbExtractor verbExtractor)
@@ -151,17 +141,12 @@ namespace StoneFruit.Execution.Handlers
             return this;
         }
 
-        private static IHandlerSource GetBuiltinHandlerSource(IVerbExtractor verbExtractor)
+        public IHandlerSetup UseHandlerTypes(IEnumerable<Type> commandTypes)
         {
-            var requiredHandlers = new[]
-            {
-                typeof(EchoHandler),
-                typeof(EnvironmentHandler),
-                typeof(ExitHandler),
-                typeof(HelpHandler),
-                typeof(MetadataHandler),
-            };
-            return new TypeListConstructSource(requiredHandlers, verbExtractor);
+            Assert.ArgumentNotNull(commandTypes, nameof(commandTypes));
+
+            _handlerTypes.AddRange(commandTypes);
+            return this;
         }
 
         public IHandlerSetup Scan()

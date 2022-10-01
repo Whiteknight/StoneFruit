@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using FluentAssertions;
+﻿using FluentAssertions;
 using NUnit.Framework;
 using StructureMap;
 using TestUtilities;
@@ -18,11 +17,9 @@ namespace StoneFruit.Containers.StructureMap.Tests.Integration
             }
         }
 
-        public class MyEnvironmentFactory : IEnvironmentFactory
+        public class MyEnvironmentFactory : IEnvironmentFactory<MyEnvironment>
         {
-            public IResult<object> Create(string name) => Result.Success<object>(new MyEnvironment(name));
-
-            public IReadOnlyCollection<string> ValidEnvironments => new[] { "A", "B", "C" };
+            public IResult<MyEnvironment> Create(string name) => Result.Success(new MyEnvironment(name));
         }
 
         public class MyService
@@ -60,10 +57,13 @@ namespace StoneFruit.Containers.StructureMap.Tests.Integration
         {
             var output = new TestOutput();
             var container = new Container();
-            container.SetupEngine<MyEnvironment>(builder => builder
+            container.SetupEngine(builder => builder
                 .SetupHandlers(h => h.Scan())
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .SetupEnvironments(e => e.UseFactory(new MyEnvironmentFactory()))
+                .SetupEnvironments(e => e
+                    .SetEnvironments(new[] { "A", "B", "C" })
+                    .UseFactory(new MyEnvironmentFactory())
+                )
                 .SetupEvents(e =>
                 {
                     e.EnvironmentChanged.Clear();

@@ -14,26 +14,6 @@ namespace StoneFruit.Containers.Unity
     {
         /// <summary>
         /// Setup registrations for the Engine. Scan assemblies in the application to find Handler
-        /// types to register with the container. This variant uses an environment object.
-        /// </summary>
-        /// <typeparam name="TEnvironment"></typeparam>
-        /// <param name="container"></param>
-        /// <param name="build"></param>
-        /// <returns></returns>
-        public static IUnityContainer SetupEngine<TEnvironment>(this IUnityContainer container, Action<IEngineBuilder> build)
-            where TEnvironment : class
-        {
-            var services = new DefaultServiceCollection();
-            EngineBuilder.SetupEngineRegistrations(services, build, () => ScanForHandlers(container));
-            EngineBuilder.SetupExplicitEnvironmentRegistration<TEnvironment>(services);
-            foreach (var descriptor in services)
-                AddRegistration(container, descriptor);
-            container.RegisterFactory<IHandlerSource>(c => new UnityHandlerSource(c, c.Resolve<IVerbExtractor>()));
-            return container;
-        }
-
-        /// <summary>
-        /// Setup registrations for the Engine. Scan assemblies in the application to find Handler
         /// types to register with the container. This variant does not use an environment object.
         /// </summary>
         /// <param name="container"></param>

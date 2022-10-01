@@ -10,7 +10,7 @@ namespace StoneFruit.Utilities
         private static void Main(string[] args)
         {
             var serviceCollection = new ServiceRegistry()
-                .SetupEngine<UtilitiesEnvironment>(Build);
+                .SetupEngine(Build);
 
             var container = new Container(serviceCollection);
             var engine = container.GetService<Engine>();

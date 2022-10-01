@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Lamar;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -19,11 +18,9 @@ namespace StoneFruit.Containers.Lamar.Tests.Integration
             }
         }
 
-        private class MyEnvironmentFactory : IEnvironmentFactory
+        private class MyEnvironmentFactory : IEnvironmentFactory<MyEnvironment>
         {
-            public IResult<object> Create(string name) => Result.Success<object>(new MyEnvironment(name));
-
-            public IReadOnlyCollection<string> ValidEnvironments => new[] { "A", "B", "C" };
+            public IResult<MyEnvironment> Create(string name) => Result.Success(new MyEnvironment(name));
         }
 
         public class MyService
@@ -61,10 +58,13 @@ namespace StoneFruit.Containers.Lamar.Tests.Integration
         {
             var output = new TestOutput();
             var services = new ServiceRegistry();
-            services.SetupEngine<MyEnvironment>(b => b
+            services.SetupEngine(b => b
                 .SetupHandlers(h => h.Scan())
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .SetupEnvironments(e => e.UseFactory(new MyEnvironmentFactory()))
+                .SetupEnvironments(e => e
+                    .SetEnvironments(new[] { "A", "B", "C" })
+                    .UseFactory(new MyEnvironmentFactory())
+                )
                 .SetupEvents(e =>
                 {
                     e.EnvironmentChanged.Clear();

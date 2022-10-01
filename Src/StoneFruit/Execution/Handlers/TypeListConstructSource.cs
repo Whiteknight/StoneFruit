@@ -16,16 +16,12 @@ namespace StoneFruit.Execution.Handlers
         private readonly TypeInstanceResolver _resolver;
         private readonly VerbTrie<VerbInfo> _types;
 
-        public TypeListConstructSource(IEnumerable<Type> types, IVerbExtractor verbExtractor)
-            : this(types, DefaultResolver, verbExtractor)
-        {
-        }
-
-        public TypeListConstructSource(IEnumerable<Type> types, TypeInstanceResolver? resolver, IVerbExtractor verbExtractor)
+        public TypeListConstructSource(IEnumerable<Type> types, TypeInstanceResolver resolver, IVerbExtractor verbExtractor)
         {
             Assert.ArgumentNotNull(types, nameof(types));
+            Assert.ArgumentNotNull(resolver, nameof(resolver));
 
-            _resolver = resolver ?? DefaultResolver;
+            _resolver = resolver;
 
             _types = new VerbTrie<VerbInfo>();
             foreach (var commandType in types)
@@ -34,27 +30,6 @@ namespace StoneFruit.Execution.Handlers
                 foreach (var verb in verbs)
                     _types.Insert(verb, new VerbInfo(verb, commandType));
             }
-        }
-
-        private static object? DefaultResolver(Type commandType, IArguments arguments, CommandDispatcher dispatcher)
-        {
-            var objects = new List<object>
-            {
-                // long-lived objects
-                dispatcher,
-                dispatcher.Environments,
-                dispatcher.State,
-                dispatcher.Output,
-                dispatcher.Parser,
-                dispatcher.Handlers,
-
-                // transient objects
-                arguments
-            };
-            var currentEnv = dispatcher.Environments.GetCurrent();
-            if (currentEnv.HasValue)
-                objects.Add(currentEnv.Value);
-            return DuckTypeConstructorInvoker.TryConstruct(commandType, objects);
         }
 
         public IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)

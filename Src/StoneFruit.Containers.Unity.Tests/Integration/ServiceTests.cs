@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using FluentAssertions;
 using NUnit.Framework;
 using TestUtilities;
@@ -18,15 +17,13 @@ namespace StoneFruit.Containers.Unity.Tests.Integration
             }
         }
 
-        private class MyEnvironmentFactory : IEnvironmentFactory
+        private class MyEnvironmentFactory : IEnvironmentFactory<MyEnvironment>
         {
-            public IResult<object> Create(string name)
+            public IResult<MyEnvironment> Create(string name)
             {
                 var env = new MyEnvironment(name);
-                return Result.Success<object>(env);
+                return Result.Success(env);
             }
-
-            public IReadOnlyCollection<string> ValidEnvironments => new[] { "A", "B", "C" };
         }
 
         public class MyService
@@ -64,15 +61,18 @@ namespace StoneFruit.Containers.Unity.Tests.Integration
         {
             var output = new TestOutput();
             var container = new UnityContainer();
-            container.SetupEngine<MyEnvironment>(b => b
+            container.SetupEngine(b => b
                 .SetupHandlers(h => h.Scan())
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .SetupEnvironments(e => e.UseFactory(new MyEnvironmentFactory()))
+                .SetupEnvironments(e => e
+                    .SetEnvironments(new[] { "A", "B", "C" })
+                    .UseFactory(new MyEnvironmentFactory())
+                )
                 .SetupEvents(e =>
                 {
                     e.EnvironmentChanged.Clear();
                 })
-            );
+            ); ;
             container.RegisterType<MyService>();
             var engine = container.Resolve<Engine>();
 

@@ -20,7 +20,7 @@ namespace StoneFruit.Containers.Autofac.Tests.Integration
         {
             var output = new TestOutput();
             var containerBuilder = new ContainerBuilder();
-            containerBuilder.SetupEngine<object>(b => b
+            containerBuilder.SetupEngine(b => b
                 .SetupHandlers(h => h.Scan())
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
             );
@@ -36,7 +36,7 @@ namespace StoneFruit.Containers.Autofac.Tests.Integration
         {
             var output = new TestOutput();
             var containerBuilder = new ContainerBuilder();
-            containerBuilder.SetupEngine<object>(b => b
+            containerBuilder.SetupEngine(b => b
                 .SetupHandlers(h => h.Scan())
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
             );

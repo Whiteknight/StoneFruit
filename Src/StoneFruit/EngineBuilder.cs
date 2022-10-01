@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Environments;
@@ -24,13 +23,13 @@ namespace StoneFruit
 
         private EngineBuilder(IServiceCollection services, Action scanForHandlers = null)
         {
+            _services = services;
             _handlers = new HandlerSetup(scanForHandlers ?? ThrowIfScanRequestedButScannerNotProvided);
             _eventCatalog = new EngineEventCatalog();
             _output = new OutputSetup();
-            _environments = new EnvironmentSetup();
+            _environments = new EnvironmentSetup(_services);
             _parsers = new ParserSetup();
             _settings = new EngineSettings();
-            _services = new ServiceCollection();
         }
 
         /// <summary>
@@ -112,11 +111,11 @@ namespace StoneFruit
             var engineBuilder = new EngineBuilder(services);
             build?.Invoke(engineBuilder);
             SetupCoreEngineRegistrations(services);
-            handlersBuilder.AddSource(ctx => new ServiceProviderHandlerSource(services, () => services.BuildServiceProvider(), ctx.VerbExtractor));
 
             // Build up the final Engine registrations. This involves resolving some
             // dependencies which were setup previously
             engineBuilder.BuildUp(services);
+            handlersBuilder.AddSource(ctx => new ServiceProviderHandlerSource(services, () => services.BuildServiceProvider(), ctx.VerbExtractor));
             var provider = services.BuildServiceProvider();
             return provider.GetRequiredService<Engine>();
         }
@@ -134,20 +133,6 @@ namespace StoneFruit
             build?.Invoke(builder);
             SetupCoreEngineRegistrations(services);
             builder.BuildUp(services);
-        }
-
-        public static void SetupExplicitEnvironmentRegistration<TEnvironment>(IServiceCollection services)
-            where TEnvironment : class
-        {
-            // The user may already have their own registration, so don't overwrite it.
-            services.TryAddScoped(provider =>
-            {
-                var current = provider.GetRequiredService<IEnvironmentCollection>().GetCurrent();
-                if (!current.HasValue)
-                    throw new InvalidCastException($"Invalid environment. Expected environment {typeof(TEnvironment)} but none found.");
-                var env = current.Value as TEnvironment;
-                return env ?? throw new InvalidCastException($"Invalid cast. Expected environment {typeof(TEnvironment)} but found {current.GetType()}");
-            });
         }
 
         private void BuildUp(IServiceCollection services)
@@ -190,7 +175,7 @@ namespace StoneFruit
             // The CurrentArguments only exist when the Engine.Run() or a variant is called, and an
             // input command has been entered. We access it from the EngineState, which comes from
             // the Engine, and we do all this to avoid circular references in the DI.
-            services.AddScoped(provider => provider.GetRequiredService<EngineState>().CurrentArguments);
+            services.AddTransient(provider => provider.GetRequiredService<EngineState>().CurrentArguments);
         }
 
         private void ThrowIfScanRequestedButScannerNotProvided()

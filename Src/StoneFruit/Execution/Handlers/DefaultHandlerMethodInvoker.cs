@@ -68,9 +68,9 @@ namespace StoneFruit.Execution.Handlers
             if (type == typeof(IArguments))
                 return arguments;
 
-            var currentEnv = dispatcher.Environments.GetCurrent();
-            if (currentEnv.HasValue && type == currentEnv.Value.GetType())
-                return currentEnv.Value;
+            //var currentEnv = dispatcher.Environments.GetCurrent();
+            //if (currentEnv.HasValue && type == currentEnv.Value.GetType())
+            //    return currentEnv.Value;
 
             if (type == typeof(bool))
                 return arguments.HasFlag(name);
