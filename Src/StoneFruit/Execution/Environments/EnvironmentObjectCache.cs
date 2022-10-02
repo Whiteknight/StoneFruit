@@ -36,5 +36,12 @@ namespace StoneFruit.Execution.Environments
             else
                 env[typeof(T)] = value;
         }
+
+        public void Clear(string environment)
+        {
+            if (!_cache.ContainsKey(environment))
+                return;
+            _cache[environment].Clear();
+        }
     }
 }
