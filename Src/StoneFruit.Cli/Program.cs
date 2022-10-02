@@ -28,14 +28,14 @@ namespace StoneFruit.Cli
 
     internal static class Program
     {
-        private static void Main(string[] args)
+        private static async Task Main(string[] args)
         {
             var engine = NoneMain();
             //var engine = StructureMapMain();
             //var engine = LamarMain();
             //var engine = MicrosoftMain();
             //var engine = AutofacMain();
-            Environment.ExitCode = engine.RunWithCommandLineArguments();
+            Environment.ExitCode = await engine.RunWithCommandLineArgumentsAsync();
 
             Console.ReadKey();
         }

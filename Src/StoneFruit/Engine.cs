@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.CommandSources;
@@ -48,10 +49,19 @@ namespace StoneFruit
         /// arguments are provided the application will run in interactive mode.
         /// </summary>
         /// <returns></returns>
-        public int RunWithCommandLineArguments()
+        public Task<int> RunWithCommandLineArgumentsAsync()
         {
             var commandLine = GetRawCommandLineArguments();
-            return Run(commandLine);
+            return RunAsync(commandLine);
+        }
+
+        public int RunWithCommandLineArguments()
+        {
+            return Task.Run(async () =>
+            {
+                var commandLine = GetRawCommandLineArguments();
+                return await RunAsync(commandLine);
+            }).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -60,19 +70,27 @@ namespace StoneFruit
         /// the application is inferred to be in interactive mode.
         /// </summary>
         /// <param name="commandLine"></param>
-        public int Run(string commandLine)
+        public Task<int> RunAsync(string commandLine)
         {
             // If there are no arguments, enter interactive mode
             if (string.IsNullOrEmpty(commandLine))
-                return RunInteractively();
+                return RunInteractivelyAsync();
 
             // if there is exactly one argument and it's the name of a valid environment,
             // start interactive mode setting that environment first.
             if (Environments.IsValid(commandLine))
-                return RunInteractively(commandLine);
+                return RunInteractivelyAsync(commandLine);
 
             // Otherwise run in headless mode and figure it out from there.
-            return RunHeadless(commandLine);
+            return RunHeadlessAsync(commandLine);
+        }
+
+        public int Run(string commandLine)
+        {
+            return Task.Run(async () =>
+            {
+                return await RunAsync(commandLine);
+            }).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -80,10 +98,19 @@ namespace StoneFruit
         /// exits the application
         /// </summary>
         /// <returns></returns>
-        public int RunHeadlessWithCommandLineArgs()
+        public Task<int> RunHeadlessWithCommandLineArgsAsync()
         {
             var commandLine = GetRawCommandLineArguments();
-            return RunHeadless(commandLine);
+            return RunHeadlessAsync(commandLine);
+        }
+
+        public int RunHeadlessWithCommandLineArgs()
+        {
+            return Task.Run(async () =>
+            {
+                var commandLine = GetRawCommandLineArguments();
+                return await RunHeadlessAsync(commandLine);
+            }).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -91,7 +118,7 @@ namespace StoneFruit
         /// </summary>
         /// <param name="commandLine"></param>
         /// <returns></returns>
-        public int RunHeadless(string commandLine)
+        public async Task<int> RunHeadlessAsync(string commandLine)
         {
             State.SetRunMode(EngineRunMode.Headless);
             var sources = new CommandSourceCollection();
@@ -103,7 +130,7 @@ namespace StoneFruit
                 sources.AddToEnd(State.EventCatalog.HeadlessHelp, _parser,
                     ("exitcode", Constants.ExitCode.HeadlessHelp.ToString())
                 );
-                return RunLoop(sources);
+                return await RunLoop(sources);
             }
 
             // Now see if the first argument is the name of an environment. If so, switch
@@ -117,7 +144,7 @@ namespace StoneFruit
                 sources.AddToEnd(State.EventCatalog.HeadlessNoArgs, _parser,
                     ("exitcode", Constants.ExitCode.HeadlessNoVerb.ToString())
                 );
-                return RunLoop(sources);
+                return await RunLoop(sources);
             }
 
             // Setup the Headless start script, an environment change command if any, the
@@ -128,7 +155,15 @@ namespace StoneFruit
             sources.AddToEnd(commandLine);
             sources.AddToEnd(State.EventCatalog.EngineStopHeadless, _parser);
 
-            return RunLoop(sources);
+            return await RunLoop(sources);
+        }
+
+        public int RunHeadless(string commandLine)
+        {
+            return Task.Run(async () =>
+            {
+                return await RunHeadlessAsync(commandLine);
+            }).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -137,7 +172,15 @@ namespace StoneFruit
         /// any commands are executed. Returns when the user has entered the 'exit' or
         /// 'quit' commands, or when some other verb has set the exit condition.
         /// </summary>
-        public int RunInteractively() => RunInteractively(null);
+        public Task<int> RunInteractivelyAsync() => RunInteractivelyAsync(null);
+
+        public int RunInteractively()
+        {
+            return Task.Run(async () =>
+            {
+                return await RunInteractivelyAsync(null);
+            }).GetAwaiter().GetResult();
+        }
 
         /// <summary>
         /// Runs interactively, setting the environment to the value given and then
@@ -146,7 +189,7 @@ namespace StoneFruit
         /// condition.
         /// </summary>
         /// <param name="environment"></param>
-        public int RunInteractively(string? environment)
+        public async Task<int> RunInteractivelyAsync(string? environment)
         {
             State.SetRunMode(EngineRunMode.Interactive);
             var source = new CommandSourceCollection();
@@ -159,7 +202,15 @@ namespace StoneFruit
             source.AddToEnd(State.EventCatalog.EngineStartInteractive, _parser);
             source.AddToEnd(new PromptCommandSource(Output, Environments, State));
 
-            return RunLoop(source);
+            return await RunLoop(source);
+        }
+
+        public int RunInteractively(string? environment)
+        {
+            return Task.Run(async () =>
+            {
+                return await RunInteractivelyAsync(environment);
+            }).GetAwaiter().GetResult();
         }
 
         // Attempt to get the raw commandline arguments as they were passed to the
@@ -191,13 +242,13 @@ namespace StoneFruit
         // Pulls commands from the command source until the source is empty or an exit
         // signal is received. Each command is added to the command queue and the queue
         // is drained.
-        private int RunLoop(CommandSourceCollection sources)
+        private async Task<int> RunLoop(CommandSourceCollection sources)
         {
             if (State.RunMode == EngineRunMode.Idle)
                 throw new ExecutionException("Cannot run the engine in Idle mode. Must enter Headless or Interactive mode first.");
             try
             {
-                return RunLoopInternal(sources);
+                return await RunLoopInternal(sources);
             }
             finally
             {
@@ -205,7 +256,7 @@ namespace StoneFruit
             }
         }
 
-        private int RunLoopInternal(CommandSourceCollection sources)
+        private async Task<int> RunLoopInternal(CommandSourceCollection sources)
         {
             while (true)
             {
@@ -228,7 +279,7 @@ namespace StoneFruit
                 if (!canExecute)
                     continue;
 
-                RunOneCommand(command);
+                await RunOneCommand(command);
 
                 // If exit is signaled, return.
                 if (State.ShouldExit)
@@ -236,14 +287,15 @@ namespace StoneFruit
             }
         }
 
-        private void RunOneCommand(ArgumentsOrString command)
+        private async Task RunOneCommand(ArgumentsOrString command)
         {
             try
             {
                 // Get a cancellation token source, configured according to state Command
                 // settings, and use that to dispatch the command
                 using var tokenSource = State.GetConfiguredCancellationSource();
-                Dispatcher.Execute(command, tokenSource.Token);
+
+                await Dispatcher.ExecuteAsync(command, tokenSource.Token);
             }
             catch (VerbNotFoundException vnf)
             {
