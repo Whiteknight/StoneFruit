@@ -22,7 +22,7 @@ namespace StoneFruit.Execution.Arguments
             services.TryAddSingleton(parser);
         }
 
-        public ICommandParser Build()
+        private ICommandParser Build()
         {
             if (_parser != null)
                 return _parser;

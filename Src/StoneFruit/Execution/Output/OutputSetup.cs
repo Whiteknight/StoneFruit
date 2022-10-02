@@ -34,7 +34,7 @@ namespace StoneFruit.Execution.Output
             services.TryAddSingleton(output);
         }
 
-        public IOutput Build()
+        private IOutput Build()
         {
             if (!_useConsole)
             {
