@@ -19,15 +19,16 @@ namespace StoneFruit
         private readonly EnvironmentSetup _environments;
         private readonly ParserSetup _parsers;
         private readonly EngineSettings _settings;
-        private readonly IServiceCollection _services;
+
+        public IServiceCollection Services { get; }
 
         private EngineBuilder(IServiceCollection services, Action scanForHandlers = null)
         {
-            _services = services;
-            _handlers = new HandlerSetup(_services, scanForHandlers ?? ThrowIfScanRequestedButScannerNotProvided);
+            Services = services;
+            _handlers = new HandlerSetup(Services, scanForHandlers ?? ThrowIfScanRequestedButScannerNotProvided);
             _eventCatalog = new EngineEventCatalog();
             _output = new OutputSetup();
-            _environments = new EnvironmentSetup(_services);
+            _environments = new EnvironmentSetup(Services);
             _parsers = new ParserSetup();
             _settings = new EngineSettings();
         }
