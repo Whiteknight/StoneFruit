@@ -52,6 +52,7 @@ metadata list
             {
                 foreach (var name in _args.GetAllPositionals())
                     _state.Metadata.Remove(name.AsString());
+                return;
             }
 
             throw new ExecutionException("Unknown arguments");
