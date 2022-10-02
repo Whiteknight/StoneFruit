@@ -29,21 +29,18 @@ namespace StoneFruit.Execution.Handlers
             typeof(MetadataHandler),
         };
 
-        private IVerbExtractor _verbExtractor;
-
         public HandlerSetup(IServiceCollection services, Action scanForHandlers)
         {
             _delegates = new DelegateHandlerSource();
             _scripts = new ScriptHandlerSource();
             _instances = new NamedInstanceHandlerSource();
-            _verbExtractor = PriorityVerbExtractor.DefaultInstance;
             _services = services;
-            _scanForHandlers = scanForHandlers ?? (() => { });
+            _scanForHandlers = scanForHandlers;
         }
 
         public void BuildUp(IServiceCollection services)
         {
-            services.TryAddSingleton(_verbExtractor);
+            services.TryAddSingleton(PriorityVerbExtractor.DefaultInstance);
             services.TryAddSingleton<IHandlerMethodInvoker, ServiceProviderMethodInvoker>();
 
             // Register these sources only if they have entries. We don't care about pre-existing
@@ -73,7 +70,7 @@ namespace StoneFruit.Execution.Handlers
         public IHandlerSetup UseVerbExtractor(IVerbExtractor verbExtractor)
         {
             Assert.ArgumentNotNull(verbExtractor, nameof(verbExtractor));
-            _verbExtractor = verbExtractor;
+            _services.AddSingleton(verbExtractor);
             return this;
         }
 
@@ -126,7 +123,6 @@ namespace StoneFruit.Execution.Handlers
         public IHandlerSetup UseHandlerTypes(IEnumerable<Type> commandTypes)
         {
             Assert.ArgumentNotNull(commandTypes, nameof(commandTypes));
-
             _handlerTypes.AddRange(commandTypes);
             return this;
         }
