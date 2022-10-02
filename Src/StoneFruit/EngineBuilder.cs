@@ -104,9 +104,9 @@ namespace StoneFruit
         /// </summary>
         /// <param name="build"></param>
         /// <returns></returns>
-        public static Engine Build(Action<IEngineBuilder> build)
+        public static Engine Build(Action<IEngineBuilder> build, IServiceCollection? services = null)
         {
-            var services = new ServiceCollection();
+            services = services ?? new ServiceCollection();
             var engineBuilder = new EngineBuilder(services, () => ScanForHandlers(services));
             build?.Invoke(engineBuilder);
             SetupCoreEngineRegistrations(services);

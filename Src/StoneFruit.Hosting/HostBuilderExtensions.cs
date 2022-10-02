@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using StoneFruit.Containers.Microsoft;
+using Microsoft.Extensions.Logging;
 
 namespace StoneFruit
 {
@@ -11,27 +11,50 @@ namespace StoneFruit
     {
         public static IHostBuilder UseStoneFruit(this IHostBuilder hostBuilder, Action<IEngineBuilder> build)
         {
-            return hostBuilder.ConfigureServices((buildContext, services) =>
+            return hostBuilder.ConfigureServices((_, services) =>
             {
                 services.AddHostedService<StoneFruitHostedService>();
-                services.SetupEngine(build, () => services.BuildServiceProvider());
+                EngineBuilder.Build(build, services);
             });
         }
     }
 
     public class StoneFruitHostedService : IHostedService
     {
+        private readonly ILogger<StoneFruitHostedService> _logger;
         private readonly Engine _engine;
+        private readonly IHostApplicationLifetime _lifetime;
 
-        public StoneFruitHostedService(Engine engine)
+        public StoneFruitHostedService(ILogger<StoneFruitHostedService> logger, Engine engine, IHostApplicationLifetime lifetime)
         {
+            _logger = logger;
             _engine = engine;
+            _lifetime = lifetime;
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
-            // TODO: _engine methods probably want to be async
-            Environment.ExitCode = _engine.RunWithCommandLineArguments();
+            _lifetime.ApplicationStarted.Register(() =>
+            {
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        // TODO: _engine methods probably want to be async
+                        Environment.ExitCode = _engine.RunWithCommandLineArguments();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Unhandled exception from StoneFruit engine");
+                    }
+                    finally
+                    {
+                        _lifetime.StopApplication();
+                    }
+                });
+            });
+
+            return Task.CompletedTask;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

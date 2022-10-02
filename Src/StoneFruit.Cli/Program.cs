@@ -4,17 +4,9 @@ using System.Threading.Tasks;
 using Autofac;
 using Lamar;
 using Microsoft.Extensions.DependencyInjection;
-using StoneFruit.Containers.Autofac;
-using StoneFruit.Containers.Lamar;
-using StoneFruit.Containers.Microsoft;
-using StoneFruit.Containers.StructureMap;
-using Autofac;
-using Lamar;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using StoneFruit.Containers.Autofac;
 using StoneFruit.Containers.Lamar;
-using StoneFruit.Containers.Microsoft;
 using StoneFruit.Containers.StructureMap;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
@@ -46,13 +38,13 @@ namespace StoneFruit.Cli
         private static void Main(string[] args)
         {
             //var engine = NoneMain();
-            var engine = StructureMapMain();
+            //var engine = StructureMapMain();
             //var engine = LamarMain();
             //var engine = MicrosoftMain();
             //var engine = AutofacMain();
-            //var host = CreateHostBuilder().Build();
-            //host.Run();
-            Environment.ExitCode = engine.RunWithCommandLineArguments();
+            //Environment.ExitCode = engine.RunWithCommandLineArguments();
+
+            CreateHostBuilder().Build().Run();
 
             Console.ReadKey();
         }
@@ -92,6 +84,7 @@ namespace StoneFruit.Cli
                     s.MaxExecuteTimeout = TimeSpan.FromSeconds(5);
                 });
         }
+
         private static IHostBuilder CreateHostBuilder()
             => Host.CreateDefaultBuilder()
             .UseStoneFruit(Build);
@@ -101,30 +94,30 @@ namespace StoneFruit.Cli
             return EngineBuilder.Build(b => Build(b));
         }
 
-        //private static Engine StructureMapMain()
-        //{
-        //    var container = new StructureMap.Container();
-        //    container.SetupEngine<MyEnvironment>(Build);
+        private static Engine StructureMapMain()
+        {
+            var container = new StructureMap.Container();
+            container.SetupEngine(Build);
 
-        //    return container.GetInstance<Engine>();
-        //}
+            return container.GetInstance<Engine>();
+        }
 
-        //private static Engine LamarMain()
-        //{
-        //    var serviceCollection = new ServiceRegistry()
-        //        .SetupEngine<MyEnvironment>(Build);
+        private static Engine LamarMain()
+        {
+            var serviceCollection = new ServiceRegistry()
+                .SetupEngine(Build);
 
-        //    var container = new Container(serviceCollection);
-        //    return container.GetService<Engine>();
-        //}
+            var container = new Container(serviceCollection);
+            return container.GetService<Engine>();
+        }
 
-        //private static Engine AutofacMain()
-        //{
-        //    var containerBuilder = new Autofac.ContainerBuilder();
-        //    containerBuilder.SetupEngine<MyEnvironment>(Build);
-        //    Autofac.IContainer container = containerBuilder.Build();
-        //    return container.Resolve<Engine>();
-        //}
+        private static Engine AutofacMain()
+        {
+            var containerBuilder = new Autofac.ContainerBuilder();
+            containerBuilder.SetupEngine(Build);
+            Autofac.IContainer container = containerBuilder.Build();
+            return container.Resolve<Engine>();
+        }
     }
 
     public class TestArgsA
