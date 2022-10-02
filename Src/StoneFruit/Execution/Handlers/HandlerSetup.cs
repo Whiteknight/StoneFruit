@@ -30,7 +30,6 @@ namespace StoneFruit.Execution.Handlers
         };
 
         private IVerbExtractor _verbExtractor;
-        private IHandlerMethodInvoker _methodInvoker;
 
         public HandlerSetup(IServiceCollection services, Action scanForHandlers)
         {
@@ -38,7 +37,6 @@ namespace StoneFruit.Execution.Handlers
             _scripts = new ScriptHandlerSource();
             _instances = new NamedInstanceHandlerSource();
             _verbExtractor = PriorityVerbExtractor.DefaultInstance;
-            _methodInvoker = new DefaultHandlerMethodInvoker();
             _services = services;
             _scanForHandlers = scanForHandlers ?? (() => { });
         }
@@ -46,7 +44,7 @@ namespace StoneFruit.Execution.Handlers
         public void BuildUp(IServiceCollection services)
         {
             services.TryAddSingleton(_verbExtractor);
-            services.TryAddSingleton(_methodInvoker);
+            services.TryAddSingleton<IHandlerMethodInvoker, ServiceProviderMethodInvoker>();
 
             // Register these sources only if they have entries. We don't care about pre-existing
             // registrations, because IHandlerSource is expected to exist in multiples
@@ -82,7 +80,7 @@ namespace StoneFruit.Execution.Handlers
         public IHandlerSetup UseMethodInvoker(IHandlerMethodInvoker invoker)
         {
             Assert.ArgumentNotNull(invoker, nameof(invoker));
-            _methodInvoker = invoker;
+            _services.AddSingleton(invoker);
             return this;
         }
 
