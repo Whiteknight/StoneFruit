@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Handlers;
 using StoneFruit.Utility;
@@ -31,7 +32,7 @@ namespace StoneFruit
         /// </summary>
         /// <param name="getSource"></param>
         /// <returns></returns>
-        IHandlerSetup AddSource(Func<HandlerSourceBuildContext, IHandlerSource> getSource);
+        IHandlerSetup AddSource(Func<IServiceProvider, IHandlerSource> getSource);
 
         /// <summary>
         /// Add a function delegate as a handler.
@@ -90,21 +91,6 @@ namespace StoneFruit
         IHandlerSetup Scan();
     }
 
-    /// <summary>
-    /// Holds values from the DI container for use with delayed instantiation of handlers.
-    /// </summary>
-    public struct HandlerSourceBuildContext
-    {
-        public HandlerSourceBuildContext(IVerbExtractor verbExtractor, IHandlerMethodInvoker invoker)
-        {
-            VerbExtractor = verbExtractor;
-            MethodInvoker = invoker;
-        }
-
-        public IVerbExtractor VerbExtractor { get; }
-        public IHandlerMethodInvoker MethodInvoker { get; }
-    }
-
     public static class HandlerSetupExtensions
     {
         /// <summary>
@@ -128,7 +114,13 @@ namespace StoneFruit
         public static IHandlerSetup UsePublicMethodsAsHandlers(this IHandlerSetup handlers, object instance)
         {
             Assert.ArgumentNotNull(handlers, nameof(handlers));
-            return handlers.AddSource(ctx => new InstanceMethodHandlerSource(instance, ctx.MethodInvoker, ctx.VerbExtractor));
+            return handlers.AddSource(provider =>
+                new InstanceMethodHandlerSource(
+                    instance,
+                    provider.GetRequiredService<IHandlerMethodInvoker>(),
+                    provider.GetRequiredService<IVerbExtractor>()
+                )
+            );
         }
 
         /// <summary>

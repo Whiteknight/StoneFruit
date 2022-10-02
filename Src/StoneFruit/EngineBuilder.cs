@@ -24,7 +24,7 @@ namespace StoneFruit
         private EngineBuilder(IServiceCollection services, Action scanForHandlers = null)
         {
             _services = services;
-            _handlers = new HandlerSetup(scanForHandlers ?? ThrowIfScanRequestedButScannerNotProvided);
+            _handlers = new HandlerSetup(_services, scanForHandlers ?? ThrowIfScanRequestedButScannerNotProvided);
             _eventCatalog = new EngineEventCatalog();
             _output = new OutputSetup();
             _environments = new EnvironmentSetup(_services);
@@ -110,13 +110,12 @@ namespace StoneFruit
             var engineBuilder = new EngineBuilder(services, () => ScanForHandlers(services));
             build?.Invoke(engineBuilder);
             SetupCoreEngineRegistrations(services);
-            IServiceProvider provider = null;
-            engineBuilder.SetupHandlers(h => h.AddSource(ctx => new ServiceProviderHandlerSource(services, () => provider, ctx.VerbExtractor)));
+            services.AddSingleton<IHandlerSource>(provider => new ServiceProviderHandlerSource(services, provider, provider.GetRequiredService<IVerbExtractor>()));
 
             // Build up the final Engine registrations. This involves resolving some
             // dependencies which were setup previously
             engineBuilder.BuildUp(services);
-            provider = services.BuildServiceProvider();
+            var provider = services.BuildServiceProvider();
             return provider.GetRequiredService<Engine>();
         }
 

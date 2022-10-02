@@ -14,10 +14,10 @@ namespace StoneFruit.Execution.Handlers
     /// </summary>
     public class HandlerSetup : IHandlerSetup
     {
-        private readonly List<Func<HandlerSourceBuildContext, IHandlerSource>> _sourceFactories;
         private readonly DelegateHandlerSource _delegates;
         private readonly ScriptHandlerSource _scripts;
         private readonly NamedInstanceHandlerSource _instances;
+        private readonly IServiceCollection _services;
         private readonly Action _scanForHandlers;
 
         private readonly List<Type> _handlerTypes = new List<Type>
@@ -32,14 +32,14 @@ namespace StoneFruit.Execution.Handlers
         private IVerbExtractor _verbExtractor;
         private IHandlerMethodInvoker _methodInvoker;
 
-        public HandlerSetup(Action scanForHandlers)
+        public HandlerSetup(IServiceCollection services, Action scanForHandlers)
         {
-            _sourceFactories = new List<Func<HandlerSourceBuildContext, IHandlerSource>>();
             _delegates = new DelegateHandlerSource();
             _scripts = new ScriptHandlerSource();
             _instances = new NamedInstanceHandlerSource();
             _verbExtractor = PriorityVerbExtractor.DefaultInstance;
             _methodInvoker = new DefaultHandlerMethodInvoker();
+            _services = services;
             _scanForHandlers = scanForHandlers ?? (() => { });
         }
 
@@ -58,9 +58,8 @@ namespace StoneFruit.Execution.Handlers
                 services.AddSingleton<IHandlerSource>(_instances);
 
             foreach (var handlerType in _handlerTypes)
-            {
                 services.AddTransient(handlerType);
-            }
+
             services.AddSingleton<IHandlerSource>(provider =>
             {
                 var ve = provider.GetRequiredService<IVerbExtractor>();
@@ -68,24 +67,9 @@ namespace StoneFruit.Execution.Handlers
                 return source;
             });
 
-            foreach (var sourceFactory in _sourceFactories)
-            {
-                services.AddSingleton(provider =>
-                {
-                    var ve = provider.GetRequiredService<IVerbExtractor>();
-                    var mi = provider.GetRequiredService<IHandlerMethodInvoker>();
-                    var ctx = new HandlerSourceBuildContext(ve, mi);
-                    return sourceFactory(ctx);
-                });
-            }
-
             // Add the IHandlers, which gets the list of all IHandlerSource instances from the DI
             // This one may be registered by the user already so don't overwrite
-            services.TryAddSingleton<IHandlers>(provider =>
-            {
-                var sources = provider.GetServices<IHandlerSource>();
-                return new HandlerSourceCollection(sources);
-            });
+            services.TryAddSingleton<IHandlers, HandlerSourceCollection>();
         }
 
         public IHandlerSetup UseVerbExtractor(IVerbExtractor verbExtractor)
@@ -102,10 +86,10 @@ namespace StoneFruit.Execution.Handlers
             return this;
         }
 
-        public IHandlerSetup AddSource(Func<HandlerSourceBuildContext, IHandlerSource> getSource)
+        public IHandlerSetup AddSource(Func<IServiceProvider, IHandlerSource> getSource)
         {
             Assert.ArgumentNotNull(getSource, nameof(getSource));
-            _sourceFactories.Add(getSource);
+            _services.AddSingleton(getSource);
             return this;
         }
 

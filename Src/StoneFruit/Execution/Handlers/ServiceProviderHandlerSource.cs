@@ -14,12 +14,12 @@ namespace StoneFruit.Execution.Handlers
     /// </summary>
     public class ServiceProviderHandlerSource : IHandlerSource
     {
-        private readonly Func<IServiceProvider> _getProvider;
         private readonly VerbTrie<VerbInfo> _verbs;
+        private readonly IServiceProvider _provider;
 
-        public ServiceProviderHandlerSource(IServiceCollection services, Func<IServiceProvider> getProvider, IVerbExtractor verbExtractor)
+        public ServiceProviderHandlerSource(IServiceCollection services, IServiceProvider provider, IVerbExtractor verbExtractor)
         {
-            _getProvider = getProvider;
+            _provider = provider;
 
             var handlerRegistrations = services.Where(sd => typeof(IHandlerBase).IsAssignableFrom(sd.ServiceType)).ToList();
             var instances = handlerRegistrations
@@ -59,7 +59,7 @@ namespace StoneFruit.Execution.Handlers
             if (!serviceType.HasValue)
                 return FailureResult<IHandlerBase>.Instance;
 
-            using var scope = _getProvider().CreateScope();
+            using var scope = _provider.CreateScope();
             return scope.ServiceProvider.GetService(serviceType.Value.Type) is IHandlerBase instance ? new SuccessResult<IHandlerBase>(instance) : FailureResult<IHandlerBase>.Instance;
         }
 
