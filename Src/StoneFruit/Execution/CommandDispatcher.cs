@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Utility;
@@ -182,23 +183,35 @@ namespace StoneFruit.Execution
         public async Task ExecuteAsync(IArguments arguments, CancellationToken token = default)
         {
             Assert.ArgumentNotNull(arguments, nameof(arguments));
+
+            // Set the current arguments in the State, so they can be resolved from the container
             State.SetCurrentArguments(arguments);
+
+            // Get the handler. Throw if a matching one is not found
             var handlerResult = Handlers.GetInstance(arguments, this);
             if (!handlerResult.HasValue)
                 throw VerbNotFoundException.FromArguments(arguments);
-            var handler = handlerResult.Value;
+
+            // Invoke the handler, async or otherwise.
+            await ExecuteHandler(handlerResult.Value, token);
+            State.ClearCurrentArguments();
+        }
+
+        private async Task ExecuteHandler(IHandlerBase handler, CancellationToken token)
+        {
             if (handler is IHandler syncHandler)
             {
                 syncHandler.Execute();
-                State.ClearCurrentArguments();
                 return;
             }
 
             if (handler is IAsyncHandler asyncHandler)
             {
                 await asyncHandler.ExecuteAsync(token);
-                State.ClearCurrentArguments();
+                return;
             }
+
+            throw new InvalidOperationException($"Unknown handler type ${handler.GetType().Name}");
         }
     }
 }
