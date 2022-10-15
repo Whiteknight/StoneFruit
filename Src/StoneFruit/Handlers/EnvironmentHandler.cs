@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using StoneFruit.Execution;
-using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Environments;
 using StoneFruit.Execution.Output;
 
@@ -12,52 +11,53 @@ namespace StoneFruit.Handlers
     public class EnvironmentHandler : IHandler
     {
         public const string Name = "env";
+        public const string FlagList = "list";
+        public const string FlagNotSet = "notset";
+        public const string FlagClearData = "cleardata";
 
         private readonly IOutput _output;
         private readonly IArguments _args;
         private readonly EngineState _state;
         private readonly IEnvironmentCollection _environments;
-        private readonly CommandDispatcher _dispatcher;
         private readonly EnvironmentObjectCache _objectCache;
 
-        public EnvironmentHandler(IOutput output, IArguments args, EngineState state, IEnvironmentCollection environments, CommandDispatcher dispatcher, EnvironmentObjectCache objectCache)
+        public EnvironmentHandler(IOutput output, IArguments args, EngineState state, IEnvironmentCollection environments, ICommandParser parser, EnvironmentObjectCache objectCache)
         {
             _output = output;
             _args = args;
             _state = state;
             _environments = environments;
-            _dispatcher = dispatcher;
             _objectCache = objectCache;
         }
 
         public static string Group => HelpHandler.BuiltinsGroup;
         public static string Description => "List or change environments";
 
-        public static string Usage => $@"{Name} [-list] [-notset] [ <name> | <number>]
+        public static string Usage => $@"{Name} ...
 
 {Name}
 Show a prompt to change the current environment, if any are configured.
 
-{Name} -list
+{Name} -{FlagList}
 Show a list of all environments. All other arguments are ignored.
 
-{Name} <envName> [ -notset ]? [ -cleardata ]?
+{Name} <envName> [ -{FlagNotSet} ]? [ -{FlagClearData} ]?
 Change directly to the specified environment.
 
-{Name} <number> [ -notset ]? [ -cleardata ]?
+{Name} <number> [ -{FlagNotSet} ]? [ -{FlagClearData} ]?
 Change directly to the environment at the specified position.
 
--notset:    Only change if not in an environment.
--cleardata: Clear contextual data when the environment is changed.
+-{FlagNotSet}: Only change if not in an environment.
+-{FlagClearData}: Clear contextual data when the environment is changed.
 
-{Name} -cleardata
+{Name} -{FlagClearData}
 Clear the data for the current environment.
 ";
 
         public void Execute()
         {
             // If --list, list all environments and return
-            if (_args.HasFlag("list"))
+            if (_args.HasFlag(FlagList))
             {
                 ListEnvironments();
                 return;
@@ -66,25 +66,17 @@ Clear the data for the current environment.
             var target = _args.Shift();
             var currentEnvNameResult = _environments.GetCurrentName();
 
-            // If --notset only set the environment if we are not currently in one
-            if (_args.HasFlag("notset"))
-            {
-                if (_environments.GetCurrentName().HasValue)
-                    return;
-                ChangeEnvironment(target, currentEnvNameResult);
-                return;
-            }
-
-            // If --clear-data and we are in an environment and we are not setting an environment
+            // If -cleardata and we are in an environment and we are not setting an environment
             // just clear the data in the current environment.
-            if (!target.Exists() && currentEnvNameResult.HasValue && _args.HasFlag("cleardata"))
+            if (!target.Exists() && currentEnvNameResult.HasValue && _args.HasFlag(FlagClearData))
             {
                 _objectCache.Clear(currentEnvNameResult.Value);
                 return;
             }
 
             // Otherwise we're switching environments
-            ChangeEnvironment(target, currentEnvNameResult);
+            if (!_args.HasFlag(FlagNotSet) || !_environments.GetCurrentName().HasValue)
+                ChangeEnvironment(target, currentEnvNameResult);
         }
 
         private void ListEnvironments()
@@ -121,9 +113,9 @@ Clear the data for the current environment.
                 if (environments.Count == 1)
                 {
                     _environments.SetCurrent(environments.First());
-                    if (_args.HasFlag("cleardata"))
+                    if (_args.HasFlag(FlagClearData))
                         _objectCache.Clear(_environments.GetCurrentName().Value);
-                    OnEnvironmentChanged();
+                    _state.OnEnvironmentChanged();
                     return;
                 }
 
@@ -137,36 +129,35 @@ Clear the data for the current environment.
             var envNameResult = GetEnvironmentNameFromUserInput(environments, envNameOrNumber.ToString());
             if (!envNameResult.HasValue)
                 throw new ExecutionException($"Cannot switch to environment {envNameOrNumber.ToString()}. Not a valid name or index.");
-            var envName = envNameResult.Value;
 
+            var envName = envNameResult.Value;
             if (!_environments.IsValid(envName))
                 throw new ExecutionException($"Unknown environment '{envName}'");
 
-            if (_args.HasFlag("cleardata"))
+            if (_args.HasFlag(FlagClearData))
                 _objectCache.Clear(_environments.GetCurrentName().Value);
 
             if (currentEnvNameResult.Equals(envName))
                 return;
 
             _environments.SetCurrent(envName);
-            OnEnvironmentChanged();
+            _state.OnEnvironmentChanged();
             return;
         }
 
         private IResult<string> GetEnvironmentNameFromUserInput(IReadOnlyList<string> environments, string envNameOrNumber)
         {
             string envName = envNameOrNumber;
-            if (envNameOrNumber.All(char.IsDigit))
+            if (!envNameOrNumber.All(char.IsDigit))
+                return Result.Success(envName);
+
+            var asInt = int.Parse(envNameOrNumber) - 1;
+            if (asInt >= 0 && asInt < environments.Count)
             {
-                var asInt = int.Parse(envNameOrNumber) - 1;
-                if (asInt >= 0 && asInt < environments.Count)
-                {
-                    envName = environments[asInt];
-                    return Result.Success(envName);
-                }
-                return FailureResult<string>.Instance;
+                envName = environments[asInt];
+                return Result.Success(envName);
             }
-            return Result.Success(envName);
+            return FailureResult<string>.Instance;
         }
 
         private void PromptUserForEnvironment()
@@ -183,20 +174,11 @@ Clear the data for the current environment.
                 ListEnvironments();
 
                 var envIndex = _output.Prompt("", true, false);
-                if (TrySetEnvironment(envIndex))
-                {
-                    OnEnvironmentChanged();
-                    break;
-                }
+                if (!TrySetEnvironment(envIndex))
+                    continue;
+                _state.OnEnvironmentChanged();
+                break;
             }
-        }
-
-        private void OnEnvironmentChanged()
-        {
-            var script = _state.EventCatalog.EnvironmentChanged;
-            var currentEnvName = _environments.GetCurrentName().GetValueOrDefault("");
-            var args = SyntheticArguments.From(("environment", currentEnvName));
-            _state.Commands.Prepend(script.GetCommands(_dispatcher.Parser, args));
         }
 
         private bool TrySetEnvironment(string arg)
@@ -205,27 +187,17 @@ Clear the data for the current environment.
             if (string.IsNullOrEmpty(arg))
                 return false;
 
-            // Argument is a number. Set the environment by index
-            if (arg.All(char.IsDigit))
+            var envNameResult = GetEnvironmentNameFromUserInput(_environments.GetNames(), arg);
+            if (!envNameResult.HasValue || !_environments.IsValid(envNameResult.Value))
             {
-                var asInt = int.Parse(arg) - 1;
-                if (_environments.IsValid(asInt))
-                {
-                    _environments.SetCurrent(asInt);
-                    return true;
-                }
+                _output
+                    .Color(ConsoleColor.Red)
+                    .WriteLine($"Invalid environment '{envNameResult.GetValueOrDefault("")}'");
+                return false;
             }
 
-            // Argument is a name of a valid environment. Set it and exit.
-            if (_environments.IsValid(arg))
-            {
-                _environments.SetCurrent(arg);
-                return true;
-            }
-
-            // Invalid selection, show an error and return failure
-            _output.Color(ConsoleColor.Red).WriteLine($"Unknown environment '{arg}'");
-            return false;
+            _environments.SetCurrent(envNameResult.Value);
+            return true;
         }
     }
 }
