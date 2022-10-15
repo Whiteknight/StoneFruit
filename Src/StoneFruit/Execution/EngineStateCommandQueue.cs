@@ -10,10 +10,12 @@ namespace StoneFruit.Execution
     public class EngineStateCommandQueue
     {
         private readonly LinkedList<ArgumentsOrString> _additionalCommands;
+        private readonly ICommandParser _parser;
 
-        public EngineStateCommandQueue()
+        public EngineStateCommandQueue(ICommandParser parser)
         {
             _additionalCommands = new LinkedList<ArgumentsOrString>();
+            _parser = parser;
         }
 
         public void Append(ArgumentsOrString argsOrString)
@@ -27,6 +29,11 @@ namespace StoneFruit.Execution
                 Append(argsOrString);
         }
 
+        public void Append(EventScript script, IArguments args)
+        {
+            Append(script.GetCommands(_parser, args));
+        }
+
         public void Prepend(IEnumerable<ArgumentsOrString> argsOrStrings)
         {
             var list = argsOrStrings.ToList();
@@ -37,6 +44,11 @@ namespace StoneFruit.Execution
         public void Prepend(ArgumentsOrString argsOrString)
         {
             _additionalCommands.AddFirst(argsOrString);
+        }
+
+        public void Prepend(EventScript script, IArguments args)
+        {
+            Prepend(script.GetCommands(_parser, args));
         }
 
         public IResult<ArgumentsOrString> GetNext()

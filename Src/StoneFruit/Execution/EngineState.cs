@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using StoneFruit.Execution.Arguments;
 using StoneFruit.Utility;
 
 namespace StoneFruit.Execution
@@ -10,9 +11,12 @@ namespace StoneFruit.Execution
     /// </summary>
     public class EngineState
     {
+        private readonly IEnvironmentCollection _environments;
+        private readonly ICommandParser _parser;
+
         private IArguments? _arguments;
 
-        public EngineState(EngineEventCatalog eventCatalog, EngineSettings settings)
+        public EngineState(EngineEventCatalog eventCatalog, EngineSettings settings, IEnvironmentCollection environments, ICommandParser parser)
         {
             Assert.ArgumentNotNull(eventCatalog, nameof(eventCatalog));
             Assert.ArgumentNotNull(settings, nameof(settings));
@@ -21,7 +25,9 @@ namespace StoneFruit.Execution
             ShouldExit = false;
 
             Settings = settings;
-            Commands = new EngineStateCommandQueue();
+            _environments = environments;
+            _parser = parser;
+            Commands = new EngineStateCommandQueue(_parser);
             Metadata = new EngineStateMetadataCache();
             RunMode = EngineRunMode.Idle;
             CommandCounter = new NullCommandCounter();
@@ -82,6 +88,29 @@ namespace StoneFruit.Execution
             if (timeout < TimeSpan.MaxValue)
                 tokenSource.CancelAfter(timeout);
             return tokenSource;
+        }
+
+        /// <summary>
+        /// Call when the current environment has been changed. Executes the EnvironmentChanged
+        /// script.
+        /// </summary>
+        public void OnEnvironmentChanged()
+        {
+            var currentEnvName = _environments.GetCurrentName().GetValueOrDefault("");
+            var args = SyntheticArguments.From(("environment", currentEnvName));
+            Commands.Prepend(EventCatalog.EnvironmentChanged, args);
+        }
+
+        public void OnHeadlessHelp()
+        {
+            var args = SyntheticArguments.From(("exitcode", Constants.ExitCode.HeadlessHelp.ToString()));
+            Commands.Prepend(EventCatalog.HeadlessHelp, args);
+        }
+
+        public void OnHeadlessNoArgs()
+        {
+            var args = SyntheticArguments.From(("exitcode", Constants.ExitCode.HeadlessNoVerb.ToString()));
+            Commands.Prepend(EventCatalog.HeadlessNoArgs, args);
         }
     }
 }

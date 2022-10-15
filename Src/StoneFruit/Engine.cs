@@ -24,7 +24,7 @@ namespace StoneFruit
             Environments = environments;
             _parser = parser;
             Output = output;
-            State = new EngineState(eventCatalog, settings);
+            State = new EngineState(eventCatalog, settings, Environments, _parser);
             Dispatcher = new CommandDispatcher(_parser, handlers, Environments, State, Output);
         }
 
@@ -127,9 +127,7 @@ namespace StoneFruit
             // require a valid environment to run help
             if (commandLine == "help")
             {
-                sources.AddToEnd(State.EventCatalog.HeadlessHelp, _parser,
-                    ("exitcode", Constants.ExitCode.HeadlessHelp.ToString())
-                );
+                State.OnHeadlessHelp();
                 return await RunLoop(sources);
             }
 
@@ -141,9 +139,7 @@ namespace StoneFruit
             // If there is no commandline left, run the HeadlessNoArgs script
             if (string.IsNullOrWhiteSpace(commandLine))
             {
-                sources.AddToEnd(State.EventCatalog.HeadlessNoArgs, _parser,
-                    ("exitcode", Constants.ExitCode.HeadlessNoVerb.ToString())
-                );
+                State.OnHeadlessNoArgs();
                 return await RunLoop(sources);
             }
 
@@ -318,14 +314,18 @@ namespace StoneFruit
         // Handle an error from the dispatcher.
         private void HandleError(Exception currentException, EventScript script, IArguments args)
         {
-            // If an exception is thrown while handling a previous exception, show an
-            // angry error message and exit immediately
-            var currentExceptionResult = State.Metadata.Get(Constants.Metadata.Error);
+            // When we handle an error, we set the Current Error in the State. When we are done
+            // handling it, we clear the error from the State. If we get into HandleError() and
+            // there is already a Current Error in the state it means we have gotten into a loop,
+            // throwing errors from the error-handling code. Instead of spiralling down forever,
+            // we bail out with a very stern message.
 
+            // Check if we already have a current error
+            var currentExceptionResult = State.Metadata.Get(Constants.Metadata.Error);
             if (currentExceptionResult.HasValue && currentExceptionResult.Value is Exception previousException)
             {
-                // This isn't scripted because it's critical error-handling code and we
-                // don't want the user to clear/override it
+                // This isn't scripted because it's critical error-handling code and we cannot
+                // allow an exception to be thrown at this point.
                 Output
                     .Color(ConsoleColor.Red)
                     .WriteLine("Received an exception while attempting to handle a previous exception")
