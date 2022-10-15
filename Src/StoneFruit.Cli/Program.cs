@@ -140,6 +140,8 @@ namespace StoneFruit.Cli
     [Verb("b")]
     public class TestBHandler : IHandler
     {
+        public static string Description => "Throw an exception";
+
         public void Execute()
         {
             throw new Exception("TESTB");
