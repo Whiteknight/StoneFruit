@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using ParserObjects;
-using static ParserObjects.CStyleParserMethods;
-using static ParserObjects.ParserMethods;
-using static ParserObjects.ParserMethods<char>;
+using static ParserObjects.Parsers;
+using static ParserObjects.Parsers.C;
+using static ParserObjects.Parsers<char>;
 
 namespace StoneFruit.Execution.Arguments
 {

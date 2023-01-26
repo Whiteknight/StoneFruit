@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using ParserObjects;
 using StoneFruit.Utility;
-using static ParserObjects.ParserMethods;
+using static ParserObjects.Parsers;
 
 namespace StoneFruit.Execution.Handlers
 {

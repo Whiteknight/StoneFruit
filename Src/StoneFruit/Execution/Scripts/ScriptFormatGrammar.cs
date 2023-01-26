@@ -4,9 +4,9 @@ using System.Linq;
 using ParserObjects;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Scripts.Formatting;
-using static ParserObjects.CStyleParserMethods;
-using static ParserObjects.ParserMethods;
-using static ParserObjects.ParserMethods<char>;
+using static ParserObjects.Parsers;
+using static ParserObjects.Parsers.C;
+using static ParserObjects.Parsers<char>;
 
 namespace StoneFruit.Execution.Scripts
 {
@@ -225,7 +225,7 @@ namespace StoneFruit.Execution.Scripts
             // The command with verb and all arguments
             // command := <verb> <argAndWhitespace>* <end>
             return Rule(
-                args.ListSeparatedBy(Whitespace(), true),
+                args.List(Whitespace(), true),
                 If(End(), Produce(() => true)),
 
                 (a, _) => new CommandFormat(a.ToList())
@@ -281,9 +281,9 @@ namespace StoneFruit.Execution.Scripts
         private class FetchFlagArgumentAccessor : IArgumentAccessor
         {
             private readonly string _name;
-            private readonly IOption<string> _newName;
+            private readonly Option<string> _newName;
 
-            public FetchFlagArgumentAccessor(string name, IOption<string> newName)
+            public FetchFlagArgumentAccessor(string name, Option<string> newName)
             {
                 _name = name;
                 _newName = newName;
@@ -304,9 +304,9 @@ namespace StoneFruit.Execution.Scripts
         {
             private readonly string _name;
             private readonly bool _required;
-            private readonly IOption<string> _defaultValue;
+            private readonly Option<string> _defaultValue;
 
-            public FetchNamedArgumentAccessor(string name, bool required, IOption<string> defaultValue)
+            public FetchNamedArgumentAccessor(string name, bool required, Option<string> defaultValue)
             {
                 _name = name;
                 _required = required;
@@ -340,9 +340,9 @@ namespace StoneFruit.Execution.Scripts
         {
             private readonly string _name;
             private readonly bool _required;
-            private readonly IOption<string> _defaultValue;
+            private readonly Option<string> _defaultValue;
 
-            public FetchNamedToPositionalArgumentAccessor(string name, bool required, IOption<string> defaultValue)
+            public FetchNamedToPositionalArgumentAccessor(string name, bool required, Option<string> defaultValue)
             {
                 _name = name;
                 _required = required;
@@ -376,9 +376,9 @@ namespace StoneFruit.Execution.Scripts
         {
             private readonly int _index;
             private readonly bool _required;
-            private readonly IOption<string> _defaultValue;
+            private readonly Option<string> _defaultValue;
 
-            public FetchPositionalArgumentAccessor(int index, bool required, IOption<string> defaultValue)
+            public FetchPositionalArgumentAccessor(int index, bool required, Option<string> defaultValue)
             {
                 _index = index;
                 _required = required;
@@ -454,9 +454,9 @@ namespace StoneFruit.Execution.Scripts
             private readonly string _newName;
             private readonly string _oldName;
             private readonly bool _required;
-            private readonly IOption<string> _defaultValue;
+            private readonly Option<string> _defaultValue;
 
-            public NamedFetchNamedArgumentAccessor(string newName, string oldName, bool required, IOption<string> defaultValue)
+            public NamedFetchNamedArgumentAccessor(string newName, string oldName, bool required, Option<string> defaultValue)
             {
                 _newName = newName;
                 _oldName = oldName;
@@ -492,9 +492,9 @@ namespace StoneFruit.Execution.Scripts
             private readonly string _newName;
             private readonly int _index;
             private readonly bool _required;
-            private readonly IOption<string> _defaultValue;
+            private readonly Option<string> _defaultValue;
 
-            public NamedFetchPositionalArgumentAccessor(string newName, int index, bool required, IOption<string> defaultValue)
+            public NamedFetchPositionalArgumentAccessor(string newName, int index, bool required, Option<string> defaultValue)
             {
                 _newName = newName;
                 _index = index;

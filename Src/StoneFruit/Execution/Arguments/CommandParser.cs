@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using ParserObjects;
-using ParserObjects.Sequences;
 using StoneFruit.Execution.Scripts;
 using StoneFruit.Execution.Scripts.Formatting;
 using StoneFruit.Utility;
-using static ParserObjects.ParserMethods;
-using static ParserObjects.ParserMethods<char>;
+using static ParserObjects.Parsers;
+using static ParserObjects.Parsers<char>;
+using static ParserObjects.Sequences;
 
 namespace StoneFruit.Execution.Arguments
 {
@@ -52,7 +52,7 @@ namespace StoneFruit.Execution.Arguments
             if (string.IsNullOrEmpty(command))
                 return SyntheticArguments.Empty();
 
-            var sequence = new StringCharacterSequence(command);
+            var sequence = FromString(command);
             var argsList = _argsParser.Parse(sequence).Value;
             if (sequence.IsAtEnd)
                 return new ParsedArguments(argsList, command);
@@ -68,7 +68,7 @@ namespace StoneFruit.Execution.Arguments
         /// <returns></returns>
         public CommandFormat ParseScript(string script)
         {
-            var input = new StringCharacterSequence(script);
+            var input = FromString(script);
             var parseResult = _scriptParser.Parse(input);
             if (!parseResult.Success)
                 throw new ParseException($"Could not parse command format string: '{script}'");
