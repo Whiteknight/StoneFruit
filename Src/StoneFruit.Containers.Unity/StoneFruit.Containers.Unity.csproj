@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+      <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>StoneFruit.Containers.Unity</AssemblyName>
     <RootNamespace>StoneFruit.Containers.Unity</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	<LangVersion>10.0</LangVersion>
-	<Nullable>enable</Nullable>
+    <LangVersion>10.0</LangVersion>
+    <Nullable>enable</Nullable>
     <Version>2.0.0-alpha4</Version>
     <Authors>Andrew F. Whitworth</Authors>
     <Company />
@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
     <PackageReference Include="Unity" Version="5.9.0" />
     <PackageReference Include="Unity.RegistrationByConvention" Version="5.9.0" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
