@@ -5,7 +5,8 @@
     <AssemblyName>StoneFruit.Containers.Autofac</AssemblyName>
     <RootNamespace>StoneFruit.Containers.Autofac</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <LangVersion>8.0</LangVersion>
+    <LangVersion>10.0</LangVersion>
+    <Nullable>enable</Nullable>
     <Version>2.0.0-alpha4</Version>
     <Authors>Andrew F. Whitworth</Authors>
     <Company />

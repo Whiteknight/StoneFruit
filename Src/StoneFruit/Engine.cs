@@ -162,14 +162,6 @@ namespace StoneFruit
             }).GetAwaiter().GetResult();
         }
 
-        /// <summary>
-        /// Runs interactively, prompting the user for input and executing each command in
-        /// turn. If an environment is not set, the user is prompted to select one before
-        /// any commands are executed. Returns when the user has entered the 'exit' or
-        /// 'quit' commands, or when some other verb has set the exit condition.
-        /// </summary>
-        public Task<int> RunInteractivelyAsync() => RunInteractivelyAsync(null);
-
         public int RunInteractively()
         {
             return Task.Run(async () =>
@@ -177,6 +169,22 @@ namespace StoneFruit
                 return await RunInteractivelyAsync(null);
             }).GetAwaiter().GetResult();
         }
+
+        public int RunInteractively(string? environment)
+        {
+            return Task.Run(async () =>
+            {
+                return await RunInteractivelyAsync(environment);
+            }).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Runs interactively, prompting the user for input and executing each command in
+        /// turn. If an environment is not set, the user is prompted to select one before
+        /// any commands are executed. Returns when the user has entered the 'exit' or
+        /// 'quit' commands, or when some other verb has set the exit condition.
+        /// </summary>
+        public Task<int> RunInteractivelyAsync() => RunInteractivelyAsync(null);
 
         /// <summary>
         /// Runs interactively, setting the environment to the value given and then
@@ -199,14 +207,6 @@ namespace StoneFruit
             source.AddToEnd(new PromptCommandSource(Output, Environments, State));
 
             return await RunLoop(source);
-        }
-
-        public int RunInteractively(string? environment)
-        {
-            return Task.Run(async () =>
-            {
-                return await RunInteractivelyAsync(environment);
-            }).GetAwaiter().GetResult();
         }
 
         // Attempt to get the raw commandline arguments as they were passed to the
