@@ -33,7 +33,7 @@ namespace StoneFruit.Containers.Lamar
             EngineBuilder.SetupEngineRegistrations(services, build, () => services.Scan(s => s.ScanForHandlers()));
             services.AddSingleton<IHandlerSource>(provider =>
             {
-                var verbExtractor = provider.GetService<IVerbExtractor>();
+                var verbExtractor = provider.GetRequiredService<IVerbExtractor>();
                 return new LamarHandlerSource(provider, verbExtractor);
             });
             return services;

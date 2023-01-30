@@ -22,7 +22,7 @@ namespace StoneFruit.Containers.StructureMap
 
             services.AddSingleton<IHandlerSource>(provider =>
             {
-                var verbExtractor = provider.GetService<IVerbExtractor>();
+                var verbExtractor = provider.GetRequiredService<IVerbExtractor>();
                 return new StructureMapHandlerSource(provider, verbExtractor);
             });
             container.Populate(services);

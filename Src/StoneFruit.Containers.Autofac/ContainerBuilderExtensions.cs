@@ -24,7 +24,7 @@ namespace StoneFruit.Containers.Autofac
             EngineBuilder.SetupEngineRegistrations(serviceCollection, build, () => ScanForHandlers(containerBuilder));
             serviceCollection.AddSingleton<IHandlerSource>(provider =>
             {
-                var verbExtractor = provider.GetService<IVerbExtractor>();
+                var verbExtractor = provider.GetRequiredService<IVerbExtractor>();
                 return new AutofacHandlerSource(provider, verbExtractor);
             });
             containerBuilder.Populate(serviceCollection);

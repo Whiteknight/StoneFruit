@@ -40,9 +40,9 @@ namespace StoneFruit.Execution.Arguments
 
         public IEnumerable<INamedArgument> GetAllNamed(string name) => _inner.GetAllNamed(name);
 
-        public IEnumerable<IFlagArgument> GetAllFlags() => _inner.GetAllFlags();
-
         public IEnumerable<INamedArgument> GetAllNamed() => _inner.GetAllNamed();
+
+        public IEnumerable<IFlagArgument> GetAllFlags() => _inner.GetAllFlags();
 
         public IEnumerable<IPositionalArgument> GetAllPositionals() => _inner.GetAllPositionals();
 

@@ -22,7 +22,7 @@ namespace StoneFruit
 
         public IServiceCollection Services { get; }
 
-        private EngineBuilder(IServiceCollection services, Action scanForHandlers = null)
+        private EngineBuilder(IServiceCollection services, Action? scanForHandlers = null)
         {
             Services = services;
             _handlers = new HandlerSetup(Services, scanForHandlers ?? ThrowIfScanRequestedButScannerNotProvided);

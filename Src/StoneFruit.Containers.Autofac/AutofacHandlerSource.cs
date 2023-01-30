@@ -18,10 +18,13 @@ namespace StoneFruit.Containers.Autofac
         public AutofacHandlerSource(IServiceProvider provider, IVerbExtractor verbExtractor)
         {
             _serviceProvider = provider;
-            _handlers = (provider as AutofacServiceProvider).LifetimeScope.ComponentRegistry.Registrations
+            if (provider is not AutofacServiceProvider autofac)
+                throw new EngineBuildException("Service provider is not Autofac and cannot be initialized");
+
+            _handlers = autofac.LifetimeScope.ComponentRegistry.Registrations
                 .Where(r => typeof(IHandlerBase).IsAssignableFrom(r.Activator.LimitType))
                 .Select(r => r.Activator.LimitType)
-                .Where(t => t != null && t.IsClass && !t.IsAbstract)
+                .Where(t => t?.IsClass == true && !t.IsAbstract)
                 .Distinct()
                 .SelectMany(commandType => verbExtractor
                     .GetVerbs(commandType)
@@ -41,7 +44,9 @@ namespace StoneFruit.Containers.Autofac
         {
             using var scope = _serviceProvider.CreateScope();
             var instance = scope.ServiceProvider.GetService(type);
-            return instance as IHandlerBase;
+            if (instance is not IHandlerBase handlerInstance)
+                throw new ExecutionException($"Handler for type {type} is not an IHandlerBase");
+            return handlerInstance;
         }
 
         private class VerbInfo : IVerbInfo

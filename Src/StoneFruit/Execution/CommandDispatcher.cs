@@ -197,7 +197,7 @@ namespace StoneFruit.Execution
             State.ClearCurrentArguments();
         }
 
-        private async Task ExecuteHandler(IHandlerBase handler, CancellationToken token)
+        private static async Task ExecuteHandler(IHandlerBase handler, CancellationToken token)
         {
             if (handler is IHandler syncHandler)
             {

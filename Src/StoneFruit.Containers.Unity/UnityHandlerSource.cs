@@ -54,7 +54,9 @@ namespace StoneFruit.Containers.Unity
             // TODO: Is .CreateChildContainer() sufficiently close to a Scope from modern Microsoft DI abstractions?
             using var scope = _container.CreateChildContainer();
             var instance = scope.Resolve(type);
-            return instance as IHandlerBase;
+            if (instance is not IHandlerBase handler)
+                throw new ExecutionException($"Handle type {type} is not IHandlerBase");
+            return handler;
         }
 
         private class VerbInfo : IVerbInfo

@@ -12,7 +12,8 @@ namespace StoneFruit.Execution.Environments
     {
         private readonly IServiceCollection _services;
 
-        private static readonly IReadOnlyList<string> _defaultNamesList = new[] {
+        private static readonly IReadOnlyList<string> _defaultNamesList = new[]
+        {
             Constants.EnvironmentNameDefault
         };
 

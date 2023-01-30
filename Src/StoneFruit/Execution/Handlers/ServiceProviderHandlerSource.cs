@@ -21,21 +21,25 @@ namespace StoneFruit.Execution.Handlers
         {
             _provider = provider;
 
-            var handlerRegistrations = services.Where(sd => typeof(IHandlerBase).IsAssignableFrom(sd.ServiceType)).ToList();
+            var handlerRegistrations = services
+                .Where(sd => typeof(IHandlerBase).IsAssignableFrom(sd.ServiceType))
+                .ToList();
+
             var instances = handlerRegistrations
                 .Where(sd => sd.ImplementationInstance != null)
                 .SelectMany(sd =>
                     verbExtractor
-                        .GetVerbs(sd.ImplementationInstance.GetType())
+                        .GetVerbs(sd.ImplementationInstance!.GetType())
                         .Select(verb => new VerbInfo(verb, sd.ImplementationInstance.GetType()))
                 )
                 .ToList();
+
             var types = handlerRegistrations
                 .Where(sd => sd.ImplementationType != null)
                 .SelectMany(sd =>
                     verbExtractor
-                        .GetVerbs(sd.ImplementationType)
-                        .Select(verb => new VerbInfo(verb, sd.ImplementationType))
+                        .GetVerbs(sd.ImplementationType!)
+                        .Select(verb => new VerbInfo(verb, sd.ImplementationType!))
                 )
                 .ToList();
             var factories = handlerRegistrations

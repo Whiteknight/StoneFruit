@@ -12,7 +12,6 @@ namespace StoneFruit.Execution
     public class EngineState
     {
         private readonly IEnvironmentCollection _environments;
-        private readonly ICommandParser _parser;
 
         private IArguments? _arguments;
 
@@ -26,8 +25,7 @@ namespace StoneFruit.Execution
 
             Settings = settings;
             _environments = environments;
-            _parser = parser;
-            Commands = new EngineStateCommandQueue(_parser);
+            Commands = new EngineStateCommandQueue(parser);
             Metadata = new EngineStateMetadataCache();
             RunMode = EngineRunMode.Idle;
             CommandCounter = new NullCommandCounter();

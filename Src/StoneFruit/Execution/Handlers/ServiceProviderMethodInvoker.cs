@@ -36,35 +36,33 @@ namespace StoneFruit.Execution.Handlers
             var argumentValues = new object?[parameters.Length];
             for (int i = 0; i < parameters.Length; i++)
             {
-                Debug.Assert(parameters[i].Name != null, "Parameter name should not be null");
-                if (parameters[i].ParameterType == typeof(CancellationToken))
-                {
-                    argumentValues[i] = token;
-                    continue;
-                }
-                if (parameters[i].ParameterType == typeof(bool))
-                {
-                    argumentValues[i] = args.HasFlag(parameters[i].Name!);
-                    continue;
-                }
-
-                IValuedArgument arg = args.Get(parameters[i].Name!);
-                if (!arg.Exists())
-                    arg = args.Get(i);
-                if (parameters[i].ParameterType == typeof(string))
-                {
-                    argumentValues[i] = arg.Exists() ? arg.AsString() : null;
-                    continue;
-                }
-                if (parameters[i].ParameterType == typeof(int))
-                {
-                    argumentValues[i] = arg.Exists() ? arg.AsInt() : 0;
-                    continue;
-                }
-
-                argumentValues[i] = _provider.GetRequiredService(parameters[i].ParameterType);
+                var parameter = parameters[i];
+                argumentValues[i] = AssignArgumentValue(parameter, args, i, token);
             }
+
             return method.Invoke(instance, argumentValues);
+        }
+
+        private object? AssignArgumentValue(ParameterInfo parameter, IArguments args, int i, CancellationToken token)
+        {
+            Debug.Assert(parameter.Name != null, "Parameter name should not be null");
+            if (parameter.ParameterType == typeof(CancellationToken))
+                return token;
+
+            if (parameter.ParameterType == typeof(bool))
+                return args.HasFlag(parameter.Name!);
+
+            IValuedArgument arg = args.Get(parameter.Name!);
+            if (!arg.Exists())
+                arg = args.Get(i);
+
+            if (parameter.ParameterType == typeof(string))
+                return arg.Exists() ? arg.AsString() : null;
+
+            if (parameter.ParameterType == typeof(int))
+                return arg.Exists() ? arg.AsInt() : 0;
+
+            return _provider.GetRequiredService(parameter.ParameterType);
         }
     }
 }

@@ -22,7 +22,9 @@ namespace StoneFruit.Execution.Environments
             if (!env.ContainsKey(typeof(T)))
                 return FailureResult<T>.Instance;
             var value = env[typeof(T)] as T;
-            return Result.Success(value);
+            if (value == null)
+                return FailureResult<T>.Instance;
+            return Result.Success(value!);
         }
 
         public void Set<T>(string environment, T value)
