@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,12 +30,13 @@ namespace StoneFruit.Execution.Handlers
             return InvokeDynamic(instance, method, arguments, token) as Task ?? Task.CompletedTask;
         }
 
-        private object InvokeDynamic(object instance, MethodInfo method, IArguments args, CancellationToken token)
+        private object? InvokeDynamic(object instance, MethodInfo method, IArguments args, CancellationToken token)
         {
             var parameters = method.GetParameters();
-            var argumentValues = new object[parameters.Length];
+            var argumentValues = new object?[parameters.Length];
             for (int i = 0; i < parameters.Length; i++)
             {
+                Debug.Assert(parameters[i].Name != null, "Parameter name should not be null");
                 if (parameters[i].ParameterType == typeof(CancellationToken))
                 {
                     argumentValues[i] = token;
@@ -42,11 +44,11 @@ namespace StoneFruit.Execution.Handlers
                 }
                 if (parameters[i].ParameterType == typeof(bool))
                 {
-                    argumentValues[i] = args.HasFlag(parameters[i].Name);
+                    argumentValues[i] = args.HasFlag(parameters[i].Name!);
                     continue;
                 }
 
-                IValuedArgument arg = args.Get(parameters[i].Name);
+                IValuedArgument arg = args.Get(parameters[i].Name!);
                 if (!arg.Exists())
                     arg = args.Get(i);
                 if (parameters[i].ParameterType == typeof(string))

@@ -11,7 +11,10 @@ namespace StoneFruit.Execution.Environments
     public class EnvironmentSetup : IEnvironmentSetup
     {
         private readonly IServiceCollection _services;
-        private static readonly IReadOnlyList<string> _defaultNamesList = new[] { Constants.EnvironmentNameDefault };
+
+        private static readonly IReadOnlyList<string> _defaultNamesList = new[] {
+            Constants.EnvironmentNameDefault
+        };
 
         public EnvironmentSetup(IServiceCollection services)
         {
@@ -66,13 +69,6 @@ namespace StoneFruit.Execution.Environments
             Assert.ArgumentNotNull(environment, nameof(environment));
             return UseFactory<T>(new InstanceEnvironmentFactory<T>(environment));
         }
-
-        //public IEnvironmentSetup UseInstances(IReadOnlyDictionary<string, object> environments)
-        //{
-        //    Assert.ArgumentNotNull(environments, nameof(environments));
-        //    _environments = new FactoryEnvironmentCollection();
-        //    return this;
-        //}
 
         public IEnvironmentSetup None()
         {

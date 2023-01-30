@@ -26,13 +26,6 @@ namespace StoneFruit
              where T : class;
 
         /// <summary>
-        /// Use named environment instances which can be switched.
-        /// </summary>
-        /// <param name="environments"></param>
-        /// <returns></returns>
-        //IEnvironmentSetup UseInstances(IReadOnlyDictionary<string, object> environments);
-
-        /// <summary>
         /// Do not use any environments (default).
         /// </summary>
         /// <returns></returns>

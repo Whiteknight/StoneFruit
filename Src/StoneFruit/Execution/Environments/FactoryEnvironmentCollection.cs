@@ -13,7 +13,6 @@ namespace StoneFruit.Execution.Environments
         private readonly IReadOnlyList<string> _nameList;
         private readonly HashSet<string> _validNames;
 
-        private IResult<object> _current;
         private IResult<string> _currentName;
 
         public FactoryEnvironmentCollection(EnvironmentsList environmentList)

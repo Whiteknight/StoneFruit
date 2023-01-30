@@ -112,7 +112,7 @@ Clear the data for the current environment.
                 // If we only have a single environment, switch directly to it with no input from the user
                 if (environments.Count == 1)
                 {
-                    _environments.SetCurrent(environments.First());
+                    _environments.SetCurrent(environments[0]);
                     if (_args.HasFlag(FlagClearData))
                         _objectCache.Clear(_environments.GetCurrentName().Value);
                     _state.OnEnvironmentChanged();
@@ -142,10 +142,9 @@ Clear the data for the current environment.
 
             _environments.SetCurrent(envName);
             _state.OnEnvironmentChanged();
-            return;
         }
 
-        private IResult<string> GetEnvironmentNameFromUserInput(IReadOnlyList<string> environments, string envNameOrNumber)
+        private static IResult<string> GetEnvironmentNameFromUserInput(IReadOnlyList<string> environments, string envNameOrNumber)
         {
             string envName = envNameOrNumber;
             if (!envNameOrNumber.All(char.IsDigit))
@@ -157,6 +156,7 @@ Clear the data for the current environment.
                 envName = environments[asInt];
                 return Result.Success(envName);
             }
+
             return FailureResult<string>.Instance;
         }
 
@@ -176,6 +176,7 @@ Clear the data for the current environment.
                 var envIndex = _output.Prompt("", true, false);
                 if (!TrySetEnvironment(envIndex))
                     continue;
+
                 _state.OnEnvironmentChanged();
                 break;
             }
