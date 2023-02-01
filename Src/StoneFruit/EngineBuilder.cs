@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Environments;
@@ -20,6 +21,8 @@ namespace StoneFruit
         private readonly ParserSetup _parsers;
         private readonly EngineSettings _settings;
 
+        private ICommandLine? _commandLine;
+
         public IServiceCollection Services { get; }
 
         private EngineBuilder(IServiceCollection services, Action? scanForHandlers = null)
@@ -38,7 +41,7 @@ namespace StoneFruit
         /// </summary>
         /// <param name="setup"></param>
         /// <returns></returns>
-        public EngineBuilder SetupHandlers(Action<IHandlerSetup> setup)
+        public IEngineBuilder SetupHandlers(Action<IHandlerSetup> setup)
         {
             setup?.Invoke(_handlers);
             return this;
@@ -49,7 +52,7 @@ namespace StoneFruit
         /// </summary>
         /// <param name="setup"></param>
         /// <returns></returns>
-        public EngineBuilder SetupEnvironments(Action<IEnvironmentSetup> setup)
+        public IEngineBuilder SetupEnvironments(Action<IEnvironmentSetup> setup)
         {
             setup?.Invoke(_environments);
             return this;
@@ -60,7 +63,7 @@ namespace StoneFruit
         /// </summary>
         /// <param name="setup"></param>
         /// <returns></returns>
-        public EngineBuilder SetupArguments(Action<IParserSetup> setup)
+        public IEngineBuilder SetupArguments(Action<IParserSetup> setup)
         {
             setup?.Invoke(_parsers);
             return this;
@@ -71,7 +74,7 @@ namespace StoneFruit
         /// </summary>
         /// <param name="setup"></param>
         /// <returns></returns>
-        public EngineBuilder SetupOutput(Action<IOutputSetup> setup)
+        public IEngineBuilder SetupOutput(Action<IOutputSetup> setup)
         {
             setup?.Invoke(_output);
             return this;
@@ -82,7 +85,7 @@ namespace StoneFruit
         /// </summary>
         /// <param name="setup"></param>
         /// <returns></returns>
-        public EngineBuilder SetupEvents(Action<EngineEventCatalog> setup)
+        public IEngineBuilder SetupEvents(Action<EngineEventCatalog> setup)
         {
             setup?.Invoke(_eventCatalog);
             return this;
@@ -93,9 +96,15 @@ namespace StoneFruit
         /// </summary>
         /// <param name="setup"></param>
         /// <returns></returns>
-        public EngineBuilder SetupSettings(Action<EngineSettings> setup)
+        public IEngineBuilder SetupSettings(Action<EngineSettings> setup)
         {
             setup?.Invoke(_settings);
+            return this;
+        }
+
+        public IEngineBuilder SetCommandLine(ICommandLine commandLine)
+        {
+            _commandLine = commandLine;
             return this;
         }
 
@@ -143,6 +152,7 @@ namespace StoneFruit
             _environments.BuildUp(services);
             _parsers.BuildUp(services);
             _output.BuildUp(services);
+            services.TryAddSingleton<ICommandLine>(_commandLine ?? new EnvironmentCommandLine());
         }
 
         private static void SetupCoreEngineRegistrations(IServiceCollection services)
@@ -160,7 +170,8 @@ namespace StoneFruit
                 var output = provider.GetRequiredService<IOutput>();
                 var engineCatalog = provider.GetRequiredService<EngineEventCatalog>();
                 var engineSettings = provider.GetRequiredService<EngineSettings>();
-                var e = new Engine(handlers, environments, parser, output, engineCatalog, engineSettings);
+                var commandLine = provider.GetRequiredService<ICommandLine>();
+                var e = new Engine(handlers, environments, parser, output, engineCatalog, engineSettings, commandLine);
                 accessor.SetEngine(e);
                 return e;
             });

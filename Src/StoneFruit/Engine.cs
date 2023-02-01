@@ -14,8 +14,17 @@ namespace StoneFruit
     public class Engine
     {
         private readonly ICommandParser _parser;
+        private readonly ICommandLine _cmdLineArgs;
 
-        public Engine(IHandlers handlers, IEnvironmentCollection environments, ICommandParser parser, IOutput output, EngineEventCatalog eventCatalog, EngineSettings settings)
+        public Engine(
+            IHandlers handlers,
+            IEnvironmentCollection environments,
+            ICommandParser parser,
+            IOutput output,
+            EngineEventCatalog eventCatalog,
+            EngineSettings settings,
+            ICommandLine cmdLineArgs
+        )
         {
             Assert.ArgumentNotNull(environments, nameof(environments));
             Assert.ArgumentNotNull(parser, nameof(parser));
@@ -24,6 +33,7 @@ namespace StoneFruit
             Environments = environments;
             _parser = parser;
             Output = output;
+            _cmdLineArgs = cmdLineArgs;
             State = new EngineState(eventCatalog, settings, Environments, _parser);
             Dispatcher = new CommandDispatcher(_parser, handlers, Environments, State, Output);
         }
@@ -51,7 +61,7 @@ namespace StoneFruit
         /// <returns></returns>
         public Task<int> RunWithCommandLineArgumentsAsync()
         {
-            var commandLine = GetRawCommandLineArguments();
+            var commandLine = _cmdLineArgs.GetRawArguments();
             return RunAsync(commandLine);
         }
 
@@ -59,7 +69,7 @@ namespace StoneFruit
         {
             return Task.Run(async () =>
             {
-                var commandLine = GetRawCommandLineArguments();
+                var commandLine = _cmdLineArgs.GetRawArguments();
                 return await RunAsync(commandLine);
             }).GetAwaiter().GetResult();
         }
@@ -100,7 +110,7 @@ namespace StoneFruit
         /// <returns></returns>
         public Task<int> RunHeadlessWithCommandLineArgsAsync()
         {
-            var commandLine = GetRawCommandLineArguments();
+            var commandLine = _cmdLineArgs.GetRawArguments();
             return RunHeadlessAsync(commandLine);
         }
 
@@ -108,7 +118,7 @@ namespace StoneFruit
         {
             return Task.Run(async () =>
             {
-                var commandLine = GetRawCommandLineArguments();
+                var commandLine = _cmdLineArgs.GetRawArguments();
                 return await RunHeadlessAsync(commandLine);
             }).GetAwaiter().GetResult();
         }
@@ -207,18 +217,6 @@ namespace StoneFruit
             source.AddToEnd(new PromptCommandSource(Output, Environments, State));
 
             return await RunLoop(source);
-        }
-
-        // Attempt to get the raw commandline arguments as they were passed to the
-        // application. Main(string[] args) is transformed by the shell with quotes
-        // stripped. Environment.CommandLine is unmodified but we have to pull the exe name
-        // off the front.
-        private static string GetRawCommandLineArguments()
-        {
-            // Environment.CommandLine includes the name of the exe invoked, so strip that
-            // off the front. Luckily it seems like quotes are stripped for us.
-            var exeName = Environment.GetCommandLineArgs()[0];
-            return Environment.CommandLine.Substring(exeName.Length).Trim();
         }
 
         // See if the given commandLine starts with a valid environment name. If so,
