@@ -117,6 +117,11 @@ namespace StoneFruit
         public static Engine Build(Action<IEngineBuilder> build)
         {
             var services = new ServiceCollection();
+            return Build(services, build);
+        }
+
+        public static Engine Build(IServiceCollection services, Action<IEngineBuilder> build)
+        {
             var engineBuilder = new EngineBuilder(services, () => ScanForHandlers(services));
             build?.Invoke(engineBuilder);
             SetupCoreEngineRegistrations(services);
