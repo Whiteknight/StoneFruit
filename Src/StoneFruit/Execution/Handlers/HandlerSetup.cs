@@ -131,10 +131,12 @@ namespace StoneFruit.Execution.Handlers
         public IHandlerSetup ScanAssemblyForHandlers(Assembly assembly)
         {
             NotNull(assembly);
-            assembly.GetTypes()
-                .Where(t => !t.IsAbstract && t.IsAssignableTo(typeof(IHandlerBase)))
+            var handlerTypes = assembly.GetTypes()
+                .Where(t => !t.IsAbstract && t.IsPublic && t.IsAssignableTo(typeof(IHandlerBase)))
                 // TODO: Add each found handler type to a wrapper. Register the wrapper.
                 ;
+            foreach (var type in handlerTypes)
+                _services.AddScoped(type);
             return this;
         }
     }

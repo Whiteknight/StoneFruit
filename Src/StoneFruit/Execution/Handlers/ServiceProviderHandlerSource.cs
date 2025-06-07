@@ -19,6 +19,10 @@ namespace StoneFruit.Execution.Handlers
 
         public ServiceProviderHandlerSource(IServiceCollection services, IServiceProvider provider, IVerbExtractor verbExtractor)
         {
+            // TODO: Redesign. Instead of taking the IServiceCollection here and picking apart the registrations,
+            // Wrap scanned handler types into a HandlerTypeWrapper and register those. Then we can inject the list
+            // here and decode from there. We don't want to depend on the lifetype of IServiceCollection lasting
+            // until this point.
             _provider = provider;
 
             var handlerRegistrations = services
@@ -64,7 +68,8 @@ namespace StoneFruit.Execution.Handlers
                 return FailureResult<IHandlerBase>.Instance;
 
             using var scope = _provider.CreateScope();
-            return scope.ServiceProvider.GetService(serviceType.Value.Type) is IHandlerBase instance ? new SuccessResult<IHandlerBase>(instance) : FailureResult<IHandlerBase>.Instance;
+            var created = scope.ServiceProvider.GetService(serviceType.Value.Type);
+            return created is IHandlerBase instance ? new SuccessResult<IHandlerBase>(instance) : FailureResult<IHandlerBase>.Instance;
         }
 
         public IEnumerable<IVerbInfo> GetAll() => _verbs.GetAll().Select(kvp => kvp.Value);
