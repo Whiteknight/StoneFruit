@@ -17,8 +17,8 @@ namespace StoneFruit.Execution
 
         public EngineState(EngineEventCatalog eventCatalog, EngineSettings settings, IEnvironmentCollection environments, ICommandParser parser)
         {
-            Assert.ArgumentNotNull(eventCatalog, nameof(eventCatalog));
-            Assert.ArgumentNotNull(settings, nameof(settings));
+            Assert.NotNull(eventCatalog, nameof(eventCatalog));
+            Assert.NotNull(settings, nameof(settings));
 
             EventCatalog = eventCatalog;
             ShouldExit = false;

@@ -23,7 +23,7 @@ namespace StoneFruit.Trie
 
         public void Insert(IEnumerable<string> keys, TValue value)
         {
-            Assert.ArgumentNotNull(keys, nameof(keys));
+            Assert.NotNull(keys, nameof(keys));
             var current = _root;
             foreach (var key in keys)
                 current = current.GetOrInsertChild(key);

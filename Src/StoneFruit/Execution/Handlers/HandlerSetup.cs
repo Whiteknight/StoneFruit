@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using StoneFruit.Execution.Scripts;
 using StoneFruit.Handlers;
 using StoneFruit.Utility;
+using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit.Execution.Handlers
 {
@@ -18,7 +21,6 @@ namespace StoneFruit.Execution.Handlers
         private readonly ScriptHandlerSource _scripts;
         private readonly NamedInstanceHandlerSource _instances;
         private readonly IServiceCollection _services;
-        private readonly Action _scanForHandlers;
 
         private readonly List<Type> _handlerTypes = new List<Type>
         {
@@ -29,13 +31,12 @@ namespace StoneFruit.Execution.Handlers
             typeof(MetadataHandler),
         };
 
-        public HandlerSetup(IServiceCollection services, Action scanForHandlers)
+        public HandlerSetup(IServiceCollection services)
         {
             _delegates = new DelegateHandlerSource();
             _scripts = new ScriptHandlerSource();
             _instances = new NamedInstanceHandlerSource();
             _services = services;
-            _scanForHandlers = scanForHandlers;
         }
 
         public void BuildUp(IServiceCollection services)
@@ -69,67 +70,71 @@ namespace StoneFruit.Execution.Handlers
 
         public IHandlerSetup UseVerbExtractor(IVerbExtractor verbExtractor)
         {
-            Assert.ArgumentNotNull(verbExtractor, nameof(verbExtractor));
+            NotNull(verbExtractor);
             _services.AddSingleton(verbExtractor);
             return this;
         }
 
         public IHandlerSetup UseMethodInvoker(IHandlerMethodInvoker invoker)
         {
-            Assert.ArgumentNotNull(invoker, nameof(invoker));
+            NotNull(invoker);
             _services.AddSingleton(invoker);
             return this;
         }
 
         public IHandlerSetup AddSource(Func<IServiceProvider, IHandlerSource> getSource)
         {
-            Assert.ArgumentNotNull(getSource, nameof(getSource));
+            NotNull(getSource);
             _services.AddSingleton(getSource);
             return this;
         }
 
         public IHandlerSetup Add(Verb verb, Action<IArguments, CommandDispatcher> handle, string description = "", string usage = "", string group = "")
         {
-            Assert.ArgumentNotNull(verb, nameof(verb));
-            Assert.ArgumentNotNull(handle, nameof(handle));
+            NotNull(verb);
+            NotNull(handle);
             _delegates.Add(verb, handle, description, usage, group);
             return this;
         }
 
         public IHandlerSetup Add(Verb verb, IHandlerBase handler, string description = "", string usage = "", string group = "")
         {
-            Assert.ArgumentNotNull(verb, nameof(verb));
-            Assert.ArgumentNotNull(handler, nameof(handler));
+            NotNull(verb);
+            NotNull(handler);
             _instances.Add(verb, handler, description, usage, group);
             return this;
         }
 
         public IHandlerSetup AddAsync(Verb verb, Func<IArguments, CommandDispatcher, Task> handleAsync, string description = "", string usage = "", string group = "")
         {
-            Assert.ArgumentNotNull(verb, nameof(verb));
-            Assert.ArgumentNotNull(handleAsync, nameof(handleAsync));
+            NotNull(verb);
+            NotNull(handleAsync);
             _delegates.AddAsync(verb, handleAsync, description, usage, group);
             return this;
         }
 
         public IHandlerSetup AddScript(Verb verb, IEnumerable<string> lines, string description = "", string usage = "", string group = "")
         {
-            Assert.ArgumentNotNull(verb, nameof(verb));
-            Assert.ArgumentNotNull(lines, nameof(lines));
+            NotNull(verb);
+            NotNull(lines);
             _scripts.AddScript(verb, lines, description, usage, group);
             return this;
         }
 
         public IHandlerSetup UseHandlerTypes(IEnumerable<Type> commandTypes)
         {
-            Assert.ArgumentNotNull(commandTypes, nameof(commandTypes));
+            NotNull(commandTypes);
             _handlerTypes.AddRange(commandTypes);
             return this;
         }
 
-        public IHandlerSetup Scan()
+        public IHandlerSetup ScanAssemblyForHandlers(Assembly assembly)
         {
-            _scanForHandlers();
+            NotNull(assembly);
+            assembly.GetTypes()
+                .Where(t => !t.IsAbstract && t.IsAssignableTo(typeof(IHandlerBase)))
+                // TODO: Add each found handler type to a wrapper. Register the wrapper.
+                ;
             return this;
         }
     }

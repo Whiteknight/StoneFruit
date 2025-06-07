@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Execution;
@@ -10,6 +12,10 @@ namespace StoneFruit
 {
     public interface IHandlerSetup
     {
+        // TODO: Scan the assembly for handlers
+        // TODO: Keep track of which assemblies we scan, to avoid double-scanning
+        // TODO: Wrap found handler types in an accessor. Then we can feed the list of accessors into the HandlerSourceCollection and resolve types from there.
+        IHandlerSetup ScanAssemblyForHandlers(Assembly assembly);
         /// <summary>
         /// Set the Verb Extractor to use to get verbs from classes and methods where verbs are
         /// not explicitly supplied.
@@ -82,17 +88,19 @@ namespace StoneFruit
         /// <param name="commandTypes"></param>
         /// <returns></returns>
         IHandlerSetup UseHandlerTypes(IEnumerable<Type> commandTypes);
-
-        /// <summary>
-        /// Scan currently-linked assemblies in the current AppDomain for all classes of type
-        /// IHandler or IAsyncHandler.
-        /// </summary>
-        /// <returns></returns>
-        IHandlerSetup Scan();
     }
 
     public static class HandlerSetupExtensions
     {
+        public static IHandlerSetup ScanHandlersFromEntryAssembly(this IHandlerSetup handlers)
+            => handlers.ScanAssemblyForHandlers(Assembly.GetExecutingAssembly());
+
+        public static IHandlerSetup ScanHandlersFromCurrentAssembly(this IHandlerSetup handlers)
+            => handlers.ScanAssemblyForHandlers(new StackTrace(1).GetFrame(0)!.GetType().Assembly);
+
+        public static IHandlerSetup ScanHandlersFromAssemblyContaining<T>(this IHandlerSetup handlers)
+            => handlers.ScanAssemblyForHandlers(typeof(T).Assembly);
+
         /// <summary>
         /// Add a handler source where handlers can be looked up.
         /// </summary>
@@ -100,8 +108,8 @@ namespace StoneFruit
         /// <returns></returns>
         public static IHandlerSetup AddSource(this IHandlerSetup handlers, IHandlerSource source)
         {
-            Assert.ArgumentNotNull(handlers, nameof(handlers));
-            Assert.ArgumentNotNull(source, nameof(source));
+            Assert.NotNull(handlers, nameof(handlers));
+            Assert.NotNull(source, nameof(source));
             return handlers.AddSource(_ => source);
         }
 
@@ -111,9 +119,9 @@ namespace StoneFruit
         /// <param name="handlers"></param>
         /// <param name="instance"></param>
         /// <returns></returns>
-        public static IHandlerSetup UsePublicMethodsAsHandlers(this IHandlerSetup handlers, object instance)
+        public static IHandlerSetup UsePublicInstanceMethodsAsHandlers(this IHandlerSetup handlers, object instance)
         {
-            Assert.ArgumentNotNull(handlers, nameof(handlers));
+            Assert.NotNull(handlers, nameof(handlers));
             return handlers.AddSource(provider =>
                 new InstanceMethodHandlerSource(
                     instance,
@@ -132,8 +140,8 @@ namespace StoneFruit
         /// <returns></returns>
         public static IHandlerSetup UseHandlerTypes(this IHandlerSetup handlers, params Type[] commandTypes)
         {
-            Assert.ArgumentNotNull(handlers, nameof(handlers));
-            Assert.ArgumentNotNull(commandTypes, nameof(commandTypes));
+            Assert.NotNull(handlers, nameof(handlers));
+            Assert.NotNull(commandTypes, nameof(commandTypes));
             return handlers.UseHandlerTypes(commandTypes);
         }
     }

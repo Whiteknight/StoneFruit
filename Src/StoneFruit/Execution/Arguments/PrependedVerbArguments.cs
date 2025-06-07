@@ -15,8 +15,8 @@ namespace StoneFruit.Execution.Arguments
 
         public PrependedVerbArguments(IEnumerable<string> verb, IArguments inner)
         {
-            Assert.ArgumentNotNull(verb, nameof(verb));
-            Assert.ArgumentNotNull(inner, nameof(inner));
+            Assert.NotNull(verb, nameof(verb));
+            Assert.NotNull(inner, nameof(inner));
 
             _verb = verb.ToList();
             _inner = inner;

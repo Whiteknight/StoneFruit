@@ -41,7 +41,7 @@ namespace StoneFruit.Execution.Environments
         public IEnvironmentSetup UseFactory<T>(IEnvironmentFactory<T> factory)
             where T : class
         {
-            Assert.ArgumentNotNull(factory, nameof(factory));
+            Assert.NotNull(factory, nameof(factory));
             _services.AddSingleton(factory);
             _services.AddScoped(services =>
             {
@@ -67,7 +67,7 @@ namespace StoneFruit.Execution.Environments
         public IEnvironmentSetup UseInstance<T>(T environment)
              where T : class
         {
-            Assert.ArgumentNotNull(environment, nameof(environment));
+            Assert.NotNull(environment, nameof(environment));
             return UseFactory<T>(new InstanceEnvironmentFactory<T>(environment));
         }
 

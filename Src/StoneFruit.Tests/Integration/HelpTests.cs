@@ -59,7 +59,7 @@ namespace StoneFruit.Tests.Integration
             var engine = EngineBuilder.Build(b => b
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupHandlers(h => h
-                    .UsePublicMethodsAsHandlers(new TestInstanceMethodsAttrs())
+                    .UsePublicInstanceMethodsAsHandlers(new TestInstanceMethodsAttrs())
                 )
             );
             engine.RunHeadless("help");
@@ -76,7 +76,7 @@ namespace StoneFruit.Tests.Integration
             var engine = EngineBuilder.Build(b => b
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
                 .SetupHandlers(h => h
-                    .UsePublicMethodsAsHandlers(new TestInstanceMethodsAttrs())
+                    .UsePublicInstanceMethodsAsHandlers(new TestInstanceMethodsAttrs())
                 )
             );
             engine.RunHeadless("help test 1");

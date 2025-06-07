@@ -47,7 +47,7 @@ namespace StoneFruit
         /// <returns></returns>
         public static IParserSetup UseSimplifiedArgumentParser(this IParserSetup setup)
         {
-            Assert.ArgumentNotNull(setup, nameof(setup));
+            Assert.NotNull(setup, nameof(setup));
             return setup.UseArgumentParser(SimplifiedArgumentGrammar.GetParser());
         }
 
@@ -58,7 +58,7 @@ namespace StoneFruit
         /// <returns></returns>
         public static IParserSetup UsePosixStyleArgumentParser(this IParserSetup setup)
         {
-            Assert.ArgumentNotNull(setup, nameof(setup));
+            Assert.NotNull(setup, nameof(setup));
             return setup.UseArgumentParser(PosixStyleArgumentGrammar.GetParser());
         }
 
@@ -69,7 +69,7 @@ namespace StoneFruit
         /// <returns></returns>
         public static IParserSetup UsePowershellStyleArgumentParser(this IParserSetup setup)
         {
-            Assert.ArgumentNotNull(setup, nameof(setup));
+            Assert.NotNull(setup, nameof(setup));
             return setup.UseArgumentParser(PowershellStyleArgumentGrammar.GetParser());
         }
 
@@ -80,7 +80,7 @@ namespace StoneFruit
         /// <returns></returns>
         public static IParserSetup UseWindowsCmdArgumentParser(this IParserSetup setup)
         {
-            Assert.ArgumentNotNull(setup, nameof(setup));
+            Assert.NotNull(setup, nameof(setup));
             return setup.UseArgumentParser(WindowsCmdArgumentGrammar.GetParser());
         }
     }

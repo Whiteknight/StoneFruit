@@ -13,13 +13,13 @@ namespace StoneFruit.Execution.Handlers
 
         public HandlerSourceCollection(IEnumerable<IHandlerSource> sources)
         {
-            Assert.ArgumentNotNull(sources, nameof(sources));
+            Assert.NotNull(sources, nameof(sources));
             _sources = sources.Where(s => s != null).ToList();
         }
 
         public IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
         {
-            Assert.ArgumentNotNull(arguments, nameof(arguments));
+            Assert.NotNull(arguments, nameof(arguments));
             return _sources
                 .Select(source => source.GetInstance(arguments, dispatcher))
                 .FirstOrDefault(result => result.HasValue) ?? FailureResult<IHandlerBase>.Instance;

@@ -10,7 +10,7 @@ namespace StoneFruit.Execution.Output
     {
         public IOutput Color(Func<Brush, Brush> changeBrush)
         {
-            Assert.ArgumentNotNull(changeBrush, nameof(changeBrush));
+            Assert.NotNull(changeBrush, nameof(changeBrush));
             var brush = changeBrush(Brush.Current);
             return brush.Equals(Brush.Current) ? (IOutput)this : new ColoredOutputWrapper(brush, this);
         }

@@ -25,10 +25,10 @@ namespace StoneFruit
 
         public IServiceCollection Services { get; }
 
-        private EngineBuilder(IServiceCollection services, Action? scanForHandlers = null)
+        private EngineBuilder(IServiceCollection services)
         {
             Services = services;
-            _handlers = new HandlerSetup(Services, scanForHandlers ?? ThrowIfScanRequestedButScannerNotProvided);
+            _handlers = new HandlerSetup(Services);
             _eventCatalog = new EngineEventCatalog();
             _output = new OutputSetup();
             _environments = new EnvironmentSetup(Services);
@@ -122,7 +122,7 @@ namespace StoneFruit
 
         public static Engine Build(IServiceCollection services, Action<IEngineBuilder> build)
         {
-            var engineBuilder = new EngineBuilder(services, () => ScanForHandlers(services));
+            var engineBuilder = new EngineBuilder(services);
             build?.Invoke(engineBuilder);
             SetupCoreEngineRegistrations(services);
             services.AddSingleton<IHandlerSource>(provider => new ServiceProviderHandlerSource(services, provider, provider.GetRequiredService<IVerbExtractor>()));
@@ -141,9 +141,9 @@ namespace StoneFruit
         /// </summary>
         /// <param name="services"></param>
         /// <param name="build"></param>
-        public static void SetupEngineRegistrations(IServiceCollection services, Action<IEngineBuilder> build, Action scanForHandlers)
+        public static void SetupEngineRegistrations(IServiceCollection services, Action<IEngineBuilder> build)
         {
-            var builder = new EngineBuilder(services, scanForHandlers: scanForHandlers);
+            var builder = new EngineBuilder(services);
             build?.Invoke(builder);
             SetupCoreEngineRegistrations(services);
             builder.BuildUp(services);
@@ -192,30 +192,6 @@ namespace StoneFruit
             // input command has been entered. We access it from the EngineState, which comes from
             // the Engine, and we do all this to avoid circular references in the DI.
             services.AddTransient(provider => provider.GetRequiredService<EngineState>().CurrentArguments);
-        }
-
-        private void ThrowIfScanRequestedButScannerNotProvided()
-        {
-            throw new EngineBuildException(".Scan() requested but no scanner registered. Are you using a DI container?");
-        }
-
-        private static void ScanForHandlers(IServiceCollection services)
-        {
-            // Scan for handler classes in all assemblies, and setup a source to pull those types out of the
-            // provider
-            services.Scan(scanner => scanner
-                .FromApplicationDependencies()
-                .AddClasses(classes => classes.Where(t =>
-                {
-                    if (!typeof(IHandlerBase).IsAssignableFrom(t))
-                        return false;
-                    if (!t.IsPublic)
-                        return false;
-                    return true;
-                }))
-                .AsSelf()
-                .WithTransientLifetime()
-            );
         }
     }
 }

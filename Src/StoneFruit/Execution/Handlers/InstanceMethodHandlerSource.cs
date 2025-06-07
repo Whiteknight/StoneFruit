@@ -20,7 +20,7 @@ namespace StoneFruit.Execution.Handlers
 
         public InstanceMethodHandlerSource(object instance, IHandlerMethodInvoker invoker, IVerbExtractor verbExtractor)
         {
-            Assert.ArgumentNotNull(instance, nameof(instance));
+            Assert.NotNull(instance, nameof(instance));
             _instance = instance;
             _methods = _instance.GetType()
                 .GetMethods(BindingFlags.Instance | BindingFlags.Public)

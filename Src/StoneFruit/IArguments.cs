@@ -108,7 +108,7 @@ namespace StoneFruit
         /// <returns></returns>
         public static IPositionalArgument Consume(this IArguments args, int index)
         {
-            Assert.ArgumentNotNull(args, nameof(args));
+            Assert.NotNull(args, nameof(args));
             return args.Get(index).MarkConsumed();
         }
 
@@ -120,7 +120,7 @@ namespace StoneFruit
         /// <returns></returns>
         public static INamedArgument Consume(this IArguments args, string name)
         {
-            Assert.ArgumentNotNull(args, nameof(args));
+            Assert.NotNull(args, nameof(args));
             return args.Get(name).MarkConsumed();
         }
 
@@ -132,7 +132,7 @@ namespace StoneFruit
         /// <returns></returns>
         public static IFlagArgument ConsumeFlag(this IArguments args, string name)
         {
-            Assert.ArgumentNotNull(args, nameof(args));
+            Assert.NotNull(args, nameof(args));
             return args.GetFlag(name).MarkConsumed();
         }
 
@@ -145,7 +145,7 @@ namespace StoneFruit
         public static T MapTo<T>(this IArguments args)
             where T : new()
         {
-            Assert.ArgumentNotNull(args, nameof(args));
+            Assert.NotNull(args, nameof(args));
             return CommandArgumentMapper.Map<T>(args);
         }
 
@@ -158,7 +158,7 @@ namespace StoneFruit
         /// <param name="obj"></param>
         public static void MapOnto<T>(this IArguments args, T obj)
         {
-            Assert.ArgumentNotNull(args, nameof(args));
+            Assert.NotNull(args, nameof(args));
             CommandArgumentMapper.MapOnto(args, obj);
         }
 
@@ -168,7 +168,7 @@ namespace StoneFruit
         /// <returns></returns>
         public static IEnumerable<IArgument> GetAllArguments(this IArguments args)
         {
-            Assert.ArgumentNotNull(args, nameof(args));
+            Assert.NotNull(args, nameof(args));
             return args.GetAllPositionals().Cast<IArgument>()
                 .Concat(args.GetAllNamed())
                 .Concat(args.GetAllFlags())
@@ -177,7 +177,7 @@ namespace StoneFruit
 
         public static IPositionalArgument GetAllUnconsumedPositionalsAsOne(this IArguments args)
         {
-            Assert.ArgumentNotNull(args, nameof(args));
+            Assert.NotNull(args, nameof(args));
             var remainingPositionals = args.GetAllPositionals().ToList();
             if (remainingPositionals.Count == 0)
                 return MissingArgument.NoPositionals();
@@ -190,7 +190,7 @@ namespace StoneFruit
         /// </summary>
         public static void VerifyAllAreConsumed(this IArguments args)
         {
-            Assert.ArgumentNotNull(args, nameof(args));
+            Assert.NotNull(args, nameof(args));
             var unconsumed = args.GetUnconsumed();
             if (!unconsumed.Any())
                 return;

@@ -29,14 +29,14 @@ namespace StoneFruit.Execution
 
         public void Add(params string[] lines)
         {
-            Assert.ArgumentNotNull(lines, nameof(lines));
+            Assert.NotNull(lines, nameof(lines));
             _lines.AddRange(lines);
         }
 
         public IEnumerable<ArgumentsOrString> GetCommands(ICommandParser parser, IArguments args)
         {
-            Assert.ArgumentNotNull(parser, nameof(parser));
-            Assert.ArgumentNotNull(args, nameof(args));
+            Assert.NotNull(parser, nameof(parser));
+            Assert.NotNull(args, nameof(args));
             return _lines
                 .Where(l => !string.IsNullOrEmpty(l))
                 .Select(parser.ParseScript)

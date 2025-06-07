@@ -9,14 +9,14 @@ namespace StoneFruit.Execution
     {
         public ArgumentsOrString(string asString)
         {
-            Assert.ArgumentNotNullOrEmpty(asString, nameof(asString));
+            Assert.NotNullOrEmpty(asString, nameof(asString));
             Arguments = null;
             String = asString;
         }
 
         public ArgumentsOrString(IArguments asArguments)
         {
-            Assert.ArgumentNotNull(asArguments, nameof(asArguments));
+            Assert.NotNull(asArguments, nameof(asArguments));
             Arguments = asArguments;
             String = null;
         }
@@ -31,7 +31,7 @@ namespace StoneFruit.Execution
 
         public IArguments GetArguments(ICommandParser parser)
         {
-            Assert.ArgumentNotNull(parser, nameof(parser));
+            Assert.NotNull(parser, nameof(parser));
             return Arguments ?? parser.ParseCommand(String!);
         }
     }

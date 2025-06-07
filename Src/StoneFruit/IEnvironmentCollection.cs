@@ -45,7 +45,7 @@ namespace StoneFruit
         /// <param name="index"></param>
         public static void SetCurrent(this IEnvironmentCollection environments, int index)
         {
-            Assert.ArgumentNotNull(environments, nameof(environments));
+            Assert.NotNull(environments, nameof(environments));
             var allEnvs = environments.GetNames();
             if (index < 0 || index >= allEnvs.Count)
                 return;
@@ -60,7 +60,7 @@ namespace StoneFruit
         /// <returns></returns>
         public static bool IsValid(this IEnvironmentCollection environments, int index)
         {
-            Assert.ArgumentNotNull(environments, nameof(environments));
+            Assert.NotNull(environments, nameof(environments));
             var allEnvs = environments.GetNames();
             return index >= 0 && index < allEnvs.Count;
         }

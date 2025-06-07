@@ -25,8 +25,8 @@ namespace StoneFruit.Utility
         /// <returns></returns>
         public static IEnumerable<T> Tap<T>(this IEnumerable<T> source, Action<T> onEach)
         {
-            Assert.ArgumentNotNull(source, nameof(source));
-            Assert.ArgumentNotNull(onEach, nameof(onEach));
+            Assert.NotNull(source, nameof(source));
+            Assert.NotNull(onEach, nameof(onEach));
 
             foreach (var item in source)
             {

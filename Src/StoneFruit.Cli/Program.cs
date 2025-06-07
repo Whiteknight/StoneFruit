@@ -1,51 +1,25 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.Cli
 {
-    public class MyFirstHandler : IHandler
-    {
-        private readonly IOutput _output;
-        private readonly EngineState _state;
-
-        public MyFirstHandler(IOutput output, EngineState state)
-        {
-            _output = output;
-            _state = state;
-        }
-
-        public void Execute()
-        {
-            _state.Metadata.Add("test", this);
-            _output.WriteLine("Starting the job...");
-            // .. Do work here ..
-            _output.WriteLine("Done.");
-        }
-    }
-
     internal static class Program
     {
-        private static async Task Main(string[] args)
+        private static void Main(string[] args)
         {
-            var engine = NoneMain();
-            //var engine = StructureMapMain();
-            //var engine = LamarMain();
-            //var engine = MicrosoftMain();
-            //var engine = AutofacMain();
-            Environment.ExitCode = await engine.RunWithCommandLineArgumentsAsync();
-
-            Console.ReadKey();
-        }
-
-        private static void Build(IEngineBuilder builder)
-        {
-            builder
+            var host = Host.CreateApplicationBuilder(args);
+            host.Logging.AddConsole();
+            host.SetupStoneFruit(b => b
                 .SetupHandlers(h => h
-                    .Scan()
-                    .UsePublicMethodsAsHandlers(new MyObject())
+                    .ScanHandlersFromEntryAssembly()
+                    .ScanHandlersFromCurrentAssembly()
+                    .ScanHandlersFromAssemblyContaining<MyFirstHandler>()
+                    .UsePublicInstanceMethodsAsHandlers(new MyObject())
                     .Add("testf", (c, d) => d.Output.WriteLine("F"), description: "do F things", usage: "testf ...", group: "delegates")
                     .AddScript("testg", new[] { "echo test", "echo g" }, group: "scripts")
                     .AddScript("testh", new[] { "echo [0]", "echo ['a']" }, group: "scripts")
@@ -73,38 +47,31 @@ namespace StoneFruit.Cli
                 {
                     //s.MaxInputlessCommands = 3;
                     s.MaxExecuteTimeout = TimeSpan.FromSeconds(5);
-                });
+                })
+            );
+            var app = host.Build();
+            app.Run();
         }
+    }
 
-        private static Engine NoneMain()
+    public class MyFirstHandler : IHandler
+    {
+        private readonly IOutput _output;
+        private readonly EngineState _state;
+
+        public MyFirstHandler(IOutput output, EngineState state)
         {
-            return EngineBuilder.Build(b => Build(b));
+            _output = output;
+            _state = state;
         }
 
-        //private static Engine StructureMapMain()
-        //{
-        //    var container = new StructureMap.Container();
-        //    container.SetupEngine<MyEnvironment>(Build);
-
-        //    return container.GetInstance<Engine>();
-        //}
-
-        //private static Engine LamarMain()
-        //{
-        //    var serviceCollection = new ServiceRegistry()
-        //        .SetupEngine<MyEnvironment>(Build);
-
-        //    var container = new Container(serviceCollection);
-        //    return container.GetService<Engine>();
-        //}
-
-        //private static Engine AutofacMain()
-        //{
-        //    var containerBuilder = new Autofac.ContainerBuilder();
-        //    containerBuilder.SetupEngine<MyEnvironment>(Build);
-        //    Autofac.IContainer container = containerBuilder.Build();
-        //    return container.Resolve<Engine>();
-        //}
+        public void Execute()
+        {
+            _state.Metadata.Add("test", this);
+            _output.WriteLine("Starting the job...");
+            // .. Do work here ..
+            _output.WriteLine("Done.");
+        }
     }
 
     public class TestArgsA

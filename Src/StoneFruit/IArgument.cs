@@ -96,7 +96,7 @@ namespace StoneFruit
         public static T Require<T>(this T argument, string errorMessage = "")
             where T : IArgument
         {
-            Assert.ArgumentNotNull(argument, nameof(argument));
+            Assert.NotNull(argument, nameof(argument));
             (argument as MissingArgument)?.Throw(errorMessage);
             return argument;
         }
@@ -108,7 +108,7 @@ namespace StoneFruit
         public static T MarkConsumed<T>(this T argument, bool consumed = true)
             where T : IArgument
         {
-            Assert.ArgumentNotNull(argument, nameof(argument));
+            Assert.NotNull(argument, nameof(argument));
             argument.Consumed = consumed;
             return argument;
         }

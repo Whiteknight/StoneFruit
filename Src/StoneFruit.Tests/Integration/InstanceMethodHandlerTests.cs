@@ -32,7 +32,7 @@ namespace StoneFruit.Tests.Integration
         {
             var output = new TestOutput();
             var engine = EngineBuilder.Build(b => b
-                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject1()))
+                .SetupHandlers(h => h.UsePublicInstanceMethodsAsHandlers(new MyObject1()))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
             );
             engine.RunHeadless("test a");
@@ -46,7 +46,7 @@ namespace StoneFruit.Tests.Integration
             var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h
                     .UseVerbExtractor(new ToLowerNameVerbExtractor())
-                    .UsePublicMethodsAsHandlers(new MyObject1())
+                    .UsePublicInstanceMethodsAsHandlers(new MyObject1())
                 )
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
             );
@@ -61,7 +61,7 @@ namespace StoneFruit.Tests.Integration
             var engine = EngineBuilder.Build(b => b
                 .SetupHandlers(h => h
                     .UseVerbExtractor(new CamelCaseToSpinalCaseVerbExtractor())
-                    .UsePublicMethodsAsHandlers(new MyObject1()))
+                    .UsePublicInstanceMethodsAsHandlers(new MyObject1()))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
             );
             engine.RunHeadless("test-a");
@@ -73,7 +73,7 @@ namespace StoneFruit.Tests.Integration
         {
             var output = new TestOutput();
             var engine = EngineBuilder.Build(b => b
-                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject1()))
+                .SetupHandlers(h => h.UsePublicInstanceMethodsAsHandlers(new MyObject1()))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
             );
             engine.RunHeadless("test b name=x");
@@ -85,7 +85,7 @@ namespace StoneFruit.Tests.Integration
         {
             var output = new TestOutput();
             var engine = EngineBuilder.Build(b => b
-                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject1()))
+                .SetupHandlers(h => h.UsePublicInstanceMethodsAsHandlers(new MyObject1()))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
             );
             engine.RunHeadless("test c");
@@ -97,7 +97,7 @@ namespace StoneFruit.Tests.Integration
         {
             var output = new TestOutput("help");
             var engine = EngineBuilder.Build(b => b
-                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject1()))
+                .SetupHandlers(h => h.UsePublicInstanceMethodsAsHandlers(new MyObject1()))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
             );
             engine.RunInteractively();
@@ -120,7 +120,7 @@ namespace StoneFruit.Tests.Integration
         {
             var output = new TestOutput();
             var engine = EngineBuilder.Build(b => b
-                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject2()))
+                .SetupHandlers(h => h.UsePublicInstanceMethodsAsHandlers(new MyObject2()))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
             );
             engine.RunHeadless("aaa");
@@ -141,7 +141,7 @@ namespace StoneFruit.Tests.Integration
         {
             var output = new TestOutput();
             var engine = EngineBuilder.Build(b => b
-                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject3()))
+                .SetupHandlers(h => h.UsePublicInstanceMethodsAsHandlers(new MyObject3()))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
             );
             engine.RunHeadless("test value=test");
@@ -153,7 +153,7 @@ namespace StoneFruit.Tests.Integration
         {
             var output = new TestOutput();
             var engine = EngineBuilder.Build(b => b
-                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject3()))
+                .SetupHandlers(h => h.UsePublicInstanceMethodsAsHandlers(new MyObject3()))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
             );
             engine.RunHeadless("test test");
@@ -174,7 +174,7 @@ namespace StoneFruit.Tests.Integration
         {
             var output = new TestOutput();
             var engine = EngineBuilder.Build(b => b
-                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject4()))
+                .SetupHandlers(h => h.UsePublicInstanceMethodsAsHandlers(new MyObject4()))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
             );
             engine.RunHeadless("test -flag");
@@ -186,7 +186,7 @@ namespace StoneFruit.Tests.Integration
         {
             var output = new TestOutput();
             var engine = EngineBuilder.Build(b => b
-                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject4()))
+                .SetupHandlers(h => h.UsePublicInstanceMethodsAsHandlers(new MyObject4()))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
             );
             engine.RunHeadless("test");
@@ -207,7 +207,7 @@ namespace StoneFruit.Tests.Integration
         {
             var output = new TestOutput();
             var engine = EngineBuilder.Build(b => b
-                .SetupHandlers(h => h.UsePublicMethodsAsHandlers(new MyObject5()))
+                .SetupHandlers(h => h.UsePublicInstanceMethodsAsHandlers(new MyObject5()))
                 .SetupOutput(o => o.DoNotUseConsole().Add(output))
             );
             engine.RunHeadless("test a");

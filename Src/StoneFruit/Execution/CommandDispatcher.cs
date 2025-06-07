@@ -15,11 +15,11 @@ namespace StoneFruit.Execution
     {
         public CommandDispatcher(ICommandParser parser, IHandlers handlers, IEnvironmentCollection environments, EngineState state, IOutput output)
         {
-            Assert.ArgumentNotNull(parser, nameof(parser));
-            Assert.ArgumentNotNull(handlers, nameof(handlers));
-            Assert.ArgumentNotNull(environments, nameof(environments));
-            Assert.ArgumentNotNull(output, nameof(output));
-            Assert.ArgumentNotNull(state, nameof(state));
+            Assert.NotNull(parser, nameof(parser));
+            Assert.NotNull(handlers, nameof(handlers));
+            Assert.NotNull(environments, nameof(environments));
+            Assert.NotNull(output, nameof(output));
+            Assert.NotNull(state, nameof(state));
 
             Parser = parser;
             Handlers = handlers;
@@ -63,7 +63,7 @@ namespace StoneFruit.Execution
         /// <param name="token"></param>
         public void Execute(ArgumentsOrString argsOrString, CancellationToken token = default)
         {
-            Assert.ArgumentNotNull(argsOrString, nameof(argsOrString));
+            Assert.NotNull(argsOrString, nameof(argsOrString));
             var args = argsOrString.GetArguments(Parser);
             Execute(args, token);
         }
@@ -77,7 +77,7 @@ namespace StoneFruit.Execution
         /// <param name="token"></param>
         public void Execute(string commandString, CancellationToken token = default)
         {
-            Assert.ArgumentNotNullOrEmpty(commandString, nameof(commandString));
+            Assert.NotNullOrEmpty(commandString, nameof(commandString));
             var command = Parser.ParseCommand(commandString);
             Execute(command, token);
         }
@@ -91,7 +91,7 @@ namespace StoneFruit.Execution
         /// <param name="token"></param>
         public void Execute(Verb verb, IArguments args, CancellationToken token = default)
         {
-            Assert.ArgumentNotNull(args, nameof(args));
+            Assert.NotNull(args, nameof(args));
             var newArgs = new PrependedVerbArguments(verb, args);
             Execute(newArgs, token);
         }
@@ -104,7 +104,7 @@ namespace StoneFruit.Execution
         /// <param name="token"></param>
         public void Execute(IArguments arguments, CancellationToken token = default)
         {
-            Assert.ArgumentNotNull(arguments, nameof(arguments));
+            Assert.NotNull(arguments, nameof(arguments));
             State.SetCurrentArguments(arguments);
             var handlerResult = Handlers.GetInstance(arguments, this);
             if (!handlerResult.HasValue)
@@ -138,7 +138,7 @@ namespace StoneFruit.Execution
         /// <returns></returns>
         public Task ExecuteAsync(ArgumentsOrString argsOrString, CancellationToken token = default)
         {
-            Assert.ArgumentNotNull(argsOrString, nameof(argsOrString));
+            Assert.NotNull(argsOrString, nameof(argsOrString));
             var args = argsOrString.GetArguments(Parser);
             return ExecuteAsync(args, token);
         }
@@ -151,7 +151,7 @@ namespace StoneFruit.Execution
         /// <returns></returns>
         public Task ExecuteAsync(string commandString, CancellationToken token = default)
         {
-            Assert.ArgumentNotNullOrEmpty(commandString, nameof(commandString));
+            Assert.NotNullOrEmpty(commandString, nameof(commandString));
             var command = Parser.ParseCommand(commandString);
             return ExecuteAsync(command, token);
         }
@@ -167,7 +167,7 @@ namespace StoneFruit.Execution
         /// <returns></returns>
         public Task ExecuteAsync(Verb verb, IArguments args, CancellationToken token = default)
         {
-            Assert.ArgumentNotNull(args, nameof(args));
+            Assert.NotNull(args, nameof(args));
             var newArgs = new PrependedVerbArguments(verb, args);
             return ExecuteAsync(newArgs, token);
         }
@@ -182,7 +182,7 @@ namespace StoneFruit.Execution
         /// <returns></returns>
         public async Task ExecuteAsync(IArguments arguments, CancellationToken token = default)
         {
-            Assert.ArgumentNotNull(arguments, nameof(arguments));
+            Assert.NotNull(arguments, nameof(arguments));
 
             // Set the current arguments in the State, so they can be resolved from the container
             State.SetCurrentArguments(arguments);

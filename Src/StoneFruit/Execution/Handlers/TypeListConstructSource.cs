@@ -18,8 +18,8 @@ namespace StoneFruit.Execution.Handlers
 
         public TypeListConstructSource(IEnumerable<Type> types, TypeInstanceResolver resolver, IVerbExtractor verbExtractor)
         {
-            Assert.ArgumentNotNull(types, nameof(types));
-            Assert.ArgumentNotNull(resolver, nameof(resolver));
+            Assert.NotNull(types, nameof(types));
+            Assert.NotNull(resolver, nameof(resolver));
 
             _resolver = resolver;
 

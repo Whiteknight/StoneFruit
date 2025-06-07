@@ -20,8 +20,8 @@ namespace StoneFruit.Execution.Arguments
 
         public CommandParser(IParser<char, IParsedArgument> argParser, IParser<char, CommandFormat> scriptParser)
         {
-            Assert.ArgumentNotNull(argParser, nameof(argParser));
-            Assert.ArgumentNotNull(scriptParser, nameof(scriptParser));
+            Assert.NotNull(argParser, nameof(argParser));
+            Assert.NotNull(scriptParser, nameof(scriptParser));
 
             _argsParser = Rule(
                 argParser.List(),

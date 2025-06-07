@@ -26,9 +26,9 @@ namespace StoneFruit
             ICommandLine cmdLineArgs
         )
         {
-            Assert.ArgumentNotNull(environments, nameof(environments));
-            Assert.ArgumentNotNull(parser, nameof(parser));
-            Assert.ArgumentNotNull(output, nameof(output));
+            Assert.NotNull(environments, nameof(environments));
+            Assert.NotNull(parser, nameof(parser));
+            Assert.NotNull(output, nameof(output));
 
             Environments = environments;
             _parser = parser;

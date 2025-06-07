@@ -58,7 +58,7 @@ namespace StoneFruit
         /// <returns></returns>
         public static IOutput Write(this IOutput output, object obj)
         {
-            Assert.ArgumentNotNull(output, nameof(output));
+            Assert.NotNull(output, nameof(output));
             if (obj == null)
                 return output;
             return output.Write(obj!.ToString()!);
@@ -73,7 +73,7 @@ namespace StoneFruit
         /// <returns></returns>
         public static IOutput WriteLine(this IOutput output, object obj)
         {
-            Assert.ArgumentNotNull(output, nameof(output));
+            Assert.NotNull(output, nameof(output));
             if (obj == null)
                 return output;
             return output.WriteLine(obj!.ToString()!);
@@ -88,8 +88,8 @@ namespace StoneFruit
         /// <returns></returns>
         public static IOutput WriteLineFormat(this IOutput output, string fmt, params object[] args)
         {
-            Assert.ArgumentNotNull(output, nameof(output));
-            Assert.ArgumentNotNullOrEmpty(fmt, nameof(fmt));
+            Assert.NotNull(output, nameof(output));
+            Assert.NotNullOrEmpty(fmt, nameof(fmt));
             var line = string.Format(fmt, args);
             return output.WriteLine(line);
         }
@@ -103,8 +103,8 @@ namespace StoneFruit
         /// <returns></returns>
         public static IOutput WriteFormat(this IOutput output, string fmt, params object[] args)
         {
-            Assert.ArgumentNotNull(output, nameof(output));
-            Assert.ArgumentNotNullOrEmpty(fmt, nameof(fmt));
+            Assert.NotNull(output, nameof(output));
+            Assert.NotNullOrEmpty(fmt, nameof(fmt));
             var line = string.Format(fmt, args);
             return output.Write(line);
         }
