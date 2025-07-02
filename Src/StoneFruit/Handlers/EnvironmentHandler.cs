@@ -31,6 +31,7 @@ namespace StoneFruit.Handlers
         }
 
         public static string Group => HelpHandler.BuiltinsGroup;
+
         public static string Description => "List or change environments";
 
         public static string Usage => $@"{Name} ...
@@ -94,7 +95,7 @@ Clear the data for the current environment.
                     .Color(ConsoleColor.White).Write(index.ToString())
                     .Color(ConsoleColor.DarkGray).Write(") ")
                     .Color(env == currentEnv ? highlight : ConsoleColor.Cyan).Write(env)
-                    .WriteLine();
+                    .Color(Brush.Default).WriteLine();
             }
         }
 

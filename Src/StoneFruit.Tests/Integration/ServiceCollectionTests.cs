@@ -13,7 +13,7 @@ public class ServiceCollectionTests
     {
         var output = new TestOutput();
         var services = new ServiceCollection();
-        services.SetupEngine(b => b
+        services.UseStonefruit(b => b
             .SetupHandlers(h => h.UseHandlerTypes(typeof(EchoHandler)))
             .SetupOutput(o => o.DoNotUseConsole().Add(output))
         );

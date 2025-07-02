@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using StoneFruit.Execution;
@@ -12,9 +13,8 @@ namespace StoneFruit.Cli
     {
         private static void Main(string[] args)
         {
-            var host = Host.CreateApplicationBuilder(args);
-            host.Logging.AddConsole();
-            host.SetupStoneFruit(b => b
+            var services = new ServiceCollection();
+            services.UseStonefruit(b => b
                 .SetupHandlers(h => h
                     .ScanHandlersFromEntryAssembly()
                     .ScanHandlersFromCurrentAssembly()
@@ -49,8 +49,9 @@ namespace StoneFruit.Cli
                     s.MaxExecuteTimeout = TimeSpan.FromSeconds(5);
                 })
             );
-            var app = host.Build();
-            app.Run();
+            var provider = services.BuildServiceProvider();
+            var engine = provider.GetRequiredService<Engine>();
+            engine.RunWithCommandLineArguments();
         }
     }
 
