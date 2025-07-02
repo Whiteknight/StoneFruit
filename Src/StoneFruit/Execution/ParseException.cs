@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Runtime.Serialization;
 
-namespace StoneFruit.Execution; 
+namespace StoneFruit.Execution;
 
 /// <summary>
 /// Exception thrown by the argument parser or script parser when the input is not in a valid

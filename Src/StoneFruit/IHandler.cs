@@ -1,40 +1,39 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace StoneFruit
+namespace StoneFruit;
+
+/// <summary>
+/// Base type for handler objects.
+/// </summary>
+public interface IHandlerBase
+{
+}
+
+/// <summary>
+/// A handler. Handlers are invoked in response to specific verbs depending on
+/// registrations and mapping rules. Any dependencies of the handler are expected to
+/// be injected in the handler during creation.
+/// </summary>
+public interface IHandler : IHandlerBase
 {
     /// <summary>
-    /// Base type for handler objects.
+    /// Execute the handler and perform any work
     /// </summary>
-    public interface IHandlerBase
-    {
-    }
+    void Execute();
+}
 
+/// <summary>
+/// An asynchronous handler. Handlers are invoked in response to specific verbs
+/// depending on registrations and mapping rules. Any dependencies of the handler are
+/// expected to be injected in the handler during creation.
+/// </summary>
+public interface IAsyncHandler : IHandlerBase
+{
     /// <summary>
-    /// A handler. Handlers are invoked in response to specific verbs depending on
-    /// registrations and mapping rules. Any dependencies of the handler are expected to
-    /// be injected in the handler during creation.
+    /// Execute the handler asynchronously and perform any work
     /// </summary>
-    public interface IHandler : IHandlerBase
-    {
-        /// <summary>
-        /// Execute the handler and perform any work
-        /// </summary>
-        void Execute();
-    }
-
-    /// <summary>
-    /// An asynchronous handler. Handlers are invoked in response to specific verbs
-    /// depending on registrations and mapping rules. Any dependencies of the handler are
-    /// expected to be injected in the handler during creation.
-    /// </summary>
-    public interface IAsyncHandler : IHandlerBase
-    {
-        /// <summary>
-        /// Execute the handler asynchronously and perform any work
-        /// </summary>
-        /// <param name="cancellation"></param>
-        /// <returns></returns>
-        Task ExecuteAsync(CancellationToken cancellation);
-    }
+    /// <param name="cancellation"></param>
+    /// <returns></returns>
+    Task ExecuteAsync(CancellationToken cancellation);
 }

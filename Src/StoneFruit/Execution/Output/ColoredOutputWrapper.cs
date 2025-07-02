@@ -1,47 +1,46 @@
 ﻿using System;
 
-namespace StoneFruit.Execution.Output
+namespace StoneFruit.Execution.Output;
+
+public class ColoredOutputWrapper : IOutput
 {
-    public class ColoredOutputWrapper : IOutput
+    private readonly Brush _color;
+    private readonly IOutput _inner;
+
+    public ColoredOutputWrapper(Brush color, IOutput inner)
     {
-        private readonly Brush _color;
-        private readonly IOutput _inner;
+        _color = color;
+        _inner = inner;
+    }
 
-        public ColoredOutputWrapper(Brush color, IOutput inner)
+    public IOutput Color(Func<Brush, Brush> changeBrush)
+    {
+        var newBrush = changeBrush?.Invoke(_color);
+        return !newBrush.HasValue || newBrush == _color ? this : new ColoredOutputWrapper(newBrush.Value, _inner);
+    }
+
+    public IOutput WriteLine() => WithBrush(() => _inner.WriteLine());
+
+    public IOutput WriteLine(string line) => WithBrush(() => _inner.WriteLine(line));
+
+    public IOutput Write(string str) => WithBrush(() => _inner.Write(str));
+
+    public string Prompt(string prompt, bool mustProvide = true, bool keepHistory = true)
+        => _inner.Prompt(prompt, mustProvide, keepHistory);
+
+    private IOutput WithBrush(Action act)
+    {
+        var current = Brush.Current;
+        _color.Set();
+        try
         {
-            _color = color;
-            _inner = inner;
+            act();
+        }
+        finally
+        {
+            current.Set();
         }
 
-        public IOutput Color(Func<Brush, Brush> changeBrush)
-        {
-            var newBrush = changeBrush?.Invoke(_color);
-            return !newBrush.HasValue || newBrush == _color ? this : new ColoredOutputWrapper(newBrush.Value, _inner);
-        }
-
-        public IOutput WriteLine() => WithBrush(() => _inner.WriteLine());
-
-        public IOutput WriteLine(string line) => WithBrush(() => _inner.WriteLine(line));
-
-        public IOutput Write(string str) => WithBrush(() => _inner.Write(str));
-
-        public string Prompt(string prompt, bool mustProvide = true, bool keepHistory = true)
-            => _inner.Prompt(prompt, mustProvide, keepHistory);
-
-        private IOutput WithBrush(Action act)
-        {
-            var current = Brush.Current;
-            _color.Set();
-            try
-            {
-                act();
-            }
-            finally
-            {
-                current.Set();
-            }
-
-            return this;
-        }
+        return this;
     }
 }

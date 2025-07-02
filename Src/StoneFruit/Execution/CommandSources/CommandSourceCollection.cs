@@ -2,64 +2,63 @@
 using System.Linq;
 using StoneFruit.Execution.Arguments;
 
-namespace StoneFruit.Execution.CommandSources
+namespace StoneFruit.Execution.CommandSources;
+
+/// <summary>
+/// Ordered collection of ICommandSources. The first source is drained and then removed from
+/// the list.
+/// </summary>
+public class CommandSourceCollection
 {
-    /// <summary>
-    /// Ordered collection of ICommandSources. The first source is drained and then removed from
-    /// the list.
-    /// </summary>
-    public class CommandSourceCollection
+    private readonly LinkedList<ICommandSource> _sources;
+
+    public CommandSourceCollection()
     {
-        private readonly LinkedList<ICommandSource> _sources;
+        _sources = new LinkedList<ICommandSource>();
+    }
 
-        public CommandSourceCollection()
+    public void AddToEnd(ICommandSource source)
+    {
+        if (source == null)
+            return;
+        _sources.AddLast(source);
+    }
+
+    public void AddToEnd(params string[] commands) => AddToEnd(new QueueCommandSource(commands));
+
+    public void AddToEnd(EventScript script, ICommandParser parser)
+        => AddToEnd(new ScriptCommandSource(script, parser));
+
+    public void AddToEnd(EventScript script, ICommandParser parser, params IArgument[] args)
+        => AddToEnd(new ScriptCommandSource(script, parser, args));
+
+    public void AddToEnd(EventScript script, ICommandParser parser, params (string, string)[] args)
+    {
+        var argsList = args.Select(t => new NamedArgument(t.Item1, t.Item2)).Cast<IArgument>().ToArray();
+        AddToEnd(new ScriptCommandSource(script, parser, argsList));
+    }
+
+    public void AddToBeginning(ICommandSource source)
+    {
+        if (source == null)
+            return;
+        _sources.AddFirst(source);
+    }
+
+    public IResult<ArgumentsOrString> GetNextCommand()
+    {
+        while (true)
         {
-            _sources = new LinkedList<ICommandSource>();
-        }
+            if (_sources.Count == 0)
+                return FailureResult<ArgumentsOrString>.Instance;
 
-        public void AddToEnd(ICommandSource source)
-        {
-            if (source == null)
-                return;
-            _sources.AddLast(source);
-        }
+            var firstSource = _sources!.First!.Value;
 
-        public void AddToEnd(params string[] commands) => AddToEnd(new QueueCommandSource(commands));
+            var next = firstSource.GetNextCommand();
+            if (next.HasValue)
+                return next;
 
-        public void AddToEnd(EventScript script, ICommandParser parser)
-            => AddToEnd(new ScriptCommandSource(script, parser));
-
-        public void AddToEnd(EventScript script, ICommandParser parser, params IArgument[] args)
-            => AddToEnd(new ScriptCommandSource(script, parser, args));
-
-        public void AddToEnd(EventScript script, ICommandParser parser, params (string, string)[] args)
-        {
-            var argsList = args.Select(t => new NamedArgument(t.Item1, t.Item2)).Cast<IArgument>().ToArray();
-            AddToEnd(new ScriptCommandSource(script, parser, argsList));
-        }
-
-        public void AddToBeginning(ICommandSource source)
-        {
-            if (source == null)
-                return;
-            _sources.AddFirst(source);
-        }
-
-        public IResult<ArgumentsOrString> GetNextCommand()
-        {
-            while (true)
-            {
-                if (_sources.Count == 0)
-                    return FailureResult<ArgumentsOrString>.Instance;
-
-                var firstSource = _sources!.First!.Value;
-
-                var next = firstSource.GetNextCommand();
-                if (next.HasValue)
-                    return next;
-
-                _sources.RemoveFirst();
-            }
+            _sources.RemoveFirst();
         }
     }
 }

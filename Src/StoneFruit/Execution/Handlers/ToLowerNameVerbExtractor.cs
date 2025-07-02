@@ -3,38 +3,37 @@ using System.Collections.Generic;
 using System.Reflection;
 using StoneFruit.Utility;
 
-namespace StoneFruit.Execution.Handlers
+namespace StoneFruit.Execution.Handlers;
+
+/// <summary>
+/// Verb extractor which takes the name of the handler class or method, removes common suffixes
+/// ('verb', 'handler', 'command') and converts the remainder to lowercase.
+/// </summary>
+public class ToLowerNameVerbExtractor : IVerbExtractor
 {
-    /// <summary>
-    /// Verb extractor which takes the name of the handler class or method, removes common suffixes
-    /// ('verb', 'handler', 'command') and converts the remainder to lowercase.
-    /// </summary>
-    public class ToLowerNameVerbExtractor : IVerbExtractor
+    public IReadOnlyList<Verb> GetVerbs(Type type)
     {
-        public IReadOnlyList<Verb> GetVerbs(Type type)
-        {
-            if (type == null || !typeof(IHandlerBase).IsAssignableFrom(type))
-                return Array.Empty<Verb>();
+        if (type == null || !typeof(IHandlerBase).IsAssignableFrom(type))
+            return Array.Empty<Verb>();
 
-            return GetVerbs(type.Name);
-        }
+        return GetVerbs(type.Name);
+    }
 
-        public IReadOnlyList<Verb> GetVerbs(MethodInfo method)
-        {
-            if (method == null)
-                return Array.Empty<Verb>();
+    public IReadOnlyList<Verb> GetVerbs(MethodInfo method)
+    {
+        if (method == null)
+            return Array.Empty<Verb>();
 
-            return GetVerbs(method.Name);
-        }
+        return GetVerbs(method.Name);
+    }
 
-        private static IReadOnlyList<Verb> GetVerbs(string name)
-        {
-            name = name
-                .RemoveSuffix("verb")
-                .RemoveSuffix("command")
-                .RemoveSuffix("handler")
-                .ToLowerInvariant();
-            return new[] { new Verb(name) };
-        }
+    private static IReadOnlyList<Verb> GetVerbs(string name)
+    {
+        name = name
+            .RemoveSuffix("verb")
+            .RemoveSuffix("command")
+            .RemoveSuffix("handler")
+            .ToLowerInvariant();
+        return new[] { new Verb(name) };
     }
 }

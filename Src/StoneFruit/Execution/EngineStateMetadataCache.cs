@@ -1,47 +1,46 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace StoneFruit.Execution
+namespace StoneFruit.Execution;
+
+/// <summary>
+/// Metadata storage for the EngineState. Can be used to hold temporary data items between
+/// command execution
+/// </summary>
+public class EngineStateMetadataCache : IEnumerable<KeyValuePair<string, object>>
 {
-    /// <summary>
-    /// Metadata storage for the EngineState. Can be used to hold temporary data items between
-    /// command execution
-    /// </summary>
-    public class EngineStateMetadataCache : IEnumerable<KeyValuePair<string, object>>
+    private readonly Dictionary<string, object> _metadata;
+
+    public EngineStateMetadataCache()
     {
-        private readonly Dictionary<string, object> _metadata;
+        _metadata = new Dictionary<string, object>();
+    }
 
-        public EngineStateMetadataCache()
+    public void Add(string name, object value, bool allowOverwrite = true)
+    {
+        if (!_metadata.ContainsKey(name))
         {
-            _metadata = new Dictionary<string, object>();
-        }
-
-        public void Add(string name, object value, bool allowOverwrite = true)
-        {
-            if (!_metadata.ContainsKey(name))
-            {
-                _metadata.Add(name, value);
-                return;
-            }
-
-            if (!allowOverwrite)
-                return;
-
-            _metadata.Remove(name);
             _metadata.Add(name, value);
+            return;
         }
 
-        public IResult<object> Get(string name)
-            => _metadata.ContainsKey(name) ? new SuccessResult<object>(_metadata[name]) : FailureResult<object>.Instance;
+        if (!allowOverwrite)
+            return;
 
-        public IEnumerator<KeyValuePair<string, object>> GetEnumerator() => _metadata.GetEnumerator();
+        _metadata.Remove(name);
+        _metadata.Add(name, value);
+    }
 
-        IEnumerator IEnumerable.GetEnumerator() => _metadata.GetEnumerator();
+    public IResult<object> Get(string name)
+        => _metadata.ContainsKey(name) ? new SuccessResult<object>(_metadata[name]) : FailureResult<object>.Instance;
 
-        public void Remove(string name)
-        {
-            if (_metadata.ContainsKey(name))
-                _metadata.Remove(name);
-        }
+    public IEnumerator<KeyValuePair<string, object>> GetEnumerator() => _metadata.GetEnumerator();
+
+    IEnumerator IEnumerable.GetEnumerator() => _metadata.GetEnumerator();
+
+    public void Remove(string name)
+    {
+        if (_metadata.ContainsKey(name))
+            _metadata.Remove(name);
     }
 }

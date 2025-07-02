@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.Serialization;
 
 namespace StoneFruit.Execution.Arguments;
 
@@ -14,12 +13,12 @@ public class ArgumentParseException : Exception
     {
     }
 
-    public ArgumentParseException() 
+    public ArgumentParseException()
         : base()
     {
     }
 
-    public ArgumentParseException(string message, Exception innerException) 
+    public ArgumentParseException(string message, Exception innerException)
         : base(message, innerException)
     {
     }

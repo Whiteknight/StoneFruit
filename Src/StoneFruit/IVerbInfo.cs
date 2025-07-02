@@ -1,33 +1,32 @@
-﻿namespace StoneFruit
+﻿namespace StoneFruit;
+
+/// <summary>
+/// Information about a registered verb.
+/// </summary>
+public interface IVerbInfo
 {
     /// <summary>
-    /// Information about a registered verb.
+    /// The verb used to invoke the handler. All verbs are case-insensitive
     /// </summary>
-    public interface IVerbInfo
-    {
-        /// <summary>
-        /// The verb used to invoke the handler. All verbs are case-insensitive
-        /// </summary>
-        Verb Verb { get; }
+    Verb Verb { get; }
 
-        /// <summary>
-        /// A short description of the verb.
-        /// </summary>
-        string Description { get; }
+    /// <summary>
+    /// A short description of the verb.
+    /// </summary>
+    string Description { get; }
 
-        /// <summary>
-        /// Detailed usage information about the verb
-        /// </summary>
-        string Usage { get; }
+    /// <summary>
+    /// Detailed usage information about the verb
+    /// </summary>
+    string Usage { get; }
 
-        /// <summary>
-        /// The grouping that the verb belongs in.
-        /// </summary>
-        string Group { get; }
+    /// <summary>
+    /// The grouping that the verb belongs in.
+    /// </summary>
+    string Group { get; }
 
-        /// <summary>
-        /// Whether or not to show the verb in the list when executing "help"
-        /// </summary>
-        bool ShouldShowInHelp { get; }
-    }
+    /// <summary>
+    /// Whether or not to show the verb in the list when executing "help"
+    /// </summary>
+    bool ShouldShowInHelp { get; }
 }

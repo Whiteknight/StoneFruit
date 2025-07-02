@@ -1,35 +1,34 @@
 ﻿using System.Collections.Generic;
 using StoneFruit.Execution;
 
-namespace StoneFruit
+namespace StoneFruit;
+
+/// <summary>
+/// Manages a list of available handlers, instantiates handlers on request, and
+/// provides metadata about the registered verbs.
+/// </summary>
+public interface IHandlerSource
 {
     /// <summary>
-    /// Manages a list of available handlers, instantiates handlers on request, and
-    /// provides metadata about the registered verbs.
+    /// Instantiates the handler for the command. If a suitable handler is not found
+    /// null is returned.
     /// </summary>
-    public interface IHandlerSource
-    {
-        /// <summary>
-        /// Instantiates the handler for the command. If a suitable handler is not found
-        /// null is returned.
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="dispatcher"></param>
-        /// <returns></returns>
-        IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher);
+    /// <param name="command"></param>
+    /// <param name="dispatcher"></param>
+    /// <returns></returns>
+    IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher);
 
-        /// <summary>
-        /// Get metadata information about all verbs registered with this source
-        /// </summary>
-        /// <returns></returns>
-        IEnumerable<IVerbInfo> GetAll();
+    /// <summary>
+    /// Get metadata information about all verbs registered with this source
+    /// </summary>
+    /// <returns></returns>
+    IEnumerable<IVerbInfo> GetAll();
 
-        /// <summary>
-        /// Get metadata information about a single verb. If the verb is not registered
-        /// with this source, null is returned
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        IResult<IVerbInfo> GetByName(Verb verb);
-    }
+    /// <summary>
+    /// Get metadata information about a single verb. If the verb is not registered
+    /// with this source, null is returned
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    IResult<IVerbInfo> GetByName(Verb verb);
 }

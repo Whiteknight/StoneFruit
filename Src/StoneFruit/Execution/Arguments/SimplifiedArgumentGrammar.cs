@@ -12,7 +12,7 @@ namespace StoneFruit.Execution.Arguments;
 /// </summary>
 public static class SimplifiedArgumentGrammar
 {
-    private static readonly Lazy<IParser<char, IParsedArgument>> _instance 
+    private static readonly Lazy<IParser<char, IParsedArgument>> _instance
         = new Lazy<IParser<char, IParsedArgument>>(GetParserInternal);
 
     public static IParser<char, IParsedArgument> GetParser() => _instance.Value;

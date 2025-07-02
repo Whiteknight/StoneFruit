@@ -2,39 +2,38 @@
 using System.Linq;
 using StoneFruit.Utility;
 
-namespace StoneFruit.Execution.Handlers
+namespace StoneFruit.Execution.Handlers;
+
+/// <summary>
+/// Combines multiple ICommandSource implementations together in priorty order.
+/// </summary>
+public class HandlerSourceCollection : IHandlers
 {
-    /// <summary>
-    /// Combines multiple ICommandSource implementations together in priorty order.
-    /// </summary>
-    public class HandlerSourceCollection : IHandlers
+    private readonly IReadOnlyList<IHandlerSource> _sources;
+
+    public HandlerSourceCollection(IEnumerable<IHandlerSource> sources)
     {
-        private readonly IReadOnlyList<IHandlerSource> _sources;
-
-        public HandlerSourceCollection(IEnumerable<IHandlerSource> sources)
-        {
-            Assert.NotNull(sources, nameof(sources));
-            _sources = sources.Where(s => s != null).ToList();
-        }
-
-        public IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
-        {
-            Assert.NotNull(arguments, nameof(arguments));
-            return _sources
-                .Select(source => source.GetInstance(arguments, dispatcher))
-                .FirstOrDefault(result => result.HasValue) ?? FailureResult<IHandlerBase>.Instance;
-        }
-
-        public IEnumerable<IVerbInfo> GetAll()
-            => _sources.SelectMany(s => s.GetAll())
-                .GroupBy(info => info.Verb)
-                .Select(g => g.First())
-                .ToDictionary(v => v.Verb)
-                .Values;
-
-        public IResult<IVerbInfo> GetByName(Verb verb)
-            => _sources
-                .Select(source => source.GetByName(verb))
-                .FirstOrDefault(result => result.HasValue) ?? FailureResult<IVerbInfo>.Instance;
+        Assert.NotNull(sources, nameof(sources));
+        _sources = sources.Where(s => s != null).ToList();
     }
+
+    public IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
+    {
+        Assert.NotNull(arguments, nameof(arguments));
+        return _sources
+            .Select(source => source.GetInstance(arguments, dispatcher))
+            .FirstOrDefault(result => result.HasValue) ?? FailureResult<IHandlerBase>.Instance;
+    }
+
+    public IEnumerable<IVerbInfo> GetAll()
+        => _sources.SelectMany(s => s.GetAll())
+            .GroupBy(info => info.Verb)
+            .Select(g => g.First())
+            .ToDictionary(v => v.Verb)
+            .Values;
+
+    public IResult<IVerbInfo> GetByName(Verb verb)
+        => _sources
+            .Select(source => source.GetByName(verb))
+            .FirstOrDefault(result => result.HasValue) ?? FailureResult<IVerbInfo>.Instance;
 }
