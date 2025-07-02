@@ -5,79 +5,79 @@ using static ParserObjects.Parsers;
 using static ParserObjects.Parsers.C;
 using static ParserObjects.Parsers<char>;
 
-namespace StoneFruit.Execution.Arguments
+namespace StoneFruit.Execution.Arguments;
+
+/// <summary>
+/// An argument grammar for windows CMD-style arguments
+/// </summary>
+public static class WindowsCmdArgumentGrammar
 {
-    /// <summary>
-    /// An argument grammar for windows CMD-style arguments
-    /// </summary>
-    public static class WindowsCmdArgumentGrammar
+    private static readonly Lazy<IParser<char, IParsedArgument>> _instance 
+        = new Lazy<IParser<char, IParsedArgument>>(GetParserInternal);
+
+    public static IParser<char, IParsedArgument> GetParser() => _instance.Value;
+
+    private static IParser<char, IParsedArgument> GetParserInternal()
     {
-        private static readonly Lazy<IParser<char, IParsedArgument>> _instance = new Lazy<IParser<char, IParsedArgument>>(GetParserInternal);
+        var doubleQuotedString = StrippedDoubleQuotedString();
 
-        public static IParser<char, IParsedArgument> GetParser() => _instance.Value;
+        var singleQuotedString = StrippedSingleQuotedString();
 
-        private static IParser<char, IParsedArgument> GetParserInternal()
-        {
-            var doubleQuotedString = StrippedDoubleQuotedString();
+        var unquotedValue = Match(c => char.IsLetterOrDigit(c) || char.IsPunctuation(c))
+            .List(true)
+            .Transform(c => new string(c.ToArray()));
 
-            var singleQuotedString = StrippedSingleQuotedString();
+        var whitespace = OptionalWhitespace();
 
-            var unquotedValue = Match(c => char.IsLetterOrDigit(c) || char.IsPunctuation(c))
-                .List(true)
-                .Transform(c => new string(c.ToArray()));
+        var value = First(
+            doubleQuotedString,
+            singleQuotedString,
+            unquotedValue
+        ).Named("Value");
 
-            var whitespace = OptionalWhitespace();
+        var name = Identifier();
 
-            var value = First(
-                doubleQuotedString,
-                singleQuotedString,
-                unquotedValue
-            ).Named("Value");
+        // '/' <name> ':' <value>
+        var namedArg = Rule(
+            Match('/'),
+            name,
+            Match(':'),
+            value,
 
-            var name = Identifier();
+            (_, n, _, v) => new ParsedNamedArgument(n, v)
+        ).Named("Named");
 
-            // '/' <name> ':' <value>
-            var namedArg = Rule(
-                Match('/'),
-                name,
-                Match(':'),
-                value,
+        // '-' <name> <whitespace> <value>
+        var maybeNamedArg = Rule(
+            Match('/'),
+            name,
+            whitespace,
+            value,
 
-                (_, n, _, v) => new ParsedNamedArgument(n, v)
-            ).Named("Named");
+            (_, name, _, value) => new ParsedFlagPositionalOrNamedArgument(name, value)
+        ).Named("NamedMaybeValue");
 
-            // '-' <name> <whitespace> <value>
-            var maybeNamedArg = Rule(
-                Match('/'),
-                name,
-                whitespace,
-                value,
+        // '/' <name>
+        var flagArg = Rule(
+            Match('/'),
+            name,
 
-                (_, name, _, value) => new ParsedFlagPositionalOrNamedArgument(name, value)
-            ).Named("NamedMaybeValue");
+            (_, n) => new ParsedFlagArgument(n)
+        ).Named("Flag");
 
-            // '/' <name>
-            var flagArg = Rule(
-                Match('/'),
-                name,
+        // <named> | <flag> | <positional>
+        var args = First<IParsedArgument>(
+            namedArg,
+            maybeNamedArg,
+            flagArg,
+            value.Transform(v => new ParsedPositionalArgument(v))
+        ).Named("Argument");
 
-                (_, n) => new ParsedFlagArgument(n)
-            ).Named("Flag");
+        return Rule(
+            whitespace,
+            args,
 
-            // <named> | <flag> | <positional>
-            var args = First<IParsedArgument>(
-                namedArg,
-                maybeNamedArg,
-                flagArg,
-                value.Transform(v => new ParsedPositionalArgument(v))
-            ).Named("Argument");
-
-            return Rule(
-                whitespace,
-                args,
-
-                (_, arg) => arg
-            );
-        }
+            (_, arg) => arg
+        );
     }
 }

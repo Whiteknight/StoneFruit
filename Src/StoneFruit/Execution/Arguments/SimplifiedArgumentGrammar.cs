@@ -5,66 +5,66 @@ using static ParserObjects.Parsers;
 using static ParserObjects.Parsers.C;
 using static ParserObjects.Parsers<char>;
 
-namespace StoneFruit.Execution.Arguments
+namespace StoneFruit.Execution.Arguments;
+
+/// <summary>
+/// A grammar for simplified arguments.
+/// </summary>
+public static class SimplifiedArgumentGrammar
 {
-    /// <summary>
-    /// A grammar for simplified arguments.
-    /// </summary>
-    public static class SimplifiedArgumentGrammar
+    private static readonly Lazy<IParser<char, IParsedArgument>> _instance 
+        = new Lazy<IParser<char, IParsedArgument>>(GetParserInternal);
+
+    public static IParser<char, IParsedArgument> GetParser() => _instance.Value;
+
+    private static IParser<char, IParsedArgument> GetParserInternal()
     {
-        private static readonly Lazy<IParser<char, IParsedArgument>> _instance = new Lazy<IParser<char, IParsedArgument>>(GetParserInternal);
+        var doubleQuotedString = StrippedDoubleQuotedString();
 
-        public static IParser<char, IParsedArgument> GetParser() => _instance.Value;
+        var singleQuotedString = StrippedSingleQuotedString();
 
-        private static IParser<char, IParsedArgument> GetParserInternal()
-        {
-            var doubleQuotedString = StrippedDoubleQuotedString();
+        var unquotedValue = Match(c => char.IsLetterOrDigit(c) || char.IsPunctuation(c))
+            .List(true)
+            .Transform(c => new string(c.ToArray()));
 
-            var singleQuotedString = StrippedSingleQuotedString();
+        // <doubleQuotedString> | <singleQuotedString> | <unquotedValue>
+        var values = First(
+            doubleQuotedString,
+            singleQuotedString,
+            unquotedValue
+        ).Named("Value");
 
-            var unquotedValue = Match(c => char.IsLetterOrDigit(c) || char.IsPunctuation(c))
-                .List(true)
-                .Transform(c => new string(c.ToArray()));
+        var names = Identifier();
 
-            // <doubleQuotedString> | <singleQuotedString> | <unquotedValue>
-            var values = First(
-                doubleQuotedString,
-                singleQuotedString,
-                unquotedValue
-            ).Named("Value");
+        // '-' <name>
+        var flagArg = Rule(
+            Match('-'),
+            names,
 
-            var names = Identifier();
+            (_, name) => new ParsedFlagArgument(name)
+        ).Named("Flag");
 
-            // '-' <name>
-            var flagArg = Rule(
-                Match('-'),
-                names,
+        // <name> '=' <value>
+        var namedArg = Rule(
+            names,
+            Match('='),
+            values,
 
-                (_, name) => new ParsedFlagArgument(name)
-            ).Named("Flag");
+            (name, _, value) => new ParsedNamedArgument(name, value)
+        ).Named("Named");
 
-            // <name> '=' <value>
-            var namedArg = Rule(
-                names,
-                Match('='),
-                values,
+        // <flag> | <named> | <positional>
+        var args = First<IParsedArgument>(
+            flagArg,
+            namedArg,
+            values.Transform(v => new ParsedPositionalArgument(v))
+        ).Named("Argument");
 
-                (name, _, value) => new ParsedNamedArgument(name, value)
-            ).Named("Named");
+        return Rule(
+            OptionalWhitespace(),
+            args,
 
-            // <flag> | <named> | <positional>
-            var args = First<IParsedArgument>(
-                flagArg,
-                namedArg,
-                values.Transform(v => new ParsedPositionalArgument(v))
-            ).Named("Argument");
-
-            return Rule(
-                OptionalWhitespace(),
-                args,
-
-                (_, arg) => arg
-            ).Named("WhitespaceAndArgument");
-        }
+            (_, arg) => arg
+        ).Named("WhitespaceAndArgument");
     }
 }

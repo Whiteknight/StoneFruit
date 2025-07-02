@@ -4,93 +4,92 @@ using ParserObjects;
 using StoneFruit.Execution.Scripts;
 using StoneFruit.Execution.Scripts.Formatting;
 
-namespace StoneFruit.Execution.Arguments
+namespace StoneFruit.Execution.Arguments;
+
+/// <summary>
+/// Sets up the parsers
+/// </summary>
+public class ParserSetup : IParserSetup
 {
-    /// <summary>
-    /// Sets up the parsers
-    /// </summary>
-    public class ParserSetup : IParserSetup
+    private IParser<char, IParsedArgument>? _argParser;
+    private IParser<char, CommandFormat>? _scriptParser;
+    private ICommandParser? _parser;
+
+    public void BuildUp(IServiceCollection services)
     {
-        private IParser<char, IParsedArgument>? _argParser;
-        private IParser<char, CommandFormat>? _scriptParser;
-        private ICommandParser? _parser;
+        // What if the service collection already has a parser registered?
+        var parser = Build();
+        services.TryAddSingleton(parser);
+    }
 
-        public void BuildUp(IServiceCollection services)
+    private ICommandParser Build()
+    {
+        if (_parser != null)
+            return _parser;
+
+        var argParser = _argParser ?? SimplifiedArgumentGrammar.GetParser();
+        var scriptParser = _scriptParser ?? ScriptFormatGrammar.GetParser();
+        return new CommandParser(argParser, scriptParser);
+    }
+
+    public IParserSetup UseParser(ICommandParser parser)
+    {
+        if (parser == null)
         {
-            // What if the service collection already has a parser registered?
-            var parser = Build();
-            services.TryAddSingleton(parser);
-        }
-
-        private ICommandParser Build()
-        {
-            if (_parser != null)
-                return _parser;
-
-            var argParser = _argParser ?? SimplifiedArgumentGrammar.GetParser();
-            var scriptParser = _scriptParser ?? ScriptFormatGrammar.GetParser();
-            return new CommandParser(argParser, scriptParser);
-        }
-
-        public IParserSetup UseParser(ICommandParser parser)
-        {
-            if (parser == null)
-            {
-                _parser = null;
-                return this;
-            }
-
-            EnsureCanSetCommandParser();
-            _parser = parser;
+            _parser = null;
             return this;
         }
 
-        public IParserSetup UseArgumentParser(IParser<char, IParsedArgument> argParser)
-        {
-            if (argParser == null)
-            {
-                _argParser = null;
-                return this;
-            }
+        EnsureCanSetCommandParser();
+        _parser = parser;
+        return this;
+    }
 
-            EnsureCanSetArgumentParser();
-            _argParser = argParser;
+    public IParserSetup UseArgumentParser(IParser<char, IParsedArgument> argParser)
+    {
+        if (argParser == null)
+        {
+            _argParser = null;
             return this;
         }
 
-        public IParserSetup UseScriptParser(IParser<char, CommandFormat> scriptParser)
-        {
-            if (scriptParser == null)
-            {
-                _scriptParser = null;
-                return this;
-            }
+        EnsureCanSetArgumentParser();
+        _argParser = argParser;
+        return this;
+    }
 
-            EnsureCanSetScriptParser();
-            _scriptParser = scriptParser;
+    public IParserSetup UseScriptParser(IParser<char, CommandFormat> scriptParser)
+    {
+        if (scriptParser == null)
+        {
+            _scriptParser = null;
             return this;
         }
 
-        private void EnsureCanSetArgumentParser()
-        {
-            if (_argParser != null)
-                throw new EngineBuildException("Argument parser is already set for this builder. You cannot set a second argument parser.");
-            if (_parser != null)
-                throw new EngineBuildException("Command parser is already set for this builder. You cannot set an Argument parser and a Command parser at the same time.");
-        }
+        EnsureCanSetScriptParser();
+        _scriptParser = scriptParser;
+        return this;
+    }
 
-        private void EnsureCanSetScriptParser()
-        {
-            if (_scriptParser != null)
-                throw new EngineBuildException("Script parser is already set for this builder. You cannot set a second script parser.");
-            if (_parser != null)
-                throw new EngineBuildException("Command parser is already set for this builder. You cannot set a Script parser and a Command parser at the same time.");
-        }
+    private void EnsureCanSetArgumentParser()
+    {
+        if (_argParser != null)
+            throw new EngineBuildException("Argument parser is already set for this builder. You cannot set a second argument parser.");
+        if (_parser != null)
+            throw new EngineBuildException("Command parser is already set for this builder. You cannot set an Argument parser and a Command parser at the same time.");
+    }
 
-        private void EnsureCanSetCommandParser()
-        {
-            if (_parser != null)
-                throw new EngineBuildException("Command parser is already set. You cannot set a second command parser.");
-        }
+    private void EnsureCanSetScriptParser()
+    {
+        if (_scriptParser != null)
+            throw new EngineBuildException("Script parser is already set for this builder. You cannot set a second script parser.");
+        if (_parser != null)
+            throw new EngineBuildException("Command parser is already set for this builder. You cannot set a Script parser and a Command parser at the same time.");
+    }
+
+    private void EnsureCanSetCommandParser()
+    {
+        if (_parser != null)
+            throw new EngineBuildException("Command parser is already set. You cannot set a second command parser.");
     }
 }

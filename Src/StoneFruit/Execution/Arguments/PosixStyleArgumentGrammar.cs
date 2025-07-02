@@ -4,113 +4,112 @@ using ParserObjects;
 using static ParserObjects.Parsers;
 using static ParserObjects.Parsers<char>;
 
-namespace StoneFruit.Execution.Arguments
+namespace StoneFruit.Execution.Arguments;
+
+/// <summary>
+/// A grammar for posix-style arguments.
+/// </summary>
+public static class PosixStyleArgumentGrammar
 {
-    /// <summary>
-    /// A grammar for posix-style arguments.
-    /// </summary>
-    public static class PosixStyleArgumentGrammar
+    private static readonly Lazy<IParser<char, IParsedArgument>> _instance = new Lazy<IParser<char, IParsedArgument>>(GetParserInternal);
+
+    public static IParser<char, IParsedArgument> GetParser() => _instance.Value;
+
+    private static IParser<char, IParsedArgument> GetParserInternal()
     {
-        private static readonly Lazy<IParser<char, IParsedArgument>> _instance = new Lazy<IParser<char, IParsedArgument>>(GetParserInternal);
+        var doubleQuotedString = StrippedDoubleQuotedString();
 
-        public static IParser<char, IParsedArgument> GetParser() => _instance.Value;
+        var singleQuotedString = StrippedSingleQuotedString();
 
-        private static IParser<char, IParsedArgument> GetParserInternal()
-        {
-            var doubleQuotedString = StrippedDoubleQuotedString();
+        var unquotedValue = Match(c => char.IsLetterOrDigit(c) || char.IsPunctuation(c))
+            .List(true)
+            .Transform(c => new string(c.ToArray()));
 
-            var singleQuotedString = StrippedSingleQuotedString();
+        var whitespace = Whitespace();
 
-            var unquotedValue = Match(c => char.IsLetterOrDigit(c) || char.IsPunctuation(c))
-                .List(true)
-                .Transform(c => new string(c.ToArray()));
+        // <doubleQuotedString> | <singleQuotedString> | <unquotedValue>
+        var value = First(
+            doubleQuotedString,
+            singleQuotedString,
+            unquotedValue
+        ).Named("Value");
 
-            var whitespace = Whitespace();
+        // The name can be numbers or symbols or anything besides whitespace.
+        var name = Match(c => char.IsLetterOrDigit(c) || c == '-' || c == '_')
+            .ListCharToString(true)
+            .Named("Name");
 
-            // <doubleQuotedString> | <singleQuotedString> | <unquotedValue>
-            var value = First(
-                doubleQuotedString,
-                singleQuotedString,
-                unquotedValue
-            ).Named("Value");
+        var singleDash = Match('-');
+        var doubleDash = Match("--");
+        var singleIdChar = Match(char.IsLetterOrDigit);
 
-            // The name can be numbers or symbols or anything besides whitespace.
-            var name = Match(c => char.IsLetterOrDigit(c) || c == '-' || c == '_')
-                .ListCharToString(true)
-                .Named("Name");
+        // '--' <name> '=' <value>
+        var longEqualsNamedArg = Rule(
+            doubleDash,
+            name,
+            Match('='),
+            value,
 
-            var singleDash = Match('-');
-            var doubleDash = Match("--");
-            var singleIdChar = Match(char.IsLetterOrDigit);
+            (_, n, _, v) => (IParsedArgument)new ParsedNamedArgument(n, v)
+        ).Named("LongNameEqualsValue");
 
-            // '--' <name> '=' <value>
-            var longEqualsNamedArg = Rule(
-                doubleDash,
-                name,
-                Match('='),
-                value,
+        // '--' <name> <ws> <value>
+        var longImpliedNamedArg = Rule(
+            doubleDash,
+            name,
+            whitespace,
+            value,
 
-                (_, n, _, v) => (IParsedArgument)new ParsedNamedArgument(n, v)
-            ).Named("LongNameEqualsValue");
+            (_, n, _, v) => (IParsedArgument)new ParsedFlagPositionalOrNamedArgument(n, v)
+        ).Named("LongNameImpliedValue");
 
-            // '--' <name> <ws> <value>
-            var longImpliedNamedArg = Rule(
-                doubleDash,
-                name,
-                whitespace,
-                value,
+        // '--' <name>
+        var longFlagArg = Rule(
+            doubleDash,
+            name,
 
-                (_, n, _, v) => (IParsedArgument)new ParsedFlagPositionalOrNamedArgument(n, v)
-            ).Named("LongNameImpliedValue");
+            (_, n) => (IParsedArgument)new ParsedFlagArgument(n)
+        ).Named("LongFlag");
 
-            // '--' <name>
-            var longFlagArg = Rule(
-                doubleDash,
-                name,
+        // We include this case because some short args with a positional following, are treated like
+        // a named arg. Provide all cases, because we don't know the intent.
+        // '-' <char> <ws> <value>
+        var shortImpliedNamedArg = Rule(
+            singleDash,
+            singleIdChar.Transform(c => c.ToString()),
+            whitespace,
+            value,
 
-                (_, n) => (IParsedArgument)new ParsedFlagArgument(n)
-            ).Named("LongFlag");
+            (_, n, _, v) => (IParsedArgument)new ParsedFlagPositionalOrNamedArgument(n, v)
+        ).Named("ShortNameImpliedValue");
 
-            // We include this case because some short args with a positional following, are treated like
-            // a named arg. Provide all cases, because we don't know the intent.
-            // '-' <char> <ws> <value>
-            var shortImpliedNamedArg = Rule(
-                singleDash,
-                singleIdChar.Transform(c => c.ToString()),
-                whitespace,
-                value,
+        // '-' <char>*
+        var shortFlagArg = Rule(
+            singleDash,
+            singleIdChar.List(true),
 
-                (_, n, _, v) => (IParsedArgument)new ParsedFlagPositionalOrNamedArgument(n, v)
-            ).Named("ShortNameImpliedValue");
+            (_, n) => (IParsedArgument)new MultiParsedFlagArgument(n.Select(x => x.ToString()))
+        ).Named("ShortFlag");
 
-            // '-' <char>*
-            var shortFlagArg = Rule(
-                singleDash,
-                singleIdChar.List(true),
+        var positional = value
+            .Transform(v => (IParsedArgument)new ParsedPositionalArgument(v))
+            .Named("Positional");
 
-                (_, n) => (IParsedArgument)new MultiParsedFlagArgument(n.Select(x => x.ToString()))
-            ).Named("ShortFlag");
+        // <named> | <longFlag> | <shortFlag> | <positional>
+        var args = First(
+            longEqualsNamedArg,
+            longImpliedNamedArg,
+            longFlagArg,
+            shortImpliedNamedArg,
+            shortFlagArg,
+            positional
+        ).Named("Argument");
 
-            var positional = value
-                .Transform(v => (IParsedArgument)new ParsedPositionalArgument(v))
-                .Named("Positional");
+        return Rule(
+            whitespace.Optional(),
+            args,
 
-            // <named> | <longFlag> | <shortFlag> | <positional>
-            var args = First(
-                longEqualsNamedArg,
-                longImpliedNamedArg,
-                longFlagArg,
-                shortImpliedNamedArg,
-                shortFlagArg,
-                positional
-            ).Named("Argument");
-
-            return Rule(
-                whitespace.Optional(),
-                args,
-
-                (_, arg) => arg
-            ).Named("WhitespaceAndArgument");
-        }
+            (_, arg) => arg
+        ).Named("WhitespaceAndArgument");
     }
 }
