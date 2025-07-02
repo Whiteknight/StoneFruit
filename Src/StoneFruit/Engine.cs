@@ -5,6 +5,7 @@ using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.CommandSources;
 using StoneFruit.Handlers;
 using StoneFruit.Utility;
+using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit
 {
@@ -26,14 +27,10 @@ namespace StoneFruit
             ICommandLine cmdLineArgs
         )
         {
-            Assert.NotNull(environments, nameof(environments));
-            Assert.NotNull(parser, nameof(parser));
-            Assert.NotNull(output, nameof(output));
-
-            Environments = environments;
-            _parser = parser;
-            Output = output;
-            _cmdLineArgs = cmdLineArgs;
+            Environments = NotNull(environments);
+            _parser = NotNull(parser);
+            Output = NotNull(output);
+            _cmdLineArgs = NotNull(cmdLineArgs);
             State = new EngineState(eventCatalog, settings, Environments, _parser);
             Dispatcher = new CommandDispatcher(_parser, handlers, Environments, State, Output);
         }
