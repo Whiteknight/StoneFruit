@@ -17,13 +17,6 @@ namespace StoneFruit.Execution
             Verb = string.Empty;
         }
 
-        protected VerbNotFoundException(
-            SerializationInfo info,
-            StreamingContext context) : base(info, context)
-        {
-            Verb = string.Empty;
-        }
-
         public VerbNotFoundException()
         {
             Verb = string.Empty;

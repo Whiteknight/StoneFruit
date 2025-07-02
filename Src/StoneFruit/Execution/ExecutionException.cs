@@ -22,10 +22,5 @@ namespace StoneFruit.Execution
             : base(message, inner)
         {
         }
-
-        protected ExecutionException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
     }
 }

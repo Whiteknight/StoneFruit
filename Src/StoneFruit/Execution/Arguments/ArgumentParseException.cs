@@ -14,12 +14,6 @@ namespace StoneFruit.Execution.Arguments
         {
         }
 
-        protected ArgumentParseException(
-            SerializationInfo info,
-            StreamingContext context) : base(info, context)
-        {
-        }
-
         public ArgumentParseException() : base()
         {
         }

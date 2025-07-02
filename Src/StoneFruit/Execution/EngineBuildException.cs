@@ -14,12 +14,6 @@ namespace StoneFruit.Execution
         {
         }
 
-        protected EngineBuildException(
-            SerializationInfo info,
-            StreamingContext context) : base(info, context)
-        {
-        }
-
         public EngineBuildException()
         {
         }

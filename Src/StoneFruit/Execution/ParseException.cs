@@ -14,12 +14,6 @@ namespace StoneFruit.Execution
         {
         }
 
-        protected ParseException(
-            SerializationInfo info,
-            StreamingContext context) : base(info, context)
-        {
-        }
-
         public ParseException()
         {
         }
