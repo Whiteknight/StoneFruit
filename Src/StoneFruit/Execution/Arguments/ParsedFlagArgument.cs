@@ -2,7 +2,7 @@
 
 /// <summary>
 /// A flag or switch argument with a name but no value. This is a raw parsed argument and
-/// will not be used in this way
+/// will not be used in this way.
 /// </summary>
 public class ParsedFlagArgument : IParsedArgument
 {

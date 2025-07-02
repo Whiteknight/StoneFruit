@@ -11,7 +11,7 @@ namespace StoneFruit.Execution.Arguments;
 /// </summary>
 public class SyntheticArguments : IArguments, IVerbSource
 {
-    private readonly IReadOnlyList<IPositionalArgument> _positionals;
+    private readonly List<IPositionalArgument> _positionals;
     private readonly IReadOnlyDictionary<string, List<INamedArgument>> _nameds;
     private readonly IReadOnlyDictionary<string, IFlagArgument> _flags;
     private int _verbCount;
@@ -54,13 +54,13 @@ public class SyntheticArguments : IArguments, IVerbSource
             .ToList();
 
     /// <summary>
-    /// Create an empty arguments object
+    /// Create an empty arguments object.
     /// </summary>
     /// <returns></returns>
     public static SyntheticArguments Empty() => new SyntheticArguments(Array.Empty<IArgument>());
 
     /// <summary>
-    /// Create named arguments from a list of name/value tuples
+    /// Create named arguments from a list of name/value tuples.
     /// </summary>
     /// <param name="args"></param>
     /// <returns></returns>
@@ -73,7 +73,7 @@ public class SyntheticArguments : IArguments, IVerbSource
     }
 
     /// <summary>
-    /// Create named arguments from a dictionary of name/value pairs
+    /// Create named arguments from a dictionary of name/value pairs.
     /// </summary>
     /// <param name="args"></param>
     /// <returns></returns>
@@ -134,7 +134,9 @@ public class SyntheticArguments : IArguments, IVerbSource
         name = name.ToLowerInvariant();
         if (!_nameds.ContainsKey(name))
             return MissingArgument.NoneNamed(name);
-        return _nameds[name].FirstOrDefault(a => !a.Consumed) ?? MissingArgument.NoneNamed(name);
+        return _nameds[name]
+            .FirstOrDefault(a => !a.Consumed)
+            ?? MissingArgument.NoneNamed(name);
     }
 
     public IEnumerable<IPositionalArgument> GetAllPositionals()
@@ -143,7 +145,9 @@ public class SyntheticArguments : IArguments, IVerbSource
     public IEnumerable<INamedArgument> GetAllNamed(string name)
     {
         name = name.ToLowerInvariant();
-        return _nameds.ContainsKey(name) ? _nameds[name].Where(a => !a.Consumed) : Enumerable.Empty<INamedArgument>();
+        return _nameds.ContainsKey(name)
+            ? _nameds[name].Where(a => !a.Consumed)
+            : Enumerable.Empty<INamedArgument>();
     }
 
     public IEnumerable<INamedArgument> GetAllNamed()
@@ -156,7 +160,9 @@ public class SyntheticArguments : IArguments, IVerbSource
         name = name.ToLowerInvariant();
         if (!_flags.ContainsKey(name))
             return MissingArgument.FlagMissing(name);
-        return _flags[name].Consumed ? MissingArgument.FlagConsumed(name) : _flags[name];
+        return _flags[name].Consumed
+            ? MissingArgument.FlagConsumed(name)
+            : _flags[name];
     }
 
     public bool HasFlag(string name, bool markConsumed = false)

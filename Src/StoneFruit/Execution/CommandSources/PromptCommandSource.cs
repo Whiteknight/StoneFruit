@@ -1,7 +1,7 @@
 ﻿namespace StoneFruit.Execution.CommandSources;
 
 /// <summary>
-/// prompts the user to input commands and exposes them to the runloop
+/// prompts the user to input commands and exposes them to the runloop.
 /// </summary>
 public class PromptCommandSource : ICommandSource
 {
@@ -23,6 +23,8 @@ public class PromptCommandSource : ICommandSource
 
         var str = _output.Prompt($"{currentName}");
         _state.CommandCounter.ReceiveUserInput();
-        return string.IsNullOrEmpty(str) ? FailureResult<ArgumentsOrString>.Instance : Result.Success(new ArgumentsOrString(str));
+        return string.IsNullOrEmpty(str)
+            ? FailureResult<ArgumentsOrString>.Instance
+            : Result.Success(new ArgumentsOrString(str));
     }
 }

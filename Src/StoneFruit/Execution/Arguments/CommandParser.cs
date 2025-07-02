@@ -2,16 +2,16 @@
 using ParserObjects;
 using StoneFruit.Execution.Scripts;
 using StoneFruit.Execution.Scripts.Formatting;
-using StoneFruit.Utility;
-using static ParserObjects.Parsers;
 using static ParserObjects.Parsers<char>;
+using static ParserObjects.Parsers;
 using static ParserObjects.Sequences;
+using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit.Execution.Arguments;
 
 /// <summary>
 /// Default ICommandParser implementation which controls parsing commands, arguments
-/// and scripts
+/// and scripts.
 /// </summary>
 public class CommandParser : ICommandParser
 {
@@ -20,15 +20,13 @@ public class CommandParser : ICommandParser
 
     public CommandParser(IParser<char, IParsedArgument> argParser, IParser<char, CommandFormat> scriptParser)
     {
-        Assert.NotNull(argParser, nameof(argParser));
-        Assert.NotNull(scriptParser, nameof(scriptParser));
-
+        NotNull(argParser);
         _argsParser = Rule(
             argParser.List(),
             OptionalWhitespace(),
             (args, _) => args
         );
-        _scriptParser = scriptParser;
+        _scriptParser = NotNull(scriptParser);
     }
 
     /// <summary>
@@ -43,7 +41,7 @@ public class CommandParser : ICommandParser
     }
 
     /// <summary>
-    /// Parse the given line of text as an IArguments
+    /// Parse the given line of text as an IArguments.
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
@@ -62,7 +60,7 @@ public class CommandParser : ICommandParser
     }
 
     /// <summary>
-    /// Parse the given line of script as a CommandFormat to be used for creating commands
+    /// Parse the given line of script as a CommandFormat to be used for creating commands.
     /// </summary>
     /// <param name="script"></param>
     /// <returns></returns>

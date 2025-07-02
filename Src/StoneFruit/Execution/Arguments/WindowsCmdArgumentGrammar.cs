@@ -8,7 +8,7 @@ using static ParserObjects.Parsers<char>;
 namespace StoneFruit.Execution.Arguments;
 
 /// <summary>
-/// An argument grammar for windows CMD-style arguments
+/// An argument grammar for windows CMD-style arguments.
 /// </summary>
 public static class WindowsCmdArgumentGrammar
 {

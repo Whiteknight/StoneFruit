@@ -8,7 +8,7 @@ using static ParserObjects.Parsers<char>;
 namespace StoneFruit.Execution.Arguments;
 
 /// <summary>
-/// A grammar for Powershell-style arguments
+/// A grammar for Powershell-style arguments.
 /// </summary>
 public static class PowershellStyleArgumentGrammar
 {

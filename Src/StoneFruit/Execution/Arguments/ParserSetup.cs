@@ -7,7 +7,7 @@ using StoneFruit.Execution.Scripts.Formatting;
 namespace StoneFruit.Execution.Arguments;
 
 /// <summary>
-/// Sets up the parsers
+/// Sets up the parsers.
 /// </summary>
 public class ParserSetup : IParserSetup
 {

@@ -123,9 +123,9 @@ public class ParsedArguments : IArguments, IVerbSource
         name = name.ToLowerInvariant();
 
         // Check the already-accessed named args. If we have it, return it.
-        if (_accessedNameds.ContainsKey(name))
+        if (_accessedNameds.TryGetValue(name, out var value))
         {
-            var firstAvailable = _accessedNameds[name].FirstOrDefault(a => !a.Consumed);
+            var firstAvailable = value.FirstOrDefault(a => !a.Consumed);
             if (firstAvailable != null)
                 return firstAvailable;
         }
@@ -185,7 +185,9 @@ public class ParsedArguments : IArguments, IVerbSource
     {
         name = name.ToLowerInvariant();
         AccessNamedUntil(n => n == name, () => false);
-        return _accessedNameds.ContainsKey(name) ? _accessedNameds[name].Where(a => !a.Consumed) : Enumerable.Empty<INamedArgument>();
+        return _accessedNameds.TryGetValue(name, out var value)
+            ? value.Where(a => !a.Consumed)
+            : Enumerable.Empty<INamedArgument>();
     }
 
     public IEnumerable<INamedArgument> GetAllNamed()

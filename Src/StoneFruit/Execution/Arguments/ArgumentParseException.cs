@@ -3,23 +3,13 @@
 namespace StoneFruit.Execution.Arguments;
 
 /// <summary>
-/// Exception thrown in response to errors encountered during argument access
+/// Exception thrown in response to errors encountered during argument access.
 /// </summary>
 [Serializable]
 public class ArgumentParseException : Exception
 {
     public ArgumentParseException(string message)
         : base(message)
-    {
-    }
-
-    public ArgumentParseException()
-        : base()
-    {
-    }
-
-    public ArgumentParseException(string message, Exception innerException)
-        : base(message, innerException)
     {
     }
 

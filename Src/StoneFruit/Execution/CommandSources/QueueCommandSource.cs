@@ -3,7 +3,7 @@
 namespace StoneFruit.Execution.CommandSources;
 
 /// <summary>
-/// Makes a literal list of commands available to the runloop
+/// Makes a literal list of commands available to the runloop.
 /// </summary>
 public class QueueCommandSource : ICommandSource
 {

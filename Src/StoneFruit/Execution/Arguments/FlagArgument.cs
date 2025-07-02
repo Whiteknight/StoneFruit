@@ -1,7 +1,7 @@
 ﻿namespace StoneFruit.Execution.Arguments;
 
 /// <summary>
-/// Accessor for a flag argument which contains a name but no value
+/// Accessor for a flag argument which contains a name but no value.
 /// </summary>
 public class FlagArgument : IFlagArgument
 {

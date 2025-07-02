@@ -4,13 +4,13 @@ using System.Reflection;
 namespace StoneFruit.Execution.Arguments;
 
 /// <summary>
-/// Map argument values onto the public properties of an object by name
+/// Map argument values onto the public properties of an object by name.
 /// </summary>
 public static class CommandArgumentMapper
 {
     /// <summary>
     /// Construct a new object instance and map public property values from the
-    /// provided arguments
+    /// provided arguments.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="args"></param>
@@ -25,7 +25,7 @@ public static class CommandArgumentMapper
 
     /// <summary>
     /// Map from the provided arguments onto the public properties of an existing
-    /// object
+    /// object.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="args"></param>

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using StoneFruit.Utility;
+using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit.Execution.Arguments;
 
@@ -15,11 +15,8 @@ public class PrependedVerbArguments : IArguments, IVerbSource
 
     public PrependedVerbArguments(IEnumerable<string> verb, IArguments inner)
     {
-        Assert.NotNull(verb, nameof(verb));
-        Assert.NotNull(inner, nameof(inner));
-
-        _verb = verb.ToList();
-        _inner = inner;
+        _verb = NotNull(verb).ToList();
+        _inner = NotNull(inner);
     }
 
     public void SetVerbCount(int count)

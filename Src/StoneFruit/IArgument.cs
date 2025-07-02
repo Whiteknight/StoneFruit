@@ -5,23 +5,24 @@ using StoneFruit.Utility;
 namespace StoneFruit;
 
 /// <summary>
-/// Represents a single argument, either positional, named, or otherwise
+/// Represents a single argument, either positional, named, or otherwise.
 /// </summary>
 public interface IArgument
 {
     /// <summary>
-    /// True if this value has already been consumed. A consumed argument cannot be retrieved again
+    /// Gets or sets a value indicating whether this value has already been
+    /// consumed. A consumed argument cannot be retrieved again.
     /// </summary>
     bool Consumed { get; set; }
 }
 
 /// <summary>
-/// Represents an argument with a value
+/// Represents an argument with a value.
 /// </summary>
 public interface IValuedArgument : IArgument
 {
     /// <summary>
-    /// The raw string value of the argument
+    /// Gets the raw string value of the argument.
     /// </summary>
     string Value { get; }
 
@@ -58,30 +59,30 @@ public interface IValuedArgument : IArgument
 }
 
 /// <summary>
-/// A positional argument is a value argument with no name
+/// A positional argument is a value argument with no name.
 /// </summary>
 public interface IPositionalArgument : IValuedArgument
 {
 }
 
 /// <summary>
-/// A named argument is a value argument with a name
+/// A named argument is a value argument with a name.
 /// </summary>
 public interface INamedArgument : IValuedArgument
 {
     /// <summary>
-    /// The name of the argument
+    /// Gets the name of the argument.
     /// </summary>
     string Name { get; }
 }
 
 /// <summary>
-/// A flag argument is an argument with a name but no value
+/// A flag argument is an argument with a name but no value.
 /// </summary>
 public interface IFlagArgument : IArgument
 {
     /// <summary>
-    /// The name flag
+    /// Gets the flag name.
     /// </summary>
     string Name { get; }
 }
@@ -91,7 +92,9 @@ public static class ArgumentExtensions
     /// <summary>
     /// Throw an exception if the argument does not exist.
     /// </summary>
+    /// <typeparam name="T"></typeparam>
     /// <param name="argument"></param>
+    /// <param name="errorMessage"></param>
     /// <returns></returns>
     public static T Require<T>(this T argument, string errorMessage = "")
         where T : IArgument
@@ -102,8 +105,11 @@ public static class ArgumentExtensions
     }
 
     /// <summary>
-    /// Mark the value as being consumed
+    /// Mark the value as being consumed.
     /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="argument"></param>
+    /// <param name="consumed"></param>
     /// <returns></returns>
     public static T MarkConsumed<T>(this T argument, bool consumed = true)
         where T : IArgument
@@ -114,12 +120,12 @@ public static class ArgumentExtensions
     }
 
     /// <summary>
-    /// Returns true if the argument exists, false otherwise
+    /// Returns true if the argument exists, false otherwise.
     /// </summary>
     /// <param name="argument"></param>
     /// <returns></returns>
     public static bool Exists(this IArgument argument)
-        => argument != null && !(argument is MissingArgument);
+        => argument is not null and not MissingArgument;
 
     /// <summary>
     /// Helper method to convert the value of the argument to a different format, using a default
