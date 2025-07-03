@@ -13,18 +13,14 @@ public sealed class EnvironmentObjectCache
         _cache = new Dictionary<string, Dictionary<Type, object>>();
     }
 
-    public IResult<T> Get<T>(string environment)
+    public Maybe<T> Get<T>(string environment)
         where T : class
     {
-        if (!_cache.ContainsKey(environment))
-            return FailureResult<T>.Instance;
-        var env = _cache[environment];
-        if (!env.ContainsKey(typeof(T)))
-            return FailureResult<T>.Instance;
-        var value = env[typeof(T)] as T;
-        if (value == null)
-            return FailureResult<T>.Instance;
-        return Result.Success(value!);
+        if (!_cache.TryGetValue(environment, out Dictionary<Type, object>? env))
+            return default;
+        if (env.TryGetValue(typeof(T), out var value) && value is T typed)
+            return typed;
+        return default;
     }
 
     public void Set<T>(string environment, T value)
@@ -33,16 +29,12 @@ public sealed class EnvironmentObjectCache
         if (!_cache.ContainsKey(environment))
             _cache.Add(environment, new Dictionary<Type, object>());
         var env = _cache[environment];
-        if (!env.ContainsKey(typeof(T)))
-            env.Add(typeof(T), value);
-        else
-            env[typeof(T)] = value;
+        env[typeof(T)] = value;
     }
 
     public void Clear(string environment)
     {
-        if (!_cache.ContainsKey(environment))
-            return;
-        _cache[environment].Clear();
+        if (_cache.TryGetValue(environment, out Dictionary<Type, object>? value))
+            value.Clear();
     }
 }

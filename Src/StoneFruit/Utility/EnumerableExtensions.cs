@@ -7,7 +7,7 @@ namespace StoneFruit.Utility;
 public static class EnumerableExtensions
 {
     /// <summary>
-    /// If the source is null, returns an empty enumerable instead
+    /// If the source is null, returns an empty enumerable instead.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="source"></param>

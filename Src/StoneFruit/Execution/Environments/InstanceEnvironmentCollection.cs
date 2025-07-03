@@ -3,23 +3,23 @@
 namespace StoneFruit.Execution.Environments;
 
 /// <summary>
-/// An IEnvironmentCollection implementation for a single environment
+/// An IEnvironmentCollection implementation for a single environment.
 /// </summary>
 public class InstanceEnvironmentCollection : IEnvironmentCollection
 {
-    private readonly IResult<object> _current;
-    private readonly IResult<string> _currentName;
+    private readonly Maybe<object> _current;
+    private readonly Maybe<string> _currentName;
 
     public InstanceEnvironmentCollection()
     {
-        _current = Result.Success(new object());
-        _currentName = Result.Success("");
+        _current = new object();
+        _currentName = string.Empty;
     }
 
     public InstanceEnvironmentCollection(object environment)
     {
-        _current = Result.Success(environment ?? new object());
-        _currentName = Result.Success("");
+        _current = environment ?? new object();
+        _currentName = string.Empty;
     }
 
     public IReadOnlyList<string> GetNames() => new[] { Constants.EnvironmentNameDefault };
@@ -31,7 +31,7 @@ public class InstanceEnvironmentCollection : IEnvironmentCollection
 
     public bool IsValid(string name) => name == Constants.EnvironmentNameDefault;
 
-    public IResult<object> GetCurrent() => _current;
+    public Maybe<object> GetCurrent() => _current;
 
-    public IResult<string> GetCurrentName() => _currentName;
+    public Maybe<string> GetCurrentName() => _currentName;
 }

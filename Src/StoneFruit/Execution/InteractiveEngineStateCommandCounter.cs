@@ -3,7 +3,7 @@
 /// <summary>
 /// Keep track of how many commands have been executed without user input and show
 /// a prompt to the user if the limit has been exceeded. Depending on user input the
-/// execution can continue or the command queue can be cleared
+/// execution can continue or the command queue can be cleared.
 /// </summary>
 public class InteractiveEngineStateCommandCounter : IEngineStateCommandCounter
 {
@@ -35,7 +35,7 @@ public class InteractiveEngineStateCommandCounter : IEngineStateCommandCounter
         }
 
         var cont = output.Prompt("Maximum command count reached, continue? (y/n)");
-        if (cont?.ToLowerInvariant() == "y")
+        if (cont.GetValueOrDefault("n").Equals("y", System.StringComparison.InvariantCultureIgnoreCase))
         {
             ReceiveUserInput();
             return true;

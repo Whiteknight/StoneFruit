@@ -18,7 +18,7 @@ public interface IHandlerBase
 public interface IHandler : IHandlerBase
 {
     /// <summary>
-    /// Execute the handler and perform any work
+    /// Execute the handler and perform any work.
     /// </summary>
     void Execute();
 }
@@ -31,7 +31,7 @@ public interface IHandler : IHandlerBase
 public interface IAsyncHandler : IHandlerBase
 {
     /// <summary>
-    /// Execute the handler asynchronously and perform any work
+    /// Execute the handler asynchronously and perform any work.
     /// </summary>
     /// <param name="cancellation"></param>
     /// <returns></returns>

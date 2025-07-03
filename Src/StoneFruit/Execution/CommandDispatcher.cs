@@ -29,27 +29,27 @@ public class CommandDispatcher
     }
 
     /// <summary>
-    /// The parser to turn strings into Commands
+    /// Gets the parser to turn strings into Commands.
     /// </summary>
     public ICommandParser Parser { get; }
 
     /// <summary>
-    /// The source of handlers
+    /// Gets the source of handlers.
     /// </summary>
     public IHandlers Handlers { get; }
 
     /// <summary>
-    /// The current environment and collection of all possible environments
+    /// Gets the current environment and collection of all possible environments.
     /// </summary>
     public IEnvironmentCollection Environments { get; }
 
     /// <summary>
-    /// The execution state of the engine
+    /// Gets the execution state of the engine.
     /// </summary>
     public EngineState State { get; }
 
     /// <summary>
-    /// The output
+    /// Gets the output.
     /// </summary>
     public IOutput Output { get; }
 
@@ -57,7 +57,7 @@ public class CommandDispatcher
     /// Find and execute the appropriate handler for the given arguments object or
     /// unparsed command string. This overload is mostly intended for internal use. If you have
     /// a raw unparsed command string or a parsed IArguments object, you should use one of
-    /// those overloads instead
+    /// those overloads instead.
     /// </summary>
     /// <param name="argsOrString"></param>
     /// <param name="token"></param>
@@ -71,7 +71,7 @@ public class CommandDispatcher
     /// <summary>
     /// Find and execute the appropriate handler for the given unparsed command string. Use
     /// this overload if you have the raw text of a command to execute and do not want to
-    /// parse it out yourself
+    /// parse it out yourself.
     /// </summary>
     /// <param name="commandString"></param>
     /// <param name="token"></param>
@@ -84,7 +84,7 @@ public class CommandDispatcher
 
     /// <summary>
     /// Find and execute the appropriate handler for the given verb and arguments. Use this
-    /// overload if you want to explicitly separate the verb from the rest of the arguments
+    /// overload if you want to explicitly separate the verb from the rest of the arguments.
     /// </summary>
     /// <param name="verb"></param>
     /// <param name="args"></param>
@@ -98,18 +98,17 @@ public class CommandDispatcher
 
     /// <summary>
     /// Find and execute the appropriate handler for the given arguments. Use this variant if
-    /// you have a parsed IArguments which contains the verb and args for the command
+    /// you have a parsed IArguments which contains the verb and args for the command.
     /// </summary>
-    /// <param name="command"></param>
+    /// <param name="arguments"></param>
     /// <param name="token"></param>
     public void Execute(IArguments arguments, CancellationToken token = default)
     {
         Assert.NotNull(arguments, nameof(arguments));
         State.SetCurrentArguments(arguments);
-        var handlerResult = Handlers.GetInstance(arguments, this);
-        if (!handlerResult.HasValue)
-            throw VerbNotFoundException.FromArguments(arguments);
-        var handler = handlerResult.Value;
+        var handler = Handlers.GetInstance(arguments, this)
+            .OnFailure(() => throw VerbNotFoundException.FromArguments(arguments))
+            .GetValueOrThrow();
         if (handler is IHandler syncHandler)
         {
             syncHandler.Execute();
@@ -175,9 +174,9 @@ public class CommandDispatcher
     /// <summary>
     /// Find and execute the appropriate handler for the given Command object. Use this
     /// overload if you have a parsed IArguments object which contains the verb and args for
-    /// the command
+    /// the command.
     /// </summary>
-    /// <param name="command"></param>
+    /// <param name="arguments"></param>
     /// <param name="token"></param>
     /// <returns></returns>
     public async Task ExecuteAsync(IArguments arguments, CancellationToken token = default)
@@ -188,12 +187,12 @@ public class CommandDispatcher
         State.SetCurrentArguments(arguments);
 
         // Get the handler. Throw if a matching one is not found
-        var handlerResult = Handlers.GetInstance(arguments, this);
-        if (!handlerResult.HasValue)
-            throw VerbNotFoundException.FromArguments(arguments);
+        var handler = Handlers.GetInstance(arguments, this)
+            .OnFailure(() => throw VerbNotFoundException.FromArguments(arguments))
+            .GetValueOrThrow();
 
         // Invoke the handler, async or otherwise.
-        await ExecuteHandler(handlerResult.Value, token);
+        await ExecuteHandler(handler, token);
         State.ClearCurrentArguments();
     }
 

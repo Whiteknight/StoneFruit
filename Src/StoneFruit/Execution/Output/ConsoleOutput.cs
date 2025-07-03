@@ -4,7 +4,7 @@ using StoneFruit.Utility;
 namespace StoneFruit.Execution.Output;
 
 /// <summary>
-/// An ITerminalOutput adaptor for System.Console and ReadLine
+/// An ITerminalOutput adaptor for System.Console and ReadLine.
 /// </summary>
 public class ConsoleOutput : IOutput
 {
@@ -33,7 +33,7 @@ public class ConsoleOutput : IOutput
         return this;
     }
 
-    public string Prompt(string prompt, bool mustProvide = true, bool keepHistory = true)
+    public Maybe<string> Prompt(string prompt, bool mustProvide = true, bool keepHistory = true)
     {
         while (true)
         {

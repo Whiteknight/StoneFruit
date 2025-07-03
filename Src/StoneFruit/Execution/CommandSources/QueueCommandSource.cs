@@ -14,12 +14,11 @@ public class QueueCommandSource : ICommandSource
         _commands = new Queue<string>(commands);
     }
 
-    public IResult<ArgumentsOrString> GetNextCommand()
+    public Maybe<ArgumentsOrString> GetNextCommand()
     {
         if (_commands.Count == 0)
-            return FailureResult<ArgumentsOrString>.Instance;
+            return default;
         var value = _commands.Dequeue();
-        var result = new ArgumentsOrString(value);
-        return Result.Success(result);
+        return new ArgumentsOrString(value);
     }
 }

@@ -45,17 +45,17 @@ public class CommandSourceCollection
         _sources.AddFirst(source);
     }
 
-    public IResult<ArgumentsOrString> GetNextCommand()
+    public Maybe<ArgumentsOrString> GetNextCommand()
     {
         while (true)
         {
             if (_sources.Count == 0)
-                return FailureResult<ArgumentsOrString>.Instance;
+                return default;
 
             var firstSource = _sources!.First!.Value;
 
             var next = firstSource.GetNextCommand();
-            if (next.HasValue)
+            if (next.IsSuccess)
                 return next;
 
             _sources.RemoveFirst();

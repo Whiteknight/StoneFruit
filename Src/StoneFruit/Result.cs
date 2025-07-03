@@ -2,88 +2,145 @@
 
 namespace StoneFruit;
 
-/// <summary>
-/// A result of an operation. On success contains a value. On failure there is no value and
-/// attempt to access the value will throw an exception.
-/// </summary>
-/// <typeparam name="T"></typeparam>
-public interface IResult<T>
+public readonly struct Maybe<T>
 {
-    bool HasValue { get; }
-    T Value { get; }
+    private readonly T? _value;
+    private readonly bool _hasValue;
 
-    bool Equals(T value);
+    public Maybe(T? value)
+    {
+        _value = value;
+        _hasValue = value is not null;
+    }
 
-    T GetValueOrDefault(T defaultValue);
+    public static implicit operator Maybe<T>(T value) => new Maybe<T>(value);
 
-    IResult<TOut> Transform<TOut>(Func<T, TOut> transform);
+    public bool IsSuccess => _hasValue && _value is not null;
+
+    public TOut Match<TOut>(Func<T, TOut> onSuccess, Func<TOut> onFailure)
+        => _hasValue && _value is not null
+            ? onSuccess(_value)
+            : onFailure();
+
+    public Maybe<TOut> Map<TOut>(Func<T, TOut> onSuccess)
+        => Match<Maybe<TOut>>(v => onSuccess(v), static () => default);
+
+    public T GetValueOrDefault(T defaultValue = default!)
+    {
+        var result = Match(v => v, () => defaultValue);
+        if (result is not null)
+            return result;
+        throw new InvalidOperationException("Attempt to return null from .GetValueOrDefault()");
+    }
+
+    public T GetValueOrThrow()
+        => Match(v => v, () => throw new InvalidOperationException("Could not get value of Maybe"));
+
+    public Result<T, TError> ToResult<TError>(Func<TError> createError)
+        => Match(v => (Result<T, TError>)v, () => (Result<T, TError>)createError());
+
+    public Maybe<T> OnSuccess(Action<T> onSuccess)
+    {
+        if (_hasValue && _value is not null)
+            onSuccess(_value);
+        return this;
+    }
+
+    public Maybe<T> OnFailure(Action onFailure)
+    {
+        if (!_hasValue || _value is null)
+            onFailure();
+        return this;
+    }
 }
 
-/// <summary>
-/// Static class for result factory methods.
-/// </summary>
+public static class Maybe
+{
+    public static Maybe<TOut> Bind<T, TOut>(this Maybe<T> maybe, Func<T, Maybe<TOut>> onSuccess)
+        => maybe.Match(v => onSuccess(v), () => default);
+}
+
+public readonly struct Result<T, TError>
+{
+    private readonly T? _value;
+    private readonly TError? _error;
+    private readonly bool _hasValue;
+
+    public Result(T? value, TError? error, bool hasValue)
+    {
+        _value = value;
+        _error = error;
+        _hasValue = hasValue && _value is not null;
+    }
+
+    public static implicit operator Result<T, TError>(T value) => new Result<T, TError>(value, default, true);
+
+    public static implicit operator Result<T, TError>(TError error) => new Result<T, TError>(default, error, false);
+
+    public bool IsSuccess => _hasValue && _value is not null;
+
+    public TOut Match<TOut>(Func<T, TOut> onSuccess, Func<TError, TOut> onError)
+    {
+        if (_hasValue && _value is not null)
+            return onSuccess(_value);
+        if (_error is not null)
+            return onError(_error);
+        throw new InvalidOperationException("Result does not have a valid Value or Error");
+    }
+
+    public Result<TOut, TError> Map<TOut>(Func<T, TOut> onValue)
+        => Match(
+            v => new Result<TOut, TError>(onValue(v), default, true),
+            e => new Result<TOut, TError>(default, e, false));
+
+    public Result<T, TErrorOut> MapError<TErrorOut>(Func<TError, TErrorOut> onError)
+        => Match(
+            v => new Result<T, TErrorOut>(v, default, true),
+            e => new Result<T, TErrorOut>(default, onError(e), false));
+
+    public T? GetValueOrDefault(T? defaultValue = default)
+        => Match(v => v, _ => defaultValue);
+
+    public T GetValueOrThrow()
+        => Match(
+            v => v,
+            e => throw new InvalidOperationException($"Could not get value of Result. Error: {e}"));
+
+    public TError? GetErrorOrDefault(TError? defaultValue = default)
+        => Match(_ => defaultValue, e => e);
+
+    public TError GetErrorOrThrow()
+        => Match(
+            _ => throw new InvalidOperationException("Could not get Error of Result."),
+            e => e);
+
+    public void ThrowIfError()
+    {
+        if (_hasValue)
+            return;
+        if (_error is Exception ex)
+            throw new Error(ex);
+        if (_error is null)
+            throw new InvalidOperationException("Could not get the Error of Result.");
+        throw new Error(_error);
+    }
+
+    public class Error : Exception
+    {
+        public Error(object error)
+            : base(error.ToString())
+        {
+        }
+
+        public Error(Exception inner)
+            : base(inner.Message, inner)
+        {
+        }
+    }
+}
+
 public static class Result
 {
-    /// <summary>
-    /// Create a success result from the given value.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="value"></param>
-    /// <returns></returns>
-    public static IResult<T> Success<T>(T value)
-        => new SuccessResult<T>(value);
-
-    /// <summary>
-    /// Create a failure result of the given type.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
-    public static IResult<T> Fail<T>()
-        => FailureResult<T>.Instance;
-}
-
-/// <summary>
-/// Represents a successful result with a valid value.
-/// </summary>
-/// <typeparam name="T"></typeparam>
-public sealed class SuccessResult<T> : IResult<T>
-{
-    public SuccessResult(T value)
-    {
-        Value = value;
-    }
-
-    public bool HasValue => true;
-
-    public T Value { get; }
-
-    public bool Equals(T value)
-        => Value!.Equals(value);
-
-    public T GetValueOrDefault(T defaultValue) => Value;
-
-    public IResult<TOut> Transform<TOut>(Func<T, TOut> transform)
-    {
-        var newValue = transform(Value);
-        return new SuccessResult<TOut>(newValue);
-    }
-}
-
-/// <summary>
-/// Represents a failure result without a valid value.
-/// </summary>
-/// <typeparam name="T"></typeparam>
-public sealed class FailureResult<T> : IResult<T>
-{
-    public static IResult<T> Instance { get; } = new FailureResult<T>();
-
-    public bool HasValue => false;
-
-    public T Value => throw new InvalidOperationException("Cannot access value of failure result");
-
-    public bool Equals(T value) => false;
-
-    public T GetValueOrDefault(T defaultValue) => defaultValue;
-
-    public IResult<TOut> Transform<TOut>(Func<T, TOut> transform) => FailureResult<TOut>.Instance;
+    public static Result<TOut, TError> Bind<T, TError, TOut>(this Result<T, TError> result, Func<T, Result<TOut, TError>> onSuccess)
+        => result.Match(v => onSuccess(v), e => new Result<TOut, TError>(default, e, false));
 }

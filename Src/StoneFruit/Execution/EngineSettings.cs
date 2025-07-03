@@ -3,7 +3,7 @@
 namespace StoneFruit.Execution;
 
 /// <summary>
-/// Settings object to control the behavior of the engine
+/// Settings object to control the behavior of the engine.
 /// </summary>
 public class EngineSettings
 {

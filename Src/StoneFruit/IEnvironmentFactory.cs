@@ -10,5 +10,5 @@ public interface IEnvironmentFactory<T>
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    IResult<T> Create(string name);
+    Maybe<T> Create(string name);
 }

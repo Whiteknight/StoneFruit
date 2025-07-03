@@ -16,15 +16,12 @@ public class PromptCommandSource : ICommandSource
         _state = state;
     }
 
-    public IResult<ArgumentsOrString> GetNextCommand()
+    public Maybe<ArgumentsOrString> GetNextCommand()
     {
-        var currentNameResult = _environments.GetCurrentName();
-        var currentName = currentNameResult.HasValue ? currentNameResult.Value : "";
-
-        var str = _output.Prompt($"{currentName}");
+        var env = _environments.GetCurrentName().GetValueOrDefault("");
+        var str = _output.Prompt(env)
+            .Bind(s => string.IsNullOrEmpty(s) ? default : new Maybe<string>(s));
         _state.CommandCounter.ReceiveUserInput();
-        return string.IsNullOrEmpty(str)
-            ? FailureResult<ArgumentsOrString>.Instance
-            : Result.Success(new ArgumentsOrString(str));
+        return str.Map(s => new ArgumentsOrString(s));
     }
 }

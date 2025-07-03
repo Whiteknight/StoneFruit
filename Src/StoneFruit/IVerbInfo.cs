@@ -6,7 +6,7 @@
 public interface IVerbInfo
 {
     /// <summary>
-    /// The verb used to invoke the handler. All verbs are case-insensitive
+    /// The verb used to invoke the handler. All verbs are case-insensitive.
     /// </summary>
     Verb Verb { get; }
 
@@ -16,7 +16,7 @@ public interface IVerbInfo
     string Description { get; }
 
     /// <summary>
-    /// Detailed usage information about the verb
+    /// Detailed usage information about the verb.
     /// </summary>
     string Usage { get; }
 
@@ -26,7 +26,7 @@ public interface IVerbInfo
     string Group { get; }
 
     /// <summary>
-    /// Whether or not to show the verb in the list when executing "help"
+    /// Whether or not to show the verb in the list when executing "help".
     /// </summary>
     bool ShouldShowInHelp { get; }
 }

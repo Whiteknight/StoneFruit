@@ -61,20 +61,19 @@ public class ServiceProviderHandlerSource : IHandlerSource
             .ToVerbTrie(i => i.Verb);
     }
 
-    public IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
+    public Maybe<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
     {
         var serviceType = _verbs.Get(arguments);
-        if (!serviceType.HasValue)
-            return FailureResult<IHandlerBase>.Instance;
+        if (!serviceType.IsSuccess)
+            return default;
 
         using var scope = _provider.CreateScope();
-        var created = scope.ServiceProvider.GetService(serviceType.Value.Type);
-        return created is IHandlerBase instance ? new SuccessResult<IHandlerBase>(instance) : FailureResult<IHandlerBase>.Instance;
+        return serviceType.Bind(st => new Maybe<IHandlerBase>(scope.ServiceProvider.GetService(st.Type) as IHandlerBase));
     }
 
     public IEnumerable<IVerbInfo> GetAll() => _verbs.GetAll().Select(kvp => kvp.Value);
 
-    public IResult<IVerbInfo> GetByName(Verb verb) => _verbs.Get(verb).Transform(i => (IVerbInfo)i);
+    public Maybe<IVerbInfo> GetByName(Verb verb) => _verbs.Get(verb).Map(i => (IVerbInfo)i);
 
     private class VerbInfo : IVerbInfo
     {

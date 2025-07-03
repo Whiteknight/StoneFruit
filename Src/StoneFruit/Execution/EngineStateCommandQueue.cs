@@ -51,13 +51,13 @@ public class EngineStateCommandQueue
         Prepend(script.GetCommands(_parser, args));
     }
 
-    public IResult<ArgumentsOrString> GetNext()
+    public Maybe<ArgumentsOrString> GetNext()
     {
         if (_additionalCommands.Count == 0)
-            return FailureResult<ArgumentsOrString>.Instance;
+            return default;
         ArgumentsOrString next = _additionalCommands!.First!.Value;
         _additionalCommands.RemoveFirst();
-        return new SuccessResult<ArgumentsOrString>(next);
+        return next;
     }
 
     public void Clear() => _additionalCommands.Clear();

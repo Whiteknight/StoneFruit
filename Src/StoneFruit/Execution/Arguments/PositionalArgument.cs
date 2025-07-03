@@ -1,7 +1,7 @@
 ﻿namespace StoneFruit.Execution.Arguments;
 
 /// <summary>
-/// Accessor for a positional argument with a value but no name
+/// Accessor for a positional argument with a value but no name.
 /// </summary>
 public class PositionalArgument : IPositionalArgument
 {

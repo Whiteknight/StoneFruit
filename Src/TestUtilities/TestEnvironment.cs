@@ -1,12 +1,11 @@
-namespace TestUtilities
-{
-    public class TestEnvironment
-    {
-        public string Value { get; }
+namespace TestUtilities;
 
-        public TestEnvironment(string value)
-        {
-            Value = value;
-        }
+public class TestEnvironment
+{
+    public string Value { get; }
+
+    public TestEnvironment(string value)
+    {
+        Value = value;
     }
 }

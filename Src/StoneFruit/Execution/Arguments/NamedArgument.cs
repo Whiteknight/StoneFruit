@@ -1,7 +1,7 @@
 ﻿namespace StoneFruit.Execution.Arguments;
 
 /// <summary>
-/// An accessor for a named argument which has a name and a value
+/// An accessor for a named argument which has a name and a value.
 /// </summary>
 public class NamedArgument : INamedArgument
 {

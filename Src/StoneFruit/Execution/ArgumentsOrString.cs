@@ -3,7 +3,7 @@
 namespace StoneFruit.Execution;
 
 /// <summary>
-/// Discriminated union for unparsed command strings or pre-parsed Command objects
+/// Discriminated union for unparsed command strings or pre-parsed Command objects.
 /// </summary>
 public class ArgumentsOrString
 {

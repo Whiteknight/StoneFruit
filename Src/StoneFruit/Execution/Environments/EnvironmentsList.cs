@@ -3,7 +3,7 @@
 namespace StoneFruit.Execution.Environments;
 
 /// <summary>
-/// Type so we can register the list of environment names with the container
+/// Type so we can register the list of environment names with the container.
 /// </summary>
 public sealed class EnvironmentsList
 {

@@ -33,32 +33,32 @@ public class VerbTrie<TValue>
 
     public int Count { get; private set; }
 
-    public IResult<TValue> Get(IArguments args)
+    public Maybe<TValue> Get(IArguments args)
     {
         if (args is not IVerbSource argsWithVerb)
-            return FailureResult<TValue>.Instance;
+            return default;
 
         var node = GetNode(argsWithVerb);
         if (node?.Value == null)
-            return FailureResult<TValue>.Instance;
+            return default;
 
-        return new SuccessResult<TValue>(node.Value);
+        return node.Value;
     }
 
-    public IResult<TValue> Get(IEnumerable<string> keys)
+    public Maybe<TValue> Get(IEnumerable<string> keys)
     {
         var current = _root;
         foreach (var key in keys)
         {
             var node = current.GetChild(key);
             if (node == null)
-                return FailureResult<TValue>.Instance;
+                return default;
             current = node;
         }
 
         if (current?.Value == null)
-            return FailureResult<TValue>.Instance;
-        return new SuccessResult<TValue>(current.Value);
+            return default;
+        return current.Value;
     }
 
     public IReadOnlyList<KeyValuePair<Verb, TValue>> GetAll()
@@ -124,7 +124,7 @@ public class VerbTrie<TValue>
         public TValue? Value { get; set; }
 
         public Node? GetChild(string key)
-            => _children.ContainsKey(key) ? _children[key] : null;
+            => _children.TryGetValue(key, out Node? value) ? value : null;
 
         public Node GetOrInsertChild(string key)
         {

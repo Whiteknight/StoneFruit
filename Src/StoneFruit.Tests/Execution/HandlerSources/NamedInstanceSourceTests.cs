@@ -4,30 +4,29 @@ using NUnit.Framework;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Handlers;
 
-namespace StoneFruit.Tests.Execution.HandlerSources
+namespace StoneFruit.Tests.Execution.HandlerSources;
+
+public class NamedInstanceSourceTests
 {
-    public class NamedInstanceSourceTests
+    private class TestCommandHandler : IHandler
     {
-        private class TestCommandHandler : IHandler
+        public TestCommandHandler()
         {
-            public TestCommandHandler()
-            {
-            }
-
-            public void Execute()
-            {
-                throw new NotImplementedException();
-            }
         }
 
-        [Test]
-        public void GetInstance_Test()
+        public void Execute()
         {
-            var target = new NamedInstanceHandlerSource();
-            target.Add("test", new TestCommandHandler());
-            var result = target.GetInstance(SyntheticArguments.From("test"), null);
-            result.HasValue.Should().BeTrue();
-            result.Value.Should().BeOfType<TestCommandHandler>();
+            throw new NotImplementedException();
         }
+    }
+
+    [Test]
+    public void GetInstance_Test()
+    {
+        var target = new NamedInstanceHandlerSource();
+        target.Add("test", new TestCommandHandler());
+        var result = target.GetInstance(SyntheticArguments.From("test"), null);
+        result.IsSuccess.Should().BeTrue();
+        result.GetValueOrThrow().Should().BeOfType<TestCommandHandler>();
     }
 }

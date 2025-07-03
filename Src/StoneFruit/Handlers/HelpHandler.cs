@@ -67,10 +67,9 @@ public class HelpHandler : IHandler
 
     private void GetDetail(Verb verb)
     {
-        var info = _commands.GetByName(verb);
-        if (!info.HasValue)
-            throw new ExecutionException($"Cannot find command named '{verb}'");
-        _output.WriteLine(info.Value.Usage);
+        _commands.GetByName(verb)
+            .OnSuccess(v => _output.WriteLine(v.Usage))
+            .OnFailure(() => throw new ExecutionException($"Cannot find command named '{verb}'"));
     }
 
     private void GetOverview(bool showAll)
@@ -106,14 +105,14 @@ public class HelpHandler : IHandler
 
     private void OutputOverviewGroups(Dictionary<string, List<IVerbInfo>> infoGroups, int descStartColumn, string blankPrefix, int maxDescLineLength)
     {
-        if (infoGroups.ContainsKey(""))
-            OutputVerbList("", infoGroups[""], descStartColumn, maxDescLineLength, blankPrefix);
+        if (infoGroups.TryGetValue("", out var value))
+            OutputVerbList("", value, descStartColumn, maxDescLineLength, blankPrefix);
 
         foreach (var infoGroup in infoGroups.Where(g => g.Key != BuiltinsGroup && g.Key != ""))
             OutputVerbList(infoGroup.Key, infoGroup.Value, descStartColumn, maxDescLineLength, blankPrefix);
 
-        if (infoGroups.ContainsKey(BuiltinsGroup) && infoGroups[BuiltinsGroup].Any())
-            OutputVerbList("Built-In Verbs", infoGroups[BuiltinsGroup], descStartColumn, maxDescLineLength, blankPrefix);
+        if (infoGroups.TryGetValue(BuiltinsGroup, out var builtins) && builtins.Count != 0)
+            OutputVerbList("Built-In Verbs", builtins, descStartColumn, maxDescLineLength, blankPrefix);
     }
 
     private static int GetConsoleWidth()

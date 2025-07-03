@@ -30,7 +30,7 @@ public class CommandParser : ICommandParser
     }
 
     /// <summary>
-    /// Get the default CommandParser instance with default parser objects configured
+    /// Get the default CommandParser instance with default parser objects configured.
     /// </summary>
     /// <returns></returns>
     public static CommandParser GetDefault()

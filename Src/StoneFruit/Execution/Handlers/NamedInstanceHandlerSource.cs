@@ -8,7 +8,7 @@ namespace StoneFruit.Execution.Handlers;
 /// <summary>
 /// Handler source for manually-specified handler instances.  This type is mainly used for
 /// situations where the user doesn't employ a DI container to detect and resolve handler types
-/// automatically
+/// automatically.
 /// </summary>
 public class NamedInstanceHandlerSource : IHandlerSource
 {
@@ -25,12 +25,12 @@ public class NamedInstanceHandlerSource : IHandlerSource
         _verbs.Insert(verb, info);
     }
 
-    public IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
-        => _verbs.Get(arguments).Transform(info => info.HandlerObject);
+    public Maybe<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
+        => _verbs.Get(arguments).Map(info => info.HandlerObject);
 
     public IEnumerable<IVerbInfo> GetAll() => _verbs.GetAll().Select(kvp => kvp.Value);
 
-    public IResult<IVerbInfo> GetByName(Verb verb) => _verbs.Get(verb).Transform(i => (IVerbInfo)i);
+    public Maybe<IVerbInfo> GetByName(Verb verb) => _verbs.Get(verb).Map(i => (IVerbInfo)i);
 
     public int Count => _verbs.Count;
 

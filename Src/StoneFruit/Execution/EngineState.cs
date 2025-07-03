@@ -76,7 +76,7 @@ public class EngineState
 
     /// <summary>
     /// Gets a CancellationTokenSource configured with settings values, to use for
-    /// dispatching commands
+    /// dispatching commands.
     /// </summary>
     /// <returns></returns>
     public CancellationTokenSource GetConfiguredCancellationSource()

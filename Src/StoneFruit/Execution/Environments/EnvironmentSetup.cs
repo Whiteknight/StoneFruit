@@ -6,7 +6,7 @@ using StoneFruit.Utility;
 namespace StoneFruit.Execution.Environments;
 
 /// <summary>
-/// Sets up the environment mechanism
+/// Sets up the environment mechanism.
 /// </summary>
 public class EnvironmentSetup : IEnvironmentSetup
 {
@@ -46,20 +46,21 @@ public class EnvironmentSetup : IEnvironmentSetup
         _services.AddScoped(services =>
         {
             var environments = services.GetRequiredService<IEnvironmentCollection>();
-            var currentEnvName = environments.GetCurrentName();
-            if (!currentEnvName.HasValue)
-                throw new EngineBuildException("Attempt to get environment context object without setting a valid environment");
+            var currentEnvName = environments.GetCurrentName()
+                .ToResult(() => "Could not get environment context object without valid environment")
+                .GetValueOrThrow();
+
             var objectCache = services.GetRequiredService<EnvironmentObjectCache>();
-            var cached = objectCache.Get<T>(currentEnvName.Value);
-            if (cached.HasValue)
-                return cached.Value;
+            var cached = objectCache.Get<T>(currentEnvName);
+            if (cached.IsSuccess)
+                return cached.GetValueOrThrow();
 
             var factory = services.GetRequiredService<IEnvironmentFactory<T>>();
-            var obj = factory.Create(currentEnvName.Value);
-            if (!obj.HasValue)
-                throw new EngineBuildException("Could not create valid environment context object for current environment");
-            objectCache.Set<T>(currentEnvName.Value, obj.Value);
-            return obj.Value;
+            var obj = factory.Create(currentEnvName)
+                .ToResult(() => "Could not create valid environment context object for current environment")
+                .GetValueOrThrow();
+            objectCache.Set(currentEnvName, obj);
+            return obj;
         });
         return this;
     }

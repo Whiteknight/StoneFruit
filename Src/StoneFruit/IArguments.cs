@@ -62,7 +62,7 @@ public interface IArguments
 
     /// <summary>
     /// Returns true if the collection contains a flag with the given name, regardless
-    /// of consumed state
+    /// of consumed state.
     /// </summary>
     /// <param name="name"></param>
     /// <param name="markConsumed"></param>

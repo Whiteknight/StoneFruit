@@ -33,18 +33,18 @@ public class InstanceMethodHandlerSource : IHandlerSource
         _invoker = invoker;
     }
 
-    public IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
+    public Maybe<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
     {
         var method = _methods.Get(arguments);
-        if (!method.HasValue)
-            return FailureResult<IHandlerBase>.Instance;
+        if (!method.IsSuccess)
+            return default;
+        var value = method.GetValueOrThrow();
+        if (value.ReturnType == typeof(void))
+            return new SyncHandlerWrapper(_instance, value, arguments, dispatcher, _invoker);
+        if (value.ReturnType == typeof(Task))
+            return new AsyncHandlerWrapper(_instance, value, arguments, dispatcher, _invoker);
 
-        if (method.Value.ReturnType == typeof(void))
-            return new SuccessResult<IHandlerBase>(new SyncHandlerWrapper(_instance, method.Value, arguments, dispatcher, _invoker));
-        if (method.Value.ReturnType == typeof(Task))
-            return new SuccessResult<IHandlerBase>(new AsyncHandlerWrapper(_instance, method.Value, arguments, dispatcher, _invoker));
-
-        return FailureResult<IHandlerBase>.Instance;
+        return default;
     }
 
     public IEnumerable<IVerbInfo> GetAll()
@@ -53,13 +53,9 @@ public class InstanceMethodHandlerSource : IHandlerSource
 
     // Since we're using the name of a method as the verb, and you can't nest methods, the
     // verb must only be a single string. Anything else is a non-match
-    public IResult<IVerbInfo> GetByName(Verb verb)
-    {
-        var method = _methods.Get(verb);
-        if (!method.HasValue)
-            return FailureResult<IVerbInfo>.Instance;
-        return new SuccessResult<IVerbInfo>(new MethodInfoVerbInfo(verb, method.Value));
-    }
+    public Maybe<IVerbInfo> GetByName(Verb verb)
+        => _methods.Get(verb)
+            .Map(v => (IVerbInfo)new MethodInfoVerbInfo(verb, v));
 
     private class MethodInfoVerbInfo : IVerbInfo
     {

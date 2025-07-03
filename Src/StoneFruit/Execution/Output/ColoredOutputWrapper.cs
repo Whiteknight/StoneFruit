@@ -16,7 +16,9 @@ public class ColoredOutputWrapper : IOutput
     public IOutput Color(Func<Brush, Brush> changeBrush)
     {
         var newBrush = changeBrush?.Invoke(_color);
-        return !newBrush.HasValue || newBrush == _color ? this : new ColoredOutputWrapper(newBrush.Value, _inner);
+        return !newBrush.HasValue || newBrush == _color
+            ? this
+            : new ColoredOutputWrapper(newBrush.Value, _inner);
     }
 
     public IOutput WriteLine() => WithBrush(() => _inner.WriteLine());
@@ -25,10 +27,10 @@ public class ColoredOutputWrapper : IOutput
 
     public IOutput Write(string str) => WithBrush(() => _inner.Write(str));
 
-    public string Prompt(string prompt, bool mustProvide = true, bool keepHistory = true)
+    public Maybe<string> Prompt(string prompt, bool mustProvide = true, bool keepHistory = true)
         => _inner.Prompt(prompt, mustProvide, keepHistory);
 
-    private IOutput WithBrush(Action act)
+    private ColoredOutputWrapper WithBrush(Action act)
     {
         var current = Brush.Current;
         _color.Set();

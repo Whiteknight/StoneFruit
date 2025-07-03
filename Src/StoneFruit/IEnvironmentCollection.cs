@@ -33,7 +33,7 @@ public interface IEnvironmentCollection
     /// is not set.
     /// </summary>
     /// <returns></returns>
-    IResult<string> GetCurrentName();
+    Maybe<string> GetCurrentName();
 }
 
 public static class EnvironmentCollectionExtensions

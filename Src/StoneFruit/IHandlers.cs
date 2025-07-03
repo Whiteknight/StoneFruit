@@ -16,7 +16,7 @@ public interface IHandlers
     /// <param name="arguments"></param>
     /// <param name="dispatcher"></param>
     /// <returns></returns>
-    IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher);
+    Maybe<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher);
 
     /// <summary>
     /// Return help information for all handlers. Used mostly by the  "help" handler to display
@@ -31,5 +31,5 @@ public interface IHandlers
     /// </summary>
     /// <param name="verb"></param>
     /// <returns></returns>
-    IResult<IVerbInfo> GetByName(Verb verb);
+    Maybe<IVerbInfo> GetByName(Verb verb);
 }

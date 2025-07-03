@@ -4,8 +4,9 @@ using System.Linq;
 namespace StoneFruit.Execution.Environments;
 
 /// <summary>
-/// Environment factory which can return entries from a dictionary
+/// Environment factory which can return entries from a dictionary.
 /// </summary>
+/// <typeparam name="T"></typeparam>
 public class DictionaryEnvironmentFactory<T> : IEnvironmentFactory<T>
 {
     private readonly IReadOnlyDictionary<string, T> _environments;
@@ -16,12 +17,10 @@ public class DictionaryEnvironmentFactory<T> : IEnvironmentFactory<T>
         ValidEnvironments = _environments.Keys.ToList();
     }
 
-    public IResult<T> Create(string name)
-    {
-        if (_environments.ContainsKey(name))
-            return Result.Success(_environments[name]);
-        return FailureResult<T>.Instance;
-    }
+    public Maybe<T> Create(string name)
+        => _environments.ContainsKey(name)
+            ? _environments[name]
+            : default(Maybe<T>);
 
     public IReadOnlyCollection<string> ValidEnvironments { get; }
 }
@@ -35,5 +34,5 @@ public class InstanceEnvironmentFactory<T> : IEnvironmentFactory<T>
         _instance = instance;
     }
 
-    public IResult<T> Create(string name) => Result.Success(_instance);
+    public Maybe<T> Create(string name) => _instance;
 }

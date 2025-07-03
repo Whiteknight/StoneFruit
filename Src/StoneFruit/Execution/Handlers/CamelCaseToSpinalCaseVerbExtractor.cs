@@ -9,7 +9,7 @@ namespace StoneFruit.Execution.Handlers;
 
 /// <summary>
 /// Verb extractor to try and parse the class/method name as CamelCase and then convert it into
-/// "spinal-case" (also known as "kebab-case")
+/// "spinal-case" (also known as "kebab-case").
 /// </summary>
 public class CamelCaseToSpinalCaseVerbExtractor : IVerbExtractor
 {

@@ -31,7 +31,7 @@ public interface IOutput
     IOutput WriteLine(string line);
 
     /// <summary>
-    /// Write the given text to the output
+    /// Write the given text to the output.
     /// </summary>
     /// <param name="str"></param>
     /// <returns></returns>
@@ -45,7 +45,7 @@ public interface IOutput
     /// <param name="mustProvide"></param>
     /// <param name="keepHistory"></param>
     /// <returns></returns>
-    string Prompt(string prompt, bool mustProvide = true, bool keepHistory = true);
+    Maybe<string> Prompt(string prompt, bool mustProvide = true, bool keepHistory = true);
 }
 
 public static class OutputExtensions

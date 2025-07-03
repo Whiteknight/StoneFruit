@@ -6,7 +6,7 @@ using StoneFruit.Utility;
 namespace StoneFruit;
 
 /// <summary>
-/// Setup argument parsing
+/// Setup argument parsing.
 /// </summary>
 public interface IParserSetup
 {

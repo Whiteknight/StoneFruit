@@ -7,7 +7,7 @@ using StoneFruit.Utility;
 namespace StoneFruit.Execution.Scripts;
 
 /// <summary>
-/// Handler source which maintains a list of scripts and wraps each script in a handler
+/// Handler source which maintains a list of scripts and wraps each script in a handler.
 /// </summary>
 public class ScriptHandlerSource : IHandlerSource
 {
@@ -18,12 +18,13 @@ public class ScriptHandlerSource : IHandlerSource
         _scripts = new VerbTrie<Script>();
     }
 
-    public IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
-        => _scripts.Get(arguments).Transform(script => (IHandlerBase)new ScriptHandler(dispatcher.Parser, script, arguments, dispatcher.State));
+    public Maybe<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
+        => _scripts.Get(arguments)
+            .Map(script => (IHandlerBase)new ScriptHandler(dispatcher.Parser, script, arguments, dispatcher.State));
 
     public IEnumerable<IVerbInfo> GetAll() => _scripts.GetAll().Select(kvp => kvp.Value);
 
-    public IResult<IVerbInfo> GetByName(Verb verb) => _scripts.Get(verb).Transform(i => (IVerbInfo)i);
+    public Maybe<IVerbInfo> GetByName(Verb verb) => _scripts.Get(verb).Map(i => (IVerbInfo)i);
 
     public void AddScript(Verb verb, IEnumerable<string> lines, string? description = null, string? usage = null, string? group = null)
     {

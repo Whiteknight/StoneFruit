@@ -7,8 +7,8 @@
 public interface ICommandSource
 {
     /// <summary>
-    /// Get the next command from the source. If there are no more commands, returns null
+    /// Get the next command from the source. If there are no more commands, returns null.
     /// </summary>
     /// <returns></returns>
-    IResult<ArgumentsOrString> GetNextCommand();
+    Maybe<ArgumentsOrString> GetNextCommand();
 }

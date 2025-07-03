@@ -37,7 +37,7 @@ public sealed class EngineBuilder : IEngineBuilder
     }
 
     /// <summary>
-    /// Setup verbs and their handlers
+    /// Setup verbs and their handlers.
     /// </summary>
     /// <param name="setup"></param>
     /// <returns></returns>
@@ -48,7 +48,7 @@ public sealed class EngineBuilder : IEngineBuilder
     }
 
     /// <summary>
-    /// Setup environments, if any
+    /// Setup environments, if any.
     /// </summary>
     /// <param name="setup"></param>
     /// <returns></returns>
@@ -59,7 +59,7 @@ public sealed class EngineBuilder : IEngineBuilder
     }
 
     /// <summary>
-    /// Setup argument parsing and handling
+    /// Setup argument parsing and handling.
     /// </summary>
     /// <param name="setup"></param>
     /// <returns></returns>
@@ -70,7 +70,7 @@ public sealed class EngineBuilder : IEngineBuilder
     }
 
     /// <summary>
-    /// Setup output
+    /// Setup output.
     /// </summary>
     /// <param name="setup"></param>
     /// <returns></returns>
@@ -81,7 +81,7 @@ public sealed class EngineBuilder : IEngineBuilder
     }
 
     /// <summary>
-    /// Setup the scripts which are executed in response to various events
+    /// Setup the scripts which are executed in response to various events.
     /// </summary>
     /// <param name="setup"></param>
     /// <returns></returns>
@@ -92,7 +92,7 @@ public sealed class EngineBuilder : IEngineBuilder
     }
 
     /// <summary>
-    /// Setup the settings for the engine
+    /// Setup the settings for the engine.
     /// </summary>
     /// <param name="setup"></param>
     /// <returns></returns>

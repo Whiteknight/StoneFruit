@@ -12,7 +12,7 @@ using static StoneFruit.Utility.Assert;
 namespace StoneFruit.Execution.Handlers;
 
 /// <summary>
-/// Setup handlers and handler sources
+/// Setup handlers and handler sources.
 /// </summary>
 public class HandlerSetup : IHandlerSetup
 {

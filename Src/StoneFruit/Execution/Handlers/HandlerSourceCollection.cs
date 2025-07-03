@@ -17,12 +17,12 @@ public class HandlerSourceCollection : IHandlers
         _sources = sources.Where(s => s != null).ToList();
     }
 
-    public IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
+    public Maybe<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
     {
         Assert.NotNull(arguments, nameof(arguments));
         return _sources
             .Select(source => source.GetInstance(arguments, dispatcher))
-            .FirstOrDefault(result => result.HasValue) ?? FailureResult<IHandlerBase>.Instance;
+            .FirstOrDefault(result => result.IsSuccess);
     }
 
     public IEnumerable<IVerbInfo> GetAll()
@@ -32,8 +32,8 @@ public class HandlerSourceCollection : IHandlers
             .ToDictionary(v => v.Verb)
             .Values;
 
-    public IResult<IVerbInfo> GetByName(Verb verb)
+    public Maybe<IVerbInfo> GetByName(Verb verb)
         => _sources
             .Select(source => source.GetByName(verb))
-            .FirstOrDefault(result => result.HasValue) ?? FailureResult<IVerbInfo>.Instance;
+            .FirstOrDefault(result => result.IsSuccess);
 }

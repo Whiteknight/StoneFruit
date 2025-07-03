@@ -8,7 +8,7 @@ using StoneFruit.Trie;
 namespace StoneFruit.Execution.Handlers;
 
 /// <summary>
-/// Handler source for function delegates
+/// Handler source for function delegates.
 /// </summary>
 public class DelegateHandlerSource : IHandlerSource
 {
@@ -21,18 +21,12 @@ public class DelegateHandlerSource : IHandlerSource
 
     public int Count => _handlers.Count;
 
-    public IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
-    {
-        var factory = _handlers.Get(arguments);
-        if (!factory.HasValue)
-            return FailureResult<IHandlerBase>.Instance;
-        var handler = factory.Value.Create(arguments, dispatcher);
-        return new SuccessResult<IHandlerBase>(handler);
-    }
+    public Maybe<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
+        => _handlers.Get(arguments).Map(f => f.Create(arguments, dispatcher));
 
     public IEnumerable<IVerbInfo> GetAll() => _handlers.GetAll().Select(kvp => kvp.Value);
 
-    public IResult<IVerbInfo> GetByName(Verb verb) => _handlers.Get(verb).Transform(i => (IVerbInfo)i);
+    public Maybe<IVerbInfo> GetByName(Verb verb) => _handlers.Get(verb).Map(i => (IVerbInfo)i);
 
     public DelegateHandlerSource Add(Verb verb, Action<IArguments, CommandDispatcher> act, string description = "", string usage = "", string group = "")
     {

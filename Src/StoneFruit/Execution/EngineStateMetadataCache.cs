@@ -5,7 +5,7 @@ namespace StoneFruit.Execution;
 
 /// <summary>
 /// Metadata storage for the EngineState. Can be used to hold temporary data items between
-/// command execution
+/// command execution.
 /// </summary>
 public class EngineStateMetadataCache : IEnumerable<KeyValuePair<string, object>>
 {
@@ -18,11 +18,8 @@ public class EngineStateMetadataCache : IEnumerable<KeyValuePair<string, object>
 
     public void Add(string name, object value, bool allowOverwrite = true)
     {
-        if (!_metadata.ContainsKey(name))
-        {
-            _metadata.Add(name, value);
+        if (_metadata.TryAdd(name, value))
             return;
-        }
 
         if (!allowOverwrite)
             return;
@@ -31,8 +28,8 @@ public class EngineStateMetadataCache : IEnumerable<KeyValuePair<string, object>
         _metadata.Add(name, value);
     }
 
-    public IResult<object> Get(string name)
-        => _metadata.ContainsKey(name) ? new SuccessResult<object>(_metadata[name]) : FailureResult<object>.Instance;
+    public Maybe<object> Get(string name)
+        => _metadata.TryGetValue(name, out object? value) ? new Maybe<object>(value) : default;
 
     public IEnumerator<KeyValuePair<string, object>> GetEnumerator() => _metadata.GetEnumerator();
 
@@ -40,7 +37,6 @@ public class EngineStateMetadataCache : IEnumerable<KeyValuePair<string, object>
 
     public void Remove(string name)
     {
-        if (_metadata.ContainsKey(name))
-            _metadata.Remove(name);
+        _metadata.Remove(name);
     }
 }

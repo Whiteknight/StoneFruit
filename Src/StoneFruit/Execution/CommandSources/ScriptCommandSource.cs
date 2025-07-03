@@ -23,11 +23,8 @@ public class ScriptCommandSource : ICommandSource
         _index = 0;
     }
 
-    public IResult<ArgumentsOrString> GetNextCommand()
-    {
-        if (_index >= _script.Length)
-            return FailureResult<ArgumentsOrString>.Instance;
-        ArgumentsOrString value = _script[_index++];
-        return Result.Success(value);
-    }
+    public Maybe<ArgumentsOrString> GetNextCommand()
+        => _index >= _script.Length
+            ? default(Maybe<ArgumentsOrString>)
+            : _script[_index++];
 }

@@ -2,61 +2,60 @@
 using NUnit.Framework;
 using TestUtilities;
 
-namespace StoneFruit.Tests.Integration
+namespace StoneFruit.Tests.Integration;
+
+public class HeadlessTests
 {
-    public class HeadlessTests
+    [Test]
+    public void StartAndStopEvents_Test()
     {
-        [Test]
-        public void StartAndStopEvents_Test()
-        {
-            var output = new TestOutput();
-            var engine = EngineBuilder.Build(b => b
-                .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .SetupEvents(c =>
-                {
-                    c.EngineStartHeadless.Add("echo start");
-                    c.EngineStopHeadless.Add("echo stop");
-                })
-            );
-            engine.RunHeadless("echo 'test'");
-            output.Lines.Count.Should().Be(3);
-            output.Lines[0].Should().Be("start");
-            output.Lines[1].Should().Be("test");
-            output.Lines[2].Should().Be("stop");
-        }
-
-        [Verb("test-help")]
-        public class TestHelpHandler : IHandler
-        {
-            private readonly IOutput _output;
-
-            public TestHelpHandler(IOutput output)
+        var output = new TestOutput();
+        var engine = EngineBuilder.Build(b => b
+            .SetupOutput(o => o.DoNotUseConsole().Add(output))
+            .SetupEvents(c =>
             {
-                _output = output;
-            }
+                c.EngineStartHeadless.Add("echo start");
+                c.EngineStopHeadless.Add("echo stop");
+            })
+        );
+        engine.RunHeadless("echo 'test'");
+        output.Lines.Count.Should().Be(3);
+        output.Lines[0].Should().Be("start");
+        output.Lines[1].Should().Be("test");
+        output.Lines[2].Should().Be("stop");
+    }
 
-            public void Execute()
-            {
-                _output.WriteLine("helped");
-            }
-        }
+    [Verb("test-help")]
+    public class TestHelpHandler : IHandler
+    {
+        private readonly IOutput _output;
 
-        [Test]
-        public void HeadlessHelp_Test()
+        public TestHelpHandler(IOutput output)
         {
-            var output = new TestOutput();
-            var engine = EngineBuilder.Build(b => b
-                .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHelpHandler)))
-                .SetupOutput(o => o.DoNotUseConsole().Add(output))
-                .SetupEvents(c =>
-                {
-                    c.HeadlessHelp.Clear();
-                    c.HeadlessHelp.Add("test-help");
-                })
-            );
-            engine.RunHeadless("help");
-            output.Lines.Count.Should().Be(1);
-            output.Lines[0].Should().Be("helped");
+            _output = output;
         }
+
+        public void Execute()
+        {
+            _output.WriteLine("helped");
+        }
+    }
+
+    [Test]
+    public void HeadlessHelp_Test()
+    {
+        var output = new TestOutput();
+        var engine = EngineBuilder.Build(b => b
+            .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHelpHandler)))
+            .SetupOutput(o => o.DoNotUseConsole().Add(output))
+            .SetupEvents(c =>
+            {
+                c.HeadlessHelp.Clear();
+                c.HeadlessHelp.Add("test-help");
+            })
+        );
+        engine.RunHeadless("help");
+        output.Lines.Count.Should().Be(1);
+        output.Lines[0].Should().Be("helped");
     }
 }

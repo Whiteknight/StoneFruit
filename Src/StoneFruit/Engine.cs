@@ -9,7 +9,7 @@ using static StoneFruit.Utility.Assert;
 namespace StoneFruit;
 
 /// <summary>
-/// The execution core. Provides a run loop to receive user commands and execute them
+/// The execution core. Provides a run loop to receive user commands and execute them.
 /// </summary>
 public class Engine
 {
@@ -37,16 +37,18 @@ public class Engine
     public EngineState State { get; }
 
     /// <summary>
-    /// The set of configured environments
+    /// Gets the set of configured environments.
     /// </summary>
     public IEnvironmentCollection Environments { get; }
 
     /// <summary>
-    /// The configured output channel
+    /// Gets the configured output channel.
     /// </summary>
     public IOutput Output { get; }
 
     public CommandDispatcher Dispatcher { get; }
+
+    private static readonly char[] _singleSpace = new[] { ' ' };
 
     /// <summary>
     /// Selects the appropriate run mode and executes it based on the raw command line
@@ -92,16 +94,13 @@ public class Engine
     }
 
     public int Run(string commandLine)
-    {
-        return Task.Run(async () =>
-        {
-            return await RunAsync(commandLine);
-        }).GetAwaiter().GetResult();
-    }
+        => Task.Run(async () => await RunAsync(commandLine))
+            .GetAwaiter()
+            .GetResult();
 
     /// <summary>
     /// Run the application in headless mode with the raw commandline arguments then
-    /// exits the application
+    /// exits the application.
     /// </summary>
     /// <returns></returns>
     public Task<int> RunHeadlessWithCommandLineArgsAsync()
@@ -161,28 +160,19 @@ public class Engine
     }
 
     public int RunHeadless(string commandLine)
-    {
-        return Task.Run(async () =>
-        {
-            return await RunHeadlessAsync(commandLine);
-        }).GetAwaiter().GetResult();
-    }
+        => Task.Run(async () => await RunHeadlessAsync(commandLine))
+            .GetAwaiter()
+            .GetResult();
 
     public int RunInteractively()
-    {
-        return Task.Run(async () =>
-        {
-            return await RunInteractivelyAsync(null);
-        }).GetAwaiter().GetResult();
-    }
+        => Task.Run(async () => await RunInteractivelyAsync(null))
+            .GetAwaiter()
+            .GetResult();
 
     public int RunInteractively(string? environment)
-    {
-        return Task.Run(async () =>
-        {
-            return await RunInteractivelyAsync(environment);
-        }).GetAwaiter().GetResult();
-    }
+        => Task.Run(async () => await RunInteractivelyAsync(environment))
+            .GetAwaiter()
+            .GetResult();
 
     /// <summary>
     /// Runs interactively, prompting the user for input and executing each command in
@@ -224,7 +214,7 @@ public class Engine
         if (validEnvironments.Count <= 1)
             return (null, commandLine);
 
-        var parts = commandLine.Split(new[] { ' ' }, 2);
+        var parts = commandLine.Split(_singleSpace, 2);
         var env = parts[0];
         return Environments.IsValid(env) ? (env, parts[1]) : (null, commandLine);
     }
@@ -252,13 +242,13 @@ public class Engine
         {
             // Get a command. If we have one in the state use that. Otherwise try to
             // get one from the sources. If null, we're all done so exit
-            IResult<ArgumentsOrString> commandResult = State.Commands.GetNext();
-            if (!commandResult.HasValue)
+            Maybe<ArgumentsOrString> commandResult = State.Commands.GetNext();
+            if (!commandResult.IsSuccess)
                 commandResult = sources.GetNextCommand();
-            if (!commandResult.HasValue)
+            if (!commandResult.IsSuccess)
                 return Constants.ExitCode.Ok;
 
-            var command = commandResult.Value;
+            var command = commandResult.GetValueOrThrow();
             if (command?.IsValid != true)
                 return Constants.ExitCode.Ok;
 
@@ -315,8 +305,8 @@ public class Engine
         // we bail out with a very stern message.
 
         // Check if we already have a current error
-        var currentExceptionResult = State.Metadata.Get(Constants.Metadata.Error);
-        if (currentExceptionResult.HasValue && currentExceptionResult.Value is Exception previousException)
+        var previousExceptionResult = State.Metadata.Get(Constants.Metadata.Error);
+        if (previousExceptionResult.IsSuccess && previousExceptionResult.GetValueOrThrow() is Exception previousException)
         {
             // This isn't scripted because it's critical error-handling code and we cannot
             // allow an exception to be thrown at this point.

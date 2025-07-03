@@ -16,19 +16,19 @@ public interface IHandlerSource
     /// <param name="command"></param>
     /// <param name="dispatcher"></param>
     /// <returns></returns>
-    IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher);
+    Maybe<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher);
 
     /// <summary>
-    /// Get metadata information about all verbs registered with this source
+    /// Get metadata information about all verbs registered with this source.
     /// </summary>
     /// <returns></returns>
     IEnumerable<IVerbInfo> GetAll();
 
     /// <summary>
     /// Get metadata information about a single verb. If the verb is not registered
-    /// with this source, null is returned
+    /// with this source, null is returned.
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    IResult<IVerbInfo> GetByName(Verb verb);
+    Maybe<IVerbInfo> GetByName(Verb verb);
 }

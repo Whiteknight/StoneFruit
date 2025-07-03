@@ -7,7 +7,7 @@ namespace StoneFruit.Utility;
 public static class Assert
 {
     /// <summary>
-    /// Throws an exception if the argument value is null
+    /// Throws an exception if the argument value is null.
     /// </summary>
     /// <param name="arg"></param>
     /// <param name="name"></param>

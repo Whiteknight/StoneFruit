@@ -32,21 +32,20 @@ public class TypeListConstructSource : IHandlerSource
         }
     }
 
-    public IResult<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
-    {
-        var verbInfo = _types.Get(arguments);
-        if (!verbInfo.HasValue)
-            return FailureResult<IHandlerBase>.Instance;
-        var instance = ResolveInstance(arguments, dispatcher, verbInfo.Value.Type);
-        return instance == null ? FailureResult<IHandlerBase>.Instance : new SuccessResult<IHandlerBase>(instance);
-    }
+    public Maybe<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
+        => _types.Get(arguments)
+            .Bind(vi => ResolveInstance(arguments, dispatcher, vi.Type)!);
 
-    private IHandlerBase? ResolveInstance(IArguments command, CommandDispatcher dispatcher, Type commandType)
-        => _resolver(commandType, command, dispatcher) as IHandlerBase;
+    private Maybe<IHandlerBase> ResolveInstance(IArguments command, CommandDispatcher dispatcher, Type commandType)
+        => _resolver(commandType, command, dispatcher) switch
+        {
+            IHandlerBase handler => new Maybe<IHandlerBase>(handler),
+            _ => default
+        };
 
     public IEnumerable<IVerbInfo> GetAll() => _types.GetAll().Select(kvp => kvp.Value);
 
-    public IResult<IVerbInfo> GetByName(Verb verb) => _types.Get(verb).Transform(i => (IVerbInfo)i);
+    public Maybe<IVerbInfo> GetByName(Verb verb) => _types.Get(verb).Map(i => (IVerbInfo)i);
 
     private class VerbInfo : IVerbInfo
     {

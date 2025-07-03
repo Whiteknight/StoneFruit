@@ -1,7 +1,7 @@
 ﻿namespace StoneFruit;
 
 /// <summary>
-/// Setup the output streams
+/// Setup the output streams.
 /// </summary>
 public interface IOutputSetup
 {
