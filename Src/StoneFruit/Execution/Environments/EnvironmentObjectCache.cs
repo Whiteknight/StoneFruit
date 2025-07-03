@@ -15,13 +15,9 @@ public sealed class EnvironmentObjectCache
 
     public Maybe<T> Get<T>(string environment)
         where T : class
-    {
-        if (!_cache.TryGetValue(environment, out Dictionary<Type, object>? env))
-            return default;
-        if (env.TryGetValue(typeof(T), out var value) && value is T typed)
-            return typed;
-        return default;
-    }
+        => _cache.MaybeGetValue(environment)
+            .Bind(env => env.MaybeGetValue(typeof(T)))
+            .Bind(value => value is T typed ? new Maybe<T>(typed) : default);
 
     public void Set<T>(string environment, T value)
         where T : class
@@ -34,7 +30,7 @@ public sealed class EnvironmentObjectCache
 
     public void Clear(string environment)
     {
-        if (_cache.TryGetValue(environment, out Dictionary<Type, object>? value))
+        if (_cache.TryGetValue(environment, out var value))
             value.Clear();
     }
 }

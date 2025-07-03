@@ -22,7 +22,7 @@ public class InstanceEnvironmentCollection : IEnvironmentCollection
         _currentName = string.Empty;
     }
 
-    public IReadOnlyList<string> GetNames() => new[] { Constants.EnvironmentNameDefault };
+    public IReadOnlyList<string> GetNames() => EnvironmentsList.DefaultNamesList;
 
     public void SetCurrent(string name)
     {

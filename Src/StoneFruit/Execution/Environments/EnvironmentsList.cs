@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace StoneFruit.Execution.Environments;
 
@@ -9,8 +10,16 @@ public sealed class EnvironmentsList
 {
     public EnvironmentsList(IReadOnlyList<string> validNames)
     {
-        ValidNames = validNames;
+        ValidNames = validNames == null || validNames.Count == 0
+            ? DefaultNamesList
+            : validNames;
     }
 
+    public static IReadOnlyList<string> DefaultNamesList => new[] { Constants.EnvironmentNameDefault };
+
     public IReadOnlyList<string> ValidNames { get; }
+
+    // For larger lists we should use a HashSet instead, but I think most usages will be
+    // relatively small.
+    public bool Contains(string name) => ValidNames.Contains(name);
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace StoneFruit.Execution.Environments;
 
@@ -10,33 +9,28 @@ namespace StoneFruit.Execution.Environments;
 /// </summary>
 public class FactoryEnvironmentCollection : IEnvironmentCollection
 {
-    private readonly IReadOnlyList<string> _nameList;
-    private readonly HashSet<string> _validNames;
+    private readonly EnvironmentsList _nameList;
 
     private Maybe<string> _currentName;
 
     public FactoryEnvironmentCollection(EnvironmentsList environmentList)
     {
-        var environments = environmentList.ValidNames;
-        if (environments == null || environments.Count == 0)
-            environments = new[] { Constants.EnvironmentNameDefault };
-        _nameList = environments.ToList();
-        _validNames = new HashSet<string>(environments);
+        _nameList = environmentList;
         _currentName = default;
     }
 
     public Maybe<string> GetCurrentName() => _currentName;
 
-    public IReadOnlyList<string> GetNames() => _nameList;
+    public IReadOnlyList<string> GetNames() => _nameList.ValidNames;
 
     public bool IsValid(string name)
-        => name != null && _validNames.Contains(name);
+        => name != null && _nameList.Contains(name);
 
     public void SetCurrent(string name)
     {
         if (name == null)
             return;
-        if (!_validNames.Contains(name))
+        if (!_nameList.Contains(name))
             throw new InvalidOperationException($"Environment {name} does not exist");
         _currentName = name;
     }

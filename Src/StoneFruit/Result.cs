@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit;
 
@@ -58,6 +60,16 @@ public static class Maybe
 {
     public static Maybe<TOut> Bind<T, TOut>(this Maybe<T> maybe, Func<T, Maybe<TOut>> onSuccess)
         => maybe.Match(v => onSuccess(v), () => default);
+
+    public static Maybe<T> Where<T>(this Maybe<T> maybe, Func<T, bool> predicate)
+        => maybe.Bind(v => predicate(v) ? new Maybe<T>(v) : default);
+}
+
+public static class MaybeExtensions
+{
+    public static Maybe<TValue> MaybeGetValue<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dict, TKey key)
+        where TKey : notnull
+        => NotNull(dict).TryGetValue(key, out var value) && value is not null ? value : default(Maybe<TValue>);
 }
 
 public readonly struct Result<T, TError>

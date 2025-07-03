@@ -23,8 +23,8 @@ public class ParsedArguments : IArguments, IVerbSource
     {
         Raw = rawArgs ?? string.Empty;
         _accessedPositionals = new List<IPositionalArgument>();
-        _accessedNameds = new Dictionary<string, List<INamedArgument>>();
-        _accessedFlags = new Dictionary<string, IFlagArgument>();
+        _accessedNameds = new Dictionary<string, List<INamedArgument>>(StringComparer.OrdinalIgnoreCase);
+        _accessedFlags = new Dictionary<string, IFlagArgument>(StringComparer.OrdinalIgnoreCase);
         _rawArguments = arguments
             .SelectMany(a => a switch
             {
@@ -131,7 +131,7 @@ public class ParsedArguments : IArguments, IVerbSource
 
         // Loop through all unaccessed args looking for the first one with the given
         // name.
-        return AccessNamedUntil(n => n == name, () => true)
+        return AccessNamedUntil(n => n.Equals(name, StringComparison.OrdinalIgnoreCase), () => true)
             .GetValueOrDefault(MissingArgument.NoneNamed(name));
     }
 
@@ -254,7 +254,7 @@ public class ParsedArguments : IArguments, IVerbSource
             return _accessedFlags[name].Consumed ? MissingArgument.FlagConsumed(name) : _accessedFlags[name];
 
         // Loop through unaccessed args looking for a matching flag.
-        return AccessFlagsUntil(name, n => n == name, () => true);
+        return AccessFlagsUntil(name, n => n.Equals(name, StringComparison.OrdinalIgnoreCase), () => true);
     }
 
     public bool HasFlag(string name, bool markConsumed = false)

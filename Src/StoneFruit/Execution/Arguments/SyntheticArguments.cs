@@ -25,11 +25,11 @@ public class SyntheticArguments : IArguments, IVerbSource
 
         _nameds = arguments.OfType<INamedArgument>()
             .GroupBy(a => a.Name)
-            .ToDictionary(g => g.Key.ToLowerInvariant(), g => g.ToList());
+            .ToDictionary(g => g.Key, g => g.ToList(), StringComparer.OrdinalIgnoreCase);
 
         _flags = arguments
             .OfType<IFlagArgument>()
-            .ToDictionary(a => a.Name.ToLowerInvariant());
+            .ToDictionary(a => a.Name, a => a, StringComparer.OrdinalIgnoreCase);
 
         _accessedShiftIndex = 0;
         _verbCount = 0;
@@ -65,12 +65,9 @@ public class SyntheticArguments : IArguments, IVerbSource
     /// <param name="args"></param>
     /// <returns></returns>
     public static SyntheticArguments From(params (string, string)[] args)
-    {
-        var argsList = args
+        => args
             .Select(t => new NamedArgument(t.Item1, t.Item2))
-            .ToList();
-        return new SyntheticArguments(argsList);
-    }
+            .ToSyntheticArguments();
 
     /// <summary>
     /// Create named arguments from a dictionary of name/value pairs.
@@ -78,12 +75,9 @@ public class SyntheticArguments : IArguments, IVerbSource
     /// <param name="args"></param>
     /// <returns></returns>
     public static SyntheticArguments From(IReadOnlyDictionary<string, string> args)
-    {
-        var argsList = args
+        => args
             .Select(kvp => new NamedArgument(kvp.Key, kvp.Value))
-            .ToList();
-        return new SyntheticArguments(argsList);
-    }
+            .ToSyntheticArguments();
 
     /// <summary>
     /// Create from a list of strings to be treated as positional arguments.
@@ -91,12 +85,9 @@ public class SyntheticArguments : IArguments, IVerbSource
     /// <param name="args"></param>
     /// <returns></returns>
     public static SyntheticArguments From(params string[] args)
-    {
-        var argsList = args
+        => args
             .Select(s => new PositionalArgument(s))
-            .ToList();
-        return new SyntheticArguments(argsList);
-    }
+            .ToSyntheticArguments();
 
     public void Reset()
     {
@@ -130,25 +121,17 @@ public class SyntheticArguments : IArguments, IVerbSource
     }
 
     public INamedArgument Get(string name)
-    {
-        name = name.ToLowerInvariant();
-        if (!_nameds.ContainsKey(name))
-            return MissingArgument.NoneNamed(name);
-        return _nameds[name]
-            .FirstOrDefault(a => !a.Consumed)
-            ?? MissingArgument.NoneNamed(name);
-    }
+        => _nameds.TryGetValue(name, out var named)
+            ? named.FirstOrDefault(a => !a.Consumed) ?? MissingArgument.NoneNamed(name)
+            : MissingArgument.NoneNamed(name);
 
     public IEnumerable<IPositionalArgument> GetAllPositionals()
         => _positionals.Skip(_verbCount).Where(a => !a.Consumed);
 
     public IEnumerable<INamedArgument> GetAllNamed(string name)
-    {
-        name = name.ToLowerInvariant();
-        return _nameds.ContainsKey(name)
+        => _nameds.ContainsKey(name)
             ? _nameds[name].Where(a => !a.Consumed)
             : Enumerable.Empty<INamedArgument>();
-    }
 
     public IEnumerable<INamedArgument> GetAllNamed()
         => _nameds.Values
@@ -156,14 +139,9 @@ public class SyntheticArguments : IArguments, IVerbSource
             .Where(a => !a.Consumed);
 
     public IFlagArgument GetFlag(string name)
-    {
-        name = name.ToLowerInvariant();
-        if (!_flags.ContainsKey(name))
-            return MissingArgument.FlagMissing(name);
-        return _flags[name].Consumed
-            ? MissingArgument.FlagConsumed(name)
-            : _flags[name];
-    }
+        => _flags.TryGetValue(name, out var flag) && !flag.Consumed
+            ? flag
+            : MissingArgument.FlagConsumed(name);
 
     public bool HasFlag(string name, bool markConsumed = false)
         => _flags.ContainsKey(name.ToLowerInvariant());
@@ -176,4 +154,12 @@ public class SyntheticArguments : IArguments, IVerbSource
     {
         _verbCount = count;
     }
+}
+
+public static class SyntheticArgumentsExtensions
+{
+    public static SyntheticArguments ToSyntheticArguments<T>(this IEnumerable<T> args)
+        where T : IArgument
+        => new SyntheticArguments(args.Cast<IArgument>().ToList());
+
 }
