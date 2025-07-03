@@ -6,27 +6,27 @@
 public interface IVerbInfo
 {
     /// <summary>
-    /// The verb used to invoke the handler. All verbs are case-insensitive.
+    /// Gets the verb used to invoke the handler. All verbs are case-insensitive.
     /// </summary>
     Verb Verb { get; }
 
     /// <summary>
-    /// A short description of the verb.
+    /// Gets a short description of the verb.
     /// </summary>
     string Description { get; }
 
     /// <summary>
-    /// Detailed usage information about the verb.
+    /// Gets detailed usage information about the verb.
     /// </summary>
     string Usage { get; }
 
     /// <summary>
-    /// The grouping that the verb belongs in.
+    /// Gets the grouping that the verb belongs in.
     /// </summary>
     string Group { get; }
 
     /// <summary>
-    /// Whether or not to show the verb in the list when executing "help".
+    /// Gets a value indicating whether whether or not to show the verb in the list when executing "help".
     /// </summary>
     bool ShouldShowInHelp { get; }
 }

@@ -12,7 +12,7 @@ namespace StoneFruit;
 public interface IArguments
 {
     /// <summary>
-    /// The raw, unparsed argument string if available. This string is usually only
+    /// Gets the raw, unparsed argument string if available. This string is usually only
     /// populated from the parser and is not usually available otherwise.
     /// </summary>
     string Raw { get; }
