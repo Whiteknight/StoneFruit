@@ -13,8 +13,8 @@ public class ParsedCommandArgumentsTests
     {
         var target = new ParsedArguments(new[]
         {
-            new ParsedNamedArgument("a", "1"),
-            new ParsedNamedArgument("a", "2")
+            new ParsedNamed("a", "1"),
+            new ParsedNamed("a", "2")
         });
         var result = target.Get("a");
         result.Value.Should().Be("1");
@@ -33,8 +33,8 @@ public class ParsedCommandArgumentsTests
     {
         var target = new ParsedArguments(new[]
         {
-            new ParsedPositionalArgument("a"),
-            new ParsedPositionalArgument("b")
+            new ParsedPositional("a"),
+            new ParsedPositional("b")
         });
         target.Shift().Value.Should().Be("a");
         target.Shift().Value.Should().Be("b");
@@ -46,8 +46,8 @@ public class ParsedCommandArgumentsTests
     {
         var target = new ParsedArguments(new[]
         {
-            new ParsedNamedArgument("a", "1"),
-            new ParsedNamedArgument("a", "2")
+            new ParsedNamed("a", "1"),
+            new ParsedNamed("a", "2")
         });
         var result = target.GetAllNamed("a").Cast<INamedArgument>().ToList();
         result.Count.Should().Be(2);
@@ -60,8 +60,8 @@ public class ParsedCommandArgumentsTests
     {
         var target = new ParsedArguments(new[]
         {
-            new ParsedNamedArgument("a", "1"),
-            new ParsedNamedArgument("a", "2")
+            new ParsedNamed("a", "1"),
+            new ParsedNamed("a", "2")
         });
         var result = target.GetAllNamed("XXX").ToList();
         result.Count.Should().Be(0);
@@ -85,13 +85,13 @@ public class ParsedCommandArgumentsTests
     [Test]
     public void MapTo_Test()
     {
-        var target = new ParsedArguments(new IParsedArgument[]
+        var target = new ParsedArguments(new ParsedArgument[]
         {
-            new ParsedPositionalArgument("test1"),
-            new ParsedNamedArgument("b", "512"),
-            new ParsedFlagArgument("c"),
-            new ParsedNamedArgument("e", "1024"),
-            new ParsedNamedArgument("f", "true")
+            new ParsedPositional("test1"),
+            new ParsedNamed("b", "512"),
+            new ParsedFlag("c"),
+            new ParsedNamed("e", "1024"),
+            new ParsedNamed("f", "true")
         });
         var result = target.MapTo<TestArgs1>();
         result.A.Should().Be("test1");
@@ -105,11 +105,11 @@ public class ParsedCommandArgumentsTests
     [Test]
     public void VerifyAllAreConsumed_NotConsumed()
     {
-        var target = new ParsedArguments(new IParsedArgument[]
+        var target = new ParsedArguments(new ParsedArgument[]
         {
-            new ParsedPositionalArgument("test1"),
-            new ParsedNamedArgument("b", "test2"),
-            new ParsedFlagArgument("c")
+            new ParsedPositional("test1"),
+            new ParsedNamed("b", "test2"),
+            new ParsedFlag("c")
         });
         Action act = () => target.VerifyAllAreConsumed();
         act.Should().Throw<StoneFruit.Execution.Arguments.ArgumentParseException>();
@@ -118,11 +118,11 @@ public class ParsedCommandArgumentsTests
     [Test]
     public void VerifyAllAreConsumed_NotConsumed_Accessed()
     {
-        var target = new ParsedArguments(new IParsedArgument[]
+        var target = new ParsedArguments(new ParsedArgument[]
         {
-            new ParsedPositionalArgument("test1"),
-            new ParsedNamedArgument("b", "test2"),
-            new ParsedFlagArgument("c")
+            new ParsedPositional("test1"),
+            new ParsedNamed("b", "test2"),
+            new ParsedFlag("c")
         });
         target.Get(0);
         target.Get("b");
@@ -134,11 +134,11 @@ public class ParsedCommandArgumentsTests
     [Test]
     public void VerifyAllAreConsumed_Consumed()
     {
-        var target = new ParsedArguments(new IParsedArgument[]
+        var target = new ParsedArguments(new ParsedArgument[]
         {
-            new ParsedPositionalArgument("test1"),
-            new ParsedNamedArgument("b", "test2"),
-            new ParsedFlagArgument("c")
+            new ParsedPositional("test1"),
+            new ParsedNamed("b", "test2"),
+            new ParsedFlag("c")
         });
         target.Consume(0);
         target.Consume("b");

@@ -12,12 +12,12 @@ namespace StoneFruit.Execution.Arguments;
 /// </summary>
 public static class SimplifiedArgumentGrammar
 {
-    private static readonly Lazy<IParser<char, IParsedArgument>> _instance
-        = new Lazy<IParser<char, IParsedArgument>>(GetParserInternal);
+    private static readonly Lazy<IParser<char, ParsedArgument>> _instance
+        = new Lazy<IParser<char, ParsedArgument>>(GetParserInternal);
 
-    public static IParser<char, IParsedArgument> GetParser() => _instance.Value;
+    public static IParser<char, ParsedArgument> GetParser() => _instance.Value;
 
-    private static IParser<char, IParsedArgument> GetParserInternal()
+    private static IParser<char, ParsedArgument> GetParserInternal()
     {
         var doubleQuotedString = StrippedDoubleQuotedString();
 
@@ -41,7 +41,7 @@ public static class SimplifiedArgumentGrammar
             Match('-'),
             names,
 
-            (_, name) => new ParsedFlagArgument(name)
+            (_, name) => new ParsedFlag(name)
         ).Named("Flag");
 
         // <name> '=' <value>
@@ -50,14 +50,14 @@ public static class SimplifiedArgumentGrammar
             Match('='),
             values,
 
-            (name, _, value) => new ParsedNamedArgument(name, value)
+            (name, _, value) => new ParsedNamed(name, value)
         ).Named("Named");
 
         // <flag> | <named> | <positional>
-        var args = First<IParsedArgument>(
+        var args = First<ParsedArgument>(
             flagArg,
             namedArg,
-            values.Transform(v => new ParsedPositionalArgument(v))
+            values.Transform(v => new ParsedPositional(v))
         ).Named("Argument");
 
         return Rule(

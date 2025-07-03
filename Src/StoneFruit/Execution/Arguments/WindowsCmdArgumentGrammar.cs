@@ -12,12 +12,12 @@ namespace StoneFruit.Execution.Arguments;
 /// </summary>
 public static class WindowsCmdArgumentGrammar
 {
-    private static readonly Lazy<IParser<char, IParsedArgument>> _instance
-        = new Lazy<IParser<char, IParsedArgument>>(GetParserInternal);
+    private static readonly Lazy<IParser<char, ParsedArgument>> _instance
+        = new Lazy<IParser<char, ParsedArgument>>(GetParserInternal);
 
-    public static IParser<char, IParsedArgument> GetParser() => _instance.Value;
+    public static IParser<char, ParsedArgument> GetParser() => _instance.Value;
 
-    private static IParser<char, IParsedArgument> GetParserInternal()
+    private static IParser<char, ParsedArgument> GetParserInternal()
     {
         var doubleQuotedString = StrippedDoubleQuotedString();
 
@@ -44,7 +44,7 @@ public static class WindowsCmdArgumentGrammar
             Match(':'),
             value,
 
-            (_, n, _, v) => new ParsedNamedArgument(n, v)
+            (_, n, _, v) => new ParsedNamed(n, v)
         ).Named("Named");
 
         // '-' <name> <whitespace> <value>
@@ -54,7 +54,7 @@ public static class WindowsCmdArgumentGrammar
             whitespace,
             value,
 
-            (_, name, _, value) => new ParsedFlagPositionalOrNamedArgument(name, value)
+            (_, name, _, value) => new ParsedFlagAndPositionalOrNamed(name, value)
         ).Named("NamedMaybeValue");
 
         // '/' <name>
@@ -62,15 +62,15 @@ public static class WindowsCmdArgumentGrammar
             Match('/'),
             name,
 
-            (_, n) => new ParsedFlagArgument(n)
+            (_, n) => new ParsedFlag(n)
         ).Named("Flag");
 
         // <named> | <flag> | <positional>
-        var args = First<IParsedArgument>(
+        var args = First<ParsedArgument>(
             namedArg,
             maybeNamedArg,
             flagArg,
-            value.Transform(v => new ParsedPositionalArgument(v))
+            value.Transform(v => new ParsedPositional(v))
         ).Named("Argument");
 
         return Rule(

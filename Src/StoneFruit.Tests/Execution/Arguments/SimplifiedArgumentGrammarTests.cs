@@ -7,7 +7,7 @@ namespace StoneFruit.Tests.Execution.Arguments;
 
 public class SimplifiedArgumentGrammarTests
 {
-    private static IParser<char, IParsedArgument> GetParser()
+    private static IParser<char, ParsedArgument> GetParser()
         => SimplifiedArgumentGrammar.GetParser();
 
     [Test]
@@ -22,7 +22,7 @@ public class SimplifiedArgumentGrammarTests
     public void Positionals_Tests()
     {
         var parser = GetParser();
-        var result = parser.Parse("testa").Value as ParsedPositionalArgument;
+        var result = parser.Parse("testa").Value as ParsedPositional;
         result.Value.Should().Be("testa");
     }
 
@@ -30,7 +30,7 @@ public class SimplifiedArgumentGrammarTests
     public void Positionals_SingleQuotedString()
     {
         var parser = GetParser();
-        var result = parser.Parse("'test a'").Value as ParsedPositionalArgument;
+        var result = parser.Parse("'test a'").Value as ParsedPositional;
         result.Value.Should().Be("test a");
     }
 
@@ -38,7 +38,7 @@ public class SimplifiedArgumentGrammarTests
     public void Positionals_DoubleQuotedString()
     {
         var parser = GetParser();
-        var result = parser.Parse("\"test a\"").Value as ParsedPositionalArgument;
+        var result = parser.Parse("\"test a\"").Value as ParsedPositional;
         result.Value.Should().Be("test a");
     }
 
@@ -46,7 +46,7 @@ public class SimplifiedArgumentGrammarTests
     public void Positionals_LeadingWhitespace()
     {
         var parser = GetParser();
-        var result = parser.Parse("   testa").Value as ParsedPositionalArgument;
+        var result = parser.Parse("   testa").Value as ParsedPositional;
         result.Value.Should().Be("testa");
     }
 
@@ -54,7 +54,7 @@ public class SimplifiedArgumentGrammarTests
     public void Named_Tests()
     {
         var parser = GetParser();
-        var result = parser.Parse("name1=value1").Value as ParsedNamedArgument;
+        var result = parser.Parse("name1=value1").Value as ParsedNamed;
         result.Name.Should().Be("name1");
         result.Value.Should().Be("value1");
     }
@@ -63,7 +63,7 @@ public class SimplifiedArgumentGrammarTests
     public void Named_LeadingWhitespace()
     {
         var parser = GetParser();
-        var result = parser.Parse("    name1=value1").Value as ParsedNamedArgument;
+        var result = parser.Parse("    name1=value1").Value as ParsedNamed;
         result.Name.Should().Be("name1");
         result.Value.Should().Be("value1");
     }
@@ -72,7 +72,7 @@ public class SimplifiedArgumentGrammarTests
     public void Named_SingleQuotedValue()
     {
         var parser = GetParser();
-        var result = parser.Parse("name1='value1'").Value as ParsedNamedArgument;
+        var result = parser.Parse("name1='value1'").Value as ParsedNamed;
         result.Name.Should().Be("name1");
         result.Value.Should().Be("value1");
     }
@@ -81,7 +81,7 @@ public class SimplifiedArgumentGrammarTests
     public void Named_DoubleQuotedValue()
     {
         var parser = GetParser();
-        var result = parser.Parse("name1=\"value1\"").Value as ParsedNamedArgument;
+        var result = parser.Parse("name1=\"value1\"").Value as ParsedNamed;
         result.Name.Should().Be("name1");
         result.Value.Should().Be("value1");
     }
@@ -90,7 +90,7 @@ public class SimplifiedArgumentGrammarTests
     public void Flags_Tests()
     {
         var parser = GetParser();
-        var result = parser.Parse("-testa").Value as ParsedFlagArgument;
+        var result = parser.Parse("-testa").Value as ParsedFlag;
         result.Name.Should().Be("testa");
     }
 }

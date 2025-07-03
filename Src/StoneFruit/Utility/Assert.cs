@@ -9,6 +9,7 @@ public static class Assert
     /// <summary>
     /// Throws an exception if the argument value is null.
     /// </summary>
+    /// <typeparam name="T"></typeparam>
     /// <param name="arg"></param>
     /// <param name="name"></param>
     public static T NotNull<T>([NotNull] T arg, [CallerArgumentExpression(nameof(arg))] string? name = null)

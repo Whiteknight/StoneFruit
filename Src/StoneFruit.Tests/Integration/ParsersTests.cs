@@ -100,7 +100,7 @@ public class ParsersTests
         var engine = EngineBuilder.Build(b => b
             .SetupHandlers(h => h.UseHandlerTypes(typeof(TestHandler)))
             .SetupOutput(o => o.DoNotUseConsole().Add(output))
-            .SetupArguments(a => a.UseArgumentParser((IParser<char, IParsedArgument>)null))
+            .SetupArguments(a => a.UseArgumentParser((IParser<char, ParsedArgument>)null))
         );
         engine.RunHeadless("test a b=x -c");
         output.Lines.Count.Should().Be(3);

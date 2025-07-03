@@ -1,6 +1,6 @@
 ﻿using System;
 using StoneFruit.Execution.Output;
-using StoneFruit.Utility;
+using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit;
 
@@ -58,7 +58,7 @@ public static class OutputExtensions
     /// <returns></returns>
     public static IOutput Write(this IOutput output, object obj)
     {
-        Assert.NotNull(output, nameof(output));
+        NotNull(output, nameof(output));
         if (obj == null)
             return output;
         return output.Write(obj!.ToString()!);
@@ -73,10 +73,8 @@ public static class OutputExtensions
     /// <returns></returns>
     public static IOutput WriteLine(this IOutput output, object obj)
     {
-        Assert.NotNull(output, nameof(output));
-        if (obj == null)
-            return output;
-        return output.WriteLine(obj!.ToString()!);
+        NotNull(output);
+        return obj == null ? output : output.WriteLine(obj!.ToString()!);
     }
 
     /// <summary>
@@ -87,12 +85,7 @@ public static class OutputExtensions
     /// <param name="args"></param>
     /// <returns></returns>
     public static IOutput WriteLineFormat(this IOutput output, string fmt, params object[] args)
-    {
-        Assert.NotNull(output, nameof(output));
-        Assert.NotNullOrEmpty(fmt, nameof(fmt));
-        var line = string.Format(fmt, args);
-        return output.WriteLine(line);
-    }
+        => NotNull(output).WriteLine(string.Format(NotNullOrEmpty(fmt), args));
 
     /// <summary>
     /// Write with a format string and arguments.
@@ -102,12 +95,7 @@ public static class OutputExtensions
     /// <param name="args"></param>
     /// <returns></returns>
     public static IOutput WriteFormat(this IOutput output, string fmt, params object[] args)
-    {
-        Assert.NotNull(output, nameof(output));
-        Assert.NotNullOrEmpty(fmt, nameof(fmt));
-        var line = string.Format(fmt, args);
-        return output.Write(line);
-    }
+        => NotNull(output).Write(string.Format(NotNullOrEmpty(fmt), args));
 
     /// <summary>
     /// Get a new output with the given color for text and the current background color
@@ -116,7 +104,8 @@ public static class OutputExtensions
     /// <param name="output"></param>
     /// <param name="color"></param>
     /// <returns></returns>
-    public static IOutput Color(this IOutput output, ConsoleColor color) => output.Color(_ => color);
+    public static IOutput Color(this IOutput output, ConsoleColor color)
+        => output.Color(_ => color);
 
     /// <summary>
     /// Get a new output with the given brush for text and background color. If the
@@ -125,5 +114,6 @@ public static class OutputExtensions
     /// <param name="output"></param>
     /// <param name="brush"></param>
     /// <returns></returns>
-    public static IOutput Color(this IOutput output, Brush brush) => output.Color(_ => brush);
+    public static IOutput Color(this IOutput output, Brush brush)
+        => output.Color(_ => brush);
 }

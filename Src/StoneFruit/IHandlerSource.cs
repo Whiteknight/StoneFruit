@@ -13,7 +13,7 @@ public interface IHandlerSource
     /// Instantiates the handler for the command. If a suitable handler is not found
     /// null is returned.
     /// </summary>
-    /// <param name="command"></param>
+    /// <param name="arguments"></param>
     /// <param name="dispatcher"></param>
     /// <returns></returns>
     Maybe<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher);
@@ -28,7 +28,7 @@ public interface IHandlerSource
     /// Get metadata information about a single verb. If the verb is not registered
     /// with this source, null is returned.
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="verb"></param>
     /// <returns></returns>
     Maybe<IVerbInfo> GetByName(Verb verb);
 }

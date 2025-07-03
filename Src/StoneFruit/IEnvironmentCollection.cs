@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using StoneFruit.Utility;
+using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit;
 
@@ -45,8 +45,7 @@ public static class EnvironmentCollectionExtensions
     /// <param name="index"></param>
     public static void SetCurrent(this IEnvironmentCollection environments, int index)
     {
-        Assert.NotNull(environments, nameof(environments));
-        var allEnvs = environments.GetNames();
+        var allEnvs = NotNull(environments).GetNames();
         if (index < 0 || index >= allEnvs.Count)
             return;
         environments.SetCurrent(allEnvs[index]);
@@ -60,8 +59,7 @@ public static class EnvironmentCollectionExtensions
     /// <returns></returns>
     public static bool IsValid(this IEnvironmentCollection environments, int index)
     {
-        Assert.NotNull(environments, nameof(environments));
-        var allEnvs = environments.GetNames();
+        var allEnvs = NotNull(environments).GetNames();
         return index >= 0 && index < allEnvs.Count;
     }
 }

@@ -19,7 +19,7 @@ public class ParsedArguments : IArguments, IVerbSource
 
     private int _lastRawPositionalIndex;
 
-    public ParsedArguments(IEnumerable<IParsedArgument> arguments, string? rawArgs = null)
+    public ParsedArguments(IEnumerable<ParsedArgument> arguments, string? rawArgs = null)
     {
         Raw = rawArgs ?? string.Empty;
         _accessedPositionals = new List<IPositionalArgument>();
@@ -28,7 +28,7 @@ public class ParsedArguments : IArguments, IVerbSource
         _rawArguments = arguments
             .SelectMany(a => a switch
             {
-                MultiParsedFlagArgument mp => mp.ToIndividualArgs(),
+                ParsedMultiFlag mp => mp.ToIndividualArgs(),
                 _ => new[] { a }
             })
             .Select(a => new RawArg(a))
@@ -45,13 +45,14 @@ public class ParsedArguments : IArguments, IVerbSource
 
     private class RawArg
     {
-        public RawArg(IParsedArgument arg)
+        public RawArg(ParsedArgument arg)
         {
             Argument = arg;
             Access = AccessType.Unaccessed;
         }
 
-        public IParsedArgument Argument { get; }
+        public ParsedArgument Argument { get; }
+
         public AccessType Access { get; set; }
     }
 
@@ -66,10 +67,10 @@ public class ParsedArguments : IArguments, IVerbSource
         .Where(raw => raw.Access != AccessType.Accessed)
         .Select(raw => raw.Argument switch
         {
-            ParsedPositionalArgument p => p.Value,
-            ParsedNamedArgument n => $"'{n.Name}' = {n.Value}",
-            ParsedFlagArgument f => $"flag {f.Name}",
-            ParsedFlagPositionalOrNamedArgument fp => raw.Access switch
+            ParsedPositional p => p.Value,
+            ParsedNamed n => $"'{n.Name}' = {n.Value}",
+            ParsedFlag f => $"flag {f.Name}",
+            ParsedFlagAndPositionalOrNamed fp => raw.Access switch
             {
                 AccessType.AccessedAsFlag => fp.Value,
                 AccessType.AccessedAsPositional => $"flag {fp.Name}",
@@ -153,7 +154,7 @@ public class ParsedArguments : IArguments, IVerbSource
             if (arg.Access == AccessType.Accessed || arg.Access == AccessType.AccessedAsPositional)
                 continue;
 
-            if (arg.Argument is ParsedPositionalArgument pa)
+            if (arg.Argument is ParsedPositional pa)
             {
                 var accessor = new PositionalArgument(pa.Value);
                 _rawArguments[i].Access = AccessType.Accessed;
@@ -162,17 +163,16 @@ public class ParsedArguments : IArguments, IVerbSource
                     return accessor;
             }
 
-            if (arg.Argument is ParsedFlagPositionalOrNamedArgument fp)
+            if (arg.Argument is ParsedFlagAndPositionalOrNamed fp)
             {
                 var accessor = new PositionalArgument(fp.Value);
                 _accessedPositionals.Add(accessor);
 
                 // If we have already consumed the flag portion, mark the whole arg consumed
                 // otherwise, mark that we have only consumed the positional portion.
-                if (arg.Access == AccessType.AccessedAsFlag)
-                    arg.Access = AccessType.Accessed;
-                else
-                    arg.Access = AccessType.AccessedAsPositional;
+                arg.Access = arg.Access == AccessType.AccessedAsFlag
+                    ? AccessType.Accessed
+                    : AccessType.AccessedAsPositional;
                 if (match())
                     return accessor;
             }
@@ -219,7 +219,7 @@ public class ParsedArguments : IArguments, IVerbSource
         if (arg.Access != AccessType.Unaccessed)
             return null;
 
-        if (arg.Argument is ParsedNamedArgument n && shouldAccess(n.Name))
+        if (arg.Argument is ParsedNamed n && shouldAccess(n.Name))
         {
             var accessor = new NamedArgument(n.Name, n.Value);
             _rawArguments[i].Access = AccessType.Accessed;
@@ -227,7 +227,7 @@ public class ParsedArguments : IArguments, IVerbSource
             return accessor;
         }
 
-        if (arg.Argument is ParsedFlagPositionalOrNamedArgument n2 && shouldAccess(n2.Name))
+        if (arg.Argument is ParsedFlagAndPositionalOrNamed n2 && shouldAccess(n2.Name))
         {
             var accessor = new NamedArgument(n2.Name, n2.Value);
             _rawArguments[i].Access = AccessType.Accessed;
@@ -281,7 +281,7 @@ public class ParsedArguments : IArguments, IVerbSource
             if (arg.Access == AccessType.Accessed || arg.Access == AccessType.AccessedAsFlag)
                 continue;
 
-            if (arg.Argument is ParsedFlagArgument f && isMatch(f.Name))
+            if (arg.Argument is ParsedFlag f && isMatch(f.Name))
             {
                 var accessor = new FlagArgument(f.Name);
                 _rawArguments[i].Access = AccessType.Accessed;
@@ -291,7 +291,7 @@ public class ParsedArguments : IArguments, IVerbSource
                 continue;
             }
 
-            if (arg.Argument is ParsedFlagPositionalOrNamedArgument fp && isMatch(fp.Name))
+            if (arg.Argument is ParsedFlagAndPositionalOrNamed fp && isMatch(fp.Name))
             {
                 var accessor = new FlagArgument(fp.Name);
                 _accessedFlags.Add(fp.Name, accessor);
@@ -323,7 +323,7 @@ public class ParsedArguments : IArguments, IVerbSource
             // than we need, decide that some of them are not part of the verb, and put back
             // the rest. It's a small price to pay to avoid the complexity of conditionally
             // caching them.
-            if (arg.Argument is ParsedPositionalArgument pa)
+            if (arg.Argument is ParsedPositional pa)
                 candidates.Add(new PositionalArgument(pa.Value));
         }
 

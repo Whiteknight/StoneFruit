@@ -26,7 +26,7 @@ public interface IParserSetup
     /// </summary>
     /// <param name="argParser"></param>
     /// <returns></returns>
-    IParserSetup UseArgumentParser(IParser<char, IParsedArgument> argParser);
+    IParserSetup UseArgumentParser(IParser<char, ParsedArgument> argParser);
 
     /// <summary>
     /// Specify a parser to use for scripts. Notice that you cannot set a Script

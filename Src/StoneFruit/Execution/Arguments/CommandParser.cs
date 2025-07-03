@@ -15,10 +15,10 @@ namespace StoneFruit.Execution.Arguments;
 /// </summary>
 public class CommandParser : ICommandParser
 {
-    private readonly IParser<char, IReadOnlyList<IParsedArgument>> _argsParser;
+    private readonly IParser<char, IReadOnlyList<ParsedArgument>> _argsParser;
     private readonly IParser<char, CommandFormat> _scriptParser;
 
-    public CommandParser(IParser<char, IParsedArgument> argParser, IParser<char, CommandFormat> scriptParser)
+    public CommandParser(IParser<char, ParsedArgument> argParser, IParser<char, CommandFormat> scriptParser)
     {
         NotNull(argParser);
         _argsParser = Rule(
@@ -34,11 +34,9 @@ public class CommandParser : ICommandParser
     /// </summary>
     /// <returns></returns>
     public static CommandParser GetDefault()
-    {
-        var argParser = SimplifiedArgumentGrammar.GetParser();
-        var scriptParser = ScriptFormatGrammar.GetParser();
-        return new CommandParser(argParser, scriptParser);
-    }
+        => new CommandParser(
+            SimplifiedArgumentGrammar.GetParser(),
+            ScriptFormatGrammar.GetParser());
 
     /// <summary>
     /// Parse the given line of text as an IArguments.

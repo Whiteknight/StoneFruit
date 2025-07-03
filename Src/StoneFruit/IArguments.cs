@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 using StoneFruit.Execution.Arguments;
-using StoneFruit.Utility;
+using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit;
 
@@ -107,10 +107,7 @@ public static class ArgumentsExtensions
     /// <param name="index"></param>
     /// <returns></returns>
     public static IPositionalArgument Consume(this IArguments args, int index)
-    {
-        Assert.NotNull(args, nameof(args));
-        return args.Get(index).MarkConsumed();
-    }
+        => NotNull(args).Get(index).MarkConsumed();
 
     /// <summary>
     /// Get the flag argument with the given name and mark it consumed.
@@ -119,10 +116,7 @@ public static class ArgumentsExtensions
     /// <param name="name"></param>
     /// <returns></returns>
     public static INamedArgument Consume(this IArguments args, string name)
-    {
-        Assert.NotNull(args, nameof(args));
-        return args.Get(name).MarkConsumed();
-    }
+        => NotNull(args).Get(name).MarkConsumed();
 
     /// <summary>
     /// Get the named argument with the given name and mark it consumed.
@@ -131,10 +125,7 @@ public static class ArgumentsExtensions
     /// <param name="name"></param>
     /// <returns></returns>
     public static IFlagArgument ConsumeFlag(this IArguments args, string name)
-    {
-        Assert.NotNull(args, nameof(args));
-        return args.GetFlag(name).MarkConsumed();
-    }
+        => NotNull(args).GetFlag(name).MarkConsumed();
 
     /// <summary>
     /// Create a new instance of type T and attempt to map argument values into the
@@ -144,10 +135,7 @@ public static class ArgumentsExtensions
     /// <returns></returns>
     public static T MapTo<T>(this IArguments args)
         where T : new()
-    {
-        Assert.NotNull(args, nameof(args));
-        return CommandArgumentMapper.Map<T>(args);
-    }
+        => CommandArgumentMapper.Map<T>(NotNull(args));
 
     /// <summary>
     /// Attempt to map argument values onto the public properties of the given object
@@ -158,8 +146,7 @@ public static class ArgumentsExtensions
     /// <param name="obj"></param>
     public static void MapOnto<T>(this IArguments args, T obj)
     {
-        Assert.NotNull(args, nameof(args));
-        CommandArgumentMapper.MapOnto(args, obj);
+        CommandArgumentMapper.MapOnto(NotNull(args), obj);
     }
 
     /// <summary>
@@ -167,22 +154,17 @@ public static class ArgumentsExtensions
     /// </summary>
     /// <returns></returns>
     public static IEnumerable<IArgument> GetAllArguments(this IArguments args)
-    {
-        Assert.NotNull(args, nameof(args));
-        return args.GetAllPositionals().Cast<IArgument>()
+        => NotNull(args).GetAllPositionals().Cast<IArgument>()
             .Concat(args.GetAllNamed())
             .Concat(args.GetAllFlags())
             .Where(p => !p.Consumed);
-    }
 
     public static IPositionalArgument GetAllUnconsumedPositionalsAsOne(this IArguments args)
-    {
-        Assert.NotNull(args, nameof(args));
-        var remainingPositionals = args.GetAllPositionals().ToList();
-        if (remainingPositionals.Count == 0)
-            return MissingArgument.NoPositionals();
-        return new DelimitedMultiPositionalArgument(remainingPositionals);
-    }
+        => NotNull(args).GetAllPositionals().ToList() switch
+        {
+            [] => MissingArgument.NoPositionals(),
+            [.. var remaining] => new DelimitedMultiPositionalArgument(remaining)
+        };
 
     /// <summary>
     /// Throw an exception if any arguments have not been consumed. Useful to alert
@@ -190,8 +172,7 @@ public static class ArgumentsExtensions
     /// </summary>
     public static void VerifyAllAreConsumed(this IArguments args)
     {
-        Assert.NotNull(args, nameof(args));
-        var unconsumed = args.GetUnconsumed();
+        var unconsumed = NotNull(args).GetUnconsumed();
         if (!unconsumed.Any())
             return;
 

@@ -12,12 +12,12 @@ namespace StoneFruit.Execution.Arguments;
 /// </summary>
 public static class PowershellStyleArgumentGrammar
 {
-    private static readonly Lazy<IParser<char, IParsedArgument>> _instance
-        = new Lazy<IParser<char, IParsedArgument>>(GetParserInternal);
+    private static readonly Lazy<IParser<char, ParsedArgument>> _instance
+        = new Lazy<IParser<char, ParsedArgument>>(GetParserInternal);
 
-    public static IParser<char, IParsedArgument> GetParser() => _instance.Value;
+    public static IParser<char, ParsedArgument> GetParser() => _instance.Value;
 
-    private static IParser<char, IParsedArgument> GetParserInternal()
+    private static IParser<char, ParsedArgument> GetParserInternal()
     {
         var doubleQuotedString = StrippedDoubleQuotedString();
 
@@ -55,7 +55,7 @@ public static class PowershellStyleArgumentGrammar
             whitespace,
             values,
 
-            (_, name, _, value) => new ParsedFlagPositionalOrNamedArgument(name, value)
+            (_, name, _, value) => new ParsedFlagAndPositionalOrNamed(name, value)
         ).Named("Named");
 
         // <nameStart> <name>
@@ -63,14 +63,14 @@ public static class PowershellStyleArgumentGrammar
             nameStart,
             names,
 
-            (_, name) => new ParsedFlagArgument(name)
+            (_, name) => new ParsedFlag(name)
         ).Named("LongFlag");
 
         // <named> | <longFlag> | <positional>
-        var args = First<IParsedArgument>(
+        var args = First<ParsedArgument>(
             namedArg,
             longFlagArg,
-            values.Transform(v => new ParsedPositionalArgument(v))
+            values.Transform(v => new ParsedPositional(v))
         ).Named("Argument");
 
         var whitespaceAndArgs = Rule(

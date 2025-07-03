@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Handlers;
-using StoneFruit.Utility;
+using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit;
 
@@ -16,6 +16,7 @@ public interface IHandlerSetup
     // TODO: Keep track of which assemblies we scan, to avoid double-scanning
     // TODO: Wrap found handler types in an accessor. Then we can feed the list of accessors into the HandlerSourceCollection and resolve types from there.
     IHandlerSetup ScanAssemblyForHandlers(Assembly assembly);
+
     /// <summary>
     /// Set the Verb Extractor to use to get verbs from classes and methods where verbs are
     /// not explicitly supplied.
@@ -104,13 +105,13 @@ public static class HandlerSetupExtensions
     /// <summary>
     /// Add a handler source where handlers can be looked up.
     /// </summary>
+    /// <param name="handlers"></param>
     /// <param name="source"></param>
     /// <returns></returns>
     public static IHandlerSetup AddSource(this IHandlerSetup handlers, IHandlerSource source)
     {
-        Assert.NotNull(handlers, nameof(handlers));
-        Assert.NotNull(source, nameof(source));
-        return handlers.AddSource(_ => source);
+        NotNull(source);
+        return NotNull(handlers).AddSource(_ => source);
     }
 
     /// <summary>
@@ -120,16 +121,13 @@ public static class HandlerSetupExtensions
     /// <param name="instance"></param>
     /// <returns></returns>
     public static IHandlerSetup UsePublicInstanceMethodsAsHandlers(this IHandlerSetup handlers, object instance)
-    {
-        Assert.NotNull(handlers, nameof(handlers));
-        return handlers.AddSource(provider =>
+        => NotNull(handlers).AddSource(provider =>
             new InstanceMethodHandlerSource(
                 instance,
                 provider.GetRequiredService<IHandlerMethodInvoker>(),
                 provider.GetRequiredService<IVerbExtractor>()
             )
         );
-    }
 
     /// <summary>
     /// Use the specified list of handler types, with the default instance resolver and
@@ -139,9 +137,5 @@ public static class HandlerSetupExtensions
     /// <param name="commandTypes"></param>
     /// <returns></returns>
     public static IHandlerSetup UseHandlerTypes(this IHandlerSetup handlers, params Type[] commandTypes)
-    {
-        Assert.NotNull(handlers, nameof(handlers));
-        Assert.NotNull(commandTypes, nameof(commandTypes));
-        return handlers.UseHandlerTypes(commandTypes);
-    }
+        => NotNull(handlers).UseHandlerTypes(NotNull(commandTypes));
 }

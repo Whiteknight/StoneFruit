@@ -11,7 +11,7 @@ namespace StoneFruit.Execution.Arguments;
 /// </summary>
 public class ParserSetup : IParserSetup
 {
-    private IParser<char, IParsedArgument>? _argParser;
+    private IParser<char, ParsedArgument>? _argParser;
     private IParser<char, CommandFormat>? _scriptParser;
     private ICommandParser? _parser;
 
@@ -45,7 +45,7 @@ public class ParserSetup : IParserSetup
         return this;
     }
 
-    public IParserSetup UseArgumentParser(IParser<char, IParsedArgument> argParser)
+    public IParserSetup UseArgumentParser(IParser<char, ParsedArgument> argParser)
     {
         if (argParser == null)
         {
