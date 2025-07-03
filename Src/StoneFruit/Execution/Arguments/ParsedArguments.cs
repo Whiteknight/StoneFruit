@@ -64,20 +64,20 @@ public class ParsedArguments : IArguments, IVerbSource
         // arguments which are marked unconsumed.
 
         var fromRaw = _rawArguments
-        .Where(raw => raw.Access != AccessType.Accessed)
-        .Select(raw => raw.Argument switch
-        {
-            ParsedPositional p => p.Value,
-            ParsedNamed n => $"'{n.Name}' = {n.Value}",
-            ParsedFlag f => $"flag {f.Name}",
-            ParsedFlagAndPositionalOrNamed fp => raw.Access switch
+            .Where(raw => raw.Access != AccessType.Accessed)
+            .Select(raw => raw.Argument switch
             {
-                AccessType.AccessedAsFlag => fp.Value,
-                AccessType.AccessedAsPositional => $"flag {fp.Name}",
-                _ => $"'{fp.Name}', {fp.Value}"
-            },
-            _ => "Unknown"
-        });
+                ParsedPositional p => p.Value,
+                ParsedNamed n => $"'{n.Name}' = {n.Value}",
+                ParsedFlag f => $"flag {f.Name}",
+                ParsedFlagAndPositionalOrNamed fp => raw.Access switch
+                {
+                    AccessType.AccessedAsFlag => fp.Value,
+                    AccessType.AccessedAsPositional => $"flag {fp.Name}",
+                    _ => $"'{fp.Name}', {fp.Value}"
+                },
+                _ => "Unknown"
+            });
 
         var fromAccessed = _accessedPositionals.Cast<IArgument>()
             .Concat(_accessedNameds.SelectMany(kvp => kvp.Value))
@@ -121,8 +121,6 @@ public class ParsedArguments : IArguments, IVerbSource
 
     public INamedArgument Get(string name)
     {
-        name = name.ToLowerInvariant();
-
         // Check the already-accessed named args. If we have it, return it.
         if (_accessedNameds.TryGetValue(name, out var value))
         {
@@ -133,8 +131,8 @@ public class ParsedArguments : IArguments, IVerbSource
 
         // Loop through all unaccessed args looking for the first one with the given
         // name.
-        var match = AccessNamedUntil(n => n == name, () => true);
-        return match ?? MissingArgument.NoneNamed(name);
+        return AccessNamedUntil(n => n == name, () => true)
+            .GetValueOrDefault(MissingArgument.NoneNamed(name));
     }
 
     public IEnumerable<IPositionalArgument> GetAllPositionals()
@@ -199,7 +197,7 @@ public class ParsedArguments : IArguments, IVerbSource
             .Where(a => !a.Consumed);
     }
 
-    private INamedArgument? AccessNamedUntil(Func<string, bool> shouldAccess, Func<bool> isComplete)
+    private Maybe<INamedArgument> AccessNamedUntil(Func<string, bool> shouldAccess, Func<bool> isComplete)
     {
         for (int i = 0; i < _rawArguments.Count; i++)
         {
@@ -208,7 +206,7 @@ public class ParsedArguments : IArguments, IVerbSource
                 return accessor;
         }
 
-        return null;
+        return default;
     }
 
     private NamedArgument? GetNamedAccessorForArgument(int i, Func<string, bool> shouldAccess)

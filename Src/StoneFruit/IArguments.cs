@@ -159,13 +159,6 @@ public static class ArgumentsExtensions
             .Concat(args.GetAllFlags())
             .Where(p => !p.Consumed);
 
-    public static IPositionalArgument GetAllUnconsumedPositionalsAsOne(this IArguments args)
-        => NotNull(args).GetAllPositionals().ToList() switch
-        {
-            [] => MissingArgument.NoPositionals(),
-            [.. var remaining] => new DelimitedMultiPositionalArgument(remaining)
-        };
-
     /// <summary>
     /// Throw an exception if any arguments have not been consumed. Useful to alert
     /// the user if extra/unnecessary arguments have been passed.
