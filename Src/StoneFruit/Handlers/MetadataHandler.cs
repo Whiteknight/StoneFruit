@@ -6,7 +6,7 @@ namespace StoneFruit.Handlers;
 [Verb(Name, Hide = true)]
 public class MetadataHandler : IHandler
 {
-    public const string Name = "metadata";
+    public const string Name = "_metadata";
     public const string RemoveSubverb = "remove";
     public const string ListSubverb = "list";
 
@@ -24,12 +24,12 @@ public class MetadataHandler : IHandler
     public static string Group => HelpHandler.BuiltinsGroup;
     public static string Description => "Work with internal metadata";
 
-    public static string Usage => @"metadata ...
+    public static string Usage => $@"{Name} ...
 
-metadata remove <keys>...
+{Name} remove <keys>...
     Remove a list of metadata items by name
 
-metadata list
+{Name} list
     List all available metadata entries
 ";
 

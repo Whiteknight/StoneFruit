@@ -23,11 +23,13 @@ public class HandlerSetup : IHandlerSetup
     private readonly HashSet<Assembly> _scannedAssemblies;
 
     private readonly List<Type> _handlerTypes = [
+        typeof(ArgumentDisplayHandler),
         typeof(EchoHandler),
         typeof(EnvironmentHandler),
         typeof(ExitHandler),
         typeof(HelpHandler),
         typeof(MetadataHandler),
+        typeof(ShowHandler)
     ];
 
     public HandlerSetup(IServiceCollection services)

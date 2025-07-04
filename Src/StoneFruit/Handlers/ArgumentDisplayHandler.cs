@@ -1,8 +1,9 @@
 ﻿namespace StoneFruit.Handlers;
 
-[Verb("args", Hide = true)]
+[Verb(Name, Hide = true)]
 public class ArgumentDisplayHandler : IHandler
 {
+    public const string Name = "_args";
     private readonly IArguments _args;
     private readonly IOutput _output;
 
@@ -14,11 +15,11 @@ public class ArgumentDisplayHandler : IHandler
 
     public static string Group => HelpHandler.BuiltinsGroup;
     public static string Description => "Diagnostic handler to display arguments passed";
-    public static string Usage => """
-        args ...
+    public static string Usage => $$"""
+        {{Name}} ...
 
             Displays all arguments passed, one per line
-            Used mostly for unit-testing and diagnosing issues with scripts
+            Used for unit-testing and diagnosing issues with argument-parsing and scripts
         """;
 
     public void Execute()
