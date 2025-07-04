@@ -29,7 +29,9 @@ public class EngineStateMetadataCache : IEnumerable<KeyValuePair<string, object>
     }
 
     public Maybe<object> Get(string name)
-        => _metadata.TryGetValue(name, out object? value) ? new Maybe<object>(value) : default;
+        => _metadata.TryGetValue(name, out object? value)
+            ? new Maybe<object>(value)
+            : default;
 
     public IEnumerator<KeyValuePair<string, object>> GetEnumerator() => _metadata.GetEnumerator();
 

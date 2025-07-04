@@ -1,4 +1,4 @@
-﻿using StoneFruit.Utility;
+﻿using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit.Execution;
 
@@ -9,15 +9,13 @@ public class ArgumentsOrString
 {
     public ArgumentsOrString(string asString)
     {
-        Assert.NotNullOrEmpty(asString, nameof(asString));
         Arguments = null;
-        String = asString;
+        String = NotNull(asString);
     }
 
     public ArgumentsOrString(IArguments asArguments)
     {
-        Assert.NotNull(asArguments, nameof(asArguments));
-        Arguments = asArguments;
+        Arguments = NotNull(asArguments);
         String = null;
     }
 
@@ -30,8 +28,5 @@ public class ArgumentsOrString
     public static implicit operator ArgumentsOrString(string s) => new ArgumentsOrString(s);
 
     public IArguments GetArguments(ICommandParser parser)
-    {
-        Assert.NotNull(parser, nameof(parser));
-        return Arguments ?? parser.ParseCommand(String!);
-    }
+        => Arguments ?? NotNull(parser).ParseCommand(String!);
 }

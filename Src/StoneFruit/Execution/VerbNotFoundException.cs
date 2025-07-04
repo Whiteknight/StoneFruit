@@ -16,21 +16,11 @@ public class VerbNotFoundException : Exception
         Verb = string.Empty;
     }
 
-    public VerbNotFoundException()
-    {
-        Verb = string.Empty;
-    }
-
-    public VerbNotFoundException(string message, Exception innerException) : base(message, innerException)
-    {
-        Verb = string.Empty;
-    }
-
     public static VerbNotFoundException FromArguments(IArguments arguments)
     {
         var firstPositional = arguments.Shift();
-        if (!firstPositional.Exists())
-            return new VerbNotFoundException("No verb provided. You must provide at least one verb");
-        return new VerbNotFoundException($"Could not find a handler for verb {firstPositional.AsString()}") { Verb = firstPositional.AsString() };
+        return firstPositional.Exists()
+            ? new VerbNotFoundException($"Could not find a handler for verb {firstPositional.AsString()}") { Verb = firstPositional.AsString() }
+            : new VerbNotFoundException("No verb provided. You must provide at least one verb");
     }
 }

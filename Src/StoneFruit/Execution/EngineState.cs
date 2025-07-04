@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 using StoneFruit.Execution.Arguments;
-using StoneFruit.Utility;
+using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit.Execution;
 
@@ -17,13 +17,10 @@ public class EngineState
 
     public EngineState(EngineEventCatalog eventCatalog, EngineSettings settings, IEnvironmentCollection environments, ICommandParser parser)
     {
-        Assert.NotNull(eventCatalog, nameof(eventCatalog));
-        Assert.NotNull(settings, nameof(settings));
-
-        EventCatalog = eventCatalog;
+        EventCatalog = NotNull(eventCatalog);
         ShouldExit = false;
 
-        Settings = settings;
+        Settings = NotNull(settings);
         _environments = environments;
         Commands = new EngineStateCommandQueue(parser);
         Metadata = new EngineStateMetadataCache();

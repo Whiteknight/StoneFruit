@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using ParserObjects;
 using StoneFruit.Execution.Scripts;
-using StoneFruit.Execution.Scripts.Formatting;
 using static ParserObjects.Parsers<char>;
 using static ParserObjects.Parsers;
 using static ParserObjects.Sequences;

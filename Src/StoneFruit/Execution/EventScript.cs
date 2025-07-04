@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using StoneFruit.Utility;
+using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit.Execution;
 
@@ -16,7 +17,7 @@ public class EventScript
     public EventScript(params string[] initialLines)
     {
         _initialLines = initialLines;
-        _lines = new List<string>(initialLines);
+        _lines = [.. initialLines];
     }
 
     public void Reset()
@@ -29,14 +30,13 @@ public class EventScript
 
     public void Add(params string[] lines)
     {
-        Assert.NotNull(lines, nameof(lines));
-        _lines.AddRange(lines);
+        _lines.AddRange(NotNull(lines));
     }
 
     public IEnumerable<ArgumentsOrString> GetCommands(ICommandParser parser, IArguments args)
     {
-        Assert.NotNull(parser, nameof(parser));
-        Assert.NotNull(args, nameof(args));
+        NotNull(parser);
+        NotNull(args);
         return _lines
             .Where(l => !string.IsNullOrEmpty(l))
             .Select(parser.ParseScript)

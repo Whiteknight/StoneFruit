@@ -64,9 +64,9 @@ public class SyntheticArguments : IArguments, IVerbSource
     /// </summary>
     /// <param name="args"></param>
     /// <returns></returns>
-    public static SyntheticArguments From(params (string, string)[] args)
+    public static SyntheticArguments From(params (string Name, string Value)[] args)
         => args
-            .Select(t => new NamedArgument(t.Item1, t.Item2))
+            .Select(t => new NamedArgument(t.Name, t.Value))
             .ToSyntheticArguments();
 
     /// <summary>

@@ -12,19 +12,4 @@ public class EngineBuildException : Exception
     public EngineBuildException(string message) : base(message)
     {
     }
-
-    public EngineBuildException()
-    {
-    }
-
-    public EngineBuildException(string message, Exception innerException) : base(message, innerException)
-    {
-    }
-
-    public static EngineBuildException NoHandlers()
-    {
-        return new EngineBuildException(@"No Handlers configured.
-
-You must have at least one handler configured in order to start the engine.");
-    }
 }

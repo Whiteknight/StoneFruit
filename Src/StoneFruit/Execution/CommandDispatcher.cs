@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using StoneFruit.Execution.Arguments;
-using StoneFruit.Utility;
+using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit.Execution;
 
@@ -15,17 +15,11 @@ public class CommandDispatcher
 {
     public CommandDispatcher(ICommandParser parser, IHandlers handlers, IEnvironmentCollection environments, EngineState state, IOutput output)
     {
-        Assert.NotNull(parser, nameof(parser));
-        Assert.NotNull(handlers, nameof(handlers));
-        Assert.NotNull(environments, nameof(environments));
-        Assert.NotNull(output, nameof(output));
-        Assert.NotNull(state, nameof(state));
-
-        Parser = parser;
-        Handlers = handlers;
-        Environments = environments;
-        Output = output;
-        State = state;
+        Parser = NotNull(parser);
+        Handlers = NotNull(handlers);
+        Environments = NotNull(environments);
+        Output = NotNull(output);
+        State = NotNull(state);
     }
 
     /// <summary>
@@ -63,8 +57,7 @@ public class CommandDispatcher
     /// <param name="token"></param>
     public void Execute(ArgumentsOrString argsOrString, CancellationToken token = default)
     {
-        Assert.NotNull(argsOrString, nameof(argsOrString));
-        var args = argsOrString.GetArguments(Parser);
+        var args = NotNull(argsOrString).GetArguments(Parser);
         Execute(args, token);
     }
 
@@ -77,8 +70,7 @@ public class CommandDispatcher
     /// <param name="token"></param>
     public void Execute(string commandString, CancellationToken token = default)
     {
-        Assert.NotNullOrEmpty(commandString, nameof(commandString));
-        var command = Parser.ParseCommand(commandString);
+        var command = Parser.ParseCommand(NotNullOrEmpty(commandString));
         Execute(command, token);
     }
 
@@ -91,8 +83,7 @@ public class CommandDispatcher
     /// <param name="token"></param>
     public void Execute(Verb verb, IArguments args, CancellationToken token = default)
     {
-        Assert.NotNull(args, nameof(args));
-        var newArgs = new PrependedVerbArguments(verb, args);
+        var newArgs = new PrependedVerbArguments(verb, NotNull(args));
         Execute(newArgs, token);
     }
 
@@ -104,8 +95,7 @@ public class CommandDispatcher
     /// <param name="token"></param>
     public void Execute(IArguments arguments, CancellationToken token = default)
     {
-        Assert.NotNull(arguments, nameof(arguments));
-        State.SetCurrentArguments(arguments);
+        State.SetCurrentArguments(NotNull(arguments));
         var handler = Handlers.GetInstance(arguments, this)
             .OnFailure(() => throw VerbNotFoundException.FromArguments(arguments))
             .GetValueOrThrow();
@@ -137,8 +127,7 @@ public class CommandDispatcher
     /// <returns></returns>
     public Task ExecuteAsync(ArgumentsOrString argsOrString, CancellationToken token = default)
     {
-        Assert.NotNull(argsOrString, nameof(argsOrString));
-        var args = argsOrString.GetArguments(Parser);
+        var args = NotNull(argsOrString).GetArguments(Parser);
         return ExecuteAsync(args, token);
     }
 
@@ -150,8 +139,7 @@ public class CommandDispatcher
     /// <returns></returns>
     public Task ExecuteAsync(string commandString, CancellationToken token = default)
     {
-        Assert.NotNullOrEmpty(commandString, nameof(commandString));
-        var command = Parser.ParseCommand(commandString);
+        var command = Parser.ParseCommand(NotNullOrEmpty(commandString));
         return ExecuteAsync(command, token);
     }
 
@@ -166,8 +154,7 @@ public class CommandDispatcher
     /// <returns></returns>
     public Task ExecuteAsync(Verb verb, IArguments args, CancellationToken token = default)
     {
-        Assert.NotNull(args, nameof(args));
-        var newArgs = new PrependedVerbArguments(verb, args);
+        var newArgs = new PrependedVerbArguments(verb, NotNull(args));
         return ExecuteAsync(newArgs, token);
     }
 
@@ -181,10 +168,8 @@ public class CommandDispatcher
     /// <returns></returns>
     public async Task ExecuteAsync(IArguments arguments, CancellationToken token = default)
     {
-        Assert.NotNull(arguments, nameof(arguments));
-
         // Set the current arguments in the State, so they can be resolved from the container
-        State.SetCurrentArguments(arguments);
+        State.SetCurrentArguments(NotNull(arguments));
 
         // Get the handler. Throw if a matching one is not found
         var handler = Handlers.GetInstance(arguments, this)

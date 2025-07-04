@@ -6,7 +6,7 @@
 public enum EngineRunMode
 {
     /// <summary>
-    /// The engine is not running
+    /// The engine is not running.
     /// </summary>
     Idle,
 
