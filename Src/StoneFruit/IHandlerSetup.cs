@@ -12,9 +12,6 @@ namespace StoneFruit;
 
 public interface IHandlerSetup
 {
-    // TODO: Scan the assembly for handlers
-    // TODO: Keep track of which assemblies we scan, to avoid double-scanning
-    // TODO: Wrap found handler types in an accessor. Then we can feed the list of accessors into the HandlerSourceCollection and resolve types from there.
     IHandlerSetup ScanAssemblyForHandlers(Assembly assembly);
 
     /// <summary>

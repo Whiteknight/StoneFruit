@@ -20,6 +20,7 @@ public class HandlerSetup : IHandlerSetup
     private readonly ScriptHandlerSource _scripts;
     private readonly NamedInstanceHandlerSource _instances;
     private readonly IServiceCollection _services;
+    private readonly HashSet<Assembly> _scannedAssemblies;
 
     private readonly List<Type> _handlerTypes = [
         typeof(EchoHandler),
@@ -35,6 +36,7 @@ public class HandlerSetup : IHandlerSetup
         _scripts = new ScriptHandlerSource();
         _instances = new NamedInstanceHandlerSource();
         _services = services;
+        _scannedAssemblies = new HashSet<Assembly>();
     }
 
     public void BuildUp(IServiceCollection services)
@@ -122,6 +124,9 @@ public class HandlerSetup : IHandlerSetup
 
     public IHandlerSetup ScanAssemblyForHandlers(Assembly assembly)
     {
+        if (_scannedAssemblies.Contains(assembly))
+            return this;
+
         var handlerTypes = NotNull(assembly).GetTypes()
             .Where(t => !t.IsAbstract && t.IsPublic && t.IsAssignableTo(typeof(IHandlerBase)));
 
@@ -131,6 +136,7 @@ public class HandlerSetup : IHandlerSetup
         foreach (var type in handlerTypes)
             RegisterHandlerType(type);
 
+        _scannedAssemblies.Add(assembly);
         return this;
     }
 
