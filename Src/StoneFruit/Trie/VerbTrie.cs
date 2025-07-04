@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using StoneFruit.Execution.Arguments;
-using StoneFruit.Utility;
+using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit.Trie;
 
@@ -23,9 +23,8 @@ public class VerbTrie<TValue>
 
     public void Insert(IEnumerable<string> keys, TValue value)
     {
-        Assert.NotNull(keys, nameof(keys));
         var current = _root;
-        foreach (var key in keys)
+        foreach (var key in NotNull(keys))
             current = current.GetOrInsertChild(key);
         current.Value = value;
         Count++;
@@ -39,10 +38,7 @@ public class VerbTrie<TValue>
             return default;
 
         var node = GetNode(argsWithVerb);
-        if (node?.Value == null)
-            return default;
-
-        return node.Value;
+        return node?.Value == null ? default : (Maybe<TValue>)node.Value;
     }
 
     public Maybe<TValue> Get(IEnumerable<string> keys)
@@ -56,9 +52,7 @@ public class VerbTrie<TValue>
             current = node;
         }
 
-        if (current?.Value == null)
-            return default;
-        return current.Value;
+        return current?.Value == null ? default : (Maybe<TValue>)current.Value;
     }
 
     public IReadOnlyList<KeyValuePair<Verb, TValue>> GetAll()

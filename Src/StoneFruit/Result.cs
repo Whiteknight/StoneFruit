@@ -30,9 +30,9 @@ public readonly struct Maybe<T>
     public T GetValueOrDefault(T defaultValue = default!)
     {
         var result = Match(v => v, () => defaultValue);
-        if (result is not null)
-            return result;
-        throw new InvalidOperationException("Attempt to return null from .GetValueOrDefault()");
+        return result is not null
+            ? result
+            : throw new InvalidOperationException("Attempt to return null from .GetValueOrDefault()");
     }
 
     public T GetValueOrThrow()

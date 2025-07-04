@@ -26,12 +26,14 @@ public class EchoHandler : IHandler
     public static string Group => HelpHandler.BuiltinsGroup;
     public static string Description => "Writes a string of output to the console";
 
-    public static string Usage => $@"{Name} [{ArgColor}=<color>] [-{FlagNoNewline}] [-{FlagNoHeadless}] ...
+    public static string Usage => $"""
+        {Name} [{ArgColor}=<color>] [-{FlagNoNewline}] [-{FlagNoHeadless}] ...
 
-Writes all positional arguments to the output. If color is specified, use that color.
-Appends a new-line to the end unless -{FlagNoNewline} is specified.
--{FlagNoHeadless} outputs nothing if the engine is in headless mode.
-";
+            Writes all positional arguments to the output. If color is specified, use that color.
+            Appends a new-line to the end unless -{FlagNoNewline} is specified.
+
+            -{FlagNoHeadless} outputs nothing if the engine is in headless mode.
+        """;
 
     public void Execute()
     {

@@ -28,23 +28,24 @@ public class HelpHandler : IHandler
 
     public static string Description => "List all commands or get detailed information for a single command";
 
-    public static string Usage => $@"{Name} [ -{FlagShowAll} ]
-    Get overview information for all available verbs. The verb Command class should implement
+    public static string Usage => $$"""
+        {{Name}} [ -{{FlagShowAll}} ]
+            Get overview information for all available verbs. The verb Command class should implement
 
-        public static string {nameof(Description)} {{ get; }}
+                public static string {{nameof(Description)}} { get; }
 
-    The help command by default hides some internal commands which are not necessary for normal
-    user interaction. To see all commands, use the -{FlagShowAll} flag.
+            The help command by default hides some internal commands which are not necessary for normal
+            user interaction. To see all commands, use the -{{FlagShowAll}} flag.
 
-{Name} <verb>
-    Get detailed help information for the given verb. The verb Command class should implement
+        {{Name}} <verb>
+            Get detailed help information for the given verb. The verb Command class should implement
 
-        public static string {nameof(Usage)} {{ get; }}
+                public static string {{nameof(Usage)}} { get; }
 
-{Name} -{FlagStartsWith} <word>
-    Get overview information for all handlers whose verbs start with the given word. The verb
-    Command class should implement the {nameof(Description)} property, described above.
-";
+        {{Name}} -{{FlagStartsWith}} <word>
+            Get overview information for all handlers whose verbs start with the given word. The verb
+            Command class should implement the {{nameof(Description)}} property, described above.
+        """;
 
     public void Execute()
     {
@@ -178,10 +179,10 @@ public class HelpHandler : IHandler
     private static IReadOnlyList<string> GetDescriptionLines(string desc, int max)
     {
         if (max <= 0 || string.IsNullOrEmpty(desc))
-            return Array.Empty<string>();
+            return [];
 
         if (desc.Length < max)
-            return new[] { desc };
+            return [desc];
 
         var list = new List<string>();
         int start = 0;

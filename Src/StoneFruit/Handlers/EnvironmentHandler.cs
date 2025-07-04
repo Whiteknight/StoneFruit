@@ -34,26 +34,27 @@ public class EnvironmentHandler : IHandler
 
     public static string Description => "List or change environments";
 
-    public static string Usage => $@"{Name} ...
+    public static string Usage => $"""
+        {Name} ...
 
-{Name}
-Show a prompt to change the current environment, if any are configured.
+        {Name}
+            Show a prompt to change the current environment, if any are configured.
 
-{Name} -{FlagList}
-Show a list of all environments. All other arguments are ignored.
+        {Name} -{FlagList}
+            Show a list of all environments. All other arguments are ignored.
 
-{Name} <envName> [ -{FlagNotSet} ]? [ -{FlagClearData} ]?
-Change directly to the specified environment.
+        {Name} <envName> [ -{FlagNotSet} ]? [ -{FlagClearData} ]?
+            Change directly to the specified environment.
 
-{Name} <number> [ -{FlagNotSet} ]? [ -{FlagClearData} ]?
-Change directly to the environment at the specified position.
+        {Name} <number> [ -{FlagNotSet} ]? [ -{FlagClearData} ]?
+            Change directly to the environment at the specified position.
 
--{FlagNotSet}: Only change if not in an environment.
--{FlagClearData}: Clear contextual data when the environment is changed.
+            -{FlagNotSet}: Only change if not in an environment.
+            -{FlagClearData}: Clear contextual data when the environment is changed.
 
-{Name} -{FlagClearData}
-Clear the data for the current environment.
-";
+        {Name} -{FlagClearData}
+            Clear the data for the current environment.
+        """;
 
     public void Execute()
     {

@@ -21,9 +21,7 @@ public static class Assert
     /// <param name="arg"></param>
     /// <param name="name"></param>
     public static string NotNullOrEmpty([NotNull] string arg, [CallerArgumentExpression(nameof(arg))] string? name = null)
-    {
-        if (string.IsNullOrEmpty(arg))
-            throw new ArgumentNullException(name);
-        return arg;
-    }
+        => !string.IsNullOrEmpty(arg)
+            ? arg
+            : throw new ArgumentNullException(name);
 }

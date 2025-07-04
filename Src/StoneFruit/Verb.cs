@@ -8,11 +8,13 @@ namespace StoneFruit;
 /// <summary>
 /// A sequence of one or more words which is mapped to a handler.
 /// </summary>
-public struct Verb : IReadOnlyList<string>, IEquatable<Verb>
+public readonly struct Verb : IReadOnlyList<string>, IEquatable<Verb>
 {
     // Verb is just a wrapper around a List of string. The constructors assert that the
     // list is non-null, not empty, and that all the entries in the list are also non-null
     // and non-empty
+
+    private static readonly char[] _onSpaces = [' '];
 
     private readonly IReadOnlyList<string> _verb;
 
@@ -21,9 +23,9 @@ public struct Verb : IReadOnlyList<string>, IEquatable<Verb>
         if (string.IsNullOrEmpty(verb))
             throw new InvalidOperationException("Verb must contain at least one word");
         if (verb.Contains(' '))
-            _verb = verb.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            _verb = verb.Split(_onSpaces, StringSplitOptions.RemoveEmptyEntries);
         else
-            _verb = new[] { verb };
+            _verb = [verb];
         if (_verb.Count == 0)
             throw new InvalidOperationException("Verb must contain at least one word");
     }
@@ -33,7 +35,7 @@ public struct Verb : IReadOnlyList<string>, IEquatable<Verb>
         if (verb == null || verb.Length == 0)
             throw new InvalidOperationException("Verb must contain at least one word");
         _verb = verb
-            .SelectMany(w => (w ?? "").Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
+            .SelectMany(w => (w ?? "").Split(_onSpaces, StringSplitOptions.RemoveEmptyEntries))
             .ToArray();
         if (_verb.Count == 0)
             throw new InvalidOperationException("Verb must contain at least one word");
@@ -56,11 +58,7 @@ public struct Verb : IReadOnlyList<string>, IEquatable<Verb>
     public override int GetHashCode() => _verb.GetHashCode();
 
     public override bool Equals(object? obj)
-    {
-        if (obj is Verb asVerb)
-            return Equals(asVerb);
-        return false;
-    }
+        => obj is Verb asVerb && Equals(asVerb);
 
     public bool Equals(Verb other)
     {

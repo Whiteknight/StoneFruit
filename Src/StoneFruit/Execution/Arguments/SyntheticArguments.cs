@@ -131,7 +131,7 @@ public class SyntheticArguments : IArguments, IVerbSource
     public IEnumerable<INamedArgument> GetAllNamed(string name)
         => _nameds.ContainsKey(name)
             ? _nameds[name].Where(a => !a.Consumed)
-            : Enumerable.Empty<INamedArgument>();
+            : [];
 
     public IEnumerable<INamedArgument> GetAllNamed()
         => _nameds.Values
@@ -161,5 +161,4 @@ public static class SyntheticArgumentsExtensions
     public static SyntheticArguments ToSyntheticArguments<T>(this IEnumerable<T> args)
         where T : IArgument
         => new SyntheticArguments(args.Cast<IArgument>().ToList());
-
 }

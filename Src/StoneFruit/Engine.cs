@@ -208,7 +208,7 @@ public class Engine
     // See if the given commandLine starts with a valid environment name. If so,
     // extract the environment name from the front and return the remainder of the
     // commandline.
-    private (string? startingEnvironment, string commandLine) GetStartingEnvironment(string commandLine)
+    private (string? StartingEnvironment, string CommandLine) GetStartingEnvironment(string commandLine)
     {
         var validEnvironments = Environments.GetNames();
         if (validEnvironments.Count <= 1)

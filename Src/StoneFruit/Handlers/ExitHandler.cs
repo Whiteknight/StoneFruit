@@ -18,6 +18,7 @@ public class ExitHandler : IHandler
     }
 
     public static string Group => HelpHandler.BuiltinsGroup;
+
     public static string Description => "Exits the application";
 
     public void Execute()

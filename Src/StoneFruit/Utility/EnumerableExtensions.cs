@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit.Utility;
 
@@ -24,10 +25,9 @@ public static class EnumerableExtensions
     /// <returns></returns>
     public static IEnumerable<T> Tap<T>(this IEnumerable<T> source, Action<T> onEach)
     {
-        Assert.NotNull(source, nameof(source));
-        Assert.NotNull(onEach, nameof(onEach));
+        NotNull(onEach, nameof(onEach));
 
-        foreach (var item in source)
+        foreach (var item in NotNull(source))
         {
             onEach(item);
             yield return item;

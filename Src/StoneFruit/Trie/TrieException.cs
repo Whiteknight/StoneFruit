@@ -6,7 +6,7 @@ namespace StoneFruit.Trie;
 /// Exception that is thrown during trie operations.
 /// </summary>
 [Serializable]
-public class TrieException : System.Exception
+public class TrieException : Exception
 {
     public TrieException(string message)
         : base(message)

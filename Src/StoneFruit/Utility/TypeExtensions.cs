@@ -15,7 +15,9 @@ public static class TypeExtensions
     /// <param name="type"></param>
     /// <returns></returns>
     public static string GetDescription(this Type type)
-        => GetPublicStaticStringPropertyValue(type, "Description") ?? GetDescriptionAttributeValue(type) ?? string.Empty;
+        => GetPublicStaticStringPropertyValue(type, "Description")
+            ?? GetDescriptionAttributeValue(type)
+            ?? string.Empty;
 
     /// <summary>
     /// Attempt to get the Usage of an IHandlerBase class. Checks static 'Usage' property first,
@@ -25,7 +27,9 @@ public static class TypeExtensions
     /// <param name="type"></param>
     /// <returns></returns>
     public static string GetUsage(this Type type)
-        => GetPublicStaticStringPropertyValue(type, "Usage") ?? GetUsageAttributeValue(type) ?? GetDescription(type);
+        => GetPublicStaticStringPropertyValue(type, "Usage")
+            ?? GetUsageAttributeValue(type)
+            ?? GetDescription(type);
 
     /// <summary>
     /// Get the group of the IHandlerBase class. Checks static 'Group' property first, followed
@@ -35,14 +39,16 @@ public static class TypeExtensions
     /// <param name="type"></param>
     /// <returns></returns>
     public static string GetGroup(this Type type)
-        => GetPublicStaticStringPropertyValue(type, "Group") ?? GetGroupAttributeValue(type) ?? string.Empty;
+        => GetPublicStaticStringPropertyValue(type, "Group")
+            ?? GetGroupAttributeValue(type)
+            ?? string.Empty;
 
     private static string? GetPublicStaticStringPropertyValue(Type type, string name)
     {
         var property = type.GetProperty(name, BindingFlags.Public | BindingFlags.Static | BindingFlags.IgnoreCase);
-        if (property != null && property.PropertyType == typeof(string))
-            return property.GetValue(null) as string;
-        return null;
+        return property != null && property.PropertyType == typeof(string)
+            ? property.GetValue(null) as string
+            : null;
     }
 
     /// <summary>
@@ -53,9 +59,8 @@ public static class TypeExtensions
     /// <param name="type"></param>
     /// <returns></returns>
     public static string? GetDescriptionAttributeValue(this MemberInfo type)
-        =>
-        type.GetCustomAttribute<DescriptionAttribute>()?.Description ??
-        type.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>()?.Description;
+        => type.GetCustomAttribute<DescriptionAttribute>()?.Description
+            ?? type.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>()?.Description;
 
     /// <summary>
     /// Attempts to get a Usage value from a custom attribute. Checks the UsageAttribute
@@ -74,9 +79,8 @@ public static class TypeExtensions
     /// <param name="type"></param>
     /// <returns></returns>
     public static string? GetGroupAttributeValue(this MemberInfo type)
-        =>
-        type.GetCustomAttribute<GroupAttribute>()?.Group ??
-        type.GetCustomAttribute<System.ComponentModel.CategoryAttribute>()?.Category;
+        => type.GetCustomAttribute<GroupAttribute>()?.Group
+            ?? type.GetCustomAttribute<System.ComponentModel.CategoryAttribute>()?.Category;
 
     /// <summary>
     /// Return true if the given verb should display in the Help output for the given handler. False

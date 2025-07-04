@@ -3,6 +3,7 @@
 /// <summary>
 /// Provides a list of valid environments and creates environments by name.
 /// </summary>
+/// <typeparam name="T"></typeparam>
 public interface IEnvironmentFactory<T>
 {
     /// <summary>
