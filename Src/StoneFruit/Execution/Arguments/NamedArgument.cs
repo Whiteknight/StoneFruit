@@ -7,7 +7,7 @@ public class NamedArgument : INamedArgument
 {
     public NamedArgument(string name, string value)
     {
-        Name = name.ToLowerInvariant();
+        Name = name;
         Value = value;
     }
 

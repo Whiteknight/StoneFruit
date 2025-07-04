@@ -11,12 +11,12 @@ namespace StoneFruit.Execution.Arguments;
 /// </summary>
 public static class PosixStyleArgumentGrammar
 {
-    private static readonly Lazy<IParser<char, ParsedArgument>> _instance
-        = new Lazy<IParser<char, ParsedArgument>>(GetParserInternal);
+    private static readonly Lazy<IParser<char, ArgumentToken>> _instance
+        = new Lazy<IParser<char, ArgumentToken>>(GetParserInternal);
 
-    public static IParser<char, ParsedArgument> GetParser() => _instance.Value;
+    public static IParser<char, ArgumentToken> GetParser() => _instance.Value;
 
-    private static IParser<char, ParsedArgument> GetParserInternal()
+    private static IParser<char, ArgumentToken> GetParserInternal()
     {
         var doubleQuotedString = StrippedDoubleQuotedString();
 
@@ -51,7 +51,7 @@ public static class PosixStyleArgumentGrammar
             Match('='),
             value,
 
-            (_, n, _, v) => (ParsedArgument)new ParsedNamed(n, v)
+            (_, n, _, v) => (ArgumentToken)new ParsedNamed(n, v)
         ).Named("LongNameEqualsValue");
 
         // '--' <name> <ws> <value>
@@ -61,7 +61,7 @@ public static class PosixStyleArgumentGrammar
             whitespace,
             value,
 
-            (_, n, _, v) => (ParsedArgument)new ParsedFlagAndPositionalOrNamed(n, v)
+            (_, n, _, v) => (ArgumentToken)new ParsedFlagAndPositionalOrNamed(n, v)
         ).Named("LongNameImpliedValue");
 
         // '--' <name>
@@ -69,7 +69,7 @@ public static class PosixStyleArgumentGrammar
             doubleDash,
             name,
 
-            (_, n) => (ParsedArgument)new ParsedFlag(n)
+            (_, n) => (ArgumentToken)new ParsedFlag(n)
         ).Named("LongFlag");
 
         // We include this case because some short args with a positional following, are treated like
@@ -81,7 +81,7 @@ public static class PosixStyleArgumentGrammar
             whitespace,
             value,
 
-            (_, n, _, v) => (ParsedArgument)new ParsedFlagAndPositionalOrNamed(n, v)
+            (_, n, _, v) => (ArgumentToken)new ParsedFlagAndPositionalOrNamed(n, v)
         ).Named("ShortNameImpliedValue");
 
         // '-' <char>*
@@ -89,11 +89,11 @@ public static class PosixStyleArgumentGrammar
             singleDash,
             singleIdChar.List(true),
 
-            (_, n) => (ParsedArgument)new ParsedMultiFlag(n.Select(x => x.ToString()).ToList())
+            (_, n) => (ArgumentToken)new ParsedMultiFlag(n.Select(x => x.ToString()).ToList())
         ).Named("ShortFlag");
 
         var positional = value
-            .Transform(v => (ParsedArgument)new ParsedPositional(v))
+            .Transform(v => (ArgumentToken)new ParsedPositional(v))
             .Named("Positional");
 
         // <named> | <longFlag> | <shortFlag> | <positional>

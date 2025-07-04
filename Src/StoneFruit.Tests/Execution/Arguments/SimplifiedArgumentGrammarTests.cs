@@ -7,7 +7,7 @@ namespace StoneFruit.Tests.Execution.Arguments;
 
 public class SimplifiedArgumentGrammarTests
 {
-    private static IParser<char, ParsedArgument> GetParser()
+    private static IParser<char, ArgumentToken> GetParser()
         => SimplifiedArgumentGrammar.GetParser();
 
     [Test]

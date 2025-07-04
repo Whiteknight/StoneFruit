@@ -19,7 +19,7 @@ public class ParsedArguments : IArguments, IVerbSource
 
     private int _lastRawPositionalIndex;
 
-    public ParsedArguments(IEnumerable<ParsedArgument> arguments, string? rawArgs = null)
+    public ParsedArguments(IEnumerable<ArgumentToken> arguments, string? rawArgs = null)
     {
         Raw = rawArgs ?? string.Empty;
         _accessedPositionals = new List<IPositionalArgument>();
@@ -45,13 +45,13 @@ public class ParsedArguments : IArguments, IVerbSource
 
     private class RawArg
     {
-        public RawArg(ParsedArgument arg)
+        public RawArg(ArgumentToken arg)
         {
             Argument = arg;
             Access = AccessType.Unaccessed;
         }
 
-        public ParsedArgument Argument { get; }
+        public ArgumentToken Argument { get; }
 
         public AccessType Access { get; set; }
     }

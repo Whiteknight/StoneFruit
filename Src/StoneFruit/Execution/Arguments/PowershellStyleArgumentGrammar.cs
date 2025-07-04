@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using ParserObjects;
 using static ParserObjects.Parsers;
 using static ParserObjects.Parsers.C;
@@ -12,20 +11,19 @@ namespace StoneFruit.Execution.Arguments;
 /// </summary>
 public static class PowershellStyleArgumentGrammar
 {
-    private static readonly Lazy<IParser<char, ParsedArgument>> _instance
-        = new Lazy<IParser<char, ParsedArgument>>(GetParserInternal);
+    private static readonly Lazy<IParser<char, ArgumentToken>> _instance
+        = new Lazy<IParser<char, ArgumentToken>>(GetParserInternal);
 
-    public static IParser<char, ParsedArgument> GetParser() => _instance.Value;
+    public static IParser<char, ArgumentToken> GetParser() => _instance.Value;
 
-    private static IParser<char, ParsedArgument> GetParserInternal()
+    private static IParser<char, ArgumentToken> GetParserInternal()
     {
         var doubleQuotedString = StrippedDoubleQuotedString();
 
         var singleQuotedString = StrippedSingleQuotedString();
 
         var unquotedValue = Match(c => char.IsLetterOrDigit(c) || char.IsPunctuation(c))
-            .List(true)
-            .Transform(c => new string(c.ToArray()));
+            .ListCharToString(true);
 
         var whitespace = OptionalWhitespace();
 
@@ -67,7 +65,7 @@ public static class PowershellStyleArgumentGrammar
         ).Named("LongFlag");
 
         // <named> | <longFlag> | <positional>
-        var args = First<ParsedArgument>(
+        var args = First<ArgumentToken>(
             namedArg,
             longFlagArg,
             values.Transform(v => new ParsedPositional(v))

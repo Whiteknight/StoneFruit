@@ -7,7 +7,7 @@ public class FlagArgument : IFlagArgument
 {
     public FlagArgument(string name)
     {
-        Name = name.ToLowerInvariant();
+        Name = name;
     }
 
     public string Name { get; }

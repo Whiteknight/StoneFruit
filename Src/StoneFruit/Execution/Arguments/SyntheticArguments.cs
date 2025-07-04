@@ -57,7 +57,7 @@ public class SyntheticArguments : IArguments, IVerbSource
     /// Create an empty arguments object.
     /// </summary>
     /// <returns></returns>
-    public static SyntheticArguments Empty() => new SyntheticArguments(Array.Empty<IArgument>());
+    public static SyntheticArguments Empty() => new SyntheticArguments([]);
 
     /// <summary>
     /// Create named arguments from a list of name/value tuples.
