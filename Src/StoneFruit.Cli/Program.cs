@@ -14,12 +14,23 @@ internal static class Program
         var services = new ServiceCollection();
         services.UseStonefruit(b => b
             .SetupHandlers(h => h
+                // Scan for handlers using reflection. Looks for any public, non-abstract,
+                // implementations of IHandlerBase in the specified assemblies
                 .ScanHandlersFromEntryAssembly()
                 .ScanHandlersFromCurrentAssembly()
                 .ScanHandlersFromAssemblyContaining<MyFirstHandler>()
+
+                // Create an object instance and treat each of it's public methods as handlers
                 .UsePublicInstanceMethodsAsHandlers(new MyObject())
+
+                // Set up a verb which executes a callback delegate
+                // Also set up a script as an alias of this
+                // Also setup a multi-word verb using a callback delegate.
                 .Add("testf", (_, d) => d.Output.WriteLine("F"), description: "do F things", usage: "testf ...", group: "delegates")
                 .AddScript("testf-alias", ["testf"], group: "delegates")
+                .Add(new[] { "test", "j" }, (c, d) => d.Output.WriteLine("J"), description: "do J things", usage: "test j")
+
+                // Create a few scripts, showing usage
                 .AddScript("testg", ["echo test", "echo g"], group: "scripts")
                 .AddScript("testh", ["echo [0]", "echo ['a']"], group: "scripts")
                 .AddScript("testi", [
@@ -28,7 +39,6 @@ internal static class Program
                     "echo 3",
                     "echo 4"
                 ], group: "scripts")
-                .Add(new[] { "test", "j" }, (c, d) => d.Output.WriteLine("J"), description: "do J things", usage: "test j")
             )
             .SetupEnvironments(e => e
                 .SetEnvironments(new[] { "Local", "Testing", "Production" })

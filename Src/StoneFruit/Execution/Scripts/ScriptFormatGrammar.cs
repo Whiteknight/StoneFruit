@@ -32,8 +32,7 @@ public static class ScriptFormatGrammar
         );
 
         var unquotedValue = Match(c => c != ':' && (char.IsLetterOrDigit(c) || char.IsPunctuation(c)))
-            .List(true)
-            .Transform(c => new string(c.ToArray()));
+            .ListCharToString(true);
 
         // <doubleQuotedString> | <singleQuotedString> | <unquotedValue>
         var values = First(
@@ -45,8 +44,7 @@ public static class ScriptFormatGrammar
         // Default values get wedged into [] or {} brackets, or at the end of a flag name, so they are more
         // restricted in terms of values they can take without quoting.
         var unquotedDefaultValue = Match(c => char.IsLetterOrDigit(c) || (char.IsPunctuation(c) && c != ']' && c != '}'))
-            .List(true)
-            .Transform(c => new string(c.ToArray()));
+            .ListCharToString(true);
 
         var possibleDefaultValue = First(
             doubleQuotedString,
