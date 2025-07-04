@@ -48,4 +48,6 @@ public static class Constants
     /// configured.
     /// </summary>
     public const string EnvironmentNameDefault = "";
+
+    public static readonly char[] SeparatedBySpace = [' '];
 }

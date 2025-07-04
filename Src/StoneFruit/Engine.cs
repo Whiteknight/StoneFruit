@@ -48,8 +48,6 @@ public class Engine
 
     public CommandDispatcher Dispatcher { get; }
 
-    private static readonly char[] _singleSpace = new[] { ' ' };
-
     /// <summary>
     /// Selects the appropriate run mode and executes it based on the raw command line
     /// arguments passed to the application. If command line arguments are provided,
@@ -138,8 +136,7 @@ public class Engine
 
         // Now see if the first argument is the name of an environment. If so, switch
         // to that environment and continue
-        var (startingEnvironment, newCl) = GetStartingEnvironment(commandLine);
-        commandLine = newCl;
+        (var startingEnvironment, commandLine) = GetStartingEnvironment(commandLine);
 
         // If there is no commandline left, run the HeadlessNoArgs script
         if (string.IsNullOrWhiteSpace(commandLine))
@@ -151,8 +148,8 @@ public class Engine
         // Setup the Headless start script, an environment change command if any, the
         // user command, and the headless stop script
         sources.AddToEnd(State.EventCatalog.EngineStartHeadless, _parser);
-        if (!string.IsNullOrWhiteSpace(startingEnvironment))
-            sources.AddToEnd($"{EnvironmentHandler.Name} '{startingEnvironment}'");
+        if (startingEnvironment.Is(string.IsNullOrEmpty))
+            sources.AddToEnd($"{EnvironmentHandler.Name} '{startingEnvironment.GetValueOrThrow()}'");
         sources.AddToEnd(commandLine);
         sources.AddToEnd(State.EventCatalog.EngineStopHeadless, _parser);
 
@@ -208,15 +205,17 @@ public class Engine
     // See if the given commandLine starts with a valid environment name. If so,
     // extract the environment name from the front and return the remainder of the
     // commandline.
-    private (string? StartingEnvironment, string CommandLine) GetStartingEnvironment(string commandLine)
+    private (Maybe<string> StartingEnvironment, string CommandLine) GetStartingEnvironment(string commandLine)
     {
         var validEnvironments = Environments.GetNames();
         if (validEnvironments.Count <= 1)
-            return (null, commandLine);
+            return (default, commandLine);
 
-        var parts = commandLine.Split(_singleSpace, 2);
+        var parts = commandLine.Split(Constants.SeparatedBySpace, 2);
         var env = parts[0];
-        return Environments.IsValid(env) ? (env, parts[1]) : (null, commandLine);
+        return Environments.IsValid(env)
+            ? (new Maybe<string>(env), parts[1])
+            : (default, commandLine);
     }
 
     // Pulls commands from the command source until the source is empty or an exit

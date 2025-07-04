@@ -64,6 +64,12 @@ public static class Maybe
     public static Maybe<T> Flatten<T>(this Maybe<Maybe<T>> maybe)
         => maybe.Bind(static v => v);
 
+    public static bool Is<T>(this Maybe<T> maybe, T expected)
+        => maybe.Match(v => v!.Equals(expected), () => false);
+
+    public static bool Is<T>(this Maybe<T> maybe, Func<T, bool> predicate)
+        => maybe.Match(predicate, () => false);
+
     public static Maybe<T> Or<T>(this Maybe<T> maybe, Func<Maybe<T>> onFailure)
         => maybe.Match(v => new Maybe<T>(v), () => onFailure());
 

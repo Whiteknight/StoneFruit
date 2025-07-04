@@ -29,7 +29,7 @@ public class ParsedArguments : IArguments, IVerbSource
             .SelectMany(a => a switch
             {
                 ParsedMultiFlag mp => mp.ToIndividualArgs(),
-                _ => new[] { a }
+                _ => [a]
             })
             .Select(a => new RawArg(a))
             .ToList();
@@ -202,20 +202,20 @@ public class ParsedArguments : IArguments, IVerbSource
         for (int i = 0; i < _rawArguments.Count; i++)
         {
             var accessor = GetNamedAccessorForArgument(i, shouldAccess);
-            if (accessor != null && isComplete())
-                return accessor;
+            if (accessor.IsSuccess && isComplete())
+                return accessor.GetValueOrThrow();
         }
 
         return default;
     }
 
-    private NamedArgument? GetNamedAccessorForArgument(int i, Func<string, bool> shouldAccess)
+    private Maybe<NamedArgument> GetNamedAccessorForArgument(int i, Func<string, bool> shouldAccess)
     {
         var arg = _rawArguments[i];
 
         // Any consumption at all means it can't be a named value
         if (arg.Access != AccessType.Unaccessed)
-            return null;
+            return default;
 
         if (arg.Argument is ParsedNamed n && shouldAccess(n.Name))
         {
@@ -234,7 +234,7 @@ public class ParsedArguments : IArguments, IVerbSource
         }
 
         // For all other argument types, there is no named accessor
-        return null;
+        return default;
     }
 
     private void AccessNamed(NamedArgument n)
