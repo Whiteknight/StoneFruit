@@ -17,48 +17,18 @@ public class ServiceProviderHandlerSource : IHandlerSource
     private readonly VerbTrie<VerbInfo> _verbs;
     private readonly IServiceProvider _provider;
 
-    public ServiceProviderHandlerSource(IServiceCollection services, IServiceProvider provider, IVerbExtractor verbExtractor)
+    public ServiceProviderHandlerSource(IServiceProvider provider, IVerbExtractor verbExtractor, IEnumerable<RegisteredHandler> handlerTypes)
     {
-        // TODO: Redesign. Instead of taking the IServiceCollection here and picking apart the registrations,
-        // Wrap scanned handler types into a HandlerTypeWrapper and register those. Then we can inject the list
-        // here and decode from there. We don't want to depend on the lifetype of IServiceCollection lasting
-        // until this point.
         _provider = provider;
 
-        var handlerRegistrations = services
-            .Where(sd => typeof(IHandlerBase).IsAssignableFrom(sd.ServiceType))
-            .ToList();
-
-        var instances = handlerRegistrations
-            .Where(sd => sd.ImplementationInstance != null)
+        _verbs = handlerTypes
+            .Where(sd => typeof(IHandlerBase).IsAssignableFrom(sd.HandlerType))
             .SelectMany(sd =>
                 verbExtractor
-                    .GetVerbs(sd.ImplementationInstance!.GetType())
-                    .Select(verb => new VerbInfo(verb, sd.ImplementationInstance.GetType()))
+                    .GetVerbs(sd.HandlerType)
+                    .Select(verb => new VerbInfo(verb, sd.HandlerType))
             )
-            .ToList();
-
-        var types = handlerRegistrations
-            .Where(sd => sd.ImplementationType != null)
-            .SelectMany(sd =>
-                verbExtractor
-                    .GetVerbs(sd.ImplementationType!)
-                    .Select(verb => new VerbInfo(verb, sd.ImplementationType!))
-            )
-            .ToList();
-        var factories = handlerRegistrations
-            .Where(sd => sd.ImplementationFactory != null && sd.ServiceType.IsClass && !sd.ServiceType.IsAbstract)
-            .SelectMany(sd =>
-                verbExtractor
-                    .GetVerbs(sd.ServiceType)
-                    .Select(verb => new VerbInfo(verb, sd.ServiceType))
-            )
-            .ToList();
-
-        _verbs = instances
-            .Concat(types)
-            .Concat(factories)
-            .ToVerbTrie(i => i.Verb);
+            .ToVerbTrie(vi => vi.Verb);
     }
 
     public Maybe<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
@@ -68,7 +38,8 @@ public class ServiceProviderHandlerSource : IHandlerSource
             return default;
 
         using var scope = _provider.CreateScope();
-        return serviceType.Bind(st => new Maybe<IHandlerBase>(scope.ServiceProvider.GetService(st.Type) as IHandlerBase));
+        return serviceType
+            .Bind(st => new Maybe<IHandlerBase>(scope.ServiceProvider.GetService(st.Type) as IHandlerBase));
     }
 
     public IEnumerable<IVerbInfo> GetAll() => _verbs.GetAll().Select(kvp => kvp.Value);

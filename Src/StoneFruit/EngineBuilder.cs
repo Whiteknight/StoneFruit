@@ -125,7 +125,6 @@ public sealed class EngineBuilder : IEngineBuilder
         var engineBuilder = new EngineBuilder(services);
         build?.Invoke(engineBuilder);
         SetupCoreEngineRegistrations(services);
-        services.AddSingleton<IHandlerSource>(provider => new ServiceProviderHandlerSource(services, provider, provider.GetRequiredService<IVerbExtractor>()));
 
         // Build up the final Engine registrations. This involves resolving some
         // dependencies which were setup previously

@@ -41,6 +41,7 @@ public class HandlerSetup : IHandlerSetup
     {
         services.TryAddSingleton(PriorityVerbExtractor.DefaultInstance);
         services.TryAddSingleton<IHandlerMethodInvoker, ServiceProviderMethodInvoker>();
+        services.AddSingleton<IHandlerSource, ServiceProviderHandlerSource>();
 
         // Register these sources only if they have entries. We don't care about pre-existing
         // registrations, because IHandlerSource is expected to exist in multiples
@@ -127,13 +128,18 @@ public class HandlerSetup : IHandlerSetup
 
     public IHandlerSetup ScanAssemblyForHandlers(Assembly assembly)
     {
-        NotNull(assembly);
-        var handlerTypes = assembly.GetTypes()
-            .Where(t => !t.IsAbstract && t.IsPublic && t.IsAssignableTo(typeof(IHandlerBase)))
-            // TODO: Add each found handler type to a wrapper. Register the wrapper.
-            ;
+        var handlerTypes = NotNull(assembly).GetTypes()
+            .Where(t => !t.IsAbstract && t.IsPublic && t.IsAssignableTo(typeof(IHandlerBase)));
+
+        // Each handler type creates two DI registrations:
+        // 1) the type itself, as itself, so we can resolve the handler instance later, and
+        // 2) a RegisteredHandler, which holds the handler type, so we can set up verb->handler mappings
         foreach (var type in handlerTypes)
+        {
             _services.AddScoped(type);
+            _services.AddSingleton(new RegisteredHandler(type));
+        }
+
         return this;
     }
 }
