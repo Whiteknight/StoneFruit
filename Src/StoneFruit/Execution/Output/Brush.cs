@@ -7,7 +7,7 @@ namespace StoneFruit.Execution.Output;
 /// Value to represent a foreground/background color combination for writing on the
 /// windows terminal.
 /// </summary>
-public struct Brush
+public readonly struct Brush
     : IEquatable<Brush>
 {
     public Brush(byte byteValue)

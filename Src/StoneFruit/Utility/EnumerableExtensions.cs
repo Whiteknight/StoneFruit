@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace StoneFruit.Utility;
 
@@ -13,7 +12,7 @@ public static class EnumerableExtensions
     /// <param name="source"></param>
     /// <returns></returns>
     public static IEnumerable<T> OrEmptyIfNull<T>(this IEnumerable<T> source)
-        => source ?? Enumerable.Empty<T>();
+        => source ?? [];
 
     /// <summary>
     /// During enumeration, execute a callback on every item without returning a different

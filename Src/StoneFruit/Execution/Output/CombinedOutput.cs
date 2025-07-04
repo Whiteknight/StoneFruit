@@ -27,9 +27,9 @@ public class CombinedOutput : IOutput
         if (_primary == null || changeBrush == null)
             return this;
         var newPrimary = _primary.Color(changeBrush);
-        if (!ReferenceEquals(newPrimary, _primary))
-            return new CombinedOutput(newPrimary, _secondaries);
-        return this;
+        return ReferenceEquals(newPrimary, _primary)
+            ? this
+            : new CombinedOutput(newPrimary, _secondaries);
     }
 
     public IOutput WriteLine()

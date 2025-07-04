@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using StoneFruit;
 using StoneFruit.Execution.Arguments;
 
-namespace StoneFruit.Execution.Scripts.Formatting;
+namespace StoneFruit.Execution.Scripts;
 
 /// <summary>
 /// A formatting object used to create a command from a list of arguments. The format
@@ -18,11 +19,8 @@ public class CommandFormat
     }
 
     public IArguments Format(IArguments args)
-    {
-        var argList = _args
+        => _args
             .SelectMany(a => a.Access(args))
             .Where(a => a != null)
-            .ToList();
-        return new SyntheticArguments(argList);
-    }
+            .ToSyntheticArguments();
 }

@@ -1,6 +1,6 @@
 ﻿using ParserObjects;
 using StoneFruit.Execution.Arguments;
-using StoneFruit.Execution.Scripts.Formatting;
+using StoneFruit.Execution.Scripts;
 using StoneFruit.Utility;
 
 namespace StoneFruit;

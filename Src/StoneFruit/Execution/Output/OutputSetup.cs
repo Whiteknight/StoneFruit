@@ -46,8 +46,8 @@ public class OutputSetup : IOutputSetup
             return new CombinedOutput(_secondaries);
         }
 
-        if (_secondaries.Count == 0)
-            return new ConsoleOutput();
-        return new CombinedOutput(new ConsoleOutput(), _secondaries);
+        return _secondaries.Count == 0
+            ? new ConsoleOutput()
+            : new CombinedOutput(new ConsoleOutput(), _secondaries);
     }
 }

@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using ParserObjects;
 using StoneFruit.Execution.Scripts;
-using StoneFruit.Execution.Scripts.Formatting;
 
 namespace StoneFruit.Execution.Arguments;
 

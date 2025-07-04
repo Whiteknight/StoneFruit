@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ParserObjects;
 using StoneFruit.Execution.Arguments;
-using StoneFruit.Execution.Scripts.Formatting;
+using StoneFruit.Utility;
 using static ParserObjects.Parsers;
 using static ParserObjects.Parsers.C;
 using static ParserObjects.Parsers<char>;
@@ -228,54 +228,35 @@ public static class ScriptFormatGrammar
             args.List(Whitespace(), true),
             If(End(), Produce(() => true)),
 
-            (a, _) => new CommandFormat(a.ToList())
+            (a, _) => new CommandFormat(a)
         );
     }
 
     private class FetchAllFlagsArgumentAccessor : IArgumentAccessor
     {
         public IEnumerable<IArgument> Access(IArguments args)
-        {
-            var results = new List<IArgument>();
-            var flags = args.GetAllFlags();
-            foreach (var flag in flags)
-            {
-                flag.MarkConsumed();
-                results.Add(new FlagArgument(flag.Name));
-            }
-
-            return results;
-        }
+            => args.GetAllFlags()
+                .Tap(f => f.MarkConsumed())
+                .Select(f => new FlagArgument(f.Name))
+                .ToList();
     }
 
     private class FetchAllNamedArgumentAccessor : IArgumentAccessor
     {
         public IEnumerable<IArgument> Access(IArguments args)
-        {
-            var results = new List<IArgument>();
-            foreach (var named in args.GetAllNamed())
-            {
-                named.MarkConsumed();
-                results.Add(new NamedArgument(named.Name, named.Value));
-            }
-
-            return results;
-        }
+            => args.GetAllNamed()
+                .Tap(n => n.MarkConsumed())
+                .Select(n => new NamedArgument(n.Name, n.Value))
+                .ToList();
     }
 
     private class FetchAllPositionalArgumentAccessor : IArgumentAccessor
     {
         public IEnumerable<IArgument> Access(IArguments args)
-        {
-            var results = new List<IArgument>();
-            foreach (var positional in args.GetAllPositionals())
-            {
-                positional.MarkConsumed();
-                results.Add(new PositionalArgument(positional.Value));
-            }
-
-            return results;
-        }
+            => args.GetAllPositionals()
+                .Tap(p => p.MarkConsumed())
+                .Select(p => new PositionalArgument(p.Value))
+                .ToList();
     }
 
     private class FetchFlagArgumentAccessor : IArgumentAccessor
@@ -293,10 +274,10 @@ public static class ScriptFormatGrammar
         {
             var flag = args.GetFlag(_name);
             if (!flag.Exists())
-                return Enumerable.Empty<IArgument>();
+                return [];
             flag.MarkConsumed();
             var name = _newName.GetValueOrDefault(_name);
-            return new[] { new FlagArgument(name) };
+            return [new FlagArgument(name)];
         }
     }
 
@@ -320,16 +301,16 @@ public static class ScriptFormatGrammar
             if (arg.Exists())
             {
                 arg.MarkConsumed();
-                return new[] { new NamedArgument(_name, arg.AsString(string.Empty)) };
+                return [new NamedArgument(_name, arg.AsString(string.Empty))];
             }
 
             // See if we have a default value
             if (_defaultValue.Success)
-                return new[] { new NamedArgument(_name, _defaultValue.Value) };
+                return [new NamedArgument(_name, _defaultValue.Value)];
 
             // See if we can ignore it
             if (!_required)
-                return Enumerable.Empty<IArgument>();
+                return [];
 
             // We're missing a required value
             throw ArgumentParseException.MissingRequiredArgument(_name);
@@ -356,16 +337,16 @@ public static class ScriptFormatGrammar
             if (arg.Exists())
             {
                 arg.MarkConsumed();
-                return new[] { new PositionalArgument(arg.AsString(string.Empty)) };
+                return [new PositionalArgument(arg.AsString(string.Empty))];
             }
 
             // See if we have a default value
             if (_defaultValue.Success)
-                return new[] { new PositionalArgument(_defaultValue.Value) };
+                return [new PositionalArgument(_defaultValue.Value)];
 
             // See if it's optional
             if (!_required)
-                return Enumerable.Empty<IArgument>();
+                return [];
 
             // We're missing a required argument
             throw ArgumentParseException.MissingRequiredArgument(_name);
@@ -392,16 +373,16 @@ public static class ScriptFormatGrammar
             if (arg.Exists() && !arg.Consumed)
             {
                 arg.MarkConsumed();
-                return new[] { new PositionalArgument(arg.AsString(string.Empty)) };
+                return [new PositionalArgument(arg.AsString(string.Empty))];
             }
 
             // See if we have a default value
             if (_defaultValue.Success)
-                return new[] { new PositionalArgument(_defaultValue.Value) };
+                return [new PositionalArgument(_defaultValue.Value)];
 
             // See if it's optional
             if (!_required)
-                return Enumerable.Empty<IArgument>();
+                return [];
 
             // We're missing a required value
             throw ArgumentParseException.MissingRequiredArgument(_index);
@@ -418,7 +399,7 @@ public static class ScriptFormatGrammar
         }
 
         public IEnumerable<IArgument> Access(IArguments args)
-            => new[] { new FlagArgument(_name) };
+            => [new FlagArgument(_name)];
     }
 
     private class LiteralNamedArgumentAccessor : IArgumentAccessor
@@ -433,7 +414,7 @@ public static class ScriptFormatGrammar
         }
 
         public IEnumerable<IArgument> Access(IArguments args)
-            => new[] { new NamedArgument(_name, _value) };
+            => [new NamedArgument(_name, _value)];
     }
 
     private class LiteralPositionalArgumentAccessor : IArgumentAccessor
@@ -446,7 +427,7 @@ public static class ScriptFormatGrammar
         }
 
         public IEnumerable<IArgument> Access(IArguments args)
-            => new[] { new PositionalArgument(_value) };
+            => [new PositionalArgument(_value)];
     }
 
     private class NamedFetchNamedArgumentAccessor : IArgumentAccessor
@@ -471,16 +452,16 @@ public static class ScriptFormatGrammar
             if (arg.Exists())
             {
                 arg.MarkConsumed();
-                return new[] { new NamedArgument(_newName, arg.AsString(string.Empty)), };
+                return [new NamedArgument(_newName, arg.AsString(string.Empty)),];
             }
 
             // Second see if we have a default value
             if (_defaultValue.Success)
-                return new[] { new NamedArgument(_newName, _defaultValue.Value) };
+                return [new NamedArgument(_newName, _defaultValue.Value)];
 
             // Third, if this value isn't required, return nothing
             if (!_required)
-                return Enumerable.Empty<IArgument>();
+                return [];
 
             // Throw an exception, we're missing something that's required.
             throw ArgumentParseException.MissingRequiredArgument(_oldName);
@@ -509,16 +490,16 @@ public static class ScriptFormatGrammar
             if (arg.Exists())
             {
                 arg.MarkConsumed();
-                return new[] { new NamedArgument(_newName, arg.AsString(string.Empty)) };
+                return [new NamedArgument(_newName, arg.AsString(string.Empty))];
             }
 
             // See if we have a default value
             if (_defaultValue.Success)
-                return new[] { new NamedArgument(_newName, _defaultValue.Value) };
+                return [new NamedArgument(_newName, _defaultValue.Value)];
 
             // See if we can ignore it
             if (!_required)
-                return Enumerable.Empty<IArgument>();
+                return [];
 
             // Throw an error that we're missing a required value
             throw ArgumentParseException.MissingRequiredArgument(_index);
