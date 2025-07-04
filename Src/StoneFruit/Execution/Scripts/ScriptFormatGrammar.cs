@@ -75,7 +75,7 @@ public static class ScriptFormatGrammar
             Match('-'),
             names,
 
-            (_, name) => new LiteralFlagArgumentAccessor(name)
+            (_, name) => (IArgumentAccessor)new LiteralFlagArgumentAccessor(name)
         );
 
         // Fetch a flag from the input and rename it on the output if it exists
@@ -90,7 +90,7 @@ public static class ScriptFormatGrammar
                 (_, newName) => newName
             ).Optional(),
 
-            (_, name, newName) => new FetchFlagArgumentAccessor(name, newName)
+            (_, name, newName) => (IArgumentAccessor)new FetchFlagArgumentAccessor(name, newName)
         );
 
         // A literal named arg which is passed without modification
@@ -100,7 +100,7 @@ public static class ScriptFormatGrammar
             Match('='),
             values,
 
-            (name, _, value) => new LiteralNamedArgumentAccessor(name, value)
+            (name, _, value) => (IArgumentAccessor)new LiteralNamedArgumentAccessor(name, value)
         );
 
         // A named argument where the name is a literal but the value fetched from a named arg
@@ -114,7 +114,7 @@ public static class ScriptFormatGrammar
             Match(']'),
             maybeRequired,
 
-            (n, _, _, s, defaultValue, _, required) => new NamedFetchNamedArgumentAccessor(n, s, required, defaultValue)
+            (n, _, _, s, defaultValue, _, required) => (IArgumentAccessor)new NamedFetchNamedArgumentAccessor(n, s, required, defaultValue)
         );
 
         // A named argument where the name is a literal but the value is fetched from a positional
@@ -128,7 +128,7 @@ public static class ScriptFormatGrammar
             Match(']'),
             maybeRequired,
 
-            (n, _, _, i, defaultValue, _, required) => new NamedFetchPositionalArgumentAccessor(n, i, required, defaultValue)
+            (n, _, _, i, defaultValue, _, required) => (IArgumentAccessor)new NamedFetchPositionalArgumentAccessor(n, i, required, defaultValue)
         );
 
         // Fetch a named argument including name and value
@@ -141,7 +141,7 @@ public static class ScriptFormatGrammar
             Match('}'),
             maybeRequired,
 
-            (_, s, defaultValue, _, required) => new FetchNamedArgumentAccessor(s, required, defaultValue)
+            (_, s, defaultValue, _, required) => (IArgumentAccessor)new FetchNamedArgumentAccessor(s, required, defaultValue)
         );
 
         // Fetch all remaining unconsumed named arguments
@@ -151,12 +151,12 @@ public static class ScriptFormatGrammar
             Match('*'),
             Match('}'),
 
-            (_, _, _) => new FetchAllNamedArgumentAccessor()
+            (_, _, _) => (IArgumentAccessor)new FetchAllNamedArgumentAccessor()
         );
 
         // A literal positional argument
         // literalPositionalArg := <values>
-        var literalPositionalArg = values.Transform(v => new LiteralPositionalArgumentAccessor(v));
+        var literalPositionalArg = values.Transform(v => (IArgumentAccessor)new LiteralPositionalArgumentAccessor(v));
 
         // Fetch a positional argument by index
         // fetchPositionalArg := '[' <integer> ']'
@@ -167,7 +167,7 @@ public static class ScriptFormatGrammar
             Match(']'),
             maybeRequired,
 
-            (_, i, defaultValue, _, required) => new FetchPositionalArgumentAccessor(i, required, defaultValue)
+            (_, i, defaultValue, _, required) => (IArgumentAccessor)new FetchPositionalArgumentAccessor(i, required, defaultValue)
         );
 
         // Fetch all remaining unconsumed positional arguments
@@ -177,7 +177,7 @@ public static class ScriptFormatGrammar
             Match('*'),
             Match(']'),
 
-            (_, _, _) => new FetchAllPositionalArgumentAccessor()
+            (_, _, _) => (IArgumentAccessor)new FetchAllPositionalArgumentAccessor()
         );
 
         // Fetch all remaining unconsumed flag arguments
@@ -186,7 +186,7 @@ public static class ScriptFormatGrammar
             Match('-'),
             Match('*'),
 
-            (_, _) => new FetchAllFlagsArgumentAccessor()
+            (_, _) => (IArgumentAccessor)new FetchAllFlagsArgumentAccessor()
         );
 
         // Fetch the value of a named argument and pass it as a positional argument
@@ -198,7 +198,7 @@ public static class ScriptFormatGrammar
             Match(']'),
             maybeRequired,
 
-            (_, s, defaultValue, _, required) => new FetchNamedToPositionalArgumentAccessor(s, required, defaultValue)
+            (_, s, defaultValue, _, required) => (IArgumentAccessor)new FetchNamedToPositionalArgumentAccessor(s, required, defaultValue)
         );
 
         // All possible args

@@ -42,7 +42,7 @@ public static class WindowsCmdArgumentGrammar
             Match(':'),
             value,
 
-            (_, n, _, v) => new ParsedNamed(n, v)
+            (_, n, _, v) => (ArgumentToken)new ParsedNamed(n, v)
         ).Named("Named");
 
         // '-' <name> <whitespace> <value>
@@ -52,7 +52,7 @@ public static class WindowsCmdArgumentGrammar
             whitespace,
             value,
 
-            (_, n, _, v) => new ParsedFlagAndPositionalOrNamed(n, v)
+            (_, n, _, v) => (ArgumentToken)new ParsedFlagAndPositionalOrNamed(n, v)
         ).Named("NamedMaybeValue");
 
         // '/' <name>
@@ -60,7 +60,7 @@ public static class WindowsCmdArgumentGrammar
             Match('/'),
             name,
 
-            (_, n) => new ParsedFlag(n)
+            (_, n) => (ArgumentToken)new ParsedFlag(n)
         ).Named("Flag");
 
         // <named> | <flag> | <positional>
@@ -68,7 +68,7 @@ public static class WindowsCmdArgumentGrammar
             namedArg,
             maybeNamedArg,
             flagArg,
-            value.Transform(v => new ParsedPositional(v))
+            value.Transform(v => (ArgumentToken)new ParsedPositional(v))
         ).Named("Argument");
 
         return Rule(

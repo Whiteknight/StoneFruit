@@ -39,7 +39,7 @@ public static class SimplifiedArgumentGrammar
             Match('-'),
             names,
 
-            (_, name) => new ParsedFlag(name)
+            (_, name) => (ArgumentToken)new ParsedFlag(name)
         ).Named("Flag");
 
         // <name> '=' <value>
@@ -48,14 +48,14 @@ public static class SimplifiedArgumentGrammar
             Match('='),
             values,
 
-            (name, _, value) => new ParsedNamed(name, value)
+            (name, _, value) => (ArgumentToken)new ParsedNamed(name, value)
         ).Named("Named");
 
         // <flag> | <named> | <positional>
         var args = First<ArgumentToken>(
             flagArg,
             namedArg,
-            values.Transform(v => new ParsedPositional(v))
+            values.Transform(v => (ArgumentToken)new ParsedPositional(v))
         ).Named("Argument");
 
         return Rule(

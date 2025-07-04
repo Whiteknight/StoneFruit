@@ -148,7 +148,7 @@ public class Engine
         // Setup the Headless start script, an environment change command if any, the
         // user command, and the headless stop script
         sources.AddToEnd(State.EventCatalog.EngineStartHeadless, _parser);
-        if (startingEnvironment.Is(string.IsNullOrEmpty))
+        if (startingEnvironment.Is(env => !string.IsNullOrEmpty(env)))
             sources.AddToEnd($"{EnvironmentHandler.Name} '{startingEnvironment.GetValueOrThrow()}'");
         sources.AddToEnd(commandLine);
         sources.AddToEnd(State.EventCatalog.EngineStopHeadless, _parser);

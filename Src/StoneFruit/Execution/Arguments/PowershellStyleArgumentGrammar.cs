@@ -43,7 +43,7 @@ public static class PowershellStyleArgumentGrammar
         var names = Identifier();
 
         // Powershell convention doesn't really have a clear way to specify that a switch/value is a
-        // named arg or just a switch followed by a positional. Return a combined argument which acts
+        // named arg or just a switch followed by  (ArgumentToken)a positional. Return a combined argument which acts
         // like all three and the user can consume it however they want
 
         // <nameStart> <name> <whitespace> <value>
@@ -53,7 +53,7 @@ public static class PowershellStyleArgumentGrammar
             whitespace,
             values,
 
-            (_, name, _, value) => new ParsedFlagAndPositionalOrNamed(name, value)
+            (_, name, _, value) => (ArgumentToken)new ParsedFlagAndPositionalOrNamed(name, value)
         ).Named("Named");
 
         // <nameStart> <name>
@@ -61,14 +61,14 @@ public static class PowershellStyleArgumentGrammar
             nameStart,
             names,
 
-            (_, name) => new ParsedFlag(name)
+            (_, name) => (ArgumentToken)new ParsedFlag(name)
         ).Named("LongFlag");
 
         // <named> | <longFlag> | <positional>
         var args = First<ArgumentToken>(
             namedArg,
             longFlagArg,
-            values.Transform(v => new ParsedPositional(v))
+            values.Transform(v => (ArgumentToken)new ParsedPositional(v))
         ).Named("Argument");
 
         var whitespaceAndArgs = Rule(

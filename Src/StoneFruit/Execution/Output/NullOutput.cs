@@ -13,5 +13,5 @@ public class NullOutput : IOutput
     public IOutput Write(string str) => this;
 
     public Maybe<string> Prompt(string prompt, bool mustProvide = true, bool keepHistory = true)
-        => string.Empty;
+        => default;
 }
