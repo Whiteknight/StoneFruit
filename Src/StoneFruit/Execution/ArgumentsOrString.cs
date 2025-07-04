@@ -7,6 +7,12 @@ namespace StoneFruit.Execution;
 /// </summary>
 public class ArgumentsOrString
 {
+    private ArgumentsOrString()
+    {
+        Arguments = null;
+        String = null;
+    }
+
     public ArgumentsOrString(string asString)
     {
         Arguments = null;
@@ -18,6 +24,8 @@ public class ArgumentsOrString
         Arguments = NotNull(asArguments);
         String = null;
     }
+
+    public static ArgumentsOrString Invalid { get; } = new ArgumentsOrString();
 
     public IArguments? Arguments { get; }
 

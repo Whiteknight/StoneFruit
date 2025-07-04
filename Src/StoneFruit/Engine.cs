@@ -243,19 +243,15 @@ public class Engine
         {
             // Get a command. If we have one in the state use that. Otherwise try to
             // get one from the sources. If null, we're all done so exit
-            Maybe<ArgumentsOrString> commandResult = State.Commands.GetNext();
-            if (!commandResult.IsSuccess)
-                commandResult = sources.GetNextCommand();
-            if (!commandResult.IsSuccess)
-                return Constants.ExitCode.Ok;
-
-            var command = commandResult.GetValueOrThrow();
-            if (command?.IsValid != true)
+            var command = State.Commands.GetNext()
+                .Or(() => sources.GetNextCommand())
+                .GetValueOrDefault(ArgumentsOrString.Invalid);
+            if (!command.IsValid)
                 return Constants.ExitCode.Ok;
 
             // Check the counter to make sure that we are not in a runaway loop
             // If we are in a loop, the counter will setup the command queue to handle
-            // it
+            // it, so we just continue.
             var canExecute = State.CommandCounter.VerifyCanExecuteNextCommand(_parser, Output);
             if (!canExecute)
                 continue;
