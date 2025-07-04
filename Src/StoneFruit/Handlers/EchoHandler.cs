@@ -7,7 +7,7 @@ namespace StoneFruit.Handlers;
 [Verb(Name, Hide = true)]
 public class EchoHandler : IHandler
 {
-    public const string Name = "_echo";
+    public const string Name = "echo";
     public const string FlagNoNewline = "nonewline";
     public const string FlagNoHeadless = "noheadless";
     public const string ArgColor = "color";

@@ -14,7 +14,7 @@ public class ScriptTests
         var engine = EngineBuilder.Build(b => b
             .SetupHandlers(h => h
                 .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                .AddScript("test", new[] { "args a b=c -d" })
+                .AddScript("test", new[] { "_args a b=c -d" })
             )
             .SetupOutput(o => o.DoNotUseConsole().Add(output))
         ); ;
@@ -32,7 +32,7 @@ public class ScriptTests
         var engine = EngineBuilder.Build(b => b
             .SetupHandlers(h => h
                 .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                .AddScript("test", new[] { "args [1] [0] ['x'] [3]" })
+                .AddScript("test", new[] { "_args [1] [0] ['x'] [3]" })
             )
             .SetupOutput(o => o.DoNotUseConsole().Add(output))
         ); ;
@@ -50,7 +50,7 @@ public class ScriptTests
         var engine = EngineBuilder.Build(b => b
             .SetupHandlers(h => h
                 .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                .AddScript("test", new[] { "args [0]!" })
+                .AddScript("test", new[] { "_args [0]!" })
             )
             .SetupOutput(o => o.DoNotUseConsole().Add(output))
         ); ;
@@ -65,7 +65,7 @@ public class ScriptTests
         var engine = EngineBuilder.Build(b => b
             .SetupHandlers(h => h
                 .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                .AddScript("test", new[] { "args [0:test]" })
+                .AddScript("test", new[] { "_args [0:test]" })
             )
             .SetupOutput(o => o.DoNotUseConsole().Add(output))
         ); ;
@@ -81,7 +81,7 @@ public class ScriptTests
         var engine = EngineBuilder.Build(b => b
             .SetupHandlers(h => h
                 .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                .AddScript("test", new[] { "args [0:'test']" })
+                .AddScript("test", new[] { "_args [0:'test']" })
             )
             .SetupOutput(o => o.DoNotUseConsole().Add(output))
         ); ;
@@ -97,7 +97,7 @@ public class ScriptTests
         var engine = EngineBuilder.Build(b => b
             .SetupHandlers(h => h
                 .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                .AddScript("test", new[] { "args [0:\"test\"]" })
+                .AddScript("test", new[] { "_args [0:\"test\"]" })
             )
             .SetupOutput(o => o.DoNotUseConsole().Add(output))
         ); ;
@@ -113,7 +113,7 @@ public class ScriptTests
         var engine = EngineBuilder.Build(b => b
             .SetupHandlers(h => h
                 .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                .AddScript("test", new[] { "args ['x']!" })
+                .AddScript("test", new[] { "_args ['x']!" })
             )
             .SetupOutput(o => o.DoNotUseConsole().Add(output))
         ); ;
@@ -128,7 +128,7 @@ public class ScriptTests
         var engine = EngineBuilder.Build(b => b
             .SetupHandlers(h => h
                 .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                .AddScript("test", new[] { "args ['x':test]" })
+                .AddScript("test", new[] { "_args ['x':test]" })
             )
             .SetupOutput(o => o.DoNotUseConsole().Add(output))
         ); ;
@@ -144,7 +144,7 @@ public class ScriptTests
         var engine = EngineBuilder.Build(b => b
             .SetupHandlers(h => h
                 .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                .AddScript("test", new[] { "args [1] [*]" })
+                .AddScript("test", new[] { "_args [1] [*]" })
             )
             .SetupOutput(o => o.DoNotUseConsole().Add(output))
         ); ;
@@ -162,7 +162,7 @@ public class ScriptTests
         var engine = EngineBuilder.Build(b => b
             .SetupHandlers(h => h
                 .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                .AddScript("test", new[] { "args a=['b'] {c} d=[0]" })
+                .AddScript("test", new[] { "_args a=['b'] {c} d=[0]" })
             )
             .SetupOutput(o => o.DoNotUseConsole().Add(output))
         ); ;
@@ -181,7 +181,7 @@ public class ScriptTests
             .SetupHandlers(h => h
                 .UseHandlerTypes(typeof(ArgumentDisplayHandler))
                 // 'b' is required but not provided.
-                .AddScript("test", new[] { "args a=['b']!" })
+                .AddScript("test", new[] { "_args a=['b']!" })
             )
             .SetupOutput(o => o.DoNotUseConsole().Add(output))
         ); ;
@@ -196,7 +196,7 @@ public class ScriptTests
         var engine = EngineBuilder.Build(b => b
             .SetupHandlers(h => h
                 .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                .AddScript("test", new[] { "args a=['b':test]" })
+                .AddScript("test", new[] { "_args a=['b':test]" })
             )
             .SetupOutput(o => o.DoNotUseConsole().Add(output))
         ); ;
@@ -212,7 +212,7 @@ public class ScriptTests
         var engine = EngineBuilder.Build(b => b
             .SetupHandlers(h => h
                 .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                .AddScript("test", new[] { "args d=[0]!" })
+                .AddScript("test", new[] { "_args d=[0]!" })
             )
             .SetupOutput(o => o.DoNotUseConsole().Add(output))
         ); ;
@@ -227,7 +227,7 @@ public class ScriptTests
         var engine = EngineBuilder.Build(b => b
             .SetupHandlers(h => h
                 .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                .AddScript("test", new[] { "args d=[0:test]" })
+                .AddScript("test", new[] { "_args d=[0:test]" })
             )
             .SetupOutput(o => o.DoNotUseConsole().Add(output))
         ); ;
@@ -243,7 +243,7 @@ public class ScriptTests
         var engine = EngineBuilder.Build(b => b
             .SetupHandlers(h => h
                 .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                .AddScript("test", new[] { "args {c}!" })
+                .AddScript("test", new[] { "_args {c}!" })
             )
             .SetupOutput(o => o.DoNotUseConsole().Add(output))
         ); ;
@@ -258,7 +258,7 @@ public class ScriptTests
         var engine = EngineBuilder.Build(b => b
             .SetupHandlers(h => h
                 .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                .AddScript("test", new[] { "args {c:test}" })
+                .AddScript("test", new[] { "_args {c:test}" })
             )
             .SetupOutput(o => o.DoNotUseConsole().Add(output))
         ); ;
@@ -274,7 +274,7 @@ public class ScriptTests
         var engine = EngineBuilder.Build(b => b
             .SetupHandlers(h => h
                 .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                .AddScript("test", new[] { "args {b} {*}" })
+                .AddScript("test", new[] { "_args {b} {*}" })
             )
             .SetupOutput(o => o.DoNotUseConsole().Add(output))
         ); ;
@@ -292,7 +292,7 @@ public class ScriptTests
         var engine = EngineBuilder.Build(b => b
             .SetupHandlers(h => h
                 .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                .AddScript("test", new[] { "args ?x ?y" })
+                .AddScript("test", new[] { "_args ?x ?y" })
             )
             .SetupOutput(o => o.DoNotUseConsole().Add(output))
         ); ;
@@ -308,7 +308,7 @@ public class ScriptTests
         var engine = EngineBuilder.Build(b => b
             .SetupHandlers(h => h
                 .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                .AddScript("test", new[] { "args ?x:a ?y:b" })
+                .AddScript("test", new[] { "_args ?x:a ?y:b" })
             )
             .SetupOutput(o => o.DoNotUseConsole().Add(output))
         ); ;
@@ -324,7 +324,7 @@ public class ScriptTests
         var engine = EngineBuilder.Build(b => b
             .SetupHandlers(h => h
                 .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                .AddScript("test", new[] { "args ?y -*" })
+                .AddScript("test", new[] { "_args ?y -*" })
             )
             .SetupOutput(o => o.DoNotUseConsole().Add(output))
         ); ;
@@ -345,7 +345,7 @@ public class ScriptTests
                 .AddScript("test", new[]
                 {
                     "echo start",
-                    "args [0] {b} ?d",
+                    "_args [0] {b} ?d",
                     "echo stop"
                 })
             )
@@ -367,7 +367,7 @@ public class ScriptTests
         var engine = EngineBuilder.Build(b => b
             .SetupHandlers(h => h
                 .UseHandlerTypes(typeof(ArgumentDisplayHandler))
-                .AddScript("test1", new[] { "args [0]" })
+                .AddScript("test1", new[] { "_args [0]" })
                 .AddScript("test2", new[] { "test1 [0]" })
             )
             .SetupOutput(o => o.DoNotUseConsole().Add(output))
@@ -385,7 +385,7 @@ public class ScriptTests
             .SetupHandlers(h => h
                 .UseHandlerTypes(typeof(ArgumentDisplayHandler))
                 .AddScript("test2", new[] { "test1 [0]" })
-                .AddScript("test1", new[] { "args [0]" })
+                .AddScript("test1", new[] { "_args [0]" })
             )
             .SetupOutput(o => o.DoNotUseConsole().Add(output))
         ); ;
