@@ -7,30 +7,34 @@
 /// </summary>
 public class InteractiveEngineStateCommandCounter : IEngineStateCommandCounter
 {
+    private const string _numberOfCommandsKey = "_numberOfCommands";
     private readonly EngineStateCommandQueue _commands;
+    private readonly EngineStateMetadataCache _metadata;
     private readonly EngineSettings _settings;
-    private int _consecutiveCommands;
 
-    public InteractiveEngineStateCommandCounter(EngineStateCommandQueue commands, EngineSettings settings)
+    public InteractiveEngineStateCommandCounter(EngineStateCommandQueue commands, EngineStateMetadataCache metadata, EngineSettings settings)
     {
         _commands = commands;
+        _metadata = metadata;
         _settings = settings;
-        _consecutiveCommands = 0;
     }
 
     public void ReceiveUserInput()
     {
         // Set to -1 so when we execute the current command that the user just input,
         // we are back to 0 commands without user input.
-        _consecutiveCommands = -1;
+        _metadata.Add(_numberOfCommandsKey, -1);
     }
 
     public bool VerifyCanExecuteNextCommand(ICommandParser parser, IOutput output)
     {
+        var consecutiveCommands = _metadata.Get(_numberOfCommandsKey)
+            .Map(o => int.TryParse(o.ToString(), out var val) ? val : 0)
+            .GetValueOrDefault(0);
         var limit = _settings.MaxInputlessCommands;
-        if (_consecutiveCommands < limit)
+        if (consecutiveCommands < limit)
         {
-            _consecutiveCommands++;
+            _metadata.Add(_numberOfCommandsKey, consecutiveCommands + 1);
             return true;
         }
 

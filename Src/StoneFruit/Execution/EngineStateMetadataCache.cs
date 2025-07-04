@@ -24,8 +24,7 @@ public class EngineStateMetadataCache : IEnumerable<KeyValuePair<string, object>
         if (!allowOverwrite)
             return;
 
-        _metadata.Remove(name);
-        _metadata.Add(name, value);
+        _metadata[name] = value;
     }
 
     public Maybe<object> Get(string name)

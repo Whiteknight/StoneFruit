@@ -45,8 +45,8 @@ public class EngineState
         RunMode = runMode;
         CommandCounter = runMode switch
         {
-            EngineRunMode.Headless => new HeadlessEngineStateCommandCounter(Commands, EventCatalog, Settings),
-            EngineRunMode.Interactive => new InteractiveEngineStateCommandCounter(Commands, Settings),
+            EngineRunMode.Headless => new HeadlessEngineStateCommandCounter(Commands, Metadata, EventCatalog, Settings),
+            EngineRunMode.Interactive => new InteractiveEngineStateCommandCounter(Commands, Metadata, Settings),
             _ => new NullCommandCounter()
         };
     }
