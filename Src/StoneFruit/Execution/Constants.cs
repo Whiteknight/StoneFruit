@@ -38,6 +38,9 @@ public static class Constants
         /// loops.
         /// </summary>
         public const string Error = "__CURRENT_EXCEPTION";
+        public const string ConsecutiveCommandsWithoutUserInput = "__CONSECUTIVE_COMMANDS";
+        public const string ConsecutiveCommandsReachedLimit = "__CONSECUTIVE_COMMANDS_LIMIT_REACHED";
+        public const string CurrentCommandIsUserInput = "__CURRENT_COMMAND_FROM_USER";
     }
 
     /// <summary>

@@ -200,7 +200,7 @@ public class Engine
             source.AddToEnd($"{EnvironmentHandler.Name} '{environment}'");
 
         source.AddToEnd(State.EventCatalog.EngineStartInteractive, _parser);
-        source.AddToEnd(new PromptCommandSource(Output, Environments, State));
+        source.AddToEnd(new PromptCommandSource(Output, Environments, State.Metadata));
 
         return await RunLoop(source);
     }

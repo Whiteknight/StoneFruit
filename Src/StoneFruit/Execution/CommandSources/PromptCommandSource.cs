@@ -7,13 +7,13 @@ public class PromptCommandSource : ICommandSource
 {
     private readonly IOutput _output;
     private readonly IEnvironmentCollection _environments;
-    private readonly EngineState _state;
+    private readonly EngineStateMetadataCache _metadata;
 
-    public PromptCommandSource(IOutput output, IEnvironmentCollection environments, EngineState state)
+    public PromptCommandSource(IOutput output, IEnvironmentCollection environments, EngineStateMetadataCache metadata)
     {
         _output = output;
         _environments = environments;
-        _state = state;
+        _metadata = metadata;
     }
 
     public Maybe<ArgumentsOrString> GetNextCommand()
@@ -21,7 +21,7 @@ public class PromptCommandSource : ICommandSource
         var env = _environments.GetCurrentName().GetValueOrDefault("");
         var str = _output.Prompt(env)
             .Bind(s => string.IsNullOrEmpty(s) ? default : new Maybe<string>(s));
-        _state.CommandCounter.ReceiveUserInput();
+        _metadata.Add(Constants.Metadata.CurrentCommandIsUserInput, true.ToString());
         return str.Map(s => new ArgumentsOrString(s));
     }
 }

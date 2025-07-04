@@ -8,8 +8,6 @@ namespace StoneFruit.Execution;
 /// </summary>
 public class HeadlessEngineStateCommandCounter : IEngineStateCommandCounter
 {
-    private const string _numberOfCommandsKey = "_numberOfCommands";
-    private const string _hasReachedLimitKey = "_hasReachedLimit";
     private readonly EngineStateCommandQueue _commands;
     private readonly EngineStateMetadataCache _metadata;
     private readonly EngineEventCatalog _events;
@@ -23,29 +21,34 @@ public class HeadlessEngineStateCommandCounter : IEngineStateCommandCounter
         _settings = settings;
     }
 
-    public void ReceiveUserInput()
-    {
-        // This will probably never be needed, but just in case...
-        _metadata.Remove(_numberOfCommandsKey);
-        _metadata.Remove(_hasReachedLimitKey);
-    }
-
     public bool VerifyCanExecuteNextCommand(ICommandParser parser, IOutput output)
     {
-        var consecutiveCommands = _metadata.Get(_numberOfCommandsKey)
+        // There's no obvious way for this to be true, but just to be safe for future scenarios...
+        var isFromUser = _metadata.Get(Constants.Metadata.CurrentCommandIsUserInput)
+            .Map(o => bool.TryParse(o.ToString(), out var val) && val)
+            .GetValueOrDefault(false);
+        if (isFromUser)
+        {
+            _metadata.Add(Constants.Metadata.ConsecutiveCommandsWithoutUserInput, 0);
+            _metadata.Remove(Constants.Metadata.CurrentCommandIsUserInput);
+            _metadata.Remove(Constants.Metadata.ConsecutiveCommandsReachedLimit);
+            return true;
+        }
+
+        var consecutiveCommands = _metadata.Get(Constants.Metadata.ConsecutiveCommandsWithoutUserInput)
             .Map(o => int.TryParse(o.ToString(), out var val) ? val : 0)
             .GetValueOrDefault(0);
         var limit = _settings.MaxInputlessCommands;
         if (consecutiveCommands <= limit)
         {
-            _metadata.Add(_numberOfCommandsKey, consecutiveCommands + 1);
+            _metadata.Add(Constants.Metadata.ConsecutiveCommandsWithoutUserInput, consecutiveCommands + 1);
             return true;
         }
 
         // If we've already reached the limit, we don't execute the script again. We just
         // bail out
         _commands.Clear();
-        var hasReachedLimit = _metadata.Get(_hasReachedLimitKey)
+        var hasReachedLimit = _metadata.Get(Constants.Metadata.ConsecutiveCommandsReachedLimit)
             .Map(o => bool.TryParse(o.ToString(), out var val) && val)
             .GetValueOrDefault(false);
         if (hasReachedLimit)
@@ -53,8 +56,8 @@ public class HeadlessEngineStateCommandCounter : IEngineStateCommandCounter
 
         // Clear the counter so we can execute the exit script. Set the limit flag so we don't
         // recurse here again until the next user input has been received.
-        _metadata.Add(_hasReachedLimitKey, true.ToString());
-        _metadata.Add(_numberOfCommandsKey, 0);
+        _metadata.Add(Constants.Metadata.ConsecutiveCommandsReachedLimit, true.ToString());
+        _metadata.Add(Constants.Metadata.ConsecutiveCommandsWithoutUserInput, 0);
         _commands.Clear();
 
         var args = SyntheticArguments.From(

@@ -7,7 +7,6 @@
 /// </summary>
 public class InteractiveEngineStateCommandCounter : IEngineStateCommandCounter
 {
-    private const string _numberOfCommandsKey = "_numberOfCommands";
     private readonly EngineStateCommandQueue _commands;
     private readonly EngineStateMetadataCache _metadata;
     private readonly EngineSettings _settings;
@@ -19,29 +18,32 @@ public class InteractiveEngineStateCommandCounter : IEngineStateCommandCounter
         _settings = settings;
     }
 
-    public void ReceiveUserInput()
-    {
-        // Set to -1 so when we execute the current command that the user just input,
-        // we are back to 0 commands without user input.
-        _metadata.Add(_numberOfCommandsKey, -1);
-    }
-
     public bool VerifyCanExecuteNextCommand(ICommandParser parser, IOutput output)
     {
-        var consecutiveCommands = _metadata.Get(_numberOfCommandsKey)
+        var isFromUser = _metadata.Get(Constants.Metadata.CurrentCommandIsUserInput)
+            .Map(o => bool.TryParse(o.ToString(), out var val) && val)
+            .GetValueOrDefault(false);
+        if (isFromUser)
+        {
+            _metadata.Add(Constants.Metadata.ConsecutiveCommandsWithoutUserInput, 0);
+            _metadata.Remove(Constants.Metadata.CurrentCommandIsUserInput);
+            return true;
+        }
+
+        var consecutiveCommands = _metadata.Get(Constants.Metadata.ConsecutiveCommandsWithoutUserInput)
             .Map(o => int.TryParse(o.ToString(), out var val) ? val : 0)
             .GetValueOrDefault(0);
         var limit = _settings.MaxInputlessCommands;
         if (consecutiveCommands < limit)
         {
-            _metadata.Add(_numberOfCommandsKey, consecutiveCommands + 1);
+            _metadata.Add(Constants.Metadata.ConsecutiveCommandsWithoutUserInput, consecutiveCommands + 1);
             return true;
         }
 
         var cont = output.Prompt("Maximum command count reached, continue? (y/n)");
         if (cont.GetValueOrDefault("n").Equals("y", System.StringComparison.InvariantCultureIgnoreCase))
         {
-            ReceiveUserInput();
+            _metadata.Add(Constants.Metadata.ConsecutiveCommandsWithoutUserInput, 0);
             return true;
         }
 

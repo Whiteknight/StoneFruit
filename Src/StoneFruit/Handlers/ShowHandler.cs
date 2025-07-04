@@ -25,7 +25,7 @@ public class ShowHandler : IHandler
 
     public void Execute()
     {
-        var command = _args.Get(0).AsString();
+        var command = _args.Get(0).Require("Must provide thing to show").AsString();
         switch (command)
         {
             case "exitcodes":

@@ -7,11 +7,6 @@
 public interface IEngineStateCommandCounter
 {
     /// <summary>
-    /// Reset the counter in response to user input.
-    /// </summary>
-    void ReceiveUserInput();
-
-    /// <summary>
     /// Check if another command can be executed, and increments the internal count if it can
     /// be executed.
     /// </summary>

@@ -48,7 +48,8 @@ internal static class Program
             {
                 //e.EngineStartInteractive.Clear();
                 //e.EngineStopInteractive.Add("echo 'goodbye'");
-                //e.EngineError.Add("echo 'you dun goofed'");
+                e.EngineError.Add("echo 'you dun goofed'");
+                e.EngineError.Add("b");
             })
             .SetupSettings(s =>
             {

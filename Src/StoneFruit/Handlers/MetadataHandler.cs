@@ -24,14 +24,15 @@ public class MetadataHandler : IHandler
     public static string Group => HelpHandler.BuiltinsGroup;
     public static string Description => "Work with internal metadata";
 
-    public static string Usage => $@"{Name} ...
+    public static string Usage => $"""
+        {Name} ...
 
-{Name} remove <keys>...
-    Remove a list of metadata items by name
+        {Name} remove <keys>...
+            Remove a list of metadata items by name
 
-{Name} list
-    List all available metadata entries
-";
+        {Name} list
+            List all available metadata entries
+        """;
 
     public void Execute()
     {
@@ -42,7 +43,7 @@ public class MetadataHandler : IHandler
             {
                 _output.Color(ConsoleColor.Green).Write(kvp.Key);
                 _output.Write(": ");
-                _output.WriteLine(kvp.Value.GetType().Name);
+                _output.WriteLine(kvp.Value.ToString() ?? string.Empty);
             }
 
             return;
