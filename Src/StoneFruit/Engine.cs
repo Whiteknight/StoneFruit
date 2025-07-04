@@ -228,7 +228,8 @@ public class Engine
             throw new ExecutionException("Cannot run the engine in Idle mode. Must enter Headless or Interactive mode first.");
         try
         {
-            return await RunLoopInternal(sources);
+            Environment.ExitCode = await RunLoopInternal(sources);
+            return Environment.ExitCode;
         }
         finally
         {
@@ -305,11 +306,12 @@ public class Engine
         // we bail out with a very stern message.
 
         // Check if we already have a current error
-        var previousExceptionResult = State.Metadata.Get(Constants.Metadata.Error);
-        if (previousExceptionResult.IsSuccess && previousExceptionResult.GetValueOrThrow() is Exception previousException)
+        var maybePrevious = State.Metadata.Get(Constants.Metadata.Error);
+        if (maybePrevious.IsSuccess && maybePrevious.GetValueOrThrow() is Exception previousException)
         {
+            // An exception was thrown while attempting to handle a previous error.
             // This isn't scripted because it's critical error-handling code and we cannot
-            // allow an exception to be thrown at this point.
+            // allow yet another exception to be thrown at this point.
             Output
                 .Color(ConsoleColor.Red)
                 .WriteLine("Received an exception while attempting to handle a previous exception")
