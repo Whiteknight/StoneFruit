@@ -53,13 +53,7 @@ public class HandlerSetup : IHandlerSetup
             services.AddSingleton<IHandlerSource>(_instances);
 
         foreach (var handlerType in _handlerTypes)
-            services.AddTransient(handlerType);
-
-        services.AddSingleton<IHandlerSource>(provider =>
-        {
-            var ve = provider.GetRequiredService<IVerbExtractor>();
-            return new TypeListConstructSource(_handlerTypes, (t, _, _) => provider.GetRequiredService(t), ve);
-        });
+            RegisterHandlerType(handlerType);
 
         // Add the IHandlers, which gets the list of all IHandlerSource instances from the DI
         // This one may be registered by the user already so don't overwrite
@@ -135,11 +129,14 @@ public class HandlerSetup : IHandlerSetup
         // 1) the type itself, as itself, so we can resolve the handler instance later, and
         // 2) a RegisteredHandler, which holds the handler type, so we can set up verb->handler mappings
         foreach (var type in handlerTypes)
-        {
-            _services.AddScoped(type);
-            _services.AddSingleton(new RegisteredHandler(type));
-        }
+            RegisterHandlerType(type);
 
         return this;
+    }
+
+    private void RegisterHandlerType(Type type)
+    {
+        _services.AddScoped(type);
+        _services.AddSingleton(new RegisteredHandler(type));
     }
 }
