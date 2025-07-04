@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using StoneFruit.Trie;
 using StoneFruit.Utility;
 
@@ -25,12 +26,12 @@ public class ScriptHandlerSource : IHandlerSource
 
     public Maybe<IVerbInfo> GetByName(Verb verb) => _scripts.Get(verb).Map(i => (IVerbInfo)i);
 
-    public void AddScript(Verb verb, IEnumerable<string> lines, string? description = null, string? usage = null, string? group = null)
+    public void AddScript(Verb verb, IEnumerable<string> lines, string description, string usage, string group)
     {
         var scriptLines = lines.OrEmptyIfNull().ToList();
         if (scriptLines.Count == 0)
             return;
-        var script = new Script(verb, scriptLines, description ?? string.Empty, usage ?? string.Empty, group ?? string.Empty);
+        var script = new Script(verb, scriptLines, description, usage, group);
         _scripts.Insert(verb, script);
     }
 
@@ -47,9 +48,9 @@ public class ScriptHandlerSource : IHandlerSource
         {
             _lines = lines;
             Verb = verb;
-            Description = description;
-            Usage = usage;
-            Group = group;
+            Description = GetDescription(Verb, description);
+            Usage = GetUsage(Verb, usage, lines);
+            Group = group ?? string.Empty;
         }
 
         public Verb Verb { get; }
@@ -60,12 +61,27 @@ public class ScriptHandlerSource : IHandlerSource
 
         public IEnumerable<CommandFormat> GetFormats(ICommandParser parser)
         {
+            // Parse the script lines and cache the results so we aren't re-parsing
             if (_formats != null)
                 return _formats;
             _formats = _lines
-                .Select(l => parser.ParseScript(l))
+                .Select(parser.ParseScript)
                 .ToList();
             return _formats;
+        }
+
+        private static string GetDescription(Verb verb, string description)
+            => string.IsNullOrEmpty(description) ? verb.ToString() : description;
+
+        private static string GetUsage(Verb verb, string usage, IReadOnlyList<string> lines)
+        {
+            if (!string.IsNullOrEmpty(usage))
+                return usage;
+            var sb = new StringBuilder();
+            sb.AppendLine($"{verb} ...");
+            foreach (var line in lines)
+                sb.AppendLine($"\t{line}");
+            return sb.ToString();
         }
     }
 

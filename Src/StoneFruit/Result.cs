@@ -59,7 +59,10 @@ public readonly struct Maybe<T>
 public static class Maybe
 {
     public static Maybe<TOut> Bind<T, TOut>(this Maybe<T> maybe, Func<T, Maybe<TOut>> onSuccess)
-        => maybe.Match(v => onSuccess(v), () => default);
+        => maybe.Match(v => onSuccess(v), static () => default);
+
+    public static Maybe<T> Flatten<T>(this Maybe<Maybe<T>> maybe)
+        => maybe.Bind(static v => v);
 
     public static Maybe<T> Where<T>(this Maybe<T> maybe, Func<T, bool> predicate)
         => maybe.Bind(v => predicate(v) ? new Maybe<T>(v) : default);

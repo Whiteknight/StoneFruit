@@ -18,6 +18,9 @@ public class CommandFormat
         _args = args;
     }
 
+    // Notice that for a format like "verb <..args>" the "verb" is itself a positional argument
+    // So the comandFormat isn't a template with literals and arguments, it's just a list of
+    // arguments, some of which will be treated like verbs.
     public IArguments Format(IArguments args)
         => _args
             .SelectMany(a => a.Access(args))

@@ -18,18 +18,17 @@ internal static class Program
                 .ScanHandlersFromCurrentAssembly()
                 .ScanHandlersFromAssemblyContaining<MyFirstHandler>()
                 .UsePublicInstanceMethodsAsHandlers(new MyObject())
-                .Add("testf", (c, d) => d.Output.WriteLine("F"), description: "do F things", usage: "testf ...", group: "delegates")
-                .AddScript("testg", new[] { "echo test", "echo g" }, group: "scripts")
-                .AddScript("testh", new[] { "echo [0]", "echo ['a']" }, group: "scripts")
-                .AddScript("testi", new[]
-                {
+                .Add("testf", (_, d) => d.Output.WriteLine("F"), description: "do F things", usage: "testf ...", group: "delegates")
+                .AddScript("testf-alias", ["testf"], group: "delegates")
+                .AddScript("testg", ["echo test", "echo g"], group: "scripts")
+                .AddScript("testh", ["echo [0]", "echo ['a']"], group: "scripts")
+                .AddScript("testi", [
                     "echo 1",
                     "echo 2",
                     "echo 3",
                     "echo 4"
-                }, group: "scripts")
+                ], group: "scripts")
                 .Add(new[] { "test", "j" }, (c, d) => d.Output.WriteLine("J"), description: "do J things", usage: "test j")
-            //.AddAlias("testf", "testf-alias")
             )
             .SetupEnvironments(e => e
                 .SetEnvironments(new[] { "Local", "Testing", "Production" })
