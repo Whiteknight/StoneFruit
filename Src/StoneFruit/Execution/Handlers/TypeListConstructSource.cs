@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using StoneFruit.Trie;
 using StoneFruit.Utility;
+using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit.Execution.Handlers;
 
@@ -16,20 +18,15 @@ public class TypeListConstructSource : IHandlerSource
     private readonly TypeInstanceResolver _resolver;
     private readonly VerbTrie<VerbInfo> _types;
 
-    public TypeListConstructSource(IEnumerable<Type> types, TypeInstanceResolver resolver, IVerbExtractor verbExtractor)
+    public TypeListConstructSource(
+        IEnumerable<Type> types,
+        TypeInstanceResolver resolver,
+        IVerbExtractor verbExtractor)
     {
-        Assert.NotNull(types, nameof(types));
-        Assert.NotNull(resolver, nameof(resolver));
-
-        _resolver = resolver;
-
-        _types = new VerbTrie<VerbInfo>();
-        foreach (var commandType in types)
-        {
-            var verbs = verbExtractor.GetVerbs(commandType);
-            foreach (var verb in verbs)
-                _types.Insert(verb, new VerbInfo(verb, commandType));
-        }
+        _resolver = NotNull(resolver);
+        _types = NotNull(types)
+            .SelectMany(t => verbExtractor.GetVerbs(t).Select(v => new VerbInfo(v, t)))
+            .ToVerbTrie(vi => vi.Verb);
     }
 
     public Maybe<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
@@ -47,18 +44,8 @@ public class TypeListConstructSource : IHandlerSource
 
     public Maybe<IVerbInfo> GetByName(Verb verb) => _types.Get(verb).Map(i => (IVerbInfo)i);
 
-    private class VerbInfo : IVerbInfo
+    private sealed record VerbInfo(Verb Verb, Type Type) : IVerbInfo
     {
-        public VerbInfo(Verb verb, Type type)
-        {
-            Verb = verb;
-            Type = type;
-        }
-
-        public Type Type { get; }
-
-        public Verb Verb { get; }
-
         public string Group => Type.GetGroup();
         public string Description => Type.GetDescription();
         public string Usage => Type.GetUsage();

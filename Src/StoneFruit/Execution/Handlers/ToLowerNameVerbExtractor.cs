@@ -12,28 +12,20 @@ namespace StoneFruit.Execution.Handlers;
 public class ToLowerNameVerbExtractor : IVerbExtractor
 {
     public IReadOnlyList<Verb> GetVerbs(Type type)
-    {
-        if (type == null || !typeof(IHandlerBase).IsAssignableFrom(type))
-            return Array.Empty<Verb>();
-
-        return GetVerbs(type.Name);
-    }
+        => type != null && typeof(IHandlerBase).IsAssignableFrom(type)
+            ? GetVerbs(type.Name)
+            : [];
 
     public IReadOnlyList<Verb> GetVerbs(MethodInfo method)
-    {
-        if (method == null)
-            return Array.Empty<Verb>();
-
-        return GetVerbs(method.Name);
-    }
+        => method != null ? GetVerbs(method.Name) : [];
 
     private static IReadOnlyList<Verb> GetVerbs(string name)
-    {
-        name = name
+        => [GetNameWithoutSuffixes(name)];
+
+    private static string GetNameWithoutSuffixes(string name)
+        => name
             .RemoveSuffix("verb")
             .RemoveSuffix("command")
             .RemoveSuffix("handler")
             .ToLowerInvariant();
-        return new[] { new Verb(name) };
-    }
 }

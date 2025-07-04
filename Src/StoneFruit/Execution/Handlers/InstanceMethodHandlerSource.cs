@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using StoneFruit.Trie;
 using StoneFruit.Utility;
+using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit.Execution.Handlers;
 
@@ -20,8 +21,7 @@ public class InstanceMethodHandlerSource : IHandlerSource
 
     public InstanceMethodHandlerSource(object instance, IHandlerMethodInvoker invoker, IVerbExtractor verbExtractor)
     {
-        Assert.NotNull(instance, nameof(instance));
-        _instance = instance;
+        _instance = NotNull(instance);
         _methods = _instance.GetType()
             .GetMethods(BindingFlags.Instance | BindingFlags.Public)
             .Where(m => m.ReturnType == typeof(void) || m.ReturnType == typeof(Task))
@@ -30,20 +30,19 @@ public class InstanceMethodHandlerSource : IHandlerSource
                 .Select(v => (Method: m, Verb: v))
             )
             .ToVerbTrie(x => x.Verb, x => x.Method);
-        _invoker = invoker;
+        _invoker = NotNull(invoker);
     }
 
     public Maybe<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
+        => _methods.Get(arguments)
+            .Bind(value => GetInstanceInternal(arguments, dispatcher, value));
+
+    private Maybe<IHandlerBase> GetInstanceInternal(IArguments arguments, CommandDispatcher dispatcher, MethodInfo value)
     {
-        var method = _methods.Get(arguments);
-        if (!method.IsSuccess)
-            return default;
-        var value = method.GetValueOrThrow();
         if (value.ReturnType == typeof(void))
             return new SyncHandlerWrapper(_instance, value, arguments, dispatcher, _invoker);
         if (value.ReturnType == typeof(Task))
             return new AsyncHandlerWrapper(_instance, value, arguments, dispatcher, _invoker);
-
         return default;
     }
 

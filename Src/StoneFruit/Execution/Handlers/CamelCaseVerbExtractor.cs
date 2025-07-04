@@ -16,19 +16,16 @@ namespace StoneFruit.Execution.Handlers;
 public class CamelCaseVerbExtractor : IVerbExtractor
 {
     public IReadOnlyList<Verb> GetVerbs(Type type)
-    {
-        if (type == null || !typeof(IHandlerBase).IsAssignableFrom(type))
-            return Array.Empty<Verb>();
-
-        return GetVerbs(type.Name);
-    }
+        => type != null && typeof(IHandlerBase).IsAssignableFrom(type)
+            ? GetVerbs(type.Name)
+            : [];
 
     public IReadOnlyList<Verb> GetVerbs(MethodInfo method) => GetVerbs(method.Name);
 
     private static IReadOnlyList<Verb> GetVerbs(string name)
     {
         if (string.IsNullOrEmpty(name))
-            return Array.Empty<Verb>();
+            return [];
 
         name = name
             .RemoveSuffix("verb")
@@ -36,14 +33,14 @@ public class CamelCaseVerbExtractor : IVerbExtractor
             .RemoveSuffix("handler");
 
         if (string.IsNullOrEmpty(name))
-            return Array.Empty<Verb>();
+            return [];
 
         var camelCase = CamelCase();
         var result = camelCase.Parse(name);
         if (!result.Success)
-            return Array.Empty<Verb>();
+            return [];
 
         var verb = result.Value.Select(s => s.ToLowerInvariant()).ToArray();
-        return new[] { new Verb(verb) };
+        return [new Verb(verb)];
     }
 }

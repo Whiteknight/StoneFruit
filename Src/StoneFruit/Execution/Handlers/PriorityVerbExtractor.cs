@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace StoneFruit.Execution.Handlers;
@@ -34,30 +35,16 @@ public class PriorityVerbExtractor : IVerbExtractor
     public static IVerbExtractor DefaultInstance => _default.Value;
 
     public IReadOnlyList<Verb> GetVerbs(Type type)
-    {
-        if (type == null || !typeof(IHandlerBase).IsAssignableFrom(type))
-            return Array.Empty<Verb>();
-        foreach (var extractor in _extractors)
-        {
-            var verbs = extractor.GetVerbs(type);
-            if (verbs?.Count > 0)
-                return verbs;
-        }
-
-        return Array.Empty<Verb>();
-    }
+        => type == null || !typeof(IHandlerBase).IsAssignableFrom(type)
+            ? []
+            : _extractors
+                .Select(e => e.GetVerbs(type))
+                .FirstOrDefault(v => v.Count > 0) ?? [];
 
     public IReadOnlyList<Verb> GetVerbs(MethodInfo method)
-    {
-        if (method == null)
-            return Array.Empty<Verb>();
-        foreach (var extractor in _extractors)
-        {
-            var verbs = extractor.GetVerbs(method);
-            if (verbs?.Count > 0)
-                return verbs;
-        }
-
-        return Array.Empty<Verb>();
-    }
+        => method == null
+            ? []
+            : _extractors
+            .Select(e => e.GetVerbs(method))
+            .FirstOrDefault(v => v?.Count > 0) ?? [];
 }

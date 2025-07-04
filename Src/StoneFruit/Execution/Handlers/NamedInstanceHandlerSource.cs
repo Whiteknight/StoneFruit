@@ -52,35 +52,17 @@ public class NamedInstanceHandlerSource : IHandlerSource
         public IHandlerBase HandlerObject { get; }
         public Verb Verb { get; }
 
-        public string Description
-        {
-            get
-            {
-                if (!string.IsNullOrEmpty(_description))
-                    return _description!;
-                return HandlerObject.GetType().GetDescription() ?? string.Empty;
-            }
-        }
+        public string Description => !string.IsNullOrEmpty(_description)
+            ? _description!
+            : HandlerObject.GetType().GetDescription() ?? string.Empty;
 
-        public string Usage
-        {
-            get
-            {
-                if (!string.IsNullOrEmpty(_usage))
-                    return _usage!;
-                return HandlerObject.GetType().GetUsage() ?? Description;
-            }
-        }
+        public string Usage => !string.IsNullOrEmpty(_usage)
+            ? _usage!
+            : HandlerObject.GetType().GetUsage() ?? Description;
 
-        public string Group
-        {
-            get
-            {
-                if (!string.IsNullOrEmpty(_group))
-                    return _group!;
-                return HandlerObject.GetType().GetGroup() ?? string.Empty;
-            }
-        }
+        public string Group => !string.IsNullOrEmpty(_group)
+            ? _group!
+            : HandlerObject.GetType().GetGroup() ?? string.Empty;
 
         public bool ShouldShowInHelp => HandlerObject.GetType().ShouldShowInHelp(Verb);
     }

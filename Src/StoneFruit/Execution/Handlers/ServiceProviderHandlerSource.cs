@@ -75,20 +75,14 @@ public class ServiceProviderHandlerSource : IHandlerSource
 
     public Maybe<IVerbInfo> GetByName(Verb verb) => _verbs.Get(verb).Map(i => (IVerbInfo)i);
 
-    private class VerbInfo : IVerbInfo
+    private sealed record VerbInfo(Verb Verb, Type Type) : IVerbInfo
     {
-        public Type Type { get; }
-
-        public VerbInfo(Verb verb, Type type)
-        {
-            Type = type;
-            Verb = verb;
-        }
-
-        public Verb Verb { get; }
         public string Description => Type.GetDescription();
+
         public string Usage => Type.GetUsage();
+
         public string Group => Type.GetGroup();
+
         public bool ShouldShowInHelp => Type.ShouldShowInHelp(Verb);
     }
 }

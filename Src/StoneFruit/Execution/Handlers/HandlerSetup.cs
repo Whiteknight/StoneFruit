@@ -21,14 +21,13 @@ public class HandlerSetup : IHandlerSetup
     private readonly NamedInstanceHandlerSource _instances;
     private readonly IServiceCollection _services;
 
-    private readonly List<Type> _handlerTypes = new List<Type>
-    {
+    private readonly List<Type> _handlerTypes = [
         typeof(EchoHandler),
         typeof(EnvironmentHandler),
         typeof(ExitHandler),
         typeof(HelpHandler),
         typeof(MetadataHandler),
-    };
+    ];
 
     public HandlerSetup(IServiceCollection services)
     {
@@ -58,8 +57,7 @@ public class HandlerSetup : IHandlerSetup
         services.AddSingleton<IHandlerSource>(provider =>
         {
             var ve = provider.GetRequiredService<IVerbExtractor>();
-            var source = new TypeListConstructSource(_handlerTypes, (t, a, d) => provider.GetRequiredService(t), ve);
-            return source;
+            return new TypeListConstructSource(_handlerTypes, (t, _, _) => provider.GetRequiredService(t), ve);
         });
 
         // Add the IHandlers, which gets the list of all IHandlerSource instances from the DI

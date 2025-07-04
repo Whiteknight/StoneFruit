@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using StoneFruit.Utility;
+using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit.Execution.Handlers;
 
@@ -13,13 +13,14 @@ public class HandlerSourceCollection : IHandlers
 
     public HandlerSourceCollection(IEnumerable<IHandlerSource> sources)
     {
-        Assert.NotNull(sources, nameof(sources));
-        _sources = sources.Where(s => s != null).ToList();
+        _sources = NotNull(sources)
+            .Where(s => s != null)
+            .ToList();
     }
 
     public Maybe<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
     {
-        Assert.NotNull(arguments, nameof(arguments));
+        NotNull(arguments);
         return _sources
             .Select(source => source.GetInstance(arguments, dispatcher))
             .FirstOrDefault(result => result.IsSuccess);

@@ -72,6 +72,7 @@
     <Rule Id="IDE0090" Action="None" />
     <Rule Id="IDE0160" Action="None" />
     <Rule Id="IDE0161" Action="Error" />
+    <Rule Id="IDE0290" Action="None" />
   </Rules>
   <Rules AnalyzerId="Roslynator.CSharp.Analyzers" RuleNamespace="Roslynator.CSharp.Analyzers">
     <Rule Id="RCS1194" Action="None" />
@@ -83,7 +84,6 @@
     <Rule Id="SA1002" Action="Error" />
     <Rule Id="SA1007" Action="Error" />
     <Rule Id="SA1009" Action="None" />
-    <Rule Id="SA1010" Action="Error" />
     <Rule Id="SA1011" Action="Error" />
     <Rule Id="SA1019" Action="Error" />
     <Rule Id="SA1020" Action="Error" />
