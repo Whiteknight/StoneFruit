@@ -5,7 +5,6 @@ namespace StoneFruit.Execution;
 /// <summary>
 /// Exception thrown by the engine when a verb cannot be found.
 /// </summary>
-[Serializable]
 public class VerbNotFoundException : Exception
 {
     public string Verb { get; private set; }

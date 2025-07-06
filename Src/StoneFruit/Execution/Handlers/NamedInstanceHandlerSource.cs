@@ -34,7 +34,7 @@ public class NamedInstanceHandlerSource : IHandlerSource
 
     public int Count => _verbs.Count;
 
-    private class VerbInfo : IVerbInfo
+    private sealed class VerbInfo : IVerbInfo
     {
         private readonly string? _description;
         private readonly string? _usage;

@@ -12,21 +12,27 @@ public class EnvironmentSetup : IEnvironmentSetup
 {
     private readonly IServiceCollection _services;
 
-    private static readonly IReadOnlyList<string> _defaultNamesList = new[]
-    {
+    private static readonly IReadOnlyList<string> _defaultNamesList = [
         Constants.EnvironmentNameDefault
-    };
+    ];
 
+    // TODO: Change this so we don't take IServiceCollection in the constructor.
+    // Set instance fields with data as we get it, and then take the IServiceCollection in the
+    // BuildUp() method only.
     public EnvironmentSetup(IServiceCollection services)
     {
         _services = services;
     }
 
+    // TODO: Change DI so that we register a CurrentEnvironment object (whose value can be changed
+    // from the env handler) and then DI types can inject that value to get environment-specific
+    // values for things instead of having all these IEnvironmentFactory<> and instance methods, etc
+
     public void BuildUp(IServiceCollection services)
     {
-        _services.AddSingleton<EnvironmentObjectCache>();
-        _services.TryAddSingleton(new EnvironmentsList(_defaultNamesList));
-        _services.TryAddSingleton<IEnvironmentCollection>(new InstanceEnvironmentCollection());
+        services.AddSingleton<EnvironmentObjectCache>();
+        services.TryAddSingleton(new EnvironmentsList(_defaultNamesList));
+        services.TryAddSingleton<IEnvironmentCollection>(new InstanceEnvironmentCollection());
     }
 
     public IEnvironmentSetup SetEnvironments(IReadOnlyList<string> names)
@@ -41,7 +47,7 @@ public class EnvironmentSetup : IEnvironmentSetup
     public IEnvironmentSetup UseFactory<T>(IEnvironmentFactory<T> factory)
         where T : class
     {
-        Assert.NotNull(factory, nameof(factory));
+        Assert.NotNull(factory);
         _services.AddSingleton(factory);
         _services.AddScoped(services =>
         {
@@ -68,7 +74,7 @@ public class EnvironmentSetup : IEnvironmentSetup
     public IEnvironmentSetup UseInstance<T>(T environment)
          where T : class
     {
-        Assert.NotNull(environment, nameof(environment));
+        Assert.NotNull(environment);
         return UseFactory<T>(new InstanceEnvironmentFactory<T>(environment));
     }
 

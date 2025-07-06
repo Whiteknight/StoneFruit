@@ -142,21 +142,21 @@ public readonly struct Result<T, TError>
     {
         if (_hasValue)
             return;
-        if (_error is Exception ex)
-            throw new Error(ex);
+        if (_error is System.Exception ex)
+            throw new Result<T, TError>.Exception(ex);
         if (_error is null)
             throw new InvalidOperationException("Could not get the Error of Result.");
-        throw new Error(_error);
+        throw new Exception(_error);
     }
 
-    public class Error : Exception
+    public class Exception : System.Exception
     {
-        public Error(object error)
+        public Exception(object error)
             : base(error.ToString())
         {
         }
 
-        public Error(Exception inner)
+        public Exception(System.Exception inner)
             : base(inner.Message, inner)
         {
         }

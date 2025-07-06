@@ -89,7 +89,7 @@ public class HandlerSetup : IHandlerSetup
     {
         NotNull(verb);
         NotNull(handle);
-        _delegates.Add(verb, handle, description, usage, group);
+        _delegates.AddFunc(verb, handle, description, usage, group);
         return this;
     }
 
@@ -105,7 +105,7 @@ public class HandlerSetup : IHandlerSetup
     {
         NotNull(verb);
         NotNull(handleAsync);
-        _delegates.AddAsync(verb, handleAsync, description, usage, group);
+        _delegates.AddAsyncFunc(verb, handleAsync, description, usage, group);
         return this;
     }
 

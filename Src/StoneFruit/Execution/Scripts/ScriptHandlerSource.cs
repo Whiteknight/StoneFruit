@@ -39,7 +39,7 @@ public class ScriptHandlerSource : IHandlerSource
 
     // This is going to stay a private child class because it has ugly mutable state
     // and it's only used here.
-    private class Script : IVerbInfo
+    private sealed class Script : IVerbInfo
     {
         private readonly IReadOnlyList<string> _lines;
         private IReadOnlyList<CommandFormat>? _formats;
@@ -87,7 +87,7 @@ public class ScriptHandlerSource : IHandlerSource
 
     // We need to keep ScriptHandler private child class, so it doesn't get scooped up
     // during DI container scan
-    private class ScriptHandler : IHandler
+    private sealed class ScriptHandler : IHandler
     {
         private readonly ICommandParser _parser;
         private readonly Script _script;

@@ -28,14 +28,14 @@ public class DelegateHandlerSource : IHandlerSource
 
     public Maybe<IVerbInfo> GetByName(Verb verb) => _handlers.Get(verb).Map(i => (IVerbInfo)i);
 
-    public DelegateHandlerSource Add(Verb verb, Action<IArguments, CommandDispatcher> act, string description = "", string usage = "", string group = "")
+    public DelegateHandlerSource AddFunc(Verb verb, Action<IArguments, CommandDispatcher> act, string description = "", string usage = "", string group = "")
     {
         var factory = new SyncHandlerFactory(act, verb, description, usage, group);
         _handlers.Insert(verb, factory);
         return this;
     }
 
-    public DelegateHandlerSource AddAsync(Verb verb, Func<IArguments, CommandDispatcher, Task> func, string description = "", string usage = "", string group = "")
+    public DelegateHandlerSource AddAsyncFunc(Verb verb, Func<IArguments, CommandDispatcher, Task> func, string description = "", string usage = "", string group = "")
     {
         _handlers.Insert(verb, new AsyncHandlerFactory(func, verb, description, usage, group));
         return this;
@@ -65,7 +65,7 @@ public class DelegateHandlerSource : IHandlerSource
         public abstract IHandlerBase Create(IArguments arguments, CommandDispatcher dispatcher);
     }
 
-    private class SyncHandlerFactory : HandlerFactory
+    private sealed class SyncHandlerFactory : HandlerFactory
     {
         private readonly Action<IArguments, CommandDispatcher> _act;
 
@@ -81,7 +81,7 @@ public class DelegateHandlerSource : IHandlerSource
         }
     }
 
-    private class AsyncHandlerFactory : HandlerFactory
+    private sealed class AsyncHandlerFactory : HandlerFactory
     {
         private readonly Func<IArguments, CommandDispatcher, Task> _func;
 
@@ -95,7 +95,7 @@ public class DelegateHandlerSource : IHandlerSource
             => new AsyncHandler(_func, arguments, dispatcher);
     }
 
-    private class SyncHandler : IHandler
+    private sealed class SyncHandler : IHandler
     {
         private readonly Action<IArguments, CommandDispatcher> _act;
         private readonly IArguments _arguments;
@@ -114,7 +114,7 @@ public class DelegateHandlerSource : IHandlerSource
         }
     }
 
-    private class AsyncHandler : IAsyncHandler
+    private sealed class AsyncHandler : IAsyncHandler
     {
         private readonly Func<IArguments, CommandDispatcher, Task> _func;
         private readonly IArguments _arguments;

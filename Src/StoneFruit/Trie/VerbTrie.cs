@@ -106,7 +106,7 @@ public class VerbTrie<TValue>
         return targetNode;
     }
 
-    private class Node
+    private sealed class Node
     {
         private readonly Dictionary<string, Node> _children;
 

@@ -56,7 +56,7 @@ public class InstanceMethodHandlerSource : IHandlerSource
         => _methods.Get(verb)
             .Map(v => (IVerbInfo)new MethodInfoVerbInfo(verb, v));
 
-    private class MethodInfoVerbInfo : IVerbInfo
+    private sealed class MethodInfoVerbInfo : IVerbInfo
     {
         private readonly MethodInfo _method;
 
@@ -73,7 +73,7 @@ public class InstanceMethodHandlerSource : IHandlerSource
         public bool ShouldShowInHelp => true;
     }
 
-    private class SyncHandlerWrapper : IHandler
+    private sealed class SyncHandlerWrapper : IHandler
     {
         private readonly object _instance;
         private readonly MethodInfo _method;
@@ -96,7 +96,7 @@ public class InstanceMethodHandlerSource : IHandlerSource
         }
     }
 
-    private class AsyncHandlerWrapper : IAsyncHandler
+    private sealed class AsyncHandlerWrapper : IAsyncHandler
     {
         private readonly object _instance;
         private readonly MethodInfo _method;

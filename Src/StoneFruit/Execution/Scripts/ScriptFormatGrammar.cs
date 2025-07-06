@@ -230,7 +230,7 @@ public static class ScriptFormatGrammar
         );
     }
 
-    private class FetchAllFlagsArgumentAccessor : IArgumentAccessor
+    private sealed class FetchAllFlagsArgumentAccessor : IArgumentAccessor
     {
         public IEnumerable<IArgument> Access(IArguments args)
             => args.GetAllFlags()
@@ -239,7 +239,7 @@ public static class ScriptFormatGrammar
                 .ToList();
     }
 
-    private class FetchAllNamedArgumentAccessor : IArgumentAccessor
+    private sealed class FetchAllNamedArgumentAccessor : IArgumentAccessor
     {
         public IEnumerable<IArgument> Access(IArguments args)
             => args.GetAllNamed()
@@ -248,7 +248,7 @@ public static class ScriptFormatGrammar
                 .ToList();
     }
 
-    private class FetchAllPositionalArgumentAccessor : IArgumentAccessor
+    private sealed class FetchAllPositionalArgumentAccessor : IArgumentAccessor
     {
         public IEnumerable<IArgument> Access(IArguments args)
             => args.GetAllPositionals()
@@ -257,7 +257,7 @@ public static class ScriptFormatGrammar
                 .ToList();
     }
 
-    private class FetchFlagArgumentAccessor : IArgumentAccessor
+    private sealed class FetchFlagArgumentAccessor : IArgumentAccessor
     {
         private readonly string _name;
         private readonly Option<string> _newName;
@@ -279,7 +279,7 @@ public static class ScriptFormatGrammar
         }
     }
 
-    private class FetchNamedArgumentAccessor : IArgumentAccessor
+    private sealed class FetchNamedArgumentAccessor : IArgumentAccessor
     {
         private readonly string _name;
         private readonly bool _required;
@@ -315,7 +315,7 @@ public static class ScriptFormatGrammar
         }
     }
 
-    private class FetchNamedToPositionalArgumentAccessor : IArgumentAccessor
+    private sealed class FetchNamedToPositionalArgumentAccessor : IArgumentAccessor
     {
         private readonly string _name;
         private readonly bool _required;
@@ -351,7 +351,7 @@ public static class ScriptFormatGrammar
         }
     }
 
-    private class FetchPositionalArgumentAccessor : IArgumentAccessor
+    private sealed class FetchPositionalArgumentAccessor : IArgumentAccessor
     {
         private readonly int _index;
         private readonly bool _required;
@@ -387,7 +387,7 @@ public static class ScriptFormatGrammar
         }
     }
 
-    private class LiteralFlagArgumentAccessor : IArgumentAccessor
+    private sealed class LiteralFlagArgumentAccessor : IArgumentAccessor
     {
         private readonly string _name;
 
@@ -400,7 +400,7 @@ public static class ScriptFormatGrammar
             => [new FlagArgument(_name)];
     }
 
-    private class LiteralNamedArgumentAccessor : IArgumentAccessor
+    private sealed class LiteralNamedArgumentAccessor : IArgumentAccessor
     {
         private readonly string _name;
         private readonly string _value;
@@ -415,7 +415,7 @@ public static class ScriptFormatGrammar
             => [new NamedArgument(_name, _value)];
     }
 
-    private class LiteralPositionalArgumentAccessor : IArgumentAccessor
+    private sealed class LiteralPositionalArgumentAccessor : IArgumentAccessor
     {
         private readonly string _value;
 
@@ -428,7 +428,7 @@ public static class ScriptFormatGrammar
             => [new PositionalArgument(_value)];
     }
 
-    private class NamedFetchNamedArgumentAccessor : IArgumentAccessor
+    private sealed class NamedFetchNamedArgumentAccessor : IArgumentAccessor
     {
         private readonly string _newName;
         private readonly string _oldName;
@@ -466,7 +466,7 @@ public static class ScriptFormatGrammar
         }
     }
 
-    private class NamedFetchPositionalArgumentAccessor : IArgumentAccessor
+    private sealed class NamedFetchPositionalArgumentAccessor : IArgumentAccessor
     {
         private readonly string _newName;
         private readonly int _index;

@@ -176,7 +176,7 @@ public class HelpHandler : IHandler
         return "  ";
     }
 
-    private static IReadOnlyList<string> GetDescriptionLines(string desc, int max)
+    private static List<string> GetDescriptionLines(string desc, int max)
     {
         if (max <= 0 || string.IsNullOrEmpty(desc))
             return [];

@@ -6,7 +6,6 @@ namespace StoneFruit.Execution;
 /// Exception we throw during engine build-up if conflicting or invalid settings have been
 /// selected.
 /// </summary>
-[Serializable]
 public class EngineBuildException : Exception
 {
     public EngineBuildException(string message) : base(message)

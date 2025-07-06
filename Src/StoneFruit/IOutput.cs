@@ -58,7 +58,7 @@ public static class OutputExtensions
     /// <returns></returns>
     public static IOutput Write(this IOutput output, object obj)
     {
-        NotNull(output, nameof(output));
+        NotNull(output);
         return obj == null
             ? output
             : output.Write(obj!.ToString()!);

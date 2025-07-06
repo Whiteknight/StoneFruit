@@ -22,7 +22,7 @@ public class ParsedArguments : IArguments, IVerbSource
     public ParsedArguments(IEnumerable<ArgumentToken> arguments, string? rawArgs = null)
     {
         Raw = rawArgs ?? string.Empty;
-        _accessedPositionals = new List<IPositionalArgument>();
+        _accessedPositionals = [];
         _accessedNameds = new Dictionary<string, List<INamedArgument>>(StringComparer.OrdinalIgnoreCase);
         _accessedFlags = new Dictionary<string, IFlagArgument>(StringComparer.OrdinalIgnoreCase);
         _rawArguments = arguments
@@ -43,7 +43,7 @@ public class ParsedArguments : IArguments, IVerbSource
         AccessedAsPositional
     }
 
-    private class RawArg
+    private sealed class RawArg
     {
         public RawArg(ArgumentToken arg)
         {
@@ -185,7 +185,7 @@ public class ParsedArguments : IArguments, IVerbSource
         AccessNamedUntil(n => n == name, () => false);
         return _accessedNameds.TryGetValue(name, out var value)
             ? value.Where(a => !a.Consumed)
-            : Enumerable.Empty<INamedArgument>();
+            : [];
     }
 
     public IEnumerable<INamedArgument> GetAllNamed()
@@ -240,7 +240,7 @@ public class ParsedArguments : IArguments, IVerbSource
     private void AccessNamed(NamedArgument n)
     {
         if (!_accessedNameds.ContainsKey(n.Name))
-            _accessedNameds.Add(n.Name, new List<INamedArgument>());
+            _accessedNameds.Add(n.Name, []);
         _accessedNameds[n.Name].Add(n);
     }
 
@@ -299,7 +299,6 @@ public class ParsedArguments : IArguments, IVerbSource
                     arg.Access = AccessType.AccessedAsFlag;
                 if (isComplete())
                     return accessor;
-                continue;
             }
         }
 

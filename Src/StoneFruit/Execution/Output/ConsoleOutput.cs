@@ -10,9 +10,9 @@ public class ConsoleOutput : IOutput
 {
     public IOutput Color(Func<Brush, Brush> changeBrush)
     {
-        Assert.NotNull(changeBrush, nameof(changeBrush));
+        Assert.NotNull(changeBrush);
         var brush = changeBrush(Brush.Current);
-        return brush.Equals(Brush.Current) ? (IOutput)this : new ColoredOutputWrapper(brush, this);
+        return brush.Equals(Brush.Current) ? this : new ColoredOutputWrapper(brush, this);
     }
 
     public IOutput WriteLine()

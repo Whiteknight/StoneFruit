@@ -61,9 +61,7 @@ public interface IValuedArgument : IArgument
 /// <summary>
 /// A positional argument is a value argument with no name.
 /// </summary>
-public interface IPositionalArgument : IValuedArgument
-{
-}
+public interface IPositionalArgument : IValuedArgument;
 
 /// <summary>
 /// A named argument is a value argument with a name.
@@ -99,7 +97,7 @@ public static class ArgumentExtensions
     public static T Require<T>(this T argument, string errorMessage = "")
         where T : IArgument
     {
-        Assert.NotNull(argument, nameof(argument));
+        Assert.NotNull(argument);
         (argument as MissingArgument)?.Throw(errorMessage);
         return argument;
     }
@@ -114,7 +112,7 @@ public static class ArgumentExtensions
     public static T MarkConsumed<T>(this T argument, bool consumed = true)
         where T : IArgument
     {
-        Assert.NotNull(argument, nameof(argument));
+        Assert.NotNull(argument);
         argument.Consumed = consumed;
         return argument;
     }
