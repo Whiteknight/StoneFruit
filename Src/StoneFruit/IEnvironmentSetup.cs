@@ -7,27 +7,17 @@ namespace StoneFruit;
 /// </summary>
 public interface IEnvironmentSetup
 {
+    /// <summary>
+    /// Set a list of environments.
+    /// </summary>
+    /// <param name="names"></param>
+    /// <returns></returns>
     IEnvironmentSetup SetEnvironments(IReadOnlyList<string> names);
 
     /// <summary>
-    /// Use a factory object to create environments on demand.
+    /// Add a named environment.
     /// </summary>
-    /// <param name="factory"></param>
+    /// <param name="name"></param>
     /// <returns></returns>
-    IEnvironmentSetup UseFactory<T>(IEnvironmentFactory<T> factory)
-        where T : class;
-
-    /// <summary>
-    /// Use a single environment instance. Environments will not be switchable.
-    /// </summary>
-    /// <param name="environment"></param>
-    /// <returns></returns>
-    IEnvironmentSetup UseInstance<T>(T environment)
-         where T : class;
-
-    /// <summary>
-    /// Do not use any environments (default).
-    /// </summary>
-    /// <returns></returns>
-    IEnvironmentSetup None();
+    IEnvironmentSetup AddEnvironment(string name);
 }

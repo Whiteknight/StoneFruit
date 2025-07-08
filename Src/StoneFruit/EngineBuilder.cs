@@ -6,6 +6,7 @@ using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Environments;
 using StoneFruit.Execution.Handlers;
 using StoneFruit.Execution.Output;
+using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit;
 
@@ -27,11 +28,11 @@ public sealed class EngineBuilder : IEngineBuilder
 
     private EngineBuilder(IServiceCollection services)
     {
-        Services = services;
+        Services = NotNull(services);
         _handlers = new HandlerSetup(Services);
         _eventCatalog = new EngineEventCatalog();
         _output = new OutputSetup();
-        _environments = new EnvironmentSetup(Services);
+        _environments = new EnvironmentSetup();
         _parsers = new ParserSetup();
         _settings = new EngineSettings();
     }

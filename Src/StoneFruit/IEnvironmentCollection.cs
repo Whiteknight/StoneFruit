@@ -3,6 +3,11 @@ using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit;
 
+public interface ICurrentEnvironment
+{
+    public string Value { get; }
+}
+
 /// <summary>
 /// Manages the list of possible environments. Environments are cached after creation, each environment
 /// is only created once. Environments are ordered and can be accessed by name or number.
@@ -14,12 +19,6 @@ public interface IEnvironmentCollection
     /// </summary>
     /// <returns></returns>
     IReadOnlyList<string> GetNames();
-
-    /// <summary>
-    /// Sets the current environment by name.
-    /// </summary>
-    /// <param name="name"></param>
-    void SetCurrent(string name);
 
     /// <summary>
     /// Returns true if this is a valid environment name.
@@ -34,23 +33,12 @@ public interface IEnvironmentCollection
     /// </summary>
     /// <returns></returns>
     Maybe<string> GetCurrentName();
+
+    ICurrentEnvironment GetCurrent();
 }
 
 public static class EnvironmentCollectionExtensions
 {
-    /// <summary>
-    /// Sets the current environment by position.
-    /// </summary>
-    /// <param name="environments"></param>
-    /// <param name="index"></param>
-    public static void SetCurrent(this IEnvironmentCollection environments, int index)
-    {
-        var allEnvs = NotNull(environments).GetNames();
-        if (index < 0 || index >= allEnvs.Count)
-            return;
-        environments.SetCurrent(allEnvs[index]);
-    }
-
     /// <summary>
     /// Returns true if this is a valid environment position.
     /// </summary>

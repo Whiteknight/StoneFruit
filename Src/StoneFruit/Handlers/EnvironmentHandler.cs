@@ -18,16 +18,15 @@ public class EnvironmentHandler : IHandler
     private readonly IOutput _output;
     private readonly IArguments _args;
     private readonly EngineState _state;
-    private readonly IEnvironmentCollection _environments;
-    private readonly EnvironmentObjectCache _objectCache;
+    private readonly EnvironmentCollection _environments;
 
-    public EnvironmentHandler(IOutput output, IArguments args, EngineState state, IEnvironmentCollection environments, ICommandParser parser, EnvironmentObjectCache objectCache)
+    public EnvironmentHandler(IOutput output, IArguments args, EngineState state, IEnvironmentCollection environments)
     {
         _output = output;
         _args = args;
         _state = state;
-        _environments = environments;
-        _objectCache = objectCache;
+        _environments = (environments as EnvironmentCollection)
+            ?? throw new InvalidOperationException($"Expected EnvironmentCollection but got {environments.GetType().Name}");
     }
 
     public static string Group => HelpHandler.BuiltinsGroup;
@@ -72,7 +71,7 @@ public class EnvironmentHandler : IHandler
         // just clear the data in the current environment.
         if (!target.Exists() && currentEnvNameResult.IsSuccess && _args.HasFlag(FlagClearData))
         {
-            _objectCache.Clear(currentEnvNameResult.GetValueOrThrow());
+            _environments.ClearCache();
             return;
         }
 
@@ -116,7 +115,7 @@ public class EnvironmentHandler : IHandler
             {
                 _environments.SetCurrent(environments[0]);
                 if (_args.HasFlag(FlagClearData))
-                    _objectCache.Clear(_environments.GetCurrentName().GetValueOrThrow());
+                    _environments.ClearCache();
                 _state.OnEnvironmentChanged();
                 return;
             }
@@ -137,7 +136,7 @@ public class EnvironmentHandler : IHandler
             throw new ExecutionException($"Unknown environment '{envName}'");
 
         if (_args.HasFlag(FlagClearData))
-            _objectCache.Clear(_environments.GetCurrentName().GetValueOrThrow());
+            _environments.ClearCache();
 
         if (currentEnvNameResult.Equals(envName))
             return;

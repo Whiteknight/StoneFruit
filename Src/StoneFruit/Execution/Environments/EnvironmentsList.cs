@@ -15,7 +15,7 @@ public sealed class EnvironmentsList
             : validNames;
     }
 
-    public static IReadOnlyList<string> DefaultNamesList => new[] { Constants.EnvironmentNameDefault };
+    public static IReadOnlyList<string> DefaultNamesList => [Constants.EnvironmentNameDefault];
 
     public IReadOnlyList<string> ValidNames { get; }
 

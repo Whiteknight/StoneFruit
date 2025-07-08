@@ -12,51 +12,53 @@ internal static class Program
     private static void Main(string[] args)
     {
         var services = new ServiceCollection();
-        services.UseStonefruit(b => b
-            .SetupHandlers(h => h
-                // Scan for handlers using reflection. Looks for any public, non-abstract,
-                // implementations of IHandlerBase in the specified assemblies
-                .ScanHandlersFromEntryAssembly()
-                .ScanHandlersFromCurrentAssembly()
-                .ScanHandlersFromAssemblyContaining<MyFirstHandler>()
+        services
+            .UseStonefruit(b => b
+                .SetupHandlers(h => h
+                    // Scan for handlers using reflection. Looks for any public, non-abstract,
+                    // implementations of IHandlerBase in the specified assemblies
+                    .ScanHandlersFromEntryAssembly()
+                    .ScanHandlersFromCurrentAssembly()
+                    .ScanHandlersFromAssemblyContaining<MyFirstHandler>()
 
-                // Create an object instance and treat each of it's public methods as handlers
-                .UsePublicInstanceMethodsAsHandlers(new MyObject())
+                    // Create an object instance and treat each of it's public methods as handlers
+                    .UsePublicInstanceMethodsAsHandlers(new MyObject())
 
-                // Set up a verb which executes a callback delegate
-                // Also set up a script as an alias of this
-                // Also setup a multi-word verb using a callback delegate.
-                .Add("testf", (_, d) => d.Output.WriteLine("F"), description: "do F things", usage: "testf ...", group: "delegates")
-                .AddScript("testf-alias", ["testf"], group: "delegates")
-                .Add(new[] { "test", "j" }, (c, d) => d.Output.WriteLine("J"), description: "do J things", usage: "test j")
+                    // Set up a verb which executes a callback delegate
+                    // Also set up a script as an alias of this
+                    // Also setup a multi-word verb using a callback delegate.
+                    .Add("testf", (_, d) => d.Output.WriteLine("F"), description: "do F things", usage: "testf ...", group: "delegates")
+                    .AddScript("testf-alias", ["testf"], group: "delegates")
+                    .Add(new[] { "test", "j" }, (c, d) => d.Output.WriteLine("J"), description: "do J things", usage: "test j")
 
-                // Create a few scripts, showing usage
-                .AddScript("testg", ["echo test", "echo g"], group: "scripts")
-                .AddScript("testh", ["echo [0]", "echo ['a']"], group: "scripts")
-                .AddScript("testi", [
-                    "echo 1",
-                    "echo 2",
-                    "echo 3",
-                    "echo 4"
-                ], group: "scripts")
+                    // Create a few scripts, showing usage
+                    .AddScript("testg", ["echo test", "echo g"], group: "scripts")
+                    .AddScript("testh", ["echo [0]", "echo ['a']"], group: "scripts")
+                    .AddScript("testi", [
+                        "echo 1",
+                        "echo 2",
+                        "echo 3",
+                        "echo 4"
+                    ], group: "scripts")
+                )
+                .SetupEnvironments(e => e
+                    .SetEnvironments(new[] { "Local", "Testing", "Production" })
+                )
+                .SetupEvents(e =>
+                {
+                    //e.EngineStartInteractive.Clear();
+                    //e.EngineStopInteractive.Add("echo 'goodbye'");
+                    e.EngineError.Add("echo 'you dun goofed'");
+                    e.EngineError.Add("b");
+                })
+                .SetupSettings(s =>
+                {
+                    //s.MaxInputlessCommands = 3;
+                    s.MaxExecuteTimeout = TimeSpan.FromSeconds(5);
+                })
             )
-            .SetupEnvironments(e => e
-                .SetEnvironments(new[] { "Local", "Testing", "Production" })
-                .UseFactory(new MyEnvironmentFactory())
-            )
-            .SetupEvents(e =>
-            {
-                //e.EngineStartInteractive.Clear();
-                //e.EngineStopInteractive.Add("echo 'goodbye'");
-                e.EngineError.Add("echo 'you dun goofed'");
-                e.EngineError.Add("b");
-            })
-            .SetupSettings(s =>
-            {
-                //s.MaxInputlessCommands = 3;
-                s.MaxExecuteTimeout = TimeSpan.FromSeconds(5);
-            })
-        );
+            .AddPerEnvironment<MyEnvironment>((p, env) => new MyEnvironment(env));
+        ;
         var provider = services.BuildServiceProvider();
         var engine = provider.GetRequiredService<Engine>();
         engine.RunWithCommandLineArguments();
@@ -139,11 +141,6 @@ public class TestCHandler : IAsyncHandler
         Console.WriteLine("Cancelled!");
         return;
     }
-}
-
-public class MyEnvironmentFactory : IEnvironmentFactory<MyEnvironment>
-{
-    public Maybe<MyEnvironment> Create(string name) => new MyEnvironment(name);
 }
 
 public class MyEnvironment
