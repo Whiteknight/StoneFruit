@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit;
@@ -24,22 +25,27 @@ public readonly struct Maybe<T>
             ? onSuccess(_value)
             : onFailure();
 
+    private TOut Match<TOut, TData>(TData data, Func<T, TData, TOut> onSuccess, Func<TData, TOut> onFailure)
+        => _hasValue && _value is not null
+            ? onSuccess(_value, data)
+            : onFailure(data);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Maybe<TOut> Map<TOut>(Func<T, TOut> onSuccess)
         => Match<Maybe<TOut>>(v => onSuccess(v), static () => default);
 
     public T GetValueOrDefault(T defaultValue = default!)
-    {
-        var result = Match(v => v, () => defaultValue);
-        return result is not null
-            ? result
-            : throw new InvalidOperationException("Attempt to return null from .GetValueOrDefault()");
-    }
+        => Match(defaultValue, static (v, _) => v, static dv => dv) switch
+        {
+            T result => result,
+            _ => throw new InvalidOperationException("Attempt to return null from .GetValueOrDefault()")
+        };
 
     public T GetValueOrThrow()
-        => Match(v => v, () => throw new InvalidOperationException("Could not get value of Maybe"));
+        => Match(static v => v, () => throw new InvalidOperationException("Could not get value of Maybe"));
 
     public Result<T, TError> ToResult<TError>(Func<TError> createError)
-        => Match(v => (Result<T, TError>)v, () => (Result<T, TError>)createError());
+        => Match(static v => (Result<T, TError>)v, () => (Result<T, TError>)createError());
 
     public Maybe<T> OnSuccess(Action<T> onSuccess)
     {

@@ -22,14 +22,7 @@ public class EnvironmentCommandLine : ICommandLine
     }
 }
 
-public class StringCommandLine : ICommandLine
+public sealed record StringCommandLine(string CommandLine) : ICommandLine
 {
-    private readonly string _commandLine;
-
-    public StringCommandLine(string commandLine)
-    {
-        _commandLine = commandLine;
-    }
-
-    public string GetRawArguments() => _commandLine;
+    public string GetRawArguments() => CommandLine;
 }
