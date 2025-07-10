@@ -37,6 +37,11 @@ public sealed class EngineBuilder : IEngineBuilder
         _settings = new EngineSettings();
     }
 
+    public static EngineBuilder Create(IServiceCollection? services = null)
+    {
+        return new EngineBuilder(services ?? new ServiceCollection());
+    }
+
     /// <summary>
     /// Setup verbs and their handlers.
     /// </summary>
@@ -109,28 +114,14 @@ public sealed class EngineBuilder : IEngineBuilder
         return this;
     }
 
-    /// <summary>
-    /// Default factory method for StoneFruit Engine. Uses the default DI container to create
-    /// all registrations and build the Engine.
-    /// </summary>
-    /// <param name="build"></param>
-    /// <returns></returns>
-    public static Engine Build(Action<IEngineBuilder> build)
+    public Engine Build()
     {
-        var services = new ServiceCollection();
-        return Build(services, build);
-    }
-
-    public static Engine Build(IServiceCollection services, Action<IEngineBuilder> build)
-    {
-        var engineBuilder = new EngineBuilder(services);
-        build?.Invoke(engineBuilder);
-        SetupCoreEngineRegistrations(services);
+        SetupCoreEngineRegistrations(Services);
 
         // Build up the final Engine registrations. This involves resolving some
         // dependencies which were setup previously
-        engineBuilder.BuildUp(services);
-        var provider = services.BuildServiceProvider();
+        BuildUp(Services);
+        var provider = Services.BuildServiceProvider();
         return provider.GetRequiredService<Engine>();
     }
 
