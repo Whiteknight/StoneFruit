@@ -24,14 +24,14 @@ public class ObjectWithHandlerMethods
 public class ObjectWithAsyncHandlerMethods
 {
     [Verb("simple-method-async")]
-    public Task SimpleMethod(IOutput output)
+    public Task SimpleMethodAsync(IOutput output)
     {
         output.WriteLine("Simple");
         return Task.CompletedTask;
     }
 
     [Verb("method-with-one-named-arg-async")]
-    public Task MethodWithOneNamedArg(IOutput output, string name)
+    public Task MethodWithOneNamedArgAsync(IOutput output, string name)
     {
         output.WriteLine($"Named: {name}");
         return Task.CompletedTask;

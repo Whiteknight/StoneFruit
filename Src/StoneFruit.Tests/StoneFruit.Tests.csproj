@@ -23,4 +23,8 @@
     <ProjectReference Include="..\StoneFruit\StoneFruit.csproj" />
     <ProjectReference Include="..\TestUtilities\TestUtilities.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Integration\" />
+  </ItemGroup>
 </Project>

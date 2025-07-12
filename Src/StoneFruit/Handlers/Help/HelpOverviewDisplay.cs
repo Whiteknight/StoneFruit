@@ -144,11 +144,11 @@ public class HelpOverviewDisplay
         // Otherwise, output the group name and return a padding value that we
         // use to indent all items in this group
         _output
-            .Write("(")
+            .Write("== ")
             .Color(ConsoleColor.Blue)
             .Write(groupName)
             .Color(Brush.Default)
-            .WriteLine("):");
+            .WriteLine(" ==");
         return "  ";
     }
 }

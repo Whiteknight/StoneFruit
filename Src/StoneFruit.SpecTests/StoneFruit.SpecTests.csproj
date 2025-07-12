@@ -15,10 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Drivers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\StoneFruit\StoneFruit.csproj" />
   </ItemGroup>
 
