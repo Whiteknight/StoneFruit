@@ -26,6 +26,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Containers", "Containers", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{651D19FA-9799-47D9-BD5D-8601DC2AF462}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoneFruit.SpecTests", "StoneFruit.SpecTests\StoneFruit.SpecTests.csproj", "{62DDEA53-E825-46EE-BD67-FF38055D45F1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +50,10 @@ Global
 		{DE356F6C-E062-4BF1-B3F5-250E51C4BADE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE356F6C-E062-4BF1-B3F5-250E51C4BADE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE356F6C-E062-4BF1-B3F5-250E51C4BADE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62DDEA53-E825-46EE-BD67-FF38055D45F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62DDEA53-E825-46EE-BD67-FF38055D45F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62DDEA53-E825-46EE-BD67-FF38055D45F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62DDEA53-E825-46EE-BD67-FF38055D45F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
