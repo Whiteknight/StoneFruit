@@ -14,6 +14,12 @@ public class ObjectWithHandlerMethods
         output.WriteLine($"Named: {name}");
     }
 
+    [Verb("method-with-one-named-arg2")]
+    public void MethodWithOneNamedArg2(IOutput output, string name)
+    {
+        output.WriteLine($"Named: {name}");
+    }
+
     [Verb("method-with-one-flag-arg")]
     public void MethodWithOneFlagArg(IOutput output, bool flag)
     {

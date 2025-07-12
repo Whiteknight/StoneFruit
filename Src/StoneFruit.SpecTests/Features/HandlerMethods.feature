@@ -23,6 +23,13 @@ Rule: Sync methods
             | Line         |
             | Named: value |
 
+    Scenario: Can invoke a handler method with positional argument2
+        Given I use ObjectWithHandlerMethod handlers
+        When I run headless with input "method-with-one-named-arg2 value"
+        Then The output should contain:
+            | Line         |
+            | Named: value |
+
     Scenario: Can invoke a handler method with flag argument true
         Given I use ObjectWithHandlerMethod handlers
         When I run headless with input "method-with-one-flag-arg -flag"
