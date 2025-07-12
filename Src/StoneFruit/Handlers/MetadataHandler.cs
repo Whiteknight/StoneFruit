@@ -1,5 +1,6 @@
 ﻿using System;
 using StoneFruit.Execution;
+using StoneFruit.Execution.Exceptions;
 
 namespace StoneFruit.Handlers;
 

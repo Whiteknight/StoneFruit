@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using ParserObjects;
+using StoneFruit.Execution.Exceptions;
 using StoneFruit.Execution.Scripts;
 using static ParserObjects.Parsers<char>;
 using static ParserObjects.Parsers;

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using ParserObjects;
+using StoneFruit.Execution.Exceptions;
 using StoneFruit.Execution.Scripts;
 
 namespace StoneFruit.Execution.Arguments;

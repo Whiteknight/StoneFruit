@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.CommandSources;
+using StoneFruit.Execution.Exceptions;
 using StoneFruit.Handlers;
 using static StoneFruit.Utility.Assert;
 
@@ -278,6 +279,16 @@ public class Engine
             // The verb was not found. Execute the VerbNotFound script
             var args = SyntheticArguments.From(("verb", vnf.Verb));
             HandleError(vnf, State.EventCatalog.VerbNotFound, args);
+        }
+        catch (InternalException ie)
+        {
+            // It is an internal exception type. We want to show the message but we don't need
+            // to burden the user with the full stacktrace.
+            var args = SyntheticArguments.From(
+                ("message", ie.Message),
+                ("stacktrace", "")
+            );
+            HandleError(ie, State.EventCatalog.EngineError, args);
         }
         catch (Exception e)
         {

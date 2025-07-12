@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace StoneFruit.Execution;
+namespace StoneFruit.Execution.Exceptions;
 
 /// <summary>
 /// Exception we throw during engine build-up if conflicting or invalid settings have been

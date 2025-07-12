@@ -10,6 +10,7 @@ public class EchoHandler : IHandler
     public const string Name = "echo";
     public const string FlagNoNewline = "nonewline";
     public const string FlagNoHeadless = "noheadless";
+    public const string FlagIgnoreEmpty = "ignoreempty";
     public const string ArgColor = "color";
 
     private readonly EngineState _state;
@@ -33,6 +34,7 @@ public class EchoHandler : IHandler
             Appends a new-line to the end unless -{FlagNoNewline} is specified.
 
             -{FlagNoHeadless} outputs nothing if the engine is in headless mode.
+            -{FlagIgnoreEmpty} do nothing if there are no non-empty arguments
         """;
 
     public void Execute()
@@ -45,6 +47,10 @@ public class EchoHandler : IHandler
 
         var strings = _args.GetAllPositionals().Where(p => p.Exists()).Select(p => p.AsString());
         var line = string.Join(" ", strings);
+
+        if (string.IsNullOrWhiteSpace(line) && _args.HasFlag(FlagIgnoreEmpty))
+            return;
+
         WriteToOutput(output, line);
     }
 

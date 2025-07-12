@@ -66,7 +66,7 @@ public class VerbTrie<TValue>
     {
         var keys = args.GetVerbCandidatePositionals();
         if (keys.Count == 0)
-            throw TrieException.NoArguments();
+            return null;
 
         var foundNodes = new List<(IPositionalArgument Arg, Node Node)>();
 

@@ -89,7 +89,7 @@ public class EngineEventCatalog
     public EventScript EngineError { get; } = new EventScript(
         // Contains the exception message and exception stack trace as arguments
         $"{EchoHandler.Name} color=Red ['message']",
-        $"{EchoHandler.Name} ['stacktrace']"
+        $"{EchoHandler.Name} -ignoreempty ['stacktrace']"
     );
 
     /// <summary>

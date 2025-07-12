@@ -1,4 +1,4 @@
-﻿using StoneFruit.Execution;
+﻿using StoneFruit.Execution.Exceptions;
 
 namespace StoneFruit.Handlers.Help;
 

@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using StoneFruit.Execution.Arguments;
+using StoneFruit.Execution.Exceptions;
 using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit.Execution;

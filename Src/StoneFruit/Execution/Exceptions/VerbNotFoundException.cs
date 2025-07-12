@@ -1,11 +1,9 @@
-﻿using System;
-
-namespace StoneFruit.Execution;
+﻿namespace StoneFruit.Execution.Exceptions;
 
 /// <summary>
 /// Exception thrown by the engine when a verb cannot be found.
 /// </summary>
-public class VerbNotFoundException : Exception
+public class VerbNotFoundException : InternalException
 {
     public string Verb { get; private set; }
 

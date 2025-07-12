@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Environments;
+using StoneFruit.Execution.Exceptions;
 using StoneFruit.Execution.Output;
 
 namespace StoneFruit.Handlers;
