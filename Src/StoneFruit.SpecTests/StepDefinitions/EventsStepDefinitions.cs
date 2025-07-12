@@ -65,4 +65,15 @@ public record EventsStepDefinitions(ScenarioContext Context)
                 e.HeadlessHelp.Add(line.Line);
         });
     }
+
+    [Given("I set the EngineError script to:")]
+    public void GivenISetTheEngineErrorScriptTo(DataTable dataTable)
+    {
+        Context.GetEngineBuilder().SetupEvents(e =>
+        {
+            e.EngineError.Clear();
+            foreach (var line in dataTable.CreateSet<LineOfText>())
+                e.EngineError.Add(line.Line);
+        });
+    }
 }

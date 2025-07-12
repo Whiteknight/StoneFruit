@@ -10,8 +10,8 @@ namespace StoneFruit.Execution.Handlers;
 
 /// <summary>
 /// Verb extractor to derive the verb from the name of the handler class. Common
-/// suffixes are removed ('verb', 'command', 'handler'), CamelCase is converted to
-/// spinal-case, and the name is converted to lower-case.
+/// suffixes are removed ('verb', 'command', 'handler'), CamelCase words are converted to
+/// lower case words, and the verb may have whitespace.
 /// </summary>
 public class CamelCaseVerbExtractor : IVerbExtractor
 {

@@ -104,6 +104,3 @@ public class EngineEventCatalog
         $"{ExitHandler.Name} ['exitcode']"
     );
 }
-
-#pragma warning restore SA1114 // Parameter list should follow declaration
-#pragma warning restore SA1623 // Property summary documentation should match accessors

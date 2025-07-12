@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using StoneFruit.Execution;
+using StoneFruit.Execution.Output;
 
 namespace StoneFruit.Handlers;
 
@@ -171,8 +172,11 @@ public class HelpHandler : IHandler
         // Otherwise, output the group name and return a padding value that we
         // use to indent all items in this group
         _output
+            .Write("(")
             .Color(ConsoleColor.Blue)
-            .WriteLine(groupName);
+            .Write(groupName)
+            .Color(Brush.Default)
+            .WriteLine("):");
         return "  ";
     }
 
