@@ -33,4 +33,36 @@ public record EventsStepDefinitions(ScenarioContext Context)
         });
     }
 
+    [Given("I set the EngineStartHeadless script to:")]
+    public void GivenISetTheEngineStartHeadlessScriptTo(DataTable dataTable)
+    {
+        Context.GetEngineBuilder().SetupEvents(e =>
+        {
+            e.EngineStartHeadless.Clear();
+            foreach (var line in dataTable.CreateSet<LineOfText>())
+                e.EngineStartHeadless.Add(line.Line);
+        });
+    }
+
+    [Given("I set the EngineStopHeadless script to:")]
+    public void GivenISetTheEngineStopHeadlessScriptTo(DataTable dataTable)
+    {
+        Context.GetEngineBuilder().SetupEvents(e =>
+        {
+            e.EngineStopHeadless.Clear();
+            foreach (var line in dataTable.CreateSet<LineOfText>())
+                e.EngineStopHeadless.Add(line.Line);
+        });
+    }
+
+    [Given("I set the HeadlessHelp script to:")]
+    public void GivenISetTheHeadlessHelpScriptTo(DataTable dataTable)
+    {
+        Context.GetEngineBuilder().SetupEvents(e =>
+        {
+            e.HeadlessHelp.Clear();
+            foreach (var line in dataTable.CreateSet<LineOfText>())
+                e.HeadlessHelp.Add(line.Line);
+        });
+    }
 }
