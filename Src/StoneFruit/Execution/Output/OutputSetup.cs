@@ -12,7 +12,7 @@ public class OutputSetup : IOutputSetup
     public OutputSetup()
     {
         _useConsole = true;
-        _secondaries = new List<IOutput>();
+        _secondaries = [];
     }
 
     public IOutputSetup DoNotUseConsole()
@@ -38,7 +38,6 @@ public class OutputSetup : IOutputSetup
     {
         if (!_useConsole)
         {
-            // This seems like a problem
             if (_secondaries.Count == 0)
                 return new NullOutput();
             if (_secondaries.Count == 1)

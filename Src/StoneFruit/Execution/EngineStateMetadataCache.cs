@@ -13,7 +13,7 @@ public class EngineStateMetadataCache : IEnumerable<KeyValuePair<string, object>
 
     public EngineStateMetadataCache()
     {
-        _metadata = new Dictionary<string, object>();
+        _metadata = [];
     }
 
     public void Add(string name, object value, bool allowOverwrite = true)

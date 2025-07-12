@@ -246,8 +246,6 @@ public class ParsedArguments : IArguments, IVerbSource
 
     public IFlagArgument GetFlag(string name)
     {
-        name = name.ToLowerInvariant();
-
         // Check if we've already accessed this flag. If so, return it if unconsumed
         // or not found
         if (_accessedFlags.ContainsKey(name))
@@ -259,7 +257,6 @@ public class ParsedArguments : IArguments, IVerbSource
 
     public bool HasFlag(string name, bool markConsumed = false)
     {
-        name = name.ToLowerInvariant();
         if (_accessedFlags.ContainsKey(name))
             return true;
         return AccessFlagsUntil(name, n => n == name, () => true).Exists();

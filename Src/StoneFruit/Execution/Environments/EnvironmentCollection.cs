@@ -34,7 +34,7 @@ public class EnvironmentCollection : IEnvironmentCollection
 
     public void CacheInstance<T>(T value)
     {
-        _cache.Set<T>(GetCurrentName().GetValueOrDefault(Constants.EnvironmentNameDefault), value);
+        _cache.Set(GetCurrentName().GetValueOrDefault(Constants.EnvironmentNameDefault), value);
     }
 
     public void ClearCache()

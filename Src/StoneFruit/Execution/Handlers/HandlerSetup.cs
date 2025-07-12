@@ -38,7 +38,7 @@ public class HandlerSetup : IHandlerSetup
         _scripts = new ScriptHandlerSource();
         _instances = new NamedInstanceHandlerSource();
         _services = services;
-        _scannedAssemblies = new HashSet<Assembly>();
+        _scannedAssemblies = [];
     }
 
     public void BuildUp(IServiceCollection services)

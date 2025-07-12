@@ -45,6 +45,9 @@ public class ServiceProviderMethodInvoker : IHandlerMethodInvoker
 
     private object? AssignArgumentValue(ParameterInfo parameter, IArguments args, int i, CancellationToken token)
     {
+        // TODO: Check the _provider first. Most registered types couldn't be mistaken for primitive values
+        // TODO: Separate the i which is the current parameter from j which would be the current non-DI index
+        // This way we can put positional args after of injected args, or where ever is appropriate.
         Debug.Assert(parameter.Name != null, "Parameter name should not be null");
         if (parameter.ParameterType == typeof(CancellationToken))
             return token;

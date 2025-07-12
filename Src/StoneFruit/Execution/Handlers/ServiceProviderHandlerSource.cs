@@ -32,14 +32,17 @@ public class ServiceProviderHandlerSource : IHandlerSource
     }
 
     public Maybe<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
-    {
-        var serviceType = _verbs.Get(arguments);
-        if (!serviceType.IsSuccess)
-            return default;
+        => _verbs.Get(arguments).Bind(GetHandlerFromProvider);
 
+    private Maybe<IHandlerBase> GetHandlerFromProvider(VerbInfo st)
+    {
         using var scope = _provider.CreateScope();
-        return serviceType
-            .Bind(st => new Maybe<IHandlerBase>(scope.ServiceProvider.GetService(st.Type) as IHandlerBase));
+        var instance = scope.ServiceProvider.GetService(st.Type) as IHandlerBase;
+        return instance switch
+        {
+            IHandlerBase handler => new Maybe<IHandlerBase>(handler),
+            _ => default
+        };
     }
 
     public IEnumerable<IVerbInfo> GetAll() => _verbs.GetAll().Select(kvp => kvp.Value);
