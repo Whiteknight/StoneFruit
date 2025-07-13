@@ -44,38 +44,32 @@ public class InstanceMethodHandlerSource : IHandlerSource
     // Since we're using the name of a method as the verb, and you can't nest methods, the
     // verb must only be a single string. Anything else is a non-match
     public Maybe<IVerbInfo> GetByName(Verb verb)
-        => _methods.Get(verb)
-            .Map(v => (IVerbInfo)v);
+        => _methods.Get(verb).Map(v => (IVerbInfo)v);
 
-    private IHandlerBase CreateHandlerInstance(Verb verb, MethodInfo value)
+    private IHandlerBase CreateHandlerInstance(Verb verb, MethodInfo method)
     {
-        if (value.ReturnType == typeof(void))
-            return new SyncHandlerWrapper(verb, _instance, value, _invoker);
-        if (value.ReturnType == typeof(Task))
-            return new AsyncHandlerWrapper(verb, _instance, value, _invoker);
+        var description = method.GetDescriptionAttributeValue() ?? string.Empty;
+        var usage = method.GetUsageAttributeValue() ?? description;
+        var group = method.GetGroupAttributeValue() ?? string.Empty;
+        if (method.ReturnType == typeof(void))
+            return new SyncHandlerWrapper(verb, _instance, method, _invoker, description, usage, group);
+        if (method.ReturnType == typeof(Task))
+            return new AsyncHandlerWrapper(verb, _instance, method, _invoker, description, usage, group);
         throw new InvalidOperationException("Invalid delegate type");
     }
 
-    private sealed record SyncHandlerWrapper(Verb Verb, object Instance, MethodInfo Method, IHandlerMethodInvoker Invoker)
-        : IHandlerWithContext,
-        IVerbInfo
+    private sealed record SyncHandlerWrapper(Verb Verb, object Instance, MethodInfo Method, IHandlerMethodInvoker Invoker, string Description, string Usage, string Group)
+        : IHandlerWithContext, IVerbInfo
     {
-        public string Description => Method.GetDescriptionAttributeValue() ?? string.Empty;
-        public string Usage => Method.GetUsageAttributeValue() ?? Description;
-        public string Group => Method.GetGroupAttributeValue() ?? string.Empty;
         public bool ShouldShowInHelp => true;
 
         public void Execute(HandlerContext context)
             => Invoker.Invoke(Instance, Method, context);
     }
 
-    private sealed record AsyncHandlerWrapper(Verb Verb, object Instance, MethodInfo Method, IHandlerMethodInvoker Invoker)
-        : IAsyncHandlerWithContext,
-        IVerbInfo
+    private sealed record AsyncHandlerWrapper(Verb Verb, object Instance, MethodInfo Method, IHandlerMethodInvoker Invoker, string Description, string Usage, string Group)
+        : IAsyncHandlerWithContext, IVerbInfo
     {
-        public string Description => Method.GetDescriptionAttributeValue() ?? string.Empty;
-        public string Usage => Method.GetUsageAttributeValue() ?? Description;
-        public string Group => Method.GetGroupAttributeValue() ?? string.Empty;
         public bool ShouldShowInHelp => true;
 
         public Task ExecuteAsync(HandlerContext context, CancellationToken cancellation)
