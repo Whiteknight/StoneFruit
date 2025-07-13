@@ -19,7 +19,7 @@ public class Engine
 
     public Engine(
         IHandlers handlers,
-        IEnvironmentCollection environments,
+        IEnvironments environments,
         ICommandParser parser,
         IOutput output,
         EngineEventCatalog eventCatalog,
@@ -40,7 +40,7 @@ public class Engine
     /// <summary>
     /// Gets the set of configured environments.
     /// </summary>
-    public IEnvironmentCollection Environments { get; }
+    public IEnvironments Environments { get; }
 
     /// <summary>
     /// Gets the configured output channel.

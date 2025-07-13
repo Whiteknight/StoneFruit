@@ -6,10 +6,10 @@
 public class PromptCommandSource : ICommandSource
 {
     private readonly IOutput _output;
-    private readonly IEnvironmentCollection _environments;
+    private readonly IEnvironments _environments;
     private readonly EngineStateMetadataCache _metadata;
 
-    public PromptCommandSource(IOutput output, IEnvironmentCollection environments, EngineStateMetadataCache metadata)
+    public PromptCommandSource(IOutput output, IEnvironments environments, EngineStateMetadataCache metadata)
     {
         _output = output;
         _environments = environments;

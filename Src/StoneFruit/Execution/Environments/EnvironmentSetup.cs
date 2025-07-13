@@ -15,8 +15,8 @@ public class EnvironmentSetup : IEnvironmentSetup
 
     public void BuildUp(IServiceCollection services)
     {
-        services.TryAddSingleton<IEnvironmentCollection>(p => new EnvironmentCollection(_names));
-        services.AddScoped(p => p.GetRequiredService<IEnvironmentCollection>().GetCurrent().Match(e => e, () => throw EnvironmentNotSetException.Create()));
+        services.TryAddSingleton<IEnvironments>(p => new EnvironmentCollection(_names));
+        services.AddScoped(p => p.GetRequiredService<IEnvironments>().GetCurrent().Match(e => e, () => throw EnvironmentNotSetException.Create()));
     }
 
     public IEnvironmentSetup SetEnvironments(IReadOnlyList<string> names)

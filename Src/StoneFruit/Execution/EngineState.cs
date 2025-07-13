@@ -11,11 +11,11 @@ namespace StoneFruit.Execution;
 /// </summary>
 public class EngineState
 {
-    private readonly IEnvironmentCollection _environments;
+    private readonly IEnvironments _environments;
 
     private IArguments? _arguments;
 
-    public EngineState(EngineEventCatalog eventCatalog, EngineSettings settings, IEnvironmentCollection environments, ICommandParser parser)
+    public EngineState(EngineEventCatalog eventCatalog, EngineSettings settings, IEnvironments environments, ICommandParser parser)
     {
         EventCatalog = NotNull(eventCatalog);
         ShouldExit = false;

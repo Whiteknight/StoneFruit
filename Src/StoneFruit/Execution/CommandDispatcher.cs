@@ -16,11 +16,11 @@ public class CommandDispatcher
 {
     private readonly ICommandParser _parser;
     private readonly IHandlers _handlers;
-    private readonly IEnvironmentCollection _environments;
+    private readonly IEnvironments _environments;
     private readonly EngineState _state;
     private readonly IOutput _output;
 
-    public CommandDispatcher(ICommandParser parser, IHandlers handlers, IEnvironmentCollection environments, EngineState state, IOutput output)
+    public CommandDispatcher(ICommandParser parser, IHandlers handlers, IEnvironments environments, EngineState state, IOutput output)
     {
         _parser = NotNull(parser);
         _handlers = NotNull(handlers);

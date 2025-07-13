@@ -8,7 +8,7 @@ namespace StoneFruit.Execution.Environments;
 /// An IEnvironmentCollection implementation which uses an IEnvironmentFactory to create environments
 /// on demand.
 /// </summary>
-public class EnvironmentCollection : IEnvironmentCollection
+public class EnvironmentCollection : IEnvironments
 {
     public static IReadOnlyList<string> DefaultNamesList => [Constants.EnvironmentNameDefault];
     private readonly IReadOnlyDictionary<string, IEnvironment> _environments;
@@ -34,21 +34,23 @@ public class EnvironmentCollection : IEnvironmentCollection
     public bool IsValid(string name)
         => name != null && _environments.ContainsKey(name);
 
-    public void SetCurrent(string name)
+    public Maybe<IEnvironment> SetCurrent(string name)
     {
         if (name == null)
-            return;
+            return GetCurrent();
         if (!_environments.ContainsKey(name))
-            throw new InvalidOperationException($"Environment {name} does not exist");
+            return default;
         _currentName = name;
+        return GetCurrent();
     }
 
-    public void SetCurrent(int index)
+    public Maybe<IEnvironment> SetCurrent(int index)
     {
         var allEnvs = GetNames();
         if (index < 0 || index >= allEnvs.Count)
-            throw new InvalidOperationException($"Environment {index} is an invalid index. Valid numbers are 1..{allEnvs.Count}");
+            return default;
         SetCurrent(allEnvs[index]);
+        return GetCurrent();
     }
 
     private sealed class Environment : IEnvironment

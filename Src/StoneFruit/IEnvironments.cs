@@ -17,7 +17,7 @@ public interface IEnvironment
 /// Manages the list of possible environments. Environments are cached after creation, each environment
 /// is only created once. Environments are ordered and can be accessed by name or number.
 /// </summary>
-public interface IEnvironmentCollection
+public interface IEnvironments
 {
     /// <summary>
     /// Gets a list of valid environment names.
@@ -44,9 +44,24 @@ public interface IEnvironmentCollection
     /// </summary>
     /// <returns></returns>
     Maybe<IEnvironment> GetCurrent();
+
+    /// <summary>
+    /// Set the current environment by name. Returns the new current environment on success.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    Maybe<IEnvironment> SetCurrent(string name);
+
+    /// <summary>
+    /// Set the current environment by index, according to the list order from GetNames(). Returns
+    /// the new current environment on success.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns></returns>
+    Maybe<IEnvironment> SetCurrent(int index);
 }
 
-public static class EnvironmentCollectionExtensions
+public static class EnvironmentsExtensions
 {
     /// <summary>
     /// Returns true if this is a valid environment position.
@@ -54,7 +69,7 @@ public static class EnvironmentCollectionExtensions
     /// <param name="environments"></param>
     /// <param name="index"></param>
     /// <returns></returns>
-    public static bool IsValid(this IEnvironmentCollection environments, int index)
+    public static bool IsValid(this IEnvironments environments, int index)
     {
         var allEnvs = NotNull(environments).GetNames();
         return index >= 0 && index < allEnvs.Count;

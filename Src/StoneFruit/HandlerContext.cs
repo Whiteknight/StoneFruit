@@ -6,6 +6,6 @@ public sealed record HandlerContext(
     IArguments Arguments,
     IOutput Output,
     CommandDispatcher Dispatcher,
-    IEnvironmentCollection Environments,
+    IEnvironments Environments,
     ICommandParser Parser,
     EngineState State);

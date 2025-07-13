@@ -161,7 +161,7 @@ public sealed class EngineBuilder : IEngineBuilder
         {
             var accessor = provider.GetRequiredService<EngineAccessor>();
             var handlers = provider.GetRequiredService<IHandlers>();
-            var environments = provider.GetRequiredService<IEnvironmentCollection>();
+            var environments = provider.GetRequiredService<IEnvironments>();
             var parser = provider.GetRequiredService<ICommandParser>();
             var output = provider.GetRequiredService<IOutput>();
             var engineCatalog = provider.GetRequiredService<EngineEventCatalog>();
