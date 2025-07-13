@@ -19,7 +19,7 @@ public static class ServiceCollectionExtensions
         NotNull(factory);
         return NotNull(services).AddScoped(p =>
         {
-            var currentEnvironment = p.GetRequiredService<ICurrentEnvironment>();
+            var currentEnvironment = p.GetRequiredService<IEnvironment>();
             var existing = currentEnvironment.GetCached<TInterface>();
             if (existing.IsSuccess)
                 return existing.GetValueOrThrow();

@@ -3,7 +3,7 @@ using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit;
 
-public interface ICurrentEnvironment
+public interface IEnvironment
 {
     string Name { get; }
     Maybe<T> GetCached<T>();
@@ -39,7 +39,11 @@ public interface IEnvironmentCollection
     /// <returns></returns>
     Maybe<string> GetCurrentName();
 
-    Maybe<ICurrentEnvironment> GetCurrent();
+    /// <summary>
+    /// Get the current environment. Returns a failure result if a valid environment is not set.
+    /// </summary>
+    /// <returns></returns>
+    Maybe<IEnvironment> GetCurrent();
 }
 
 public static class EnvironmentCollectionExtensions

@@ -100,7 +100,7 @@ public class EnvironmentHandler : IHandler
         }
     }
 
-    private void ChangeEnvironment(IPositionalArgument target, Maybe<ICurrentEnvironment> maybeCurrentEnv)
+    private void ChangeEnvironment(IPositionalArgument target, Maybe<IEnvironment> maybeCurrentEnv)
     {
         // If invoked with an argument, it is the name or index of an environment. Attempt to set that
         // environment and exit

@@ -11,7 +11,7 @@ namespace StoneFruit.Execution.Environments;
 public class EnvironmentCollection : IEnvironmentCollection
 {
     public static IReadOnlyList<string> DefaultNamesList => [Constants.EnvironmentNameDefault];
-    private readonly IReadOnlyDictionary<string, ICurrentEnvironment> _environments;
+    private readonly IReadOnlyDictionary<string, IEnvironment> _environments;
     private readonly EnvironmentObjectCache _cache;
 
     private Maybe<string> _currentName;
@@ -20,14 +20,14 @@ public class EnvironmentCollection : IEnvironmentCollection
     {
         var validNames = names == null || names.Count == 0 ? DefaultNamesList : names;
         _cache = [];
-        _environments = validNames.ToDictionary(n => n, n => (ICurrentEnvironment)new Environment(n, _cache), StringComparer.OrdinalIgnoreCase);
+        _environments = validNames.ToDictionary(n => n, n => (IEnvironment)new Environment(n, _cache), StringComparer.OrdinalIgnoreCase);
         _currentName = default;
     }
 
     public Maybe<string> GetCurrentName() => _currentName;
 
-    public Maybe<ICurrentEnvironment> GetCurrent()
-        => GetCurrentName().Map(n => _environments[n]);
+    public Maybe<IEnvironment> GetCurrent()
+        => GetCurrentName().Bind(_environments.MaybeGetValue);
 
     public IReadOnlyList<string> GetNames() => _environments.Keys.ToList();
 
@@ -51,7 +51,7 @@ public class EnvironmentCollection : IEnvironmentCollection
         SetCurrent(allEnvs[index]);
     }
 
-    private sealed class Environment : ICurrentEnvironment
+    private sealed class Environment : IEnvironment
     {
         private readonly EnvironmentObjectCache _cache;
 
