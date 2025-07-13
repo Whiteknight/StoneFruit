@@ -17,11 +17,8 @@ public class PromptCommandSource : ICommandSource
     }
 
     public Maybe<ArgumentsOrString> GetNextCommand()
-    {
-        var env = _environments.GetCurrentName().GetValueOrDefault("");
-        var str = _output.Prompt(env)
-            .Bind(s => string.IsNullOrEmpty(s) ? default : new Maybe<string>(s));
-        _metadata.Add(Constants.Metadata.CurrentCommandIsUserInput, true.ToString());
-        return str.Map(s => new ArgumentsOrString(s));
-    }
+        => _environments.GetCurrentName()
+            .And(env => _output.Prompt(env))
+            .OnSuccess(_ => _metadata.Add(Constants.Metadata.CurrentCommandIsUserInput, true.ToString()))
+            .Map(s => new ArgumentsOrString(s));
 }

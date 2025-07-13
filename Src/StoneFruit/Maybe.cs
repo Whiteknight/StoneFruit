@@ -64,6 +64,9 @@ public readonly struct Maybe<T>
 
 public static class Maybe
 {
+    public static Maybe<TOut> And<T, TOut>(this Maybe<T> maybe, Func<T, Maybe<TOut>> onSuccess)
+        => maybe.Match(v => onSuccess(v), static () => default);
+
     public static Maybe<TOut> Bind<T, TOut>(this Maybe<T> maybe, Func<T, Maybe<TOut>> onSuccess)
         => maybe.Match(v => onSuccess(v), static () => default);
 

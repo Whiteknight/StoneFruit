@@ -40,6 +40,8 @@ public class ConsoleOutput : IOutput
             var value = ReadLine.Read(prompt + "> ");
             if (string.IsNullOrEmpty(value) && mustProvide)
                 continue;
+            if (string.IsNullOrEmpty(value))
+                return default;
             if (keepHistory)
                 ReadLine.AddHistory(value);
             return value;
