@@ -9,7 +9,7 @@ namespace StoneFruit.Execution.Handlers;
 /// </summary>
 public interface IHandlerMethodInvoker
 {
-    void Invoke(object instance, MethodInfo method, IArguments arguments, CommandDispatcher dispatcher, CancellationToken token);
+    void Invoke(object instance, MethodInfo method, HandlerContext context);
 
-    Task InvokeAsync(object instance, MethodInfo method, IArguments arguments, CommandDispatcher dispatcher, CancellationToken token);
+    Task InvokeAsync(object instance, MethodInfo method, HandlerContext context, CancellationToken token);
 }

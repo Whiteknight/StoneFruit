@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -85,11 +86,11 @@ public class HandlerSetup : IHandlerSetup
         return this;
     }
 
-    public IHandlerSetup Add(Verb verb, Action<IArguments, CommandDispatcher> handle, string description = "", string usage = "", string group = "")
+    public IHandlerSetup Add(Verb verb, Action<HandlerContext> handle, string description = "", string usage = "", string group = "")
     {
         NotNull(verb);
         NotNull(handle);
-        _delegates.AddFunc(verb, handle, description, usage, group);
+        _delegates.Add(verb, handle, description, usage, group);
         return this;
     }
 
@@ -101,11 +102,11 @@ public class HandlerSetup : IHandlerSetup
         return this;
     }
 
-    public IHandlerSetup AddAsync(Verb verb, Func<IArguments, CommandDispatcher, Task> handleAsync, string description = "", string usage = "", string group = "")
+    public IHandlerSetup Add(Verb verb, Func<HandlerContext, CancellationToken, Task> handleAsync, string description = "", string usage = "", string group = "")
     {
         NotNull(verb);
         NotNull(handleAsync);
-        _delegates.AddAsyncFunc(verb, handleAsync, description, usage, group);
+        _delegates.Add(verb, handleAsync, description, usage, group);
         return this;
     }
 

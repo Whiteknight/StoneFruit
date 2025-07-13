@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -33,16 +32,16 @@ public class InstanceMethodHandlerSource : IHandlerSource
         _invoker = NotNull(invoker);
     }
 
-    public Maybe<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
-        => _methods.Get(arguments)
-            .Bind(value => GetInstanceInternal(arguments, dispatcher, value));
+    public Maybe<IHandlerBase> GetInstance(HandlerContext context)
+        => _methods.Get(context.Arguments)
+            .Bind(value => GetInstanceInternal(context, value));
 
-    private Maybe<IHandlerBase> GetInstanceInternal(IArguments arguments, CommandDispatcher dispatcher, MethodInfo value)
+    private Maybe<IHandlerBase> GetInstanceInternal(HandlerContext context, MethodInfo value)
     {
         if (value.ReturnType == typeof(void))
-            return new SyncHandlerWrapper(_instance, value, arguments, dispatcher, _invoker);
+            return new SyncHandlerWrapper(_instance, value, context, _invoker);
         if (value.ReturnType == typeof(Task))
-            return new AsyncHandlerWrapper(_instance, value, arguments, dispatcher, _invoker);
+            return new AsyncHandlerWrapper(_instance, value, context, _invoker);
         return default;
     }
 
@@ -56,65 +55,23 @@ public class InstanceMethodHandlerSource : IHandlerSource
         => _methods.Get(verb)
             .Map(v => (IVerbInfo)new MethodInfoVerbInfo(verb, v));
 
-    private sealed class MethodInfoVerbInfo : IVerbInfo
+    private sealed record MethodInfoVerbInfo(Verb Verb, MethodInfo Method) : IVerbInfo
     {
-        private readonly MethodInfo _method;
-
-        public MethodInfoVerbInfo(Verb verb, MethodInfo method)
-        {
-            Verb = verb;
-            _method = method;
-        }
-
-        public Verb Verb { get; }
-        public string Description => _method.GetDescriptionAttributeValue() ?? string.Empty;
-        public string Usage => _method.GetUsageAttributeValue() ?? Description;
-        public string Group => _method.GetGroupAttributeValue() ?? string.Empty;
+        public string Description => Method.GetDescriptionAttributeValue() ?? string.Empty;
+        public string Usage => Method.GetUsageAttributeValue() ?? Description;
+        public string Group => Method.GetGroupAttributeValue() ?? string.Empty;
         public bool ShouldShowInHelp => true;
     }
 
-    private sealed class SyncHandlerWrapper : IHandler
+    private sealed record SyncHandlerWrapper(object Instance, MethodInfo Method, HandlerContext Context, IHandlerMethodInvoker Invoker) : IHandler
     {
-        private readonly object _instance;
-        private readonly MethodInfo _method;
-        private readonly IArguments _command;
-        private readonly CommandDispatcher _dispatcher;
-        private readonly IHandlerMethodInvoker _invoker;
-
-        public SyncHandlerWrapper(object instance, MethodInfo method, IArguments command, CommandDispatcher dispatcher, IHandlerMethodInvoker invoker)
-        {
-            _instance = instance;
-            _method = method;
-            _command = command;
-            _dispatcher = dispatcher;
-            _invoker = invoker;
-        }
-
         public void Execute()
-        {
-            _invoker.Invoke(_instance, _method, _command, _dispatcher, CancellationToken.None);
-        }
+            => Invoker.Invoke(Instance, Method, Context);
     }
 
-    private sealed class AsyncHandlerWrapper : IAsyncHandler
+    private sealed record AsyncHandlerWrapper(object Instance, MethodInfo Method, HandlerContext Context, IHandlerMethodInvoker Invoker) : IAsyncHandler
     {
-        private readonly object _instance;
-        private readonly MethodInfo _method;
-        private readonly IArguments _command;
-        private readonly CommandDispatcher _dispatcher;
-        private readonly IHandlerMethodInvoker _invoker;
-
-        public AsyncHandlerWrapper(object instance, MethodInfo method, IArguments command, CommandDispatcher dispatcher, IHandlerMethodInvoker invoker)
-        {
-            Debug.Assert(method.ReturnType == typeof(Task), "Must be using a Task return type");
-            _instance = instance;
-            _method = method;
-            _command = command;
-            _dispatcher = dispatcher;
-            _invoker = invoker;
-        }
-
         public Task ExecuteAsync(CancellationToken cancellation)
-            => _invoker.InvokeAsync(_instance, _method, _command, _dispatcher, cancellation);
+            => Invoker.InvokeAsync(Instance, Method, Context, cancellation);
     }
 }

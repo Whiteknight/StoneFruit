@@ -12,122 +12,52 @@ namespace StoneFruit.Execution.Handlers;
 /// </summary>
 public class DelegateHandlerSource : IHandlerSource
 {
-    private readonly VerbTrie<HandlerFactory> _handlers;
+    private readonly VerbTrie<IHandlerBase> _handlers;
 
     public DelegateHandlerSource()
     {
-        _handlers = new VerbTrie<HandlerFactory>();
+        _handlers = new VerbTrie<IHandlerBase>();
     }
 
     public int Count => _handlers.Count;
 
-    public Maybe<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
-        => _handlers.Get(arguments).Map(f => f.Create(arguments, dispatcher));
+    public Maybe<IHandlerBase> GetInstance(HandlerContext context)
+        => _handlers.Get(context.Arguments);
 
-    public IEnumerable<IVerbInfo> GetAll() => _handlers.GetAll().Select(kvp => kvp.Value);
+    public IEnumerable<IVerbInfo> GetAll()
+        => _handlers.GetAll()
+            .Select(kvp => kvp.Value)
+            .Cast<IVerbInfo>();
 
     public Maybe<IVerbInfo> GetByName(Verb verb) => _handlers.Get(verb).Map(i => (IVerbInfo)i);
 
-    public DelegateHandlerSource AddFunc(Verb verb, Action<IArguments, CommandDispatcher> act, string description = "", string usage = "", string group = "")
+    public DelegateHandlerSource Add(Verb verb, Action<HandlerContext> act, string description, string usage, string group)
     {
-        var factory = new SyncHandlerFactory(act, verb, description, usage, group);
-        _handlers.Insert(verb, factory);
+        _handlers.Insert(verb, new SyncHandler(act, verb, description, usage, group));
         return this;
     }
 
-    public DelegateHandlerSource AddAsyncFunc(Verb verb, Func<IArguments, CommandDispatcher, Task> func, string description = "", string usage = "", string group = "")
+    public DelegateHandlerSource Add(Verb verb, Func<HandlerContext, CancellationToken, Task> func, string description, string usage, string group)
     {
-        _handlers.Insert(verb, new AsyncHandlerFactory(func, verb, description, usage, group));
+        _handlers.Insert(verb, new AsyncHandler(func, verb, description, usage, group));
         return this;
     }
 
-    // We need to return an IHandler instance which has the IArguments from the current command
-    // injected already into the constructor. So when we register the delegate we store a
-    // factory to create an IHandler. The factory takes the IArguments from the current command
-    // and creates a new IHandler instance with the IArguments injected into the constructor.
-
-    private abstract class HandlerFactory : IVerbInfo
+    private sealed record SyncHandler(Action<HandlerContext> Act, Verb Verb, string Description, string Usage, string Group)
+        : IHandlerWithContext, IVerbInfo
     {
-        protected HandlerFactory(Verb verb, string description, string usage, string group)
-        {
-            Verb = verb;
-            Description = description;
-            Usage = string.IsNullOrEmpty(usage) ? description : usage;
-            Group = group;
-        }
-
-        public Verb Verb { get; }
-        public string Description { get; }
-        public string Usage { get; }
-        public string Group { get; }
         public bool ShouldShowInHelp => true;
 
-        public abstract IHandlerBase Create(IArguments arguments, CommandDispatcher dispatcher);
+        public void Execute(HandlerContext context)
+            => Act(context);
     }
 
-    private sealed class SyncHandlerFactory : HandlerFactory
+    private sealed record AsyncHandler(Func<HandlerContext, CancellationToken, Task> Func, Verb Verb, string Description, string Usage, string Group)
+        : IAsyncHandlerWithContext, IVerbInfo
     {
-        private readonly Action<IArguments, CommandDispatcher> _act;
+        public bool ShouldShowInHelp => true;
 
-        public SyncHandlerFactory(Action<IArguments, CommandDispatcher> act, Verb verb, string description, string usage, string group)
-            : base(verb, description, usage, group)
-        {
-            _act = act;
-        }
-
-        public override IHandlerBase Create(IArguments arguments, CommandDispatcher dispatcher)
-        {
-            return new SyncHandler(_act, arguments, dispatcher);
-        }
-    }
-
-    private sealed class AsyncHandlerFactory : HandlerFactory
-    {
-        private readonly Func<IArguments, CommandDispatcher, Task> _func;
-
-        public AsyncHandlerFactory(Func<IArguments, CommandDispatcher, Task> func, Verb verb, string description, string usage, string group)
-            : base(verb, description, usage, group)
-        {
-            _func = func;
-        }
-
-        public override IHandlerBase Create(IArguments arguments, CommandDispatcher dispatcher)
-            => new AsyncHandler(_func, arguments, dispatcher);
-    }
-
-    private sealed class SyncHandler : IHandler
-    {
-        private readonly Action<IArguments, CommandDispatcher> _act;
-        private readonly IArguments _arguments;
-        private readonly CommandDispatcher _dispatcher;
-
-        public SyncHandler(Action<IArguments, CommandDispatcher> act, IArguments arguments, CommandDispatcher dispatcher)
-        {
-            _act = act;
-            _arguments = arguments;
-            _dispatcher = dispatcher;
-        }
-
-        public void Execute()
-        {
-            _act(_arguments, _dispatcher);
-        }
-    }
-
-    private sealed class AsyncHandler : IAsyncHandler
-    {
-        private readonly Func<IArguments, CommandDispatcher, Task> _func;
-        private readonly IArguments _arguments;
-        private readonly CommandDispatcher _dispatcher;
-
-        public AsyncHandler(Func<IArguments, CommandDispatcher, Task> func, IArguments arguments, CommandDispatcher dispatcher)
-        {
-            _func = func;
-            _arguments = arguments;
-            _dispatcher = dispatcher;
-        }
-
-        public Task ExecuteAsync(CancellationToken cancellation)
-            => _func(_arguments, _dispatcher);
+        public Task ExecuteAsync(HandlerContext context, CancellationToken cancellation)
+            => Func(context, cancellation);
     }
 }

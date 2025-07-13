@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ParserObjects;
 using StoneFruit.Execution.Trie;
 using StoneFruit.Utility;
 
@@ -18,9 +19,9 @@ public class ScriptHandlerSource : IHandlerSource
         _scripts = new VerbTrie<Script>();
     }
 
-    public Maybe<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
-        => _scripts.Get(arguments)
-            .Map(script => (IHandlerBase)new ScriptHandler(dispatcher.Parser, script, arguments, dispatcher.State));
+    public Maybe<IHandlerBase> GetInstance(HandlerContext context)
+        => _scripts.Get(context.Arguments)
+            .Map(script => (IHandlerBase)new ScriptHandler(context, script));
 
     public IEnumerable<IVerbInfo> GetAll() => _scripts.GetAll().Select(kvp => kvp.Value);
 
@@ -87,33 +88,20 @@ public class ScriptHandlerSource : IHandlerSource
 
     // We need to keep ScriptHandler private child class, so it doesn't get scooped up
     // during DI container scan
-    private sealed class ScriptHandler : IHandler
+    private sealed record ScriptHandler(HandlerContext Context, Script Script) : IHandler
     {
-        private readonly ICommandParser _parser;
-        private readonly Script _script;
-        private readonly IArguments _arguments;
-        private readonly EngineState _state;
-
-        public ScriptHandler(ICommandParser parser, Script script, IArguments arguments, EngineState state)
-        {
-            _parser = parser;
-            _script = script;
-            _arguments = arguments;
-            _state = state;
-        }
-
         public void Execute()
         {
             // Get the format objects, parsing them if necessary
-            var formats = _script.GetFormats(_parser);
+            var formats = Script.GetFormats(Context.Parser);
             foreach (var lineFormat in formats)
             {
                 // Fill in arguments to the formats to create the command
-                var formattedArguments = lineFormat.Format(_arguments);
-                _arguments.Reset();
+                var formattedArguments = lineFormat.Format(Context.Arguments);
+                Context.Arguments.Reset();
 
                 // Add the command to the EngineState for execution after this
-                _state.Commands.Append(new ArgumentsOrString(formattedArguments));
+                Context.State.Commands.Append(new ArgumentsOrString(formattedArguments));
             }
         }
     }

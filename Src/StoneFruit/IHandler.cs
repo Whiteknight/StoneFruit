@@ -23,6 +23,11 @@ public interface IHandler : IHandlerBase
     void Execute();
 }
 
+public interface IHandlerWithContext : IHandlerBase
+{
+    void Execute(HandlerContext context);
+}
+
 /// <summary>
 /// An asynchronous handler. Handlers are invoked in response to specific verbs
 /// depending on registrations and mapping rules. Any dependencies of the handler are
@@ -36,4 +41,9 @@ public interface IAsyncHandler : IHandlerBase
     /// <param name="cancellation"></param>
     /// <returns></returns>
     Task ExecuteAsync(CancellationToken cancellation);
+}
+
+public interface IAsyncHandlerWithContext : IHandlerBase
+{
+    Task ExecuteAsync(HandlerContext context, CancellationToken cancellation);
 }

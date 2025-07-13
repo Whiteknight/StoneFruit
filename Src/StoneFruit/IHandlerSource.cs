@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using StoneFruit.Execution;
 
 namespace StoneFruit;
 
@@ -13,10 +12,9 @@ public interface IHandlerSource
     /// Instantiates the handler for the command. If a suitable handler is not found
     /// null is returned.
     /// </summary>
-    /// <param name="arguments"></param>
-    /// <param name="dispatcher"></param>
+    /// <param name="context"></param>
     /// <returns></returns>
-    Maybe<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher);
+    Maybe<IHandlerBase> GetInstance(HandlerContext context);
 
     /// <summary>
     /// Get metadata information about all verbs registered with this source.

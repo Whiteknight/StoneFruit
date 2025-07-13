@@ -25,8 +25,8 @@ public class NamedInstanceHandlerSource : IHandlerSource
         _verbs.Insert(verb, info);
     }
 
-    public Maybe<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
-        => _verbs.Get(arguments).Map(info => info.HandlerObject);
+    public Maybe<IHandlerBase> GetInstance(HandlerContext context)
+        => _verbs.Get(context.Arguments).Map(info => info.HandlerObject);
 
     public IEnumerable<IVerbInfo> GetAll() => _verbs.GetAll().Select(kvp => kvp.Value);
 

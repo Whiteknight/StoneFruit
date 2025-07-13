@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using StoneFruit.Execution;
 
 namespace StoneFruit;
 
@@ -13,10 +12,9 @@ public interface IHandlers
     /// Given a list of arguments, find a handler with a matching verb. Returns null if no
     /// matching handler is found.
     /// </summary>
-    /// <param name="arguments"></param>
-    /// <param name="dispatcher"></param>
+    /// <param name="context"></param>
     /// <returns></returns>
-    Maybe<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher);
+    Maybe<IHandlerBase> GetInstance(HandlerContext context);
 
     /// <summary>
     /// Return help information for all handlers. Used mostly by the  "help" handler to display

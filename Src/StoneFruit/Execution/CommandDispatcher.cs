@@ -14,39 +14,20 @@ namespace StoneFruit.Execution;
 /// </summary>
 public class CommandDispatcher
 {
+    private readonly ICommandParser _parser;
+    private readonly IHandlers _handlers;
+    private readonly IEnvironmentCollection _environments;
+    private readonly EngineState _state;
+    private readonly IOutput _output;
+
     public CommandDispatcher(ICommandParser parser, IHandlers handlers, IEnvironmentCollection environments, EngineState state, IOutput output)
     {
-        Parser = NotNull(parser);
-        Handlers = NotNull(handlers);
-        Environments = NotNull(environments);
-        Output = NotNull(output);
-        State = NotNull(state);
+        _parser = NotNull(parser);
+        _handlers = NotNull(handlers);
+        _environments = NotNull(environments);
+        _output = NotNull(output);
+        _state = NotNull(state);
     }
-
-    /// <summary>
-    /// Gets the parser to turn strings into Commands.
-    /// </summary>
-    public ICommandParser Parser { get; }
-
-    /// <summary>
-    /// Gets the source of handlers.
-    /// </summary>
-    public IHandlers Handlers { get; }
-
-    /// <summary>
-    /// Gets the current environment and collection of all possible environments.
-    /// </summary>
-    public IEnvironmentCollection Environments { get; }
-
-    /// <summary>
-    /// Gets the execution state of the engine.
-    /// </summary>
-    public EngineState State { get; }
-
-    /// <summary>
-    /// Gets the output.
-    /// </summary>
-    public IOutput Output { get; }
 
     /// <summary>
     /// Find and execute the appropriate handler for the given arguments object or
@@ -58,7 +39,7 @@ public class CommandDispatcher
     /// <param name="token"></param>
     public void Execute(ArgumentsOrString argsOrString, CancellationToken token = default)
     {
-        var args = NotNull(argsOrString).GetArguments(Parser);
+        var args = NotNull(argsOrString).GetArguments(_parser);
         Execute(args, token);
     }
 
@@ -71,7 +52,7 @@ public class CommandDispatcher
     /// <param name="token"></param>
     public void Execute(string commandString, CancellationToken token = default)
     {
-        var command = Parser.ParseCommand(NotNullOrEmpty(commandString));
+        var command = _parser.ParseCommand(NotNullOrEmpty(commandString));
         Execute(command, token);
     }
 
@@ -96,14 +77,15 @@ public class CommandDispatcher
     /// <param name="token"></param>
     public void Execute(IArguments arguments, CancellationToken token = default)
     {
-        State.SetCurrentArguments(NotNull(arguments));
-        var handler = Handlers.GetInstance(arguments, this)
+        _state.SetCurrentArguments(NotNull(arguments));
+        var context = CreateHandlerContext(arguments);
+        var handler = _handlers.GetInstance(context)
             .OnFailure(() => throw VerbNotFoundException.FromArguments(arguments))
             .GetValueOrThrow();
         if (handler is IHandler syncHandler)
         {
             syncHandler.Execute();
-            State.ClearCurrentArguments();
+            _state.ClearCurrentArguments();
             return;
         }
 
@@ -113,7 +95,7 @@ public class CommandDispatcher
                 .ConfigureAwait(false)
                 .GetAwaiter()
                 .GetResult();
-            State.ClearCurrentArguments();
+            _state.ClearCurrentArguments();
         }
     }
 
@@ -128,7 +110,7 @@ public class CommandDispatcher
     /// <returns></returns>
     public Task ExecuteAsync(ArgumentsOrString argsOrString, CancellationToken token = default)
     {
-        var args = NotNull(argsOrString).GetArguments(Parser);
+        var args = NotNull(argsOrString).GetArguments(_parser);
         return ExecuteAsync(args, token);
     }
 
@@ -140,7 +122,7 @@ public class CommandDispatcher
     /// <returns></returns>
     public Task ExecuteAsync(string commandString, CancellationToken token = default)
     {
-        var command = Parser.ParseCommand(NotNullOrEmpty(commandString));
+        var command = _parser.ParseCommand(NotNullOrEmpty(commandString));
         return ExecuteAsync(command, token);
     }
 
@@ -170,23 +152,30 @@ public class CommandDispatcher
     public async Task ExecuteAsync(IArguments arguments, CancellationToken token = default)
     {
         // Set the current arguments in the State, so they can be resolved from the container
-        State.SetCurrentArguments(NotNull(arguments));
+        _state.SetCurrentArguments(NotNull(arguments));
 
         // Get the handler. Throw if a matching one is not found
-        var handler = Handlers.GetInstance(arguments, this)
+        var context = CreateHandlerContext(arguments);
+        var handler = _handlers.GetInstance(context)
             .OnFailure(() => throw VerbNotFoundException.FromArguments(arguments))
             .GetValueOrThrow();
 
         // Invoke the handler, async or otherwise.
-        await ExecuteHandler(handler, token);
-        State.ClearCurrentArguments();
+        await ExecuteHandler(handler, CreateHandlerContext(arguments), token);
+        _state.ClearCurrentArguments();
     }
 
-    private static async Task ExecuteHandler(IHandlerBase handler, CancellationToken token)
+    private static async Task ExecuteHandler(IHandlerBase handler, HandlerContext context, CancellationToken token)
     {
         if (handler is IHandler syncHandler)
         {
             syncHandler.Execute();
+            return;
+        }
+
+        if (handler is IHandlerWithContext syncWithContext)
+        {
+            syncWithContext.Execute(context);
             return;
         }
 
@@ -196,6 +185,15 @@ public class CommandDispatcher
             return;
         }
 
+        if (handler is IAsyncHandlerWithContext asyncWithContext)
+        {
+            await asyncWithContext.ExecuteAsync(context, token);
+            return;
+        }
+
         throw new InvalidOperationException($"Unknown handler type ${handler.GetType().Name}");
     }
+
+    private HandlerContext CreateHandlerContext(IArguments args)
+        => new HandlerContext(args, _output, this, _environments, _parser, _state);
 }

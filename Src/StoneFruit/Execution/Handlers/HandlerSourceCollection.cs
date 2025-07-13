@@ -18,11 +18,11 @@ public class HandlerSourceCollection : IHandlers
             .ToList();
     }
 
-    public Maybe<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
+    public Maybe<IHandlerBase> GetInstance(HandlerContext context)
     {
-        NotNull(arguments);
+        NotNull(context);
         return _sources
-            .Select(source => source.GetInstance(arguments, dispatcher))
+            .Select(source => source.GetInstance(context))
             .FirstOrDefault(result => result.IsSuccess);
     }
 

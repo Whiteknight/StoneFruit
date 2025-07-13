@@ -20,13 +20,13 @@ public class ServiceProviderMethodInvoker : IHandlerMethodInvoker
         _provider = provider;
     }
 
-    public void Invoke(object instance, MethodInfo method, IArguments arguments, CommandDispatcher dispatcher, CancellationToken token)
+    public void Invoke(object instance, MethodInfo method, HandlerContext context)
     {
-        InvokeDynamic(instance, method, arguments, token);
+        InvokeDynamic(instance, method, context.Arguments, CancellationToken.None);
     }
 
-    public Task InvokeAsync(object instance, MethodInfo method, IArguments arguments, CommandDispatcher dispatcher, CancellationToken token)
-        => InvokeDynamic(instance, method, arguments, token) as Task ?? Task.CompletedTask;
+    public Task InvokeAsync(object instance, MethodInfo method, HandlerContext context, CancellationToken token)
+        => InvokeDynamic(instance, method, context.Arguments, token) as Task ?? Task.CompletedTask;
 
     private object? InvokeDynamic(object instance, MethodInfo method, IArguments args, CancellationToken token)
     {

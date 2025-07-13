@@ -11,7 +11,8 @@ public class ScriptHandlerSourceTests
     public void GetInstance_DoesNotExist()
     {
         var source = new ScriptHandlerSource();
-        var instance = source.GetInstance(SyntheticArguments.From("X"), null);
+        var context = new HandlerContext(SyntheticArguments.From("X"), null, null, null, null, null);
+        var instance = source.GetInstance(context);
         instance.IsSuccess.Should().BeFalse();
     }
 

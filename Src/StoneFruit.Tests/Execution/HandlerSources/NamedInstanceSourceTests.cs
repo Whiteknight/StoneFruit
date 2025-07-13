@@ -10,10 +10,6 @@ public class NamedInstanceSourceTests
 {
     private class TestCommandHandler : IHandler
     {
-        public TestCommandHandler()
-        {
-        }
-
         public void Execute()
         {
             throw new NotImplementedException();
@@ -25,7 +21,8 @@ public class NamedInstanceSourceTests
     {
         var target = new NamedInstanceHandlerSource();
         target.Add("test", new TestCommandHandler());
-        var result = target.GetInstance(SyntheticArguments.From("test"), null);
+        var context = new HandlerContext(SyntheticArguments.From("test"), null, null, null, null, null);
+        var result = target.GetInstance(context);
         result.IsSuccess.Should().BeTrue();
         result.GetValueOrThrow().Should().BeOfType<TestCommandHandler>();
     }

@@ -31,8 +31,8 @@ public class ServiceProviderHandlerSource : IHandlerSource
             .ToVerbTrie(vi => vi.Verb);
     }
 
-    public Maybe<IHandlerBase> GetInstance(IArguments arguments, CommandDispatcher dispatcher)
-        => _verbs.Get(arguments).Bind(GetHandlerFromProvider);
+    public Maybe<IHandlerBase> GetInstance(HandlerContext context)
+        => _verbs.Get(context.Arguments).Bind(GetHandlerFromProvider);
 
     private Maybe<IHandlerBase> GetHandlerFromProvider(VerbInfo st)
     {
