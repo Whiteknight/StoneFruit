@@ -9,9 +9,8 @@ public record DynamicDispatchStepDefinitions(ScenarioContext Context)
     public void GivenIUseTheDynamicDispatchHandlers()
     {
         Context.GetEngineBuilder().SetupHandlers(h => h
-            .UseHandlerTypes(
-                typeof(DispatchTargetHandler),
-                typeof(DynamicDispatchHandler),
-                typeof(AsyncDynamicDispatchHandler)));
+            .Add<DispatchTargetHandler>()
+            .Add<DynamicDispatchHandler>()
+            .Add<AsyncDynamicDispatchHandler>());
     }
 }

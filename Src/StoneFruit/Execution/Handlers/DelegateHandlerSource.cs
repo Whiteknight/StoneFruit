@@ -32,16 +32,14 @@ public class DelegateHandlerSource : IHandlerSource
     public Maybe<IVerbInfo> GetByName(Verb verb)
         => _handlers.Get(verb).Map(i => (IVerbInfo)i);
 
-    public DelegateHandlerSource Add(Verb verb, Action<HandlerContext> act, string description, string usage, string group)
+    public void Add(Verb verb, Action<HandlerContext> act, string description, string usage, string group)
     {
         _handlers.Insert(verb, new SyncHandler(act, verb, description, usage, group));
-        return this;
     }
 
-    public DelegateHandlerSource Add(Verb verb, Func<HandlerContext, CancellationToken, Task> func, string description, string usage, string group)
+    public void Add(Verb verb, Func<HandlerContext, CancellationToken, Task> func, string description, string usage, string group)
     {
         _handlers.Insert(verb, new AsyncHandler(func, verb, description, usage, group));
-        return this;
     }
 
     private sealed record SyncHandler(Action<HandlerContext> Act, Verb Verb, string Description, string Usage, string Group)

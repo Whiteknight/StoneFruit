@@ -9,6 +9,6 @@ public record ArgumentMappingStepDefinitions(ScenarioContext Context)
     public void GivenIUseTheArgumentMappingHandler()
     {
         var builder = Context.GetEngineBuilder();
-        builder.SetupHandlers(h => h.UseHandlerTypes(typeof(ArgumentMappingHandler)));
+        builder.SetupHandlers(h => h.Add<ArgumentMappingHandler>());
     }
 }

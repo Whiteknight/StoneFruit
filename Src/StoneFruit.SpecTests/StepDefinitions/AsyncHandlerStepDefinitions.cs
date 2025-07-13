@@ -9,6 +9,6 @@ public record AsyncHandlerStepDefinitions(ScenarioContext Context)
     public void GivenIUseTheSimpleAsyncHandler()
     {
         var builder = Context.GetEngineBuilder();
-        builder.SetupHandlers(h => h.UseHandlerTypes(typeof(SimpleAsyncHandler)));
+        builder.SetupHandlers(h => h.Add<SimpleAsyncHandler>());
     }
 }

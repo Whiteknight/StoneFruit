@@ -9,6 +9,6 @@ public record ThrowExceptionHandlerStepDefinitions(ScenarioContext Context)
     public void GivenIUseTheThrowExceptionHandler()
     {
         var builder = Context.GetEngineBuilder();
-        builder.SetupHandlers(h => h.UseHandlerTypes(typeof(ThrowExceptionHandler)));
+        builder.SetupHandlers(h => h.Add<ThrowExceptionHandler>());
     }
 }

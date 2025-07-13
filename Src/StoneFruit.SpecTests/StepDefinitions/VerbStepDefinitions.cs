@@ -10,7 +10,7 @@ public record VerbStepDefinitions(ScenarioContext Context)
     public void GivenIUseTheMultiWordVerbHandler()
     {
         var builder = Context.GetEngineBuilder();
-        builder.SetupHandlers(h => h.UseHandlerTypes(typeof(MultiWordVerbHandler)));
+        builder.SetupHandlers(h => h.Add<MultiWordVerbHandler>());
     }
 
     [Given("I use the CamelCaseVerbExtractor")]

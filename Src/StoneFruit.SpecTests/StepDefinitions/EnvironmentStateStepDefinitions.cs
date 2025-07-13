@@ -9,7 +9,7 @@ public record EnvironmentStateStepDefinitions(ScenarioContext Context)
     public void GivenIUseTheIncrementEnvStateCountHandler()
     {
         var builder = Context.GetEngineBuilder();
-        builder.SetupHandlers(h => h.UseHandlerTypes(typeof(IncrementEnvStateCount)));
+        builder.SetupHandlers(h => h.Add<IncrementEnvStateCount>());
         builder.Services.AddPerEnvironment((p, n) => new TestEnvironmentState(n));
     }
 }

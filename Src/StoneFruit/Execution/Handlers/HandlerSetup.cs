@@ -23,16 +23,6 @@ public class HandlerSetup : IHandlerSetup
     private readonly IServiceCollection _services;
     private readonly HashSet<Assembly> _scannedAssemblies;
 
-    private readonly List<Type> _handlerTypes = [
-        typeof(ArgumentDisplayHandler),
-        typeof(EchoHandler),
-        typeof(EnvironmentHandler),
-        typeof(ExitHandler),
-        typeof(HelpHandler),
-        typeof(MetadataHandler),
-        typeof(ShowHandler)
-    ];
-
     public HandlerSetup(IServiceCollection services)
     {
         _delegates = new DelegateHandlerSource();
@@ -57,8 +47,14 @@ public class HandlerSetup : IHandlerSetup
         if (_instances.Count > 0)
             services.AddSingleton<IHandlerSource>(_instances);
 
-        foreach (var handlerType in _handlerTypes)
-            RegisterHandlerType(handlerType);
+        // Register built-in handlers
+        services.AddHandler<ArgumentDisplayHandler>();
+        services.AddHandler<EchoHandler>();
+        services.AddHandler<EnvironmentHandler>();
+        services.AddHandler<ExitHandler>();
+        services.AddHandler<HelpHandler>();
+        services.AddHandler<MetadataHandler>();
+        services.AddHandler<ShowHandler>();
 
         // Add the IHandlers, which gets the list of all IHandlerSource instances from the DI
         // This one may be registered by the user already so don't overwrite
@@ -110,18 +106,24 @@ public class HandlerSetup : IHandlerSetup
         return this;
     }
 
+    public IHandlerSetup Add<T>()
+        where T : class, IHandlerBase
+    {
+        _services.AddHandler<T>();
+        return this;
+    }
+
+    public IHandlerSetup Add(Type handlerType)
+    {
+        _services.AddHandler(handlerType);
+        return this;
+    }
+
     public IHandlerSetup AddScript(Verb verb, IEnumerable<string> lines, string description = "", string usage = "", string group = "")
     {
         NotNull(verb);
         NotNull(lines);
         _scripts.AddScript(verb, lines, description, usage, group);
-        return this;
-    }
-
-    public IHandlerSetup UseHandlerTypes(IEnumerable<Type> commandTypes)
-    {
-        NotNull(commandTypes);
-        _handlerTypes.AddRange(commandTypes);
         return this;
     }
 
@@ -137,15 +139,9 @@ public class HandlerSetup : IHandlerSetup
         // 1) the type itself, as itself, so we can resolve the handler instance later, and
         // 2) a RegisteredHandler, which holds the handler type, so we can set up verb->handler mappings
         foreach (var type in handlerTypes)
-            RegisterHandlerType(type);
+            _services.AddHandler(type);
 
         _scannedAssemblies.Add(assembly);
         return this;
-    }
-
-    private void RegisterHandlerType(Type type)
-    {
-        _services.AddScoped(type);
-        _services.AddSingleton(new RegisteredHandler(type));
     }
 }

@@ -9,7 +9,7 @@ public record AsyncTimeoutStepDefinitions(ScenarioContext Context)
     public void GivenIUseTheAsyncTimeoutHandler()
     {
         var builder = Context.GetEngineBuilder();
-        builder.SetupHandlers(h => h.UseHandlerTypes(typeof(AsyncTimeoutHandler)));
+        builder.SetupHandlers(h => h.Add<AsyncTimeoutHandler>());
     }
 
 }

@@ -69,6 +69,21 @@ public interface IHandlerSetup
     IHandlerSetup Add(Verb verb, Func<HandlerContext, CancellationToken, Task> handleAsync, string description = "", string usage = "", string group = "");
 
     /// <summary>
+    /// Register a handler type. Verbs and help information will be derived from the type.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    IHandlerSetup Add<T>()
+        where T : class, IHandlerBase;
+
+    /// <summary>
+    /// Register a handler type. Verbs and help information will be derived from the type.
+    /// </summary>
+    /// <param name="handlerType"></param>
+    /// <returns></returns>
+    IHandlerSetup Add(Type handlerType);
+
+    /// <summary>
     /// Add a script with a verb and zero or more commands to execute.
     /// </summary>
     /// <param name="verb"></param>
@@ -77,15 +92,6 @@ public interface IHandlerSetup
     /// <param name="usage"></param>
     /// <returns></returns>
     IHandlerSetup AddScript(Verb verb, IEnumerable<string> lines, string description = "", string usage = "", string group = "");
-
-    /// <summary>
-    /// Specify an explicit list of handler types to register with the Engine. Notice that these types
-    /// may not be constructed using your DI container of choice. If you are using a DI container, you
-    /// should try to register types with the container instead.
-    /// </summary>
-    /// <param name="commandTypes"></param>
-    /// <returns></returns>
-    IHandlerSetup UseHandlerTypes(IEnumerable<Type> commandTypes);
 }
 
 public static class HandlerSetupExtensions
@@ -125,14 +131,4 @@ public static class HandlerSetupExtensions
                 provider.GetRequiredService<IVerbExtractor>()
             )
         );
-
-    /// <summary>
-    /// Use the specified list of handler types, with the default instance resolver and
-    /// default verb extractor.
-    /// </summary>
-    /// <param name="handlers"></param>
-    /// <param name="commandTypes"></param>
-    /// <returns></returns>
-    public static IHandlerSetup UseHandlerTypes(this IHandlerSetup handlers, params Type[] commandTypes)
-        => NotNull(handlers).UseHandlerTypes(NotNull(commandTypes));
 }

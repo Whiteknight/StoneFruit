@@ -1,18 +1,13 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Execution.Exceptions;
+using StoneFruit.Execution.Handlers;
 using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection UseStonefruit(this IServiceCollection services, Action<IEngineBuilder> build)
-    {
-        EngineBuilder.SetupEngineRegistrations(services, build);
-        return services;
-    }
-
     public static IServiceCollection AddPerEnvironment<TInterface>(this IServiceCollection services, Func<IServiceProvider, string, TInterface> factory)
         where TInterface : class
     {
@@ -28,5 +23,21 @@ public static class ServiceCollectionExtensions
             currentEnvironment.CacheInstance(value);
             return value;
         });
+    }
+
+    public static IServiceCollection AddHandler<T>(this IServiceCollection services)
+        where T : class, IHandlerBase
+        => NotNull(services)
+            .AddScoped<T>()
+            .AddSingleton(RegisteredHandler.Create<T>());
+
+    public static IServiceCollection AddHandler(this IServiceCollection services, Type handlerType)
+    {
+        NotNull(services);
+        NotNull(handlerType);
+        if (!handlerType.IsAssignableTo(typeof(IHandler)))
+            throw new EngineBuildException($"Cannot register handler type {handlerType.Name}. It is not derived from IHandlerBase.");
+        return services.AddScoped(handlerType)
+            .AddSingleton(new RegisteredHandler(handlerType));
     }
 }
