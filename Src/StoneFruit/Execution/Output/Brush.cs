@@ -24,6 +24,11 @@ public readonly struct Brush
         ByteValue = ConsoleColorUtilities.ColorsToByte(foreground, background);
     }
 
+    public Brush(ConsoleColor foreground)
+        : this(foreground, Console.BackgroundColor)
+    {
+    }
+
     public static Brush Default => new Brush(ConsoleColor.Gray, ConsoleColor.Black);
 
     public static Brush Current => new Brush(Console.ForegroundColor, Console.BackgroundColor);

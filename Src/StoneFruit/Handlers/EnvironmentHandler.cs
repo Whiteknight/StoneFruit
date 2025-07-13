@@ -76,14 +76,17 @@ public class EnvironmentHandler : IHandler
             return;
         }
 
-        // Otherwise we're switching environments
-        if (!_args.HasFlag(FlagNotSet) || !_environments.GetCurrentName().IsSuccess)
-            ChangeEnvironment(target, maybeCurrentEnv);
+        // If -notset and we have a current env, bail out
+        if (_args.HasFlag(FlagNotSet) && _environments.GetCurrentName().IsSuccess)
+            return;
+
+        // Change the environment
+        ChangeEnvironment(target, maybeCurrentEnv);
     }
 
     private void ListEnvironments()
     {
-        var highlight = new Brush(ConsoleColor.Black, ConsoleColor.Cyan);
+        var color = new Brush(ConsoleColor.Cyan);
         var envList = _environments.GetNames();
         var currentEnvNameResult = _environments.GetCurrentName();
         var currentEnv = currentEnvNameResult.GetValueOrDefault(string.Empty);
@@ -95,7 +98,7 @@ public class EnvironmentHandler : IHandler
             _output
                 .Color(ConsoleColor.White).Write(index.ToString())
                 .Color(ConsoleColor.DarkGray).Write(") ")
-                .Color(env == currentEnv ? highlight : ConsoleColor.Cyan).Write(env)
+                .Color(env == currentEnv ? color.Swap() : color).Write(env)
                 .Color(Brush.Default).WriteLine();
         }
     }
@@ -136,13 +139,12 @@ public class EnvironmentHandler : IHandler
         if (!_environments.IsValid(envName))
             throw new ExecutionException($"Unknown environment '{envName}'");
 
-        if (_args.HasFlag(FlagClearData))
-            maybeCurrentEnv.OnSuccess(e => e.ClearCache());
-
         if (maybeCurrentEnv.Satisfies(e => e.Name == envName))
             return;
 
         _environments.SetCurrent(envName);
+        if (_args.HasFlag(FlagClearData))
+            _environments.GetCurrent().OnSuccess(e => e.ClearCache());
         _state.OnEnvironmentChanged();
     }
 

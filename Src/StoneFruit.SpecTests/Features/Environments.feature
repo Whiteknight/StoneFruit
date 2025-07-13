@@ -147,6 +147,8 @@ Rule: PerEnvironment objects maintain state until env changed
             | env B                     |
             | increment-env-state-count |
             | increment-env-state-count |
+            | env A                     |
+            | increment-env-state-count |
         When I run interactively in environment "A"
         Then The output should contain:
             | Line                               |
@@ -157,6 +159,8 @@ Rule: PerEnvironment objects maintain state until env changed
             | Environment changed to B           |
             | B: 1                               |
             | B: 2                               |
+            | Environment changed to A           |
+            | A: 4                               |
 
     Scenario: PerEnvironment object maintains state no env changed script
         Given I clear the EnvironmentChanged script
@@ -176,3 +180,23 @@ Rule: PerEnvironment objects maintain state until env changed
             | A: 3                               |
             | B: 1                               |
             | B: 2                               |
+
+     Scenario: PerEnvironment object cleared when requested
+        Given I input the following lines:
+            | Line                      |
+            | increment-env-state-count |
+            | increment-env-state-count |
+            | increment-env-state-count |
+            | env B                     |
+            | env A -cleardata          |
+            | increment-env-state-count |
+        When I run interactively in environment "A"
+        Then The output should contain:
+            | Line                               |
+            | Environment changed to A           |
+            | A: 1                               |
+            | A: 2                               |
+            | A: 3                               |
+            | Environment changed to B           |
+            | Environment changed to A           |
+            | A: 1                               |

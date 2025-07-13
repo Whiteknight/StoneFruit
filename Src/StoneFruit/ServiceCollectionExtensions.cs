@@ -35,7 +35,7 @@ public static class ServiceCollectionExtensions
     {
         NotNull(services);
         NotNull(handlerType);
-        if (!handlerType.IsAssignableTo(typeof(IHandler)))
+        if (!handlerType.IsAssignableTo(typeof(IHandlerBase)))
             throw new EngineBuildException($"Cannot register handler type {handlerType.Name}. It is not derived from IHandlerBase.");
         return services.AddScoped(handlerType)
             .AddSingleton(new RegisteredHandler(handlerType));
