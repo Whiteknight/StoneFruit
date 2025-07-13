@@ -67,6 +67,20 @@ public readonly struct Result<T, TError>
         throw new Exception(_error);
     }
 
+    public Result<T, TError> OnSuccess(Action<T> onSuccess)
+    {
+        if (_hasValue && _value is not null)
+            onSuccess(_value);
+        return this;
+    }
+
+    public Result<T, TError> OnFailure(Action<TError> onFailure)
+    {
+        if ((!_hasValue || _value is null) && _error is not null)
+            onFailure(_error);
+        return this;
+    }
+
     public class Exception : System.Exception
     {
         public Exception(object error)
