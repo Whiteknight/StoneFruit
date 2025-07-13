@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using static StoneFruit.Utility.Assert;
+using System.Linq;
 
 namespace StoneFruit.Execution.Environments;
 
@@ -10,43 +10,35 @@ namespace StoneFruit.Execution.Environments;
 /// </summary>
 public class EnvironmentCollection : IEnvironmentCollection
 {
-    private readonly EnvironmentsList _nameList;
+    public static IReadOnlyList<string> DefaultNamesList => [Constants.EnvironmentNameDefault];
+    private readonly IReadOnlyDictionary<string, ICurrentEnvironment> _environments;
     private readonly EnvironmentObjectCache _cache;
 
     private Maybe<string> _currentName;
 
-    public EnvironmentCollection(EnvironmentsList environmentList)
+    public EnvironmentCollection(IReadOnlyList<string>? names)
     {
-        _nameList = NotNull(environmentList);
-        _currentName = default;
+        var validNames = names == null || names.Count == 0 ? DefaultNamesList : names;
         _cache = [];
+        _environments = validNames.ToDictionary(n => n, n => (ICurrentEnvironment)new Environment(n, _cache), StringComparer.OrdinalIgnoreCase);
+        _currentName = default;
     }
 
     public Maybe<string> GetCurrentName() => _currentName;
 
-    public IReadOnlyList<string> GetNames() => _nameList.ValidNames;
+    public Maybe<ICurrentEnvironment> GetCurrent()
+        => GetCurrentName().Map(n => _environments[n]);
+
+    public IReadOnlyList<string> GetNames() => _environments.Keys.ToList();
 
     public bool IsValid(string name)
-        => name != null && _nameList.Contains(name);
-
-    public Maybe<T> GetCached<T>()
-        => GetCurrentName().Bind(_cache.Get<T>);
-
-    public void CacheInstance<T>(T value)
-    {
-        _cache.Set(GetCurrentName().GetValueOrDefault(Constants.EnvironmentNameDefault), value);
-    }
-
-    public void ClearCache()
-    {
-        GetCurrentName().OnSuccess(_cache.Clear);
-    }
+        => name != null && _environments.ContainsKey(name);
 
     public void SetCurrent(string name)
     {
         if (name == null)
             return;
-        if (!_nameList.Contains(name))
+        if (!_environments.ContainsKey(name))
             throw new InvalidOperationException($"Environment {name} does not exist");
         _currentName = name;
     }
@@ -59,8 +51,29 @@ public class EnvironmentCollection : IEnvironmentCollection
         SetCurrent(allEnvs[index]);
     }
 
-    private sealed record CurrentEnvironment(string Value) : ICurrentEnvironment;
+    private sealed class Environment : ICurrentEnvironment
+    {
+        private readonly EnvironmentObjectCache _cache;
 
-    public ICurrentEnvironment GetCurrent()
-        => new CurrentEnvironment(GetCurrentName().GetValueOrDefault(Constants.EnvironmentNameDefault));
+        public Environment(string name, EnvironmentObjectCache cache)
+        {
+            Name = name;
+            _cache = cache;
+        }
+
+        public string Name { get; }
+
+        public Maybe<T> GetCached<T>()
+        => _cache.Get<T>(Name);
+
+        public void CacheInstance<T>(T value)
+        {
+            _cache.Set(Name, value);
+        }
+
+        public void ClearCache()
+        {
+            _cache.Clear(Name);
+        }
+    }
 }

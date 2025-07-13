@@ -2,6 +2,7 @@
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using StoneFruit.Execution.Exceptions;
 
 namespace StoneFruit.Execution.Environments;
 
@@ -10,17 +11,12 @@ namespace StoneFruit.Execution.Environments;
 /// </summary>
 public class EnvironmentSetup : IEnvironmentSetup
 {
-    private static readonly IReadOnlyList<string> _defaultNamesList = [
-        Constants.EnvironmentNameDefault
-    ];
-
     private List<string>? _names;
 
     public void BuildUp(IServiceCollection services)
     {
-        services.TryAddSingleton(new EnvironmentsList(_names ?? _defaultNamesList));
-        services.TryAddSingleton<IEnvironmentCollection, EnvironmentCollection>();
-        services.AddScoped(p => p.GetRequiredService<IEnvironmentCollection>().GetCurrent());
+        services.TryAddSingleton<IEnvironmentCollection>(p => new EnvironmentCollection(_names));
+        services.AddScoped(p => p.GetRequiredService<IEnvironmentCollection>().GetCurrent().Match(e => e, () => throw EnvironmentNotSetException.Create()));
     }
 
     public IEnvironmentSetup SetEnvironments(IReadOnlyList<string> names)

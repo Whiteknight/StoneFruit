@@ -60,6 +60,9 @@ public readonly struct Maybe<T>
             onFailure();
         return this;
     }
+
+    public bool Satisfies(Func<T, bool> predicate)
+        => Match(predicate, static (v, p) => p(v), static _ => false);
 }
 
 public static class Maybe

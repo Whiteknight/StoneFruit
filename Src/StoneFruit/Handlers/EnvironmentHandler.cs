@@ -66,19 +66,19 @@ public class EnvironmentHandler : IHandler
         }
 
         var target = _args.Shift();
-        var currentEnvNameResult = _environments.GetCurrentName();
+        var maybeCurrentEnv = _environments.GetCurrent();
 
         // If -cleardata and we are in an environment and we are not setting an environment
         // just clear the data in the current environment.
-        if (!target.Exists() && currentEnvNameResult.IsSuccess && _args.HasFlag(FlagClearData))
+        if (!target.Exists() && _args.HasFlag(FlagClearData))
         {
-            _environments.ClearCache();
+            maybeCurrentEnv.OnSuccess(e => e.ClearCache());
             return;
         }
 
         // Otherwise we're switching environments
         if (!_args.HasFlag(FlagNotSet) || !_environments.GetCurrentName().IsSuccess)
-            ChangeEnvironment(target, currentEnvNameResult);
+            ChangeEnvironment(target, maybeCurrentEnv);
     }
 
     private void ListEnvironments()
@@ -100,7 +100,7 @@ public class EnvironmentHandler : IHandler
         }
     }
 
-    private void ChangeEnvironment(IPositionalArgument target, Maybe<string> currentEnvNameResult)
+    private void ChangeEnvironment(IPositionalArgument target, Maybe<ICurrentEnvironment> maybeCurrentEnv)
     {
         // If invoked with an argument, it is the name or index of an environment. Attempt to set that
         // environment and exit
@@ -116,7 +116,7 @@ public class EnvironmentHandler : IHandler
             {
                 _environments.SetCurrent(environments[0]);
                 if (_args.HasFlag(FlagClearData))
-                    _environments.ClearCache();
+                    maybeCurrentEnv.OnSuccess(e => e.ClearCache());
                 _state.OnEnvironmentChanged();
                 return;
             }
@@ -137,9 +137,9 @@ public class EnvironmentHandler : IHandler
             throw new ExecutionException($"Unknown environment '{envName}'");
 
         if (_args.HasFlag(FlagClearData))
-            _environments.ClearCache();
+            maybeCurrentEnv.OnSuccess(e => e.ClearCache());
 
-        if (currentEnvNameResult.Equals(envName))
+        if (maybeCurrentEnv.Satisfies(e => e.Name == envName))
             return;
 
         _environments.SetCurrent(envName);

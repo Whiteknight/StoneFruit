@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using StoneFruit.Execution.Environments;
+using StoneFruit.Execution.Exceptions;
 using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit;
@@ -19,14 +19,13 @@ public static class ServiceCollectionExtensions
         NotNull(factory);
         return NotNull(services).AddScoped(p =>
         {
-            var environments = p.GetRequiredService<IEnvironmentCollection>() as EnvironmentCollection
-                ?? throw new InvalidOperationException("Could not get EnvironmentCollection");
-            var existing = environments.GetCached<TInterface>();
+            var currentEnvironment = p.GetRequiredService<ICurrentEnvironment>();
+            var existing = currentEnvironment.GetCached<TInterface>();
             if (existing.IsSuccess)
                 return existing.GetValueOrThrow();
-            var value = factory(p, environments.GetCurrentName().GetValueOrThrow())
-                ?? throw new InvalidOperationException($"Cannot resolve object of type {typeof(TInterface).Name}. Factory method returned null.");
-            environments.CacheInstance(value);
+            var value = factory(p, currentEnvironment.Name)
+                ?? throw new ExecutionException($"Cannot resolve object of type {typeof(TInterface).Name}. Factory method returned null.");
+            currentEnvironment.CacheInstance(value);
             return value;
         });
     }

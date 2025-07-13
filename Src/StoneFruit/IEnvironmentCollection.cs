@@ -5,7 +5,12 @@ namespace StoneFruit;
 
 public interface ICurrentEnvironment
 {
-    public string Value { get; }
+    string Name { get; }
+    Maybe<T> GetCached<T>();
+
+    void CacheInstance<T>(T value);
+
+    void ClearCache();
 }
 
 /// <summary>
@@ -34,7 +39,7 @@ public interface IEnvironmentCollection
     /// <returns></returns>
     Maybe<string> GetCurrentName();
 
-    ICurrentEnvironment GetCurrent();
+    Maybe<ICurrentEnvironment> GetCurrent();
 }
 
 public static class EnvironmentCollectionExtensions

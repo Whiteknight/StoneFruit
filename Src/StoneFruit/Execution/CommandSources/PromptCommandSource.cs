@@ -17,7 +17,7 @@ public class PromptCommandSource : ICommandSource
     }
 
     public Maybe<ArgumentsOrString> GetNextCommand()
-        => _environments.GetCurrentName()
+        => _environments.GetCurrentName().Or(() => Constants.EnvironmentNameDefault)
             .And(env => _output.Prompt(env))
             .OnSuccess(_ => _metadata.Add(Constants.Metadata.CurrentCommandIsUserInput, true.ToString()))
             .Map(s => new ArgumentsOrString(s));
