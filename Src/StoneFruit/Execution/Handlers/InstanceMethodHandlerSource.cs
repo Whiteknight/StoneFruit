@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using StoneFruit.Trie;
+using StoneFruit.Execution.Trie;
 using StoneFruit.Utility;
 using static StoneFruit.Utility.Assert;
 

@@ -2,7 +2,7 @@
 using StoneFruit.Execution.Arguments;
 using static StoneFruit.Utility.Assert;
 
-namespace StoneFruit.Trie;
+namespace StoneFruit.Execution.Trie;
 
 /// <summary>
 /// Trie to lookup handlers or handler-related types using a set of positional arguments from

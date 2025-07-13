@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using StoneFruit.Trie;
+using StoneFruit.Execution.Trie;
 
 namespace StoneFruit.Execution.Handlers;
 

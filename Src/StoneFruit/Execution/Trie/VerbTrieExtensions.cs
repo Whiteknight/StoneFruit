@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace StoneFruit.Trie;
+namespace StoneFruit.Execution.Trie;
 
 public static class VerbTrieExtensions
 {
@@ -37,5 +37,5 @@ public static class VerbTrieExtensions
     /// <returns></returns>
     public static VerbTrie<T> ToVerbTrie<T>(this IEnumerable<T> source, Func<T, Verb> getVerb)
         where T : class
-        => ToVerbTrie(source, getVerb, v => v);
+        => source.ToVerbTrie(getVerb, v => v);
 }
