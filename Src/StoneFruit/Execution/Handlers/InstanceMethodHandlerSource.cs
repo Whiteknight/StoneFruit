@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -15,63 +16,69 @@ namespace StoneFruit.Execution.Handlers;
 public class InstanceMethodHandlerSource : IHandlerSource
 {
     private readonly object _instance;
-    private readonly VerbTrie<MethodInfo> _methods;
+    private readonly VerbTrie<IHandlerBase> _methods;
     private readonly IHandlerMethodInvoker _invoker;
 
     public InstanceMethodHandlerSource(object instance, IHandlerMethodInvoker invoker, IVerbExtractor verbExtractor)
     {
+        _invoker = NotNull(invoker);
         _instance = NotNull(instance);
         _methods = _instance.GetType()
             .GetMethods(BindingFlags.Instance | BindingFlags.Public)
             .Where(m => m.ReturnType == typeof(void) || m.ReturnType == typeof(Task))
             .SelectMany(m => verbExtractor
                 .GetVerbs(m)
-                .Select(v => (Method: m, Verb: v))
+                .Select(v => (Handler: CreateHandlerInstance(v, m), Verb: v))
             )
-            .ToVerbTrie(x => x.Verb, x => x.Method);
-        _invoker = NotNull(invoker);
+            .ToVerbTrie(x => x.Verb, x => x.Handler);
     }
 
     public Maybe<IHandlerBase> GetInstance(HandlerContext context)
-        => _methods.Get(context.Arguments)
-            .Bind(value => GetInstanceInternal(context, value));
-
-    private Maybe<IHandlerBase> GetInstanceInternal(HandlerContext context, MethodInfo value)
-    {
-        if (value.ReturnType == typeof(void))
-            return new SyncHandlerWrapper(_instance, value, context, _invoker);
-        if (value.ReturnType == typeof(Task))
-            return new AsyncHandlerWrapper(_instance, value, context, _invoker);
-        return default;
-    }
+        => _methods.Get(context.Arguments);
 
     public IEnumerable<IVerbInfo> GetAll()
         => _methods.GetAll()
-            .Select(kvp => new MethodInfoVerbInfo(kvp.Key, kvp.Value));
+            .Select(kvp => kvp.Value)
+            .Cast<IVerbInfo>();
 
     // Since we're using the name of a method as the verb, and you can't nest methods, the
     // verb must only be a single string. Anything else is a non-match
     public Maybe<IVerbInfo> GetByName(Verb verb)
         => _methods.Get(verb)
-            .Map(v => (IVerbInfo)new MethodInfoVerbInfo(verb, v));
+            .Map(v => (IVerbInfo)v);
 
-    private sealed record MethodInfoVerbInfo(Verb Verb, MethodInfo Method) : IVerbInfo
+    private IHandlerBase CreateHandlerInstance(Verb verb, MethodInfo value)
+    {
+        if (value.ReturnType == typeof(void))
+            return new SyncHandlerWrapper(verb, _instance, value, _invoker);
+        if (value.ReturnType == typeof(Task))
+            return new AsyncHandlerWrapper(verb, _instance, value, _invoker);
+        throw new InvalidOperationException("Invalid delegate type");
+    }
+
+    private sealed record SyncHandlerWrapper(Verb Verb, object Instance, MethodInfo Method, IHandlerMethodInvoker Invoker)
+        : IHandlerWithContext,
+        IVerbInfo
     {
         public string Description => Method.GetDescriptionAttributeValue() ?? string.Empty;
         public string Usage => Method.GetUsageAttributeValue() ?? Description;
         public string Group => Method.GetGroupAttributeValue() ?? string.Empty;
         public bool ShouldShowInHelp => true;
+
+        public void Execute(HandlerContext context)
+            => Invoker.Invoke(Instance, Method, context);
     }
 
-    private sealed record SyncHandlerWrapper(object Instance, MethodInfo Method, HandlerContext Context, IHandlerMethodInvoker Invoker) : IHandler
+    private sealed record AsyncHandlerWrapper(Verb Verb, object Instance, MethodInfo Method, IHandlerMethodInvoker Invoker)
+        : IAsyncHandlerWithContext,
+        IVerbInfo
     {
-        public void Execute()
-            => Invoker.Invoke(Instance, Method, Context);
-    }
+        public string Description => Method.GetDescriptionAttributeValue() ?? string.Empty;
+        public string Usage => Method.GetUsageAttributeValue() ?? Description;
+        public string Group => Method.GetGroupAttributeValue() ?? string.Empty;
+        public bool ShouldShowInHelp => true;
 
-    private sealed record AsyncHandlerWrapper(object Instance, MethodInfo Method, HandlerContext Context, IHandlerMethodInvoker Invoker) : IAsyncHandler
-    {
-        public Task ExecuteAsync(CancellationToken cancellation)
-            => Invoker.InvokeAsync(Instance, Method, Context, cancellation);
+        public Task ExecuteAsync(HandlerContext context, CancellationToken cancellation)
+            => Invoker.InvokeAsync(Instance, Method, context, cancellation);
     }
 }
