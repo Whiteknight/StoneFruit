@@ -29,7 +29,8 @@ public class DelegateHandlerSource : IHandlerSource
             .Select(kvp => kvp.Value)
             .Cast<IVerbInfo>();
 
-    public Maybe<IVerbInfo> GetByName(Verb verb) => _handlers.Get(verb).Map(i => (IVerbInfo)i);
+    public Maybe<IVerbInfo> GetByName(Verb verb)
+        => _handlers.Get(verb).Map(i => (IVerbInfo)i);
 
     public DelegateHandlerSource Add(Verb verb, Action<HandlerContext> act, string description, string usage, string group)
     {

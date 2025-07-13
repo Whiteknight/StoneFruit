@@ -2,27 +2,33 @@
 
 namespace StoneFruit.SpecTests.Support;
 
-public class PositionalMappedArguments
+public class ArgumentMappedObject
 {
     [ArgumentIndex(0)]
+    [ArgumentNamed("first")]
     public string? Arg1 { get; set; }
 
     [ArgumentIndex(1)]
+    [ArgumentNamed("second")]
     public string? Arg2 { get; set; }
 
     [ArgumentIndex(2)]
+    [ArgumentNamed("third")]
     public string? Arg3 { get; set; }
+
+    public bool Flag1 { get; set; }
+
 }
 
-public class PositionalMappingHandler : IHandler
+public class ArgumentMappingHandler : IHandler
 {
     private readonly IOutput _output;
-    private readonly PositionalMappedArguments _args;
+    private readonly ArgumentMappedObject _args;
 
-    public PositionalMappingHandler(IArguments args, IOutput output)
+    public ArgumentMappingHandler(IArguments args, IOutput output)
     {
         _output = output;
-        _args = args.MapTo<PositionalMappedArguments>();
+        _args = args.MapTo<ArgumentMappedObject>();
     }
 
     public void Execute()
@@ -30,5 +36,6 @@ public class PositionalMappingHandler : IHandler
         _output.WriteLine(_args.Arg1 ?? string.Empty);
         _output.WriteLine(_args.Arg2 ?? string.Empty);
         _output.WriteLine(_args.Arg3 ?? string.Empty);
+        _output.WriteLine(_args.Flag1);
     }
 }

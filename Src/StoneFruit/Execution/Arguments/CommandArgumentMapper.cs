@@ -40,13 +40,28 @@ public static class CommandArgumentMapper
         foreach (var property in publicProperties)
         {
             // Try to map positional argument if the attribute is set
-            var attr = property.GetCustomAttributes<ArgumentIndexAttribute>(true).FirstOrDefault();
-            if (attr != null)
+            var idxAttr = property.GetCustomAttribute<ArgumentIndexAttribute>(true);
+            if (idxAttr != null)
             {
-                var index = attr.Index;
+                var index = idxAttr.Index;
                 var positionalArgument = args.Consume(index);
-                AssignPropertyValue(positionalArgument, property, obj);
-                continue;
+                if (positionalArgument.Exists())
+                {
+                    AssignPropertyValue(positionalArgument, property, obj);
+                    continue;
+                }
+            }
+
+            var namedAttr = property.GetCustomAttribute<ArgumentNamedAttribute>(true);
+            if (namedAttr != null)
+            {
+                var name = namedAttr.Name;
+                var namedArgument = args.Consume(name);
+                if (namedArgument.Exists())
+                {
+                    AssignPropertyValue(namedArgument, property, obj);
+                    continue;
+                }
             }
 
             if ((property.PropertyType == typeof(bool) || property.PropertyType == typeof(bool?)) && args.ConsumeFlag(property.Name).Exists())

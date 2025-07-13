@@ -5,10 +5,10 @@ namespace StoneFruit.SpecTests.StepDefinitions;
 [Binding]
 public record ArgumentMappingStepDefinitions(ScenarioContext Context)
 {
-    [Given("I use the PositionalMapping handler")]
-    public void GivenIUseThePositionalMappingHandler()
+    [Given("I use the ArgumentMapping handler")]
+    public void GivenIUseTheArgumentMappingHandler()
     {
         var builder = Context.GetEngineBuilder();
-        builder.SetupHandlers(h => h.UseHandlerTypes(typeof(PositionalMappingHandler)));
+        builder.SetupHandlers(h => h.UseHandlerTypes(typeof(ArgumentMappingHandler)));
     }
 }

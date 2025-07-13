@@ -17,4 +17,17 @@ public sealed class ArgumentIndexAttribute : Attribute
     }
 }
 
-// TODO: ArgumentNamedAttribute
+/// <summary>
+/// Attribute to associate a property in a class with a name to facilitate
+/// argument mapping.
+/// </summary>
+[AttributeUsage(AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
+public sealed class ArgumentNamedAttribute : Attribute
+{
+    public string Name { get; }
+
+    public ArgumentNamedAttribute(string name)
+    {
+        Name = name;
+    }
+}
