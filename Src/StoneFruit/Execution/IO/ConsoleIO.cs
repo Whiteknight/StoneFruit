@@ -1,8 +1,7 @@
 ﻿using System;
-using StoneFruit.Execution.IO;
 using StoneFruit.Utility;
 
-namespace StoneFruit.Execution.Output;
+namespace StoneFruit.Execution.IO;
 
 /// <summary>
 /// An ITerminalOutput adaptor for System.Console and ReadLine.
