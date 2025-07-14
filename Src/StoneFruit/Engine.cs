@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.CommandSources;
+using StoneFruit.Execution.Environments;
 using StoneFruit.Execution.Exceptions;
 using StoneFruit.Handlers;
 using static StoneFruit.Utility.Assert;

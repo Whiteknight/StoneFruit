@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using StoneFruit.Execution;
-using StoneFruit.Execution.Environments;
 using StoneFruit.Execution.Output;
+using StoneFruit.Handlers;
 
-namespace StoneFruit.Handlers;
+namespace StoneFruit.Execution.Environments;
 
 [Verb(Name)]
 public class EnvironmentHandler : IHandler
@@ -96,8 +95,9 @@ public class EnvironmentHandler : IHandler
     private Result<IEnvironment, EnvironmentError> MaybeChangeEnvironment()
     {
         // If -notset and we have a current env, bail out
+        // It's an error, but not one that turns into an exception.
         if (_args.HasFlag(FlagNotSet) && _environments.GetCurrentName().IsSuccess)
-            return new NoEnvironmentSet();
+            return new EnvironmentNotChanged();
 
         // We don't have an arg. If there is exactly 1 option, jump to that. Otherwise prompt
         // the user (if we're in interactive mode)
@@ -109,7 +109,7 @@ public class EnvironmentHandler : IHandler
         // We can skip some checks because this name is from a known list of valid environment names
         var environments = _environments.GetNames();
         if (environments.Count == 1)
-            return SetNewEnvironment(environments[0]);
+            return _environments.SetCurrent(environments[0]);
 
         return PromptUserForEnvironment();
     }
@@ -141,7 +141,7 @@ public class EnvironmentHandler : IHandler
             return new NoEnvironmentSpecified();
 
         return GetEnvironmentNameFromUserInput(_environments.GetNames(), arg)
-            .Bind(SetNewEnvironment);
+            .Bind(_environments.SetCurrent);
     }
 
     private static Result<string, EnvironmentError> GetEnvironmentNameFromUserInput(IReadOnlyList<string> environments, string envNameOrNumber)
@@ -154,7 +154,4 @@ public class EnvironmentHandler : IHandler
 
         return new InvalidEnvironment(envNameOrNumber);
     }
-
-    private Result<IEnvironment, EnvironmentError> SetNewEnvironment(string envName)
-        => _environments.SetCurrent(envName).ToResult<EnvironmentError>(() => new InvalidEnvironment(envName));
 }

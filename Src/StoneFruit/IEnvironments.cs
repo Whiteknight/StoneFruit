@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using StoneFruit.Execution.Environments;
 using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit;
@@ -37,20 +38,20 @@ public interface IEnvironments
     /// is not set.
     /// </summary>
     /// <returns></returns>
-    Maybe<string> GetCurrentName();
+    Result<string, EnvironmentError> GetCurrentName();
 
     /// <summary>
     /// Get the current environment. Returns a failure result if a valid environment is not set.
     /// </summary>
     /// <returns></returns>
-    Maybe<IEnvironment> GetCurrent();
+    Result<IEnvironment, EnvironmentError> GetCurrent();
 
     /// <summary>
     /// Set the current environment by name. Returns the new current environment on success.
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    Maybe<IEnvironment> SetCurrent(string name);
+    Result<IEnvironment, EnvironmentError> SetCurrent(string name);
 
     /// <summary>
     /// Set the current environment by index, according to the list order from GetNames(). Returns
@@ -58,7 +59,7 @@ public interface IEnvironments
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    Maybe<IEnvironment> SetCurrent(int index);
+    Result<IEnvironment, EnvironmentError> SetCurrent(int index);
 }
 
 public static class EnvironmentsExtensions

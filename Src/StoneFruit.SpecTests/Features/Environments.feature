@@ -50,7 +50,7 @@ Rule: Can change environments
         When I run interactively in environment "A"
         Then The output should contain at least:
             | Line                    |
-            | Unknown environment 'X' |
+            | Invalid environment X specified. Environment not changed. |
 
 Rule: Can list environments
     

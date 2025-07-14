@@ -24,31 +24,32 @@ public class EnvironmentCollection : IEnvironments
         _currentName = default;
     }
 
-    public Maybe<string> GetCurrentName() => _currentName;
+    public Result<string, EnvironmentError> GetCurrentName()
+        => _currentName.ToResult<EnvironmentError>(() => new NoEnvironmentSet());
 
-    public Maybe<IEnvironment> GetCurrent()
-        => GetCurrentName().Bind(_environments.MaybeGetValue);
+    public Result<IEnvironment, EnvironmentError> GetCurrent()
+        => GetCurrentName().Map(r => _environments[r]);
 
     public IReadOnlyList<string> GetNames() => _environments.Keys.ToList();
 
     public bool IsValid(string name)
         => name != null && _environments.ContainsKey(name);
 
-    public Maybe<IEnvironment> SetCurrent(string name)
+    public Result<IEnvironment, EnvironmentError> SetCurrent(string name)
     {
         if (name == null)
             return GetCurrent();
         if (!_environments.ContainsKey(name))
-            return default;
+            return new InvalidEnvironment(name);
         _currentName = name;
         return GetCurrent();
     }
 
-    public Maybe<IEnvironment> SetCurrent(int index)
+    public Result<IEnvironment, EnvironmentError> SetCurrent(int index)
     {
         var allEnvs = GetNames();
         if (index < 0 || index >= allEnvs.Count)
-            return default;
+            return new InvalidEnvironment(index.ToString());
         SetCurrent(allEnvs[index]);
         return GetCurrent();
     }

@@ -18,7 +18,10 @@ public class PromptCommandSource : ICommandSource
 
     public Maybe<ArgumentsOrString> GetNextCommand()
         => _environments.GetCurrentName().Or(() => Constants.EnvironmentNameDefault)
-            .And(env => _output.Prompt(env))
+            // TODO: Need to figure out the correct error result here
+            .Map(env => _output.Prompt(env).GetValueOrDefault(string.Empty))
             .OnSuccess(_ => _metadata.Add(Constants.Metadata.CurrentCommandIsUserInput, true.ToString()))
-            .Map(s => new ArgumentsOrString(s));
+            .Match(
+                s => new Maybe<ArgumentsOrString>(new ArgumentsOrString(s)),
+                _ => default);
 }

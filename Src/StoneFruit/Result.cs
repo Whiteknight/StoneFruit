@@ -81,6 +81,12 @@ public readonly struct Result<T, TError>
         return this;
     }
 
+    public bool Satisfies(Func<T, bool> predicate)
+        => Match(t => predicate(t), _ => false);
+
+    public Result<T, TError> Or(Func<Result<T, TError>> onFailure)
+        => Match(v => new Result<T, TError>(v, default, true), _ => onFailure());
+
     public class Exception : System.Exception
     {
         public Exception(object error)

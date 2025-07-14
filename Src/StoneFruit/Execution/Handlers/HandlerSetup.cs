@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using StoneFruit.Execution.Environments;
 using StoneFruit.Execution.Scripts;
 using StoneFruit.Handlers;
 using static StoneFruit.Utility.Assert;
