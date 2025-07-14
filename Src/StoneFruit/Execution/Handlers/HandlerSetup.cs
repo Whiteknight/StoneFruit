@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using StoneFruit.Execution.Environments;
 using StoneFruit.Execution.Scripts;
 using StoneFruit.Handlers;
+using StoneFruit.Utility;
 using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit.Execution.Handlers;
@@ -134,7 +135,7 @@ public class HandlerSetup : IHandlerSetup
             return this;
 
         var handlerTypes = NotNull(assembly).GetTypes()
-            .Where(t => !t.IsAbstract && t.IsPublic && t.IsAssignableTo(typeof(IHandlerBase)));
+            .Where(t => t.IsPublic && t.IsHandlerType());
 
         // Each handler type creates two DI registrations:
         // 1) the type itself, as itself, so we can resolve the handler instance later, and

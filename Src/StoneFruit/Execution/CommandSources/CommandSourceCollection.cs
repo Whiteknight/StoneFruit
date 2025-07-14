@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.Execution.CommandSources;
 
@@ -28,22 +26,6 @@ public class CommandSourceCollection
 
     public void AddToEnd(EventScript script, ICommandParser parser)
         => AddToEnd(new ScriptCommandSource(script, parser));
-
-    public void AddToEnd(EventScript script, ICommandParser parser, params IArgument[] args)
-        => AddToEnd(new ScriptCommandSource(script, parser, args));
-
-    public void AddToEnd(EventScript script, ICommandParser parser, params (string, string)[] args)
-    {
-        var argsList = args.Select(t => new NamedArgument(t.Item1, t.Item2)).Cast<IArgument>().ToArray();
-        AddToEnd(new ScriptCommandSource(script, parser, argsList));
-    }
-
-    public void AddToBeginning(ICommandSource source)
-    {
-        if (source == null)
-            return;
-        _sources.AddFirst(source);
-    }
 
     public Maybe<ArgumentsOrString> GetNextCommand()
     {

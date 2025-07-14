@@ -16,7 +16,7 @@ namespace StoneFruit.Execution.Handlers;
 public class CamelCaseVerbExtractor : IVerbExtractor
 {
     public IReadOnlyList<Verb> GetVerbs(Type type)
-        => type != null && typeof(IHandlerBase).IsAssignableFrom(type)
+        => type.IsHandlerType()
             ? GetVerbs(type.Name)
             : [];
 

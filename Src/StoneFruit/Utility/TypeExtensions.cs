@@ -103,4 +103,7 @@ public static class TypeExtensions
         // default.
         return true;
     }
+
+    public static bool IsHandlerType(this Type type)
+        => type != null && !type.IsAbstract && !type.IsInterface && type.IsAssignableTo(typeof(IHandlerBase));
 }

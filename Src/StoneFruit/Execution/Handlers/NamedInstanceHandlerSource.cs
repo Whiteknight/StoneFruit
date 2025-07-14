@@ -2,6 +2,7 @@
 using System.Linq;
 using StoneFruit.Execution.Trie;
 using StoneFruit.Utility;
+using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit.Execution.Handlers;
 
@@ -19,14 +20,22 @@ public class NamedInstanceHandlerSource : IHandlerSource
         _verbs = new VerbTrie<VerbInfo>();
     }
 
-    public void Add(Verb verb, IHandlerBase handlerObject, string? description = null, string? usage = null, string? group = null)
+    public void Add(Verb verb, IHandlerBase handler, string? description = null, string? usage = null, string? group = null)
     {
-        var info = new VerbInfo(verb, handlerObject, description, usage, group);
+        description = (string.IsNullOrEmpty(description) ? handler.GetType().GetDescription() : null) ?? string.Empty;
+        var info = new VerbInfo(
+            verb,
+            NotNull(handler),
+            description,
+            (string.IsNullOrEmpty(usage) ? handler.GetType().GetUsage() : null) ?? description,
+            (string.IsNullOrEmpty(group) ? handler.GetType().GetGroup() : null) ?? string.Empty,
+            handler.GetType().ShouldShowInHelp(verb));
+
         _verbs.Insert(verb, info);
     }
 
     public Maybe<IHandlerBase> GetInstance(HandlerContext context)
-        => _verbs.Get(context.Arguments).Map(info => info.HandlerObject);
+        => _verbs.Get(context.Arguments).Map(info => info.Handler);
 
     public IEnumerable<IVerbInfo> GetAll() => _verbs.GetAll().Select(kvp => kvp.Value);
 
@@ -34,36 +43,5 @@ public class NamedInstanceHandlerSource : IHandlerSource
 
     public int Count => _verbs.Count;
 
-    private sealed class VerbInfo : IVerbInfo
-    {
-        private readonly string? _description;
-        private readonly string? _usage;
-        private readonly string? _group;
-
-        public VerbInfo(Verb verb, IHandlerBase handlerObject, string? description, string? usage, string? group)
-        {
-            Verb = verb;
-            HandlerObject = handlerObject;
-            _description = description;
-            _usage = usage;
-            _group = group;
-        }
-
-        public IHandlerBase HandlerObject { get; }
-        public Verb Verb { get; }
-
-        public string Description => !string.IsNullOrEmpty(_description)
-            ? _description!
-            : HandlerObject.GetType().GetDescription() ?? string.Empty;
-
-        public string Usage => !string.IsNullOrEmpty(_usage)
-            ? _usage!
-            : HandlerObject.GetType().GetUsage() ?? Description;
-
-        public string Group => !string.IsNullOrEmpty(_group)
-            ? _group!
-            : HandlerObject.GetType().GetGroup() ?? string.Empty;
-
-        public bool ShouldShowInHelp => HandlerObject.GetType().ShouldShowInHelp(Verb);
-    }
+    private sealed record VerbInfo(Verb Verb, IHandlerBase Handler, string Description, string Usage, string Group, bool ShouldShowInHelp) : IVerbInfo;
 }

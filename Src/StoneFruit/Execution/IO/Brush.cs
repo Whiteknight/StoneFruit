@@ -13,15 +13,15 @@ public readonly struct Brush
     public Brush(byte byteValue)
     {
         ByteValue = byteValue;
-        Foreground = ConsoleColorUtilities.GetForeground(byteValue);
-        Background = ConsoleColorUtilities.GetBackground(byteValue);
+        Foreground = GetForeground(byteValue);
+        Background = GetBackground(byteValue);
     }
 
     public Brush(ConsoleColor foreground, ConsoleColor background)
     {
         Background = background;
         Foreground = foreground;
-        ByteValue = ConsoleColorUtilities.ColorsToByte(foreground, background);
+        ByteValue = ColorsToByte(foreground, background);
     }
 
     public Brush(ConsoleColor foreground)
@@ -68,4 +68,11 @@ public readonly struct Brush
     public static bool operator ==(Brush a, Brush b) => a.Equals(b);
 
     public static bool operator !=(Brush a, Brush b) => !a.Equals(b);
+
+    private static byte ColorsToByte(ConsoleColor foreground, ConsoleColor background)
+        => (byte)(((byte)foreground << 4) | (byte)background);
+
+    private static ConsoleColor GetForeground(byte b) => (ConsoleColor)((b & 0xF0) >> 4);
+
+    private static ConsoleColor GetBackground(byte b) => (ConsoleColor)(b & 0x0F);
 }

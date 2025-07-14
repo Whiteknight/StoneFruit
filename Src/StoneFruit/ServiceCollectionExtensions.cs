@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Execution.Exceptions;
 using StoneFruit.Execution.Handlers;
+using StoneFruit.Utility;
 using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit;
@@ -35,7 +36,7 @@ public static class ServiceCollectionExtensions
     {
         NotNull(services);
         NotNull(handlerType);
-        if (!handlerType.IsAssignableTo(typeof(IHandlerBase)))
+        if (!handlerType.IsHandlerType())
             throw new EngineBuildException($"Cannot register handler type {handlerType.Name}. It is not derived from IHandlerBase.");
         return services.AddScoped(handlerType)
             .AddSingleton(new RegisteredHandler(handlerType));

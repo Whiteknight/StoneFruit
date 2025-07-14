@@ -26,7 +26,6 @@ public static class EnumerableExtensions
     public static IEnumerable<T> Tap<T>(this IEnumerable<T> source, Action<T> onEach)
     {
         NotNull(onEach);
-
         foreach (var item in NotNull(source))
         {
             onEach(item);
