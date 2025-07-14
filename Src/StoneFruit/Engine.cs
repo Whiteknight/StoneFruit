@@ -17,12 +17,14 @@ public class Engine
 {
     private readonly ICommandParser _parser;
     private readonly ICommandLine _cmdLineArgs;
+    private readonly IInput _input;
 
     public Engine(
         IHandlers handlers,
         IEnvironments environments,
         ICommandParser parser,
         IOutput output,
+        IInput input,
         EngineEventCatalog eventCatalog,
         EngineSettings settings,
         ICommandLine cmdLineArgs
@@ -31,8 +33,9 @@ public class Engine
         Environments = NotNull(environments);
         _parser = NotNull(parser);
         Output = NotNull(output);
+        _input = NotNull(input);
         _cmdLineArgs = NotNull(cmdLineArgs);
-        State = new EngineState(eventCatalog, settings, Environments, _parser);
+        State = new EngineState(eventCatalog, settings, Environments, _parser, _input);
         Dispatcher = new CommandDispatcher(_parser, handlers, Environments, State, Output);
     }
 
@@ -199,7 +202,7 @@ public class Engine
             source.AddToEnd($"{EnvironmentHandler.Name} '{environment}'");
 
         source.AddToEnd(State.EventCatalog.EngineStartInteractive, _parser);
-        source.AddToEnd(new PromptCommandSource(Output, Environments, State.Metadata));
+        source.AddToEnd(new PromptCommandSource(_input, Environments, State.Metadata));
 
         return await RunLoop(source);
     }
@@ -253,7 +256,7 @@ public class Engine
             // Check the counter to make sure that we are not in a runaway loop
             // If we are in a loop, the counter will setup the command queue to handle
             // it, so we just continue.
-            var canExecute = State.CommandCounter.VerifyCanExecuteNextCommand(_parser, Output);
+            var canExecute = State.CommandCounter.VerifyCanExecuteNextCommand(_parser);
             if (!canExecute)
                 continue;
 

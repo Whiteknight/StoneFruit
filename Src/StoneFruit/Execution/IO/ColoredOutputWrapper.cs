@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace StoneFruit.Execution.Output;
+namespace StoneFruit.Execution.IO;
 
 public class ColoredOutputWrapper : IOutput
 {
@@ -26,9 +26,6 @@ public class ColoredOutputWrapper : IOutput
     public IOutput WriteLine(string line) => WithBrush(() => _inner.WriteLine(line));
 
     public IOutput Write(string str) => WithBrush(() => _inner.Write(str));
-
-    public Maybe<string> Prompt(string prompt, bool mustProvide = true, bool keepHistory = true)
-        => _inner.Prompt(prompt, mustProvide, keepHistory);
 
     private ColoredOutputWrapper WithBrush(Action act)
     {

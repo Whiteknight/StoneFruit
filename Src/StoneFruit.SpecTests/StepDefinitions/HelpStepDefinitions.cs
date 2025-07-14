@@ -10,7 +10,7 @@ public record HelpStepDefinitions(ScenarioContext Context)
     public void ThenTheHelpOutputShouldContainGroupWithTheseVerbs(DataTable dataTable)
     {
         var expectedVerbs = dataTable.CreateSet<ExpectedVerb>().ToList();
-        var output = Context.GetOutput();
+        var output = Context.GetIo();
         var groups = new Dictionary<string, List<string>>()
         {
             { "", [] }

@@ -37,7 +37,7 @@ public interface IEngineBuilder
     /// </summary>
     /// <param name="setup"></param>
     /// <returns></returns>
-    IEngineBuilder SetupOutput(Action<IOutputSetup> setup);
+    IEngineBuilder SetupIo(Action<IIoSetup> setup);
 
     /// <summary>
     /// Setup the scripts which are executed in response to various events.

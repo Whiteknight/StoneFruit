@@ -1,14 +1,14 @@
 ﻿using System.Text;
-using StoneFruit.Execution.Output;
+using StoneFruit.Execution.IO;
 
 namespace StoneFruit.SpecTests.Support;
 
-public class TestOutput : IOutput
+public class TestInputOutput : IOutput, IInput
 {
     private readonly Queue<string> _inputs;
     private readonly StringBuilder _output;
 
-    public TestOutput(params string[] inputs)
+    public TestInputOutput(params string[] inputs)
     {
         _output = new StringBuilder();
         _inputs = new Queue<string>(inputs);

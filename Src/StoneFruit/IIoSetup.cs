@@ -3,7 +3,7 @@
 /// <summary>
 /// Setup the output streams.
 /// </summary>
-public interface IOutputSetup
+public interface IIoSetup
 {
     /// <summary>
     /// Do not use a Console output. Console is the only output which supports color,
@@ -12,7 +12,7 @@ public interface IOutputSetup
     /// for unit test scenarios.
     /// </summary>
     /// <returns></returns>
-    IOutputSetup DoNotUseConsole();
+    IIoSetup DoNotUseConsole();
 
     /// <summary>
     /// Add a secondary output to receive a copy of output text. This text will not include color and
@@ -20,5 +20,7 @@ public interface IOutputSetup
     /// </summary>
     /// <param name="output"></param>
     /// <returns></returns>
-    IOutputSetup Add(IOutput output);
+    IIoSetup Add(IOutput output);
+
+    IIoSetup Use(IInput input);
 }

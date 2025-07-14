@@ -5,10 +5,5 @@
 /// </summary>
 public class NullCommandCounter : IEngineStateCommandCounter
 {
-    public void ReceiveUserInput()
-    {
-        // This counter does not count, so we don't need to do anything here
-    }
-
-    public bool VerifyCanExecuteNextCommand(ICommandParser parser, IOutput output) => true;
+    public bool VerifyCanExecuteNextCommand(ICommandParser parser) => true;
 }

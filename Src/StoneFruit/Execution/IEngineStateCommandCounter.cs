@@ -11,7 +11,6 @@ public interface IEngineStateCommandCounter
     /// be executed.
     /// </summary>
     /// <param name="parser"></param>
-    /// <param name="output"></param>
     /// <returns></returns>
-    bool VerifyCanExecuteNextCommand(ICommandParser parser, IOutput output);
+    bool VerifyCanExecuteNextCommand(ICommandParser parser);
 }

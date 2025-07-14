@@ -1,7 +1,7 @@
 ﻿using System;
 using StoneFruit.Utility;
 
-namespace StoneFruit.Execution.Output;
+namespace StoneFruit.Execution.IO;
 
 /// <summary>
 /// Value to represent a foreground/background color combination for writing on the
@@ -61,7 +61,7 @@ public readonly struct Brush
     {
         unchecked
         {
-            return ((int)Foreground * 397) ^ (int)Background;
+            return (int)Foreground * 397 ^ (int)Background;
         }
     }
 

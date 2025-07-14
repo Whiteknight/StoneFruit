@@ -9,11 +9,12 @@ public static class ScenarioContextEngineExtensions
     {
         if (context.TryGetValue<EngineBuilder>("engineBuilder", out var builder))
             return builder;
-        var output = context.GetOutput();
+        var io = context.GetIo();
         builder = EngineBuilder.Create();
-        builder.SetupOutput(o => o
+        builder.SetupIo(o => o
             .DoNotUseConsole()
-            .Add(output)
+            .Add(io)
+            .Use(io)
         );
         context["engineBuilder"] = builder;
         return builder;
@@ -29,12 +30,12 @@ public static class ScenarioContextEngineExtensions
         return engine;
     }
 
-    public static TestOutput GetOutput(this ScenarioContext context)
+    public static TestInputOutput GetIo(this ScenarioContext context)
     {
-        if (context.TryGetValue<TestOutput>("output", out var output))
+        if (context.TryGetValue<TestInputOutput>("io", out var output))
             return output;
-        output = new TestOutput();
-        context["output"] = output;
+        output = new TestInputOutput();
+        context["io"] = output;
         return output;
     }
 }

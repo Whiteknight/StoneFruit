@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace StoneFruit.Execution.Output;
+namespace StoneFruit.Execution.IO;
 
-public class NullOutput : IOutput
+public class NullIO : IOutput, IInput
 {
     public IOutput Color(Func<Brush, Brush> changeBrush) => this;
 

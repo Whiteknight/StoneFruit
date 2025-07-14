@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using StoneFruit.Execution.Output;
+using StoneFruit.Execution.IO;
 using StoneFruit.Handlers;
 
 namespace StoneFruit.Execution.Environments;
@@ -15,13 +15,15 @@ public class EnvironmentHandler : IHandler
     public const string FlagClearData = "cleardata";
 
     private readonly IOutput _output;
+    private readonly IInput _input;
     private readonly IArguments _args;
     private readonly EngineState _state;
     private readonly IEnvironments _environments;
 
-    public EnvironmentHandler(IOutput output, IArguments args, EngineState state, IEnvironments environments)
+    public EnvironmentHandler(IOutput output, IInput input, IArguments args, EngineState state, IEnvironments environments)
     {
         _output = output;
+        _input = input;
         _args = args;
         _state = state;
         _environments = environments;
@@ -127,7 +129,7 @@ public class EnvironmentHandler : IHandler
             _output.Color(ConsoleColor.DarkCyan).WriteLine("Please select an environment:");
             ListEnvironments();
 
-            var envIndex = _output.Prompt("", true, false).GetValueOrThrow();
+            var envIndex = _input.Prompt("", true, false).GetValueOrThrow();
             var result = TrySetEnvironment(envIndex);
             if (result.IsSuccess)
                 return result;

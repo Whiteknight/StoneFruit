@@ -1,5 +1,4 @@
-﻿using StoneFruit.Execution.Arguments;
-using StoneFruit.Execution.Exceptions;
+﻿using StoneFruit.Execution.Exceptions;
 
 namespace StoneFruit.Execution;
 
@@ -11,18 +10,18 @@ public class HeadlessEngineStateCommandCounter : IEngineStateCommandCounter
 {
     private readonly EngineStateCommandQueue _commands;
     private readonly EngineStateMetadataCache _metadata;
-    private readonly EngineEventCatalog _events;
     private readonly EngineSettings _settings;
+    private readonly EngineState _state;
 
-    public HeadlessEngineStateCommandCounter(EngineStateCommandQueue commands, EngineStateMetadataCache metadata, EngineEventCatalog events, EngineSettings settings)
+    public HeadlessEngineStateCommandCounter(EngineStateCommandQueue commands, EngineStateMetadataCache metadata, EngineSettings settings, EngineState state)
     {
         _commands = commands;
         _metadata = metadata;
-        _events = events;
         _settings = settings;
+        _state = state;
     }
 
-    public bool VerifyCanExecuteNextCommand(ICommandParser parser, IOutput output)
+    public bool VerifyCanExecuteNextCommand(ICommandParser parser)
     {
         // There's no obvious way for this to be true, but just to be safe for future scenarios...
         var isFromUser = _metadata.Get(Constants.Metadata.CurrentCommandIsUserInput)
@@ -61,11 +60,7 @@ public class HeadlessEngineStateCommandCounter : IEngineStateCommandCounter
         _metadata.Add(Constants.Metadata.ConsecutiveCommandsWithoutUserInput, 0);
         _commands.Clear();
 
-        var args = SyntheticArguments.From(
-            ("limit", limit.ToString()),
-            ("exitcode", Constants.ExitCode.MaximumCommands.ToString())
-        );
-        _commands.Prepend(_events.MaximumHeadlessCommands.GetCommands(parser, args));
+        _state.OnMaximumHeadlessCommands();
 
         return false;
     }

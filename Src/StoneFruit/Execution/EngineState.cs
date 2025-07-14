@@ -12,16 +12,17 @@ namespace StoneFruit.Execution;
 public class EngineState
 {
     private readonly IEnvironments _environments;
-
+    private readonly IInput _input;
     private IArguments? _arguments;
 
-    public EngineState(EngineEventCatalog eventCatalog, EngineSettings settings, IEnvironments environments, ICommandParser parser)
+    public EngineState(EngineEventCatalog eventCatalog, EngineSettings settings, IEnvironments environments, ICommandParser parser, IInput input)
     {
         EventCatalog = NotNull(eventCatalog);
         ShouldExit = false;
 
         Settings = NotNull(settings);
         _environments = environments;
+        _input = input;
         Commands = new EngineStateCommandQueue(parser);
         Metadata = new EngineStateMetadataCache();
         RunMode = EngineRunMode.Idle;
@@ -45,8 +46,8 @@ public class EngineState
         RunMode = runMode;
         CommandCounter = runMode switch
         {
-            EngineRunMode.Headless => new HeadlessEngineStateCommandCounter(Commands, Metadata, EventCatalog, Settings),
-            EngineRunMode.Interactive => new InteractiveEngineStateCommandCounter(Commands, Metadata, Settings),
+            EngineRunMode.Headless => new HeadlessEngineStateCommandCounter(Commands, Metadata, Settings, this),
+            EngineRunMode.Interactive => new InteractiveEngineStateCommandCounter(Commands, Metadata, Settings, _input),
             _ => new NullCommandCounter()
         };
     }
@@ -91,7 +92,7 @@ public class EngineState
     /// </summary>
     public void OnEnvironmentChanged()
     {
-        var currentEnvName = _environments.GetCurrentName().GetValueOrDefault("");
+        var currentEnvName = _environments.GetCurrentName().GetValueOrDefault("")!;
         var args = SyntheticArguments.From(("environment", currentEnvName));
         Commands.Prepend(EventCatalog.EnvironmentChanged, args);
     }
@@ -106,5 +107,14 @@ public class EngineState
     {
         var args = SyntheticArguments.From(("exitcode", Constants.ExitCode.HeadlessNoVerb.ToString()));
         Commands.Prepend(EventCatalog.HeadlessNoArgs, args);
+    }
+
+    public void OnMaximumHeadlessCommands()
+    {
+        var args = SyntheticArguments.From(
+           ("limit", Settings.MaxInputlessCommands.ToString()),
+           ("exitcode", Constants.ExitCode.MaximumCommands.ToString())
+        );
+        Commands.Prepend(EventCatalog.MaximumHeadlessCommands, args);
     }
 }

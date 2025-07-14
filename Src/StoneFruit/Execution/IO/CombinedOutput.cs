@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using StoneFruit.Execution.Output;
 using StoneFruit.Utility;
 
-namespace StoneFruit.Execution.Output;
+namespace StoneFruit.Execution.IO;
 
 public class CombinedOutput : IOutput
 {
@@ -12,7 +13,7 @@ public class CombinedOutput : IOutput
 
     public CombinedOutput(IEnumerable<IOutput> secondaries)
     {
-        _primary = new NullOutput();
+        _primary = new NullIO();
         _secondaries = secondaries.OrEmptyIfNull().ToList();
     }
 
@@ -55,7 +56,4 @@ public class CombinedOutput : IOutput
             s.Write(str);
         return this;
     }
-
-    public Maybe<string> Prompt(string prompt, bool mustProvide = true, bool keepHistory = true)
-        => _primary?.Prompt(prompt, mustProvide, keepHistory) ?? string.Empty;
 }

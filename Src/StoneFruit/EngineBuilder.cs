@@ -5,7 +5,7 @@ using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Environments;
 using StoneFruit.Execution.Handlers;
-using StoneFruit.Execution.Output;
+using StoneFruit.Execution.IO;
 using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit;
@@ -16,7 +16,7 @@ namespace StoneFruit;
 public sealed class EngineBuilder : IEngineBuilder
 {
     private readonly HandlerSetup _handlers;
-    private readonly OutputSetup _output;
+    private readonly IoSetup _output;
     private readonly EngineEventCatalog _eventCatalog;
     private readonly EnvironmentSetup _environments;
     private readonly ParserSetup _parsers;
@@ -31,7 +31,7 @@ public sealed class EngineBuilder : IEngineBuilder
         Services = NotNull(services);
         _handlers = new HandlerSetup(Services);
         _eventCatalog = new EngineEventCatalog();
-        _output = new OutputSetup();
+        _output = new IoSetup();
         _environments = new EnvironmentSetup();
         _parsers = new ParserSetup();
         _settings = new EngineSettings();
@@ -80,7 +80,7 @@ public sealed class EngineBuilder : IEngineBuilder
     /// </summary>
     /// <param name="setup"></param>
     /// <returns></returns>
-    public IEngineBuilder SetupOutput(Action<IOutputSetup> setup)
+    public IEngineBuilder SetupIo(Action<IIoSetup> setup)
     {
         setup?.Invoke(_output);
         return this;
@@ -164,10 +164,11 @@ public sealed class EngineBuilder : IEngineBuilder
             var environments = provider.GetRequiredService<IEnvironments>();
             var parser = provider.GetRequiredService<ICommandParser>();
             var output = provider.GetRequiredService<IOutput>();
+            var input = provider.GetRequiredService<IInput>();
             var engineCatalog = provider.GetRequiredService<EngineEventCatalog>();
             var engineSettings = provider.GetRequiredService<EngineSettings>();
             var commandLine = provider.GetRequiredService<ICommandLine>();
-            var e = new Engine(handlers, environments, parser, output, engineCatalog, engineSettings, commandLine);
+            var e = new Engine(handlers, environments, parser, output, input, engineCatalog, engineSettings, commandLine);
             accessor.SetEngine(e);
             return e;
         });

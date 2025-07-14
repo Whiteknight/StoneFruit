@@ -10,15 +10,17 @@ public class InteractiveEngineStateCommandCounter : IEngineStateCommandCounter
     private readonly EngineStateCommandQueue _commands;
     private readonly EngineStateMetadataCache _metadata;
     private readonly EngineSettings _settings;
+    private readonly IInput _input;
 
-    public InteractiveEngineStateCommandCounter(EngineStateCommandQueue commands, EngineStateMetadataCache metadata, EngineSettings settings)
+    public InteractiveEngineStateCommandCounter(EngineStateCommandQueue commands, EngineStateMetadataCache metadata, EngineSettings settings, IInput input)
     {
         _commands = commands;
         _metadata = metadata;
         _settings = settings;
+        _input = input;
     }
 
-    public bool VerifyCanExecuteNextCommand(ICommandParser parser, IOutput output)
+    public bool VerifyCanExecuteNextCommand(ICommandParser parser)
     {
         var isFromUser = _metadata.Get(Constants.Metadata.CurrentCommandIsUserInput)
             .Map(o => bool.TryParse(o.ToString(), out var val) && val)
@@ -40,7 +42,7 @@ public class InteractiveEngineStateCommandCounter : IEngineStateCommandCounter
             return true;
         }
 
-        var cont = output.Prompt("Maximum command count reached, continue? (y/n)");
+        var cont = _input.Prompt("Maximum command count reached, continue? (y/n)");
         if (cont.GetValueOrDefault("n").Equals("y", System.StringComparison.InvariantCultureIgnoreCase))
         {
             _metadata.Add(Constants.Metadata.ConsecutiveCommandsWithoutUserInput, 0);

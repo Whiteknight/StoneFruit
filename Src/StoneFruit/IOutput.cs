@@ -1,5 +1,5 @@
 ﻿using System;
-using StoneFruit.Execution.Output;
+using StoneFruit.Execution.IO;
 using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit;
@@ -36,7 +36,10 @@ public interface IOutput
     /// <param name="str"></param>
     /// <returns></returns>
     IOutput Write(string str);
+}
 
+public interface IInput
+{
     /// <summary>
     /// Show a prompt to the user to request input. For non-interactive outputs, this
     /// will be a no-op.

@@ -1,4 +1,5 @@
 ﻿using System;
+using StoneFruit.Execution.IO;
 using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Output;
@@ -6,7 +7,7 @@ namespace StoneFruit.Execution.Output;
 /// <summary>
 /// An ITerminalOutput adaptor for System.Console and ReadLine.
 /// </summary>
-public class ConsoleOutput : IOutput
+public class ConsoleIO : IOutput, IInput
 {
     public IOutput Color(Func<Brush, Brush> changeBrush)
     {

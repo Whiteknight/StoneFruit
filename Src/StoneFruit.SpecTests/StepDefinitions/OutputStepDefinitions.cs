@@ -10,7 +10,7 @@ public record OutputStepDefinitions(ScenarioContext Context)
     public void ThenTheOutputShouldContain(DataTable dataTable)
     {
         var lines = dataTable.CreateSet<LineOfText>().ToList();
-        var output = Context.GetOutput();
+        var output = Context.GetIo();
         output.Lines.Length.Should().Be(lines.Count, $"Output contains:\n{string.Join("\n", output.Lines)}");
         for (int i = 0; i < lines.Count; i++)
             output.Lines[i].Should().Be(lines[i].Line);
@@ -20,7 +20,7 @@ public record OutputStepDefinitions(ScenarioContext Context)
     public void ThenTheOutputShouldContainAtLeast(DataTable dataTable)
     {
         var lines = dataTable.CreateSet<LineOfText>().ToList();
-        var output = Context.GetOutput();
+        var output = Context.GetIo();
         output.Lines.Length.Should().BeGreaterThanOrEqualTo(lines.Count, $"Output contains:\n{string.Join("\n", output.Lines)}");
         for (int i = 0; i < lines.Count; i++)
             output.Lines[i].Should().Be(lines[i].Line);
@@ -29,7 +29,7 @@ public record OutputStepDefinitions(ScenarioContext Context)
     [Given("I input the following lines:")]
     public void GivenIInputTheFollowingLines(DataTable dataTable)
     {
-        var output = Context.GetOutput();
+        var output = Context.GetIo();
         foreach (var line in dataTable.CreateSet<LineOfText>())
             output.EnqueueInputLine(line.Line);
     }
