@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace StoneFruit.Execution.Scripts;
 
-public abstract record ScriptsError()
+public abstract record ScriptsError
 {
     public virtual ScriptsError Combine(ScriptsError other)
     {
@@ -16,17 +16,17 @@ public abstract record ScriptsError()
     }
 }
 
-public sealed record MissingRequiredPositional(int Index) : ScriptsError
+public sealed record MissingRequiredPositional(int Line, int Index) : ScriptsError
 {
-    public override string ToString() => $"Required argument at position {Index} was not provided";
+    public override string ToString() => $"Line {Line}: Required argument at position {Index} was not provided";
 }
 
-public sealed record MissingRequiredNamed(string Name) : ScriptsError
+public sealed record MissingRequiredNamed(int Line, string Name) : ScriptsError
 {
-    public override string ToString() => $"Required argument named '{Name}' was not provided";
+    public override string ToString() => $"Line {Line}: Required argument named '{Name}' was not provided";
 }
 
-public sealed record EmptyLine() : ScriptsError
+public sealed record EmptyLine : ScriptsError
 {
     public override ScriptsError Combine(ScriptsError other) => other;
 }

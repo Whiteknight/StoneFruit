@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using StoneFruit.Execution.Scripts;
 using static StoneFruit.Utility.Assert;
 
@@ -34,16 +33,8 @@ public class EventScript
     }
 
     public IEnumerable<ArgumentsOrString> GetCommands(ICommandParser parser, IArguments args)
-    {
-        NotNull(parser);
-        NotNull(args);
-        return _lines
-            .Where(l => !string.IsNullOrEmpty(l))
-            .Select(parser.ParseScript)
-            .Select(format => format.Format(args))
-            // TODO: Would like to try and aggregate together all scripts/lines and throw all at once
-            .Select(r => r.GetValueOrThrowScriptsException());
-    }
-
-    public override string ToString() => string.Join("\n", _lines);
+        => NotNull(parser).ParseScript(_lines, NotNull(args))
+            .Match(
+                success => success,
+                error => throw new ScriptsException(error));
 }

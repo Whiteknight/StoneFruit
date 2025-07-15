@@ -235,7 +235,7 @@ public static class ScriptFormatGrammar
 
     private sealed class FetchAllFlagsArgumentAccessor : IArgumentAccessor
     {
-        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args)
+        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args, int line)
             => args.GetAllFlags()
                 .Tap(f => f.MarkConsumed())
                 .Select(f => new FlagArgument(f.Name))
@@ -244,7 +244,7 @@ public static class ScriptFormatGrammar
 
     private sealed class FetchAllNamedArgumentAccessor : IArgumentAccessor
     {
-        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args)
+        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args, int line)
             => args.GetAllNamed()
                 .Tap(n => n.MarkConsumed())
                 .Select(n => new NamedArgument(n.Name, n.Value))
@@ -253,7 +253,7 @@ public static class ScriptFormatGrammar
 
     private sealed class FetchAllPositionalArgumentAccessor : IArgumentAccessor
     {
-        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args)
+        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args, int line)
             => args.GetAllPositionals()
                 .Tap(p => p.MarkConsumed())
                 .Select(p => new PositionalArgument(p.Value))
@@ -271,7 +271,7 @@ public static class ScriptFormatGrammar
             _newName = newName;
         }
 
-        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args)
+        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args, int line)
         {
             var flag = args.GetFlag(_name);
             if (!flag.Exists())
@@ -295,7 +295,7 @@ public static class ScriptFormatGrammar
             _defaultValue = defaultValue;
         }
 
-        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args)
+        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args, int line)
         {
             // See if we have the requested value
             var arg = args.Get(_name);
@@ -314,7 +314,7 @@ public static class ScriptFormatGrammar
                 return Empty();
 
             // We're missing a required value
-            return new MissingRequiredNamed(_name);
+            return new MissingRequiredNamed(line, _name);
         }
     }
 
@@ -331,7 +331,7 @@ public static class ScriptFormatGrammar
             _defaultValue = defaultValue;
         }
 
-        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args)
+        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args, int line)
         {
             // See if we have the argument
             var arg = args.Get(_name);
@@ -350,7 +350,7 @@ public static class ScriptFormatGrammar
                 return Empty();
 
             // We're missing a required argument
-            return new MissingRequiredNamed(_name);
+            return new MissingRequiredNamed(line, _name);
         }
     }
 
@@ -367,7 +367,7 @@ public static class ScriptFormatGrammar
             _defaultValue = defaultValue;
         }
 
-        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args)
+        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args, int line)
         {
             // See if we have the value
             var arg = args.Get(_index);
@@ -386,7 +386,7 @@ public static class ScriptFormatGrammar
                 return Empty();
 
             // We're missing a required value
-            return new MissingRequiredPositional(_index);
+            return new MissingRequiredPositional(line, _index);
         }
     }
 
@@ -399,7 +399,7 @@ public static class ScriptFormatGrammar
             _name = name;
         }
 
-        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args)
+        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args, int line)
             => new[] { new FlagArgument(_name) };
     }
 
@@ -414,7 +414,7 @@ public static class ScriptFormatGrammar
             _value = value;
         }
 
-        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args)
+        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args, int line)
             => new[] { new NamedArgument(_name, _value) };
     }
 
@@ -427,7 +427,7 @@ public static class ScriptFormatGrammar
             _value = value;
         }
 
-        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args)
+        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args, int line)
             => new[] { new PositionalArgument(_value) };
     }
 
@@ -446,7 +446,7 @@ public static class ScriptFormatGrammar
             _defaultValue = defaultValue;
         }
 
-        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args)
+        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args, int line)
         {
             // First, see if we have the value
             var arg = args.Get(_oldName);
@@ -465,7 +465,7 @@ public static class ScriptFormatGrammar
                 return Empty();
 
             // Throw an exception, we're missing something that's required.
-            return new MissingRequiredNamed(_oldName);
+            return new MissingRequiredNamed(line, _oldName);
         }
     }
 
@@ -484,7 +484,7 @@ public static class ScriptFormatGrammar
             _defaultValue = defaultValue;
         }
 
-        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args)
+        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args, int line)
         {
             // See if we have the requested value
             var arg = args.Get(_index);
@@ -503,7 +503,7 @@ public static class ScriptFormatGrammar
                 return Empty();
 
             // Throw an error that we're missing a required value
-            return new MissingRequiredPositional(_index);
+            return new MissingRequiredPositional(line, _index);
         }
     }
 }

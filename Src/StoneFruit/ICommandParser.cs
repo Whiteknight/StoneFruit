@@ -1,4 +1,6 @@
-﻿using StoneFruit.Execution.Scripts;
+﻿using System.Collections.Generic;
+using StoneFruit.Execution;
+using StoneFruit.Execution.Scripts;
 
 namespace StoneFruit;
 
@@ -15,10 +17,5 @@ public interface ICommandParser
     /// <returns></returns>
     IArguments ParseCommand(string command);
 
-    /// <summary>
-    /// Parse the line of text into a CommandFormat template.
-    /// </summary>
-    /// <param name="script"></param>
-    /// <returns></returns>
-    CommandFormat ParseScript(string script);
+    Result<List<ArgumentsOrString>, ScriptsError> ParseScript(IReadOnlyList<string> lines, IArguments args);
 }

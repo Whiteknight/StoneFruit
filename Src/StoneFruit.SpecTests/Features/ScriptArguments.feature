@@ -159,8 +159,8 @@ Rule: Required script arguments must be provided
             | _args [0]! |
         When I run headless with input "test"
         Then The output should contain at least: 
-            | Line                                             |
-            | Required argument at position 0 was not provided |
+            | Line                                                     |
+            | Line 0: Required argument at position 0 was not provided |
 
     Scenario: Required positional not provided multiple
         Given I have a script "test" with lines:
@@ -168,10 +168,23 @@ Rule: Required script arguments must be provided
             | _args [0]! [1]! [2]! |
         When I run headless with input "test"
         Then The output should contain at least: 
-            | Line                                             |
-            | Required argument at position 0 was not provided |
-            | Required argument at position 1 was not provided |
-            | Required argument at position 2 was not provided |
+            | Line                                                     |
+            | Line 0: Required argument at position 0 was not provided |
+            | Line 0: Required argument at position 1 was not provided |
+            | Line 0: Required argument at position 2 was not provided |
+
+    Scenario: Required positional not provided multiple lines
+        Given I have a script "test" with lines:
+            | Line       |
+            | _args [0]! |
+            | _args [1]! |
+            | _args [2]! |
+        When I run headless with input "test"
+        Then The output should contain at least: 
+            | Line                                                     |
+            | Line 0: Required argument at position 0 was not provided |
+            | Line 1: Required argument at position 1 was not provided |
+            | Line 2: Required argument at position 2 was not provided |
 
     Scenario: Required positional named not provided
         Given I have a script "test" with lines:
@@ -179,8 +192,8 @@ Rule: Required script arguments must be provided
             | _args ['x']! |
         When I run headless with input "test"
         Then The output should contain at least: 
-            | Line                                         |
-            | Required argument named 'x' was not provided |
+            | Line                                                 |
+            | Line 0: Required argument named 'x' was not provided |
 
     Scenario: Required positional named not provided multiple
         Given I have a script "test" with lines:
@@ -188,10 +201,10 @@ Rule: Required script arguments must be provided
             | _args ['x']! ['y']! ['z']! |
         When I run headless with input "test"
         Then The output should contain at least: 
-            | Line                                         |
-            | Required argument named 'x' was not provided |
-            | Required argument named 'y' was not provided |
-            | Required argument named 'z' was not provided |
+            | Line                                                 |
+            | Line 0: Required argument named 'x' was not provided |
+            | Line 0: Required argument named 'y' was not provided |
+            | Line 0: Required argument named 'z' was not provided |
 
      Scenario: Required literal name named value not provided
         Given I have a script "test" with lines:
@@ -199,8 +212,8 @@ Rule: Required script arguments must be provided
             | _args a=['b']! |
         When I run headless with input "test"
         Then The output should contain at least: 
-            | Line                                         |
-            | Required argument named 'b' was not provided |
+            | Line                                                 |
+            | Line 0: Required argument named 'b' was not provided |
 
     Scenario: Required literal name positional value not provided
         Given I have a script "test" with lines:
@@ -208,8 +221,8 @@ Rule: Required script arguments must be provided
             | _args a=[0]! |
         When I run headless with input "test"
         Then The output should contain at least: 
-            | Line                                             |
-            | Required argument at position 0 was not provided |
+            | Line                                                     |
+            | Line 0: Required argument at position 0 was not provided |
 
     Scenario: Required named not provided
         Given I have a script "test" with lines:
@@ -217,8 +230,8 @@ Rule: Required script arguments must be provided
             | _args {c}! |
         When I run headless with input "test"
         Then The output should contain at least: 
-            | Line                                         |
-            | Required argument named 'c' was not provided |
+            | Line                                                 |
+            | Line 0: Required argument named 'c' was not provided |
 
 Rule: Script arguments can become a verb
 
