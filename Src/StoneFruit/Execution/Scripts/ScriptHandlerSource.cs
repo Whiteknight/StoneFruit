@@ -68,12 +68,10 @@ public class ScriptHandlerSource : IHandlerSource
     {
         public void Execute()
         {
-            var lines = Context.Parser.ParseScript(Script.Lines, Context.Arguments)
-                .Match(
-                    success => success,
-                    error => throw new ScriptsException(error));
+            var lines = Context.Parser
+                .ParseScript(Script.Lines, Context.Arguments)
+                .ThrowIfContainsErrors();
             Context.Arguments.Reset();
-
             Context.State.Commands.Append(lines);
         }
     }

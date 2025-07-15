@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using StoneFruit.Execution.Scripts;
 using static StoneFruit.Utility.Assert;
 
-namespace StoneFruit.Execution;
+namespace StoneFruit.Execution.Scripts;
 
 /// <summary>
 /// A script of commands which will be executed in sequence, in response to different
@@ -33,8 +32,7 @@ public class EventScript
     }
 
     public IEnumerable<ArgumentsOrString> GetCommands(ICommandParser parser, IArguments args)
-        => NotNull(parser).ParseScript(_lines, NotNull(args))
-            .Match(
-                success => success,
-                error => throw new ScriptsException(error));
+        => NotNull(parser)
+            .ParseScript(_lines, NotNull(args))
+            .ThrowIfContainsErrors();
 }

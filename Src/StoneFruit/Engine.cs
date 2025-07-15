@@ -5,6 +5,7 @@ using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.CommandSources;
 using StoneFruit.Execution.Environments;
 using StoneFruit.Execution.Exceptions;
+using StoneFruit.Execution.Scripts;
 using StoneFruit.Handlers;
 using static StoneFruit.Utility.Assert;
 
