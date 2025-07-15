@@ -97,11 +97,12 @@ public class ScriptHandlerSource : IHandlerSource
             foreach (var lineFormat in formats)
             {
                 // Fill in arguments to the formats to create the command
-                var formattedArguments = lineFormat.Format(Context.Arguments);
+                var formattedArguments = lineFormat.Format(Context.Arguments)
+                    .GetValueOrThrowScriptsException();
                 Context.Arguments.Reset();
 
                 // Add the command to the EngineState for execution after this
-                Context.State.Commands.Append(new ArgumentsOrString(formattedArguments));
+                Context.State.Commands.Append(formattedArguments);
             }
         }
     }

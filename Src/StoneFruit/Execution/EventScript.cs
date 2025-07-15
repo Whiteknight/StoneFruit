@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using StoneFruit.Utility;
+using StoneFruit.Execution.Scripts;
 using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit.Execution;
@@ -41,8 +41,8 @@ public class EventScript
             .Where(l => !string.IsNullOrEmpty(l))
             .Select(parser.ParseScript)
             .Select(format => format.Format(args))
-            .Tap(_ => args.Reset())
-            .Select(c => new ArgumentsOrString(c));
+            // TODO: Would like to try and aggregate together all scripts/lines and throw all at once
+            .Select(r => r.GetValueOrThrowScriptsException());
     }
 
     public override string ToString() => string.Join("\n", _lines);

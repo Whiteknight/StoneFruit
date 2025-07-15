@@ -15,9 +15,17 @@ public readonly struct Result<T, TError>
         _hasValue = hasValue && _value is not null;
     }
 
-    public static implicit operator Result<T, TError>(T value) => new Result<T, TError>(value, default, true);
+    public static implicit operator Result<T, TError>(T value)
+        => new Result<T, TError>(value, default, true);
 
-    public static implicit operator Result<T, TError>(TError error) => new Result<T, TError>(default, error, false);
+    public static implicit operator Result<T, TError>(TError error)
+        => new Result<T, TError>(default, error, false);
+
+    public static Result<T, TError> Create(T value)
+        => new Result<T, TError>(value, default, true);
+
+    public static Result<T, TError> Create(TError error)
+        => new Result<T, TError>(default, error, false);
 
     public bool IsSuccess => _hasValue && _value is not null;
 
@@ -105,4 +113,15 @@ public static class Result
 {
     public static Result<TOut, TError> Bind<T, TError, TOut>(this Result<T, TError> result, Func<T, Result<TOut, TError>> onSuccess)
         => result.Match(v => onSuccess(v), e => new Result<TOut, TError>(default, e, false));
+
+    public static Result<T, TError> Combine<T, TError>(this Result<T, TError> r1, Result<T, TError> r2, Func<T, T, T> combineValues, Func<TError, TError, TError> combineErrors)
+    {
+        if (!r1.IsSuccess && !r2.IsSuccess)
+            return combineErrors(r1.GetErrorOrThrow(), r2.GetErrorOrThrow());
+        if (!r1.IsSuccess)
+            return r1;
+        if (!r2.IsSuccess)
+            return r2;
+        return combineValues(r1.GetValueOrThrow(), r2.GetValueOrThrow());
+    }
 }

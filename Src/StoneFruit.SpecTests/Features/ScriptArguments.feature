@@ -162,6 +162,17 @@ Rule: Required script arguments must be provided
             | Line                                             |
             | Required argument at position 0 was not provided |
 
+    Scenario: Required positional not provided multiple
+        Given I have a script "test" with lines:
+            | Line                 |
+            | _args [0]! [1]! [2]! |
+        When I run headless with input "test"
+        Then The output should contain at least: 
+            | Line                                             |
+            | Required argument at position 0 was not provided |
+            | Required argument at position 1 was not provided |
+            | Required argument at position 2 was not provided |
+
     Scenario: Required positional named not provided
         Given I have a script "test" with lines:
             | Line         |
@@ -170,6 +181,17 @@ Rule: Required script arguments must be provided
         Then The output should contain at least: 
             | Line                                         |
             | Required argument named 'x' was not provided |
+
+    Scenario: Required positional named not provided multiple
+        Given I have a script "test" with lines:
+            | Line                       |
+            | _args ['x']! ['y']! ['z']! |
+        When I run headless with input "test"
+        Then The output should contain at least: 
+            | Line                                         |
+            | Required argument named 'x' was not provided |
+            | Required argument named 'y' was not provided |
+            | Required argument named 'z' was not provided |
 
      Scenario: Required literal name named value not provided
         Given I have a script "test" with lines:

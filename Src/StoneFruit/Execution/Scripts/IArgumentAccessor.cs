@@ -13,5 +13,5 @@ public interface IArgumentAccessor
     /// </summary>
     /// <param name="args"></param>
     /// <returns></returns>
-    IEnumerable<IArgument> Access(IArguments args);
+    Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args);
 }

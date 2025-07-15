@@ -230,9 +230,12 @@ public static class ScriptFormatGrammar
         );
     }
 
+    private static Result<IReadOnlyList<IArgument>, ScriptsError> Empty()
+        => Result<IReadOnlyList<IArgument>, ScriptsError>.Create([]);
+
     private sealed class FetchAllFlagsArgumentAccessor : IArgumentAccessor
     {
-        public IEnumerable<IArgument> Access(IArguments args)
+        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args)
             => args.GetAllFlags()
                 .Tap(f => f.MarkConsumed())
                 .Select(f => new FlagArgument(f.Name))
@@ -241,7 +244,7 @@ public static class ScriptFormatGrammar
 
     private sealed class FetchAllNamedArgumentAccessor : IArgumentAccessor
     {
-        public IEnumerable<IArgument> Access(IArguments args)
+        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args)
             => args.GetAllNamed()
                 .Tap(n => n.MarkConsumed())
                 .Select(n => new NamedArgument(n.Name, n.Value))
@@ -250,7 +253,7 @@ public static class ScriptFormatGrammar
 
     private sealed class FetchAllPositionalArgumentAccessor : IArgumentAccessor
     {
-        public IEnumerable<IArgument> Access(IArguments args)
+        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args)
             => args.GetAllPositionals()
                 .Tap(p => p.MarkConsumed())
                 .Select(p => new PositionalArgument(p.Value))
@@ -268,14 +271,14 @@ public static class ScriptFormatGrammar
             _newName = newName;
         }
 
-        public IEnumerable<IArgument> Access(IArguments args)
+        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args)
         {
             var flag = args.GetFlag(_name);
             if (!flag.Exists())
-                return [];
+                return Empty();
             flag.MarkConsumed();
             var name = _newName.GetValueOrDefault(_name);
-            return [new FlagArgument(name)];
+            return new[] { new FlagArgument(name) };
         }
     }
 
@@ -292,26 +295,26 @@ public static class ScriptFormatGrammar
             _defaultValue = defaultValue;
         }
 
-        public IEnumerable<IArgument> Access(IArguments args)
+        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args)
         {
             // See if we have the requested value
             var arg = args.Get(_name);
             if (arg.Exists())
             {
                 arg.MarkConsumed();
-                return [new NamedArgument(_name, arg.AsString(string.Empty))];
+                return new[] { new NamedArgument(_name, arg.AsString(string.Empty)) };
             }
 
             // See if we have a default value
             if (_defaultValue.Success)
-                return [new NamedArgument(_name, _defaultValue.Value)];
+                return new[] { new NamedArgument(_name, _defaultValue.Value) };
 
             // See if we can ignore it
             if (!_required)
-                return [];
+                return Empty();
 
             // We're missing a required value
-            throw ArgumentParseException.MissingRequiredArgument(_name);
+            return new MissingRequiredNamed(_name);
         }
     }
 
@@ -328,26 +331,26 @@ public static class ScriptFormatGrammar
             _defaultValue = defaultValue;
         }
 
-        public IEnumerable<IArgument> Access(IArguments args)
+        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args)
         {
             // See if we have the argument
             var arg = args.Get(_name);
             if (arg.Exists())
             {
                 arg.MarkConsumed();
-                return [new PositionalArgument(arg.AsString(string.Empty))];
+                return new[] { new PositionalArgument(arg.AsString(string.Empty)) };
             }
 
             // See if we have a default value
             if (_defaultValue.Success)
-                return [new PositionalArgument(_defaultValue.Value)];
+                return new[] { new PositionalArgument(_defaultValue.Value) };
 
             // See if it's optional
             if (!_required)
-                return [];
+                return Empty();
 
             // We're missing a required argument
-            throw ArgumentParseException.MissingRequiredArgument(_name);
+            return new MissingRequiredNamed(_name);
         }
     }
 
@@ -364,26 +367,26 @@ public static class ScriptFormatGrammar
             _defaultValue = defaultValue;
         }
 
-        public IEnumerable<IArgument> Access(IArguments args)
+        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args)
         {
             // See if we have the value
             var arg = args.Get(_index);
             if (arg.Exists() && !arg.Consumed)
             {
                 arg.MarkConsumed();
-                return [new PositionalArgument(arg.AsString(string.Empty))];
+                return new[] { new PositionalArgument(arg.AsString(string.Empty)) };
             }
 
             // See if we have a default value
             if (_defaultValue.Success)
-                return [new PositionalArgument(_defaultValue.Value)];
+                return new[] { new PositionalArgument(_defaultValue.Value) };
 
             // See if it's optional
             if (!_required)
-                return [];
+                return Empty();
 
             // We're missing a required value
-            throw ArgumentParseException.MissingRequiredArgument(_index);
+            return new MissingRequiredPositional(_index);
         }
     }
 
@@ -396,8 +399,8 @@ public static class ScriptFormatGrammar
             _name = name;
         }
 
-        public IEnumerable<IArgument> Access(IArguments args)
-            => [new FlagArgument(_name)];
+        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args)
+            => new[] { new FlagArgument(_name) };
     }
 
     private sealed class LiteralNamedArgumentAccessor : IArgumentAccessor
@@ -411,8 +414,8 @@ public static class ScriptFormatGrammar
             _value = value;
         }
 
-        public IEnumerable<IArgument> Access(IArguments args)
-            => [new NamedArgument(_name, _value)];
+        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args)
+            => new[] { new NamedArgument(_name, _value) };
     }
 
     private sealed class LiteralPositionalArgumentAccessor : IArgumentAccessor
@@ -424,8 +427,8 @@ public static class ScriptFormatGrammar
             _value = value;
         }
 
-        public IEnumerable<IArgument> Access(IArguments args)
-            => [new PositionalArgument(_value)];
+        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args)
+            => new[] { new PositionalArgument(_value) };
     }
 
     private sealed class NamedFetchNamedArgumentAccessor : IArgumentAccessor
@@ -443,26 +446,26 @@ public static class ScriptFormatGrammar
             _defaultValue = defaultValue;
         }
 
-        public IEnumerable<IArgument> Access(IArguments args)
+        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args)
         {
             // First, see if we have the value
             var arg = args.Get(_oldName);
             if (arg.Exists())
             {
                 arg.MarkConsumed();
-                return [new NamedArgument(_newName, arg.AsString(string.Empty)),];
+                return new[] { new NamedArgument(_newName, arg.AsString(string.Empty)) };
             }
 
             // Second see if we have a default value
             if (_defaultValue.Success)
-                return [new NamedArgument(_newName, _defaultValue.Value)];
+                return new[] { new NamedArgument(_newName, _defaultValue.Value) };
 
             // Third, if this value isn't required, return nothing
             if (!_required)
-                return [];
+                return Empty();
 
             // Throw an exception, we're missing something that's required.
-            throw ArgumentParseException.MissingRequiredArgument(_oldName);
+            return new MissingRequiredNamed(_oldName);
         }
     }
 
@@ -481,26 +484,26 @@ public static class ScriptFormatGrammar
             _defaultValue = defaultValue;
         }
 
-        public IEnumerable<IArgument> Access(IArguments args)
+        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArguments args)
         {
             // See if we have the requested value
             var arg = args.Get(_index);
             if (arg.Exists())
             {
                 arg.MarkConsumed();
-                return [new NamedArgument(_newName, arg.AsString(string.Empty))];
+                return new[] { new NamedArgument(_newName, arg.AsString(string.Empty)) };
             }
 
             // See if we have a default value
             if (_defaultValue.Success)
-                return [new NamedArgument(_newName, _defaultValue.Value)];
+                return new[] { new NamedArgument(_newName, _defaultValue.Value) };
 
             // See if we can ignore it
             if (!_required)
-                return [];
+                return Empty();
 
             // Throw an error that we're missing a required value
-            throw ArgumentParseException.MissingRequiredArgument(_index);
+            return new MissingRequiredPositional(_index);
         }
     }
 }

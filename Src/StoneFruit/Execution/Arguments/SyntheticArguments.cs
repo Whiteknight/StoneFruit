@@ -64,7 +64,7 @@ public class SyntheticArguments : IArguments, IVerbSource
     /// </summary>
     /// <param name="args"></param>
     /// <returns></returns>
-    public static SyntheticArguments From(params (string Name, string Value)[] args)
+    public static IArguments From(params (string Name, string Value)[] args)
         => args
             .Select(t => new NamedArgument(t.Name, t.Value))
             .ToSyntheticArguments();
@@ -74,7 +74,7 @@ public class SyntheticArguments : IArguments, IVerbSource
     /// </summary>
     /// <param name="args"></param>
     /// <returns></returns>
-    public static SyntheticArguments From(IReadOnlyDictionary<string, string> args)
+    public static IArguments From(IReadOnlyDictionary<string, string> args)
         => args
             .Select(kvp => new NamedArgument(kvp.Key, kvp.Value))
             .ToSyntheticArguments();
@@ -84,7 +84,7 @@ public class SyntheticArguments : IArguments, IVerbSource
     /// </summary>
     /// <param name="args"></param>
     /// <returns></returns>
-    public static SyntheticArguments From(params string[] args)
+    public static IArguments From(params string[] args)
         => args
             .Select(s => new PositionalArgument(s))
             .ToSyntheticArguments();
@@ -158,7 +158,7 @@ public class SyntheticArguments : IArguments, IVerbSource
 
 public static class SyntheticArgumentsExtensions
 {
-    public static SyntheticArguments ToSyntheticArguments<T>(this IEnumerable<T> args)
+    public static IArguments ToSyntheticArguments<T>(this IEnumerable<T> args)
         where T : IArgument
         => new SyntheticArguments(args.Cast<IArgument>().ToList());
 }
