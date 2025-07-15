@@ -18,12 +18,26 @@ public abstract record ScriptsError
 
 public sealed record MissingRequiredPositional(int Line, int Index) : ScriptsError
 {
-    public override string ToString() => $"Line {Line}: Required argument at position {Index} was not provided";
+    public override string ToString()
+        => $"Line {Line}: Required argument at position {Index} was not provided";
 }
 
 public sealed record MissingRequiredNamed(int Line, string Name) : ScriptsError
 {
-    public override string ToString() => $"Line {Line}: Required argument named '{Name}' was not provided";
+    public override string ToString()
+        => $"Line {Line}: Required argument named '{Name}' was not provided";
+}
+
+public sealed record ParseFailure(int Line, string Script, string Error) : ScriptsError
+{
+    public override string ToString()
+        => $"Line {Line}: Could not parse command format string: '{Script}': {Error}";
+}
+
+public sealed record ParseIncomplete(int Line, string Script, string Remainder) : ScriptsError
+{
+    public override string ToString()
+        => $"Line {Line}: Parse did not complete for format string '{Script}'. Unparsed remainder: '{Remainder}'";
 }
 
 public sealed record EmptyLine : ScriptsError

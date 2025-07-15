@@ -3,8 +3,8 @@ using System.Linq;
 using ParserObjects;
 using StoneFruit.Execution.Exceptions;
 using StoneFruit.Execution.Scripts;
-using static ParserObjects.Parsers;
 using static ParserObjects.Parsers<char>;
+using static ParserObjects.Parsers;
 using static ParserObjects.Sequences;
 using static StoneFruit.Utility.Assert;
 
@@ -60,35 +60,39 @@ public class CommandParser : ICommandParser
 
     public Result<List<ArgumentsOrString>, ScriptsError> ParseScript(IReadOnlyList<string> lines, IArguments args)
     {
-        var x = lines
+        var results = lines
             .Where(l => !string.IsNullOrEmpty(l))
-            .Select(ParseScriptLine)
-            .Select((format, i) => format.Format(args, i))
-            .Aggregate(CommandList.New(), (l, r) => r.Match(
-                success => l.Add(success),
-                errors => l.Add(errors)));
-        if (x.Errors.Count != 0)
-            return x.Errors.Aggregate((e1, e2) => e1.Combine(e2));
+            .Select((l, i) => CompileLine(l, i, args))
+            .Aggregate(ResultsLists.New(), SeparateSuccessesAndFailures);
+        if (results.Errors.Count != 0)
+            return results.Errors.Aggregate((e1, e2) => e1.Combine(e2));
 
-        return x.Arguments.ConvertAll(l => new ArgumentsOrString(l));
+        return results.Arguments.ConvertAll(l => new ArgumentsOrString(l));
     }
 
-    private CommandFormat ParseScriptLine(string script)
+    private static ResultsLists SeparateSuccessesAndFailures(ResultsLists l, Result<IReadOnlyList<IArgument>, ScriptsError> r)
+        => r.Match(l.Add, l.Add);
+
+    private Result<IReadOnlyList<IArgument>, ScriptsError> CompileLine(string script, int line, IArguments args)
+        => ParseScriptToCommandFormat(script, line).Bind(f => f.Format(args, line));
+
+    private Result<CommandFormat, ScriptsError> ParseScriptToCommandFormat(string script, int line)
     {
         var input = FromString(script);
         var parseResult = _scriptParser.Parse(input);
         if (!parseResult.Success)
-            throw new ParseException($"Could not parse command format string: '{script}': {parseResult.ErrorMessage}");
+            return new ParseFailure(line, script, parseResult.ErrorMessage);
         if (!input.IsAtEnd)
-            throw new ParseException($"Parse did not complete for format string '{script}'. Unparsed remainder: '{input.GetRemainder()}'");
+            return new ParseIncomplete(line, script, input.GetRemainder());
         return parseResult.Value;
     }
 
-    private readonly record struct CommandList(List<IArguments> Arguments, List<ScriptsError> Errors)
+    // Keeps track of a list of successes and failures from all parse results
+    private readonly record struct ResultsLists(List<IArguments> Arguments, List<ScriptsError> Errors)
     {
-        public static CommandList New() => new CommandList([], []);
+        public static ResultsLists New() => new ResultsLists([], []);
 
-        public CommandList Add(IReadOnlyList<IArgument> s)
+        public ResultsLists Add(IReadOnlyList<IArgument> s)
         {
             var args = s.ToSyntheticArguments();
             args.Reset();
@@ -96,7 +100,7 @@ public class CommandParser : ICommandParser
             return this;
         }
 
-        public CommandList Add(ScriptsError error)
+        public ResultsLists Add(ScriptsError error)
         {
             Errors.Add(error);
             return this;
