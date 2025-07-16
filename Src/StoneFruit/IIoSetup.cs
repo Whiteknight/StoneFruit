@@ -23,4 +23,8 @@ public interface IIoSetup
     IIoSetup Add(IOutput output);
 
     IIoSetup Use(IInput input);
+
+    IIoSetup SetCommandLine(ICommandLine commandLine);
+
+    IIoSetup SetCommandLine(string commandLine);
 }

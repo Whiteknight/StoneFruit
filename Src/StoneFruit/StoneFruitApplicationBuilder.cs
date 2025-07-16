@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Environments;
@@ -21,8 +20,6 @@ public sealed class StoneFruitApplicationBuilder
     private readonly EnvironmentSetup _environments;
     private readonly ParserSetup _parsers;
     private readonly EngineSettings _settings;
-
-    private ICommandLine? _commandLine;
 
     public IServiceCollection Services { get; }
 
@@ -108,19 +105,8 @@ public sealed class StoneFruitApplicationBuilder
         return this;
     }
 
-    public StoneFruitApplicationBuilder SetCommandLine(ICommandLine commandLine)
-    {
-        _commandLine = commandLine;
-        return this;
-    }
-
-    public StoneFruitApplicationBuilder SetCommandLine(string commandLine)
-        => SetCommandLine(new StringCommandLine(commandLine));
-
     public StoneFruitApplication Build()
     {
-        SetupCoreEngineRegistrations(Services);
-
         // Build up the final Engine registrations. This involves resolving some
         // dependencies which were setup previously
         BuildUp(Services);
@@ -128,30 +114,15 @@ public sealed class StoneFruitApplicationBuilder
         return provider.GetRequiredService<StoneFruitApplication>();
     }
 
-    /// <summary>
-    /// Setup all dependencies and container registrations to create and execute the
-    /// Engine, using the EngineBuilder. Assumes the user is providing their own DI container
-    /// and scanning/resolving logic for handlers.
-    /// </summary>
-    /// <param name="services"></param>
-    /// <param name="build"></param>
-    public static void SetupEngineRegistrations(IServiceCollection services, Action<StoneFruitApplicationBuilder> build)
-    {
-        var builder = new StoneFruitApplicationBuilder(services);
-        build?.Invoke(builder);
-        SetupCoreEngineRegistrations(services);
-        builder.BuildUp(services);
-    }
-
     private void BuildUp(IServiceCollection services)
     {
+        SetupCoreEngineRegistrations(services);
         _handlers.BuildUp(services);
         services.AddSingleton(_eventCatalog);
         services.AddSingleton(_settings);
         _environments.BuildUp(services);
         _parsers.BuildUp(services);
         _output.BuildUp(services);
-        services.TryAddSingleton<ICommandLine>(_commandLine ?? new EnvironmentCommandLine());
     }
 
     private static void SetupCoreEngineRegistrations(IServiceCollection services)
@@ -159,10 +130,10 @@ public sealed class StoneFruitApplicationBuilder
         // Register the Engine and the things that the Engine provides. These registrations
         // are required, the user is not expected to inject their own Engine, State or
         // Dispatcher
-        services.AddSingleton(_ => new EngineAccessor());
+        services.AddSingleton(_ => new StoneFruitApplicationAccessor());
         services.AddSingleton(provider =>
         {
-            var accessor = provider.GetRequiredService<EngineAccessor>();
+            var accessor = provider.GetRequiredService<StoneFruitApplicationAccessor>();
             var handlers = provider.GetRequiredService<IHandlers>();
             var environments = provider.GetRequiredService<IEnvironments>();
             var parser = provider.GetRequiredService<ICommandParser>();
@@ -172,7 +143,7 @@ public sealed class StoneFruitApplicationBuilder
             var engineSettings = provider.GetRequiredService<EngineSettings>();
             var commandLine = provider.GetRequiredService<ICommandLine>();
             var e = new StoneFruitApplication(handlers, environments, parser, output, input, engineCatalog, engineSettings, commandLine);
-            accessor.SetEngine(e);
+            accessor.Set(e);
             return e;
         });
 
@@ -180,8 +151,8 @@ public sealed class StoneFruitApplicationBuilder
         // by getting the Engine. We use EngineAccessor here, because we will have circular references
         // with a few Engine dependencies otherwise. Circular references only need to be resolved
         // after the Engine.Run() or variants are called.
-        services.AddSingleton(provider => provider.GetRequiredService<EngineAccessor>().Engine.State);
-        services.AddSingleton(provider => provider.GetRequiredService<EngineAccessor>().Engine.Dispatcher);
+        services.AddSingleton(provider => provider.GetRequiredService<StoneFruitApplicationAccessor>().Instance.State);
+        services.AddSingleton(provider => provider.GetRequiredService<StoneFruitApplicationAccessor>().Instance.Dispatcher);
 
         // The CurrentArguments only exist when the Engine.Run() or a variant is called, and an
         // input command has been entered. We access it from the EngineState, which comes from

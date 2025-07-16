@@ -9,6 +9,7 @@ public class IoSetup : IIoSetup
     private readonly List<IOutput> _outputs;
     private bool _useConsole;
     private IInput? _input;
+    private ICommandLine? _commandLine;
 
     public IoSetup()
     {
@@ -35,8 +36,18 @@ public class IoSetup : IIoSetup
         return this;
     }
 
+    public IIoSetup SetCommandLine(ICommandLine commandLine)
+    {
+        _commandLine = commandLine;
+        return this;
+    }
+
+    public IIoSetup SetCommandLine(string commandLine)
+        => SetCommandLine(new StringCommandLine(commandLine));
+
     public void BuildUp(IServiceCollection services)
     {
+        services.TryAddSingleton(_commandLine ?? new EnvironmentCommandLine());
         services.TryAddSingleton(BuildOutput());
         services.TryAddSingleton(BuildInput());
     }

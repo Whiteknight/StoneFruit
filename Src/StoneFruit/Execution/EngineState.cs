@@ -39,7 +39,9 @@ public class EngineState
     public EngineRunMode RunMode { get; private set; }
     public IEngineStateCommandCounter CommandCounter { get; private set; }
 
-    public IArguments CurrentArguments => _arguments ?? throw new InvalidOperationException("Attempt to access IArguments when there are no current arguments set");
+    public IArguments CurrentArguments
+        => _arguments
+            ?? SyntheticArguments.Empty();
 
     public void SetRunMode(EngineRunMode runMode)
     {

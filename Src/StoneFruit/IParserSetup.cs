@@ -1,7 +1,7 @@
 ﻿using ParserObjects;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Scripts;
-using StoneFruit.Utility;
+using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit;
 
@@ -37,10 +37,7 @@ public static class ParserSetupExtensions
     /// <param name="setup"></param>
     /// <returns></returns>
     public static IParserSetup UseSimplifiedArgumentParser(this IParserSetup setup)
-    {
-        Assert.NotNull(setup);
-        return setup.UseArgumentParser(SimplifiedArgumentGrammar.GetParser());
-    }
+        => NotNull(setup).UseArgumentParser(SimplifiedArgumentGrammar.GetParser());
 
     /// <summary>
     /// Use a POSIX-style argument syntax similar to many existing POSIX utilities.
@@ -48,10 +45,7 @@ public static class ParserSetupExtensions
     /// <param name="setup"></param>
     /// <returns></returns>
     public static IParserSetup UsePosixStyleArgumentParser(this IParserSetup setup)
-    {
-        Assert.NotNull(setup);
-        return setup.UseArgumentParser(PosixStyleArgumentGrammar.GetParser());
-    }
+        => NotNull(setup).UseArgumentParser(PosixStyleArgumentGrammar.GetParser());
 
     /// <summary>
     /// Use a Windows PowerShell syntax for arguments.
@@ -59,10 +53,7 @@ public static class ParserSetupExtensions
     /// <param name="setup"></param>
     /// <returns></returns>
     public static IParserSetup UsePowershellStyleArgumentParser(this IParserSetup setup)
-    {
-        Assert.NotNull(setup);
-        return setup.UseArgumentParser(PowershellStyleArgumentGrammar.GetParser());
-    }
+        => NotNull(setup).UseArgumentParser(PowershellStyleArgumentGrammar.GetParser());
 
     /// <summary>
     /// Use a class Windows-CMD syntax for arguments.
@@ -70,8 +61,5 @@ public static class ParserSetupExtensions
     /// <param name="setup"></param>
     /// <returns></returns>
     public static IParserSetup UseWindowsCmdArgumentParser(this IParserSetup setup)
-    {
-        Assert.NotNull(setup);
-        return setup.UseArgumentParser(WindowsCmdArgumentGrammar.GetParser());
-    }
+        => NotNull(setup).UseArgumentParser(WindowsCmdArgumentGrammar.GetParser());
 }

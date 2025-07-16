@@ -110,7 +110,7 @@ public static class OutputExtensions
     /// <param name="color"></param>
     /// <returns></returns>
     public static IOutput Color(this IOutput output, ConsoleColor color)
-        => output.Color(_ => color);
+        => NotNull(output).Color(_ => color);
 
     /// <summary>
     /// Get a new output with the given brush for text and background color. If the
@@ -120,5 +120,5 @@ public static class OutputExtensions
     /// <param name="brush"></param>
     /// <returns></returns>
     public static IOutput Color(this IOutput output, Brush brush)
-        => output.Color(_ => brush);
+        => NotNull(output).Color(_ => brush);
 }
