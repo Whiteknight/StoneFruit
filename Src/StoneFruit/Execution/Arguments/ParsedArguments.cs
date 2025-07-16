@@ -7,8 +7,7 @@ namespace StoneFruit.Execution.Arguments;
 /// <summary>
 /// Provides access to a collection of IArgument objects by name or position. Arguments
 /// from the parser are inherently ambiguous, so this collection keeps them in a raw
-/// state until intent is determined by user access. At this point the arguments are
-/// moved to an "accessed" state where they are known unambiguously.
+/// state until intent is determined by user access.
 /// </summary>
 public class ParsedArguments : IArguments, IVerbSource
 {
@@ -57,6 +56,33 @@ public class ParsedArguments : IArguments, IVerbSource
     }
 
     public string Raw { get; }
+
+    // We access verbs before we access any args, so we can work entirely out of the
+    // raw unprocessed args list here.
+    public IReadOnlyList<IPositionalArgument> GetVerbCandidatePositionals()
+    {
+        var candidates = new List<IPositionalArgument>();
+        for (int i = 0; i < _rawArguments.Count; i++)
+        {
+            var arg = _rawArguments[i];
+            if (arg.Access == AccessType.Accessed || arg.Access == AccessType.AccessedAsPositional)
+                continue;
+
+            // In some cases we're going to double-convert an arg. We'll pull more positionals
+            // than we need, decide that some of them are not part of the verb, and put back
+            // the rest. It's a small price to pay to avoid the complexity of conditionally
+            // caching them.
+            if (arg.Argument is ParsedPositional pa)
+                candidates.Add(new PositionalArgument(pa.Value));
+        }
+
+        return candidates;
+    }
+
+    public void SetVerbCount(int count)
+    {
+        _rawArguments.RemoveRange(0, count);
+    }
 
     public IReadOnlyList<string> GetUnconsumed()
     {
@@ -141,44 +167,6 @@ public class ParsedArguments : IArguments, IVerbSource
         return _accessedPositionals.Where(a => !a.Consumed);
     }
 
-    // Loop over all unconsumed raw positional arguments, accessing each one until a condition is satisfied.
-    // When the condition is matched, return the current item.
-    private IPositionalArgument AccessPositionalsUntil(Func<bool> match)
-    {
-        for (; _lastRawPositionalIndex < _rawArguments.Count; _lastRawPositionalIndex++)
-        {
-            var i = _lastRawPositionalIndex;
-            var arg = _rawArguments[i];
-            if (arg.Access == AccessType.Accessed || arg.Access == AccessType.AccessedAsPositional)
-                continue;
-
-            if (arg.Argument is ParsedPositional pa)
-            {
-                var accessor = new PositionalArgument(pa.Value);
-                _rawArguments[i].Access = AccessType.Accessed;
-                _accessedPositionals.Add(accessor);
-                if (match())
-                    return accessor;
-            }
-
-            if (arg.Argument is ParsedFlagAndPositionalOrNamed fp)
-            {
-                var accessor = new PositionalArgument(fp.Value);
-                _accessedPositionals.Add(accessor);
-
-                // If we have already consumed the flag portion, mark the whole arg consumed
-                // otherwise, mark that we have only consumed the positional portion.
-                arg.Access = arg.Access == AccessType.AccessedAsFlag
-                    ? AccessType.Accessed
-                    : AccessType.AccessedAsPositional;
-                if (match())
-                    return accessor;
-            }
-        }
-
-        return MissingArgument.NoPositionals();
-    }
-
     public IEnumerable<INamedArgument> GetAllNamed(string name)
     {
         name = name.ToLowerInvariant();
@@ -195,6 +183,73 @@ public class ParsedArguments : IArguments, IVerbSource
         return _accessedNameds.Values
             .SelectMany(n => n)
             .Where(a => !a.Consumed);
+    }
+
+    public IFlagArgument GetFlag(string name)
+    {
+        // Check if we've already accessed this flag. If so, return it if unconsumed
+        // or not found
+        if (_accessedFlags.ContainsKey(name))
+            return _accessedFlags[name].Consumed ? MissingArgument.FlagConsumed(name) : _accessedFlags[name];
+
+        // Loop through unaccessed args looking for a matching flag.
+        return AccessFlagsUntil(name, n => n == name, () => true);
+    }
+
+    public bool HasFlag(string name, bool markConsumed = false)
+        => _accessedFlags.ContainsKey(name)
+            || AccessFlagsUntil(name, n => n == name, () => true).Exists();
+
+    public IEnumerable<IFlagArgument> GetAllFlags()
+    {
+        AccessFlagsUntil("", _ => true, () => false);
+        return _accessedFlags.Values.Where(a => !a.Consumed);
+    }
+
+    // Loop over all unconsumed raw positional arguments, accessing each one until a condition is satisfied.
+    // When the condition is matched, return the current item.
+    private IPositionalArgument AccessPositionalsUntil(Func<bool> match)
+    {
+        for (; _lastRawPositionalIndex < _rawArguments.Count; _lastRawPositionalIndex++)
+        {
+            var i = _lastRawPositionalIndex;
+            var arg = _rawArguments[i];
+            if (arg.Access == AccessType.Accessed || arg.Access == AccessType.AccessedAsPositional)
+                continue;
+
+            IPositionalArgument? accessor = arg.Argument switch
+            {
+                ParsedPositional pa => MarkAccessedAsPositional(i, pa),
+                ParsedFlagAndPositionalOrNamed fp => MarkAccessedAsPositional(arg, fp),
+                _ => null
+            };
+
+            if (accessor != null && match())
+                return accessor;
+        }
+
+        return MissingArgument.NoPositionals();
+    }
+
+    private PositionalArgument MarkAccessedAsPositional(RawArg arg, ParsedFlagAndPositionalOrNamed fp)
+    {
+        var accessor = new PositionalArgument(fp.Value);
+        _accessedPositionals.Add(accessor);
+
+        // If we have already consumed the flag portion, mark the whole arg consumed
+        // otherwise, mark that we have only consumed the positional portion.
+        arg.Access = arg.Access == AccessType.AccessedAsFlag
+            ? AccessType.Accessed
+            : AccessType.AccessedAsPositional;
+        return accessor;
+    }
+
+    private PositionalArgument MarkAccessedAsPositional(int i, ParsedPositional pa)
+    {
+        var accessor = new PositionalArgument(pa.Value);
+        _rawArguments[i].Access = AccessType.Accessed;
+        _accessedPositionals.Add(accessor);
+        return accessor;
     }
 
     private Maybe<INamedArgument> AccessNamedUntil(Func<string, bool> shouldAccess, Func<bool> isComplete)
@@ -218,23 +273,29 @@ public class ParsedArguments : IArguments, IVerbSource
             return default;
 
         if (arg.Argument is ParsedNamed n && shouldAccess(n.Name))
-        {
-            var accessor = new NamedArgument(n.Name, n.Value);
-            _rawArguments[i].Access = AccessType.Accessed;
-            AccessNamed(accessor);
-            return accessor;
-        }
+            return MarkAccessedAsNamed(i, n);
 
         if (arg.Argument is ParsedFlagAndPositionalOrNamed n2 && shouldAccess(n2.Name))
-        {
-            var accessor = new NamedArgument(n2.Name, n2.Value);
-            _rawArguments[i].Access = AccessType.Accessed;
-            AccessNamed(accessor);
-            return accessor;
-        }
+            return MarkAccessedAsNamed(i, n2);
 
         // For all other argument types, there is no named accessor
         return default;
+    }
+
+    private NamedArgument MarkAccessedAsNamed(int i, ParsedFlagAndPositionalOrNamed n2)
+    {
+        var accessor = new NamedArgument(n2.Name, n2.Value);
+        _rawArguments[i].Access = AccessType.Accessed;
+        AccessNamed(accessor);
+        return accessor;
+    }
+
+    private NamedArgument MarkAccessedAsNamed(int i, ParsedNamed n)
+    {
+        var accessor = new NamedArgument(n.Name, n.Value);
+        _rawArguments[i].Access = AccessType.Accessed;
+        AccessNamed(accessor);
+        return accessor;
     }
 
     private void AccessNamed(NamedArgument n)
@@ -242,30 +303,6 @@ public class ParsedArguments : IArguments, IVerbSource
         if (!_accessedNameds.ContainsKey(n.Name))
             _accessedNameds.Add(n.Name, []);
         _accessedNameds[n.Name].Add(n);
-    }
-
-    public IFlagArgument GetFlag(string name)
-    {
-        // Check if we've already accessed this flag. If so, return it if unconsumed
-        // or not found
-        if (_accessedFlags.ContainsKey(name))
-            return _accessedFlags[name].Consumed ? MissingArgument.FlagConsumed(name) : _accessedFlags[name];
-
-        // Loop through unaccessed args looking for a matching flag.
-        return AccessFlagsUntil(name, n => n.Equals(name, StringComparison.OrdinalIgnoreCase), () => true);
-    }
-
-    public bool HasFlag(string name, bool markConsumed = false)
-    {
-        if (_accessedFlags.ContainsKey(name))
-            return true;
-        return AccessFlagsUntil(name, n => n == name, () => true).Exists();
-    }
-
-    public IEnumerable<IFlagArgument> GetAllFlags()
-    {
-        AccessFlagsUntil("", _ => true, () => false);
-        return _accessedFlags.Values.Where(a => !a.Consumed);
     }
 
     private IFlagArgument AccessFlagsUntil(string name, Func<string, bool> isMatch, Func<bool> isComplete)
@@ -276,56 +313,36 @@ public class ParsedArguments : IArguments, IVerbSource
             if (arg.Access == AccessType.Accessed || arg.Access == AccessType.AccessedAsFlag)
                 continue;
 
+            IFlagArgument? accessor = null;
+
             if (arg.Argument is ParsedFlag f && isMatch(f.Name))
-            {
-                var accessor = new FlagArgument(f.Name);
-                _rawArguments[i].Access = AccessType.Accessed;
-                _accessedFlags.Add(f.Name, accessor);
-                if (isComplete())
-                    return accessor;
-                continue;
-            }
+                accessor = MarkAccessedAsFlag(i, f);
 
             if (arg.Argument is ParsedFlagAndPositionalOrNamed fp && isMatch(fp.Name))
-            {
-                var accessor = new FlagArgument(fp.Name);
-                _accessedFlags.Add(fp.Name, accessor);
-                if (arg.Access == AccessType.AccessedAsPositional)
-                    arg.Access = AccessType.Accessed;
-                else
-                    arg.Access = AccessType.AccessedAsFlag;
-                if (isComplete())
-                    return accessor;
-            }
+                accessor = MarkAccessedAsFlag(arg, fp);
+
+            if (accessor != null && isComplete())
+                return accessor;
         }
 
         return MissingArgument.FlagMissing(name);
     }
 
-    // We access verbs before we access any args, so we can work entirely out of the
-    // raw unprocessed args list here.
-    public IReadOnlyList<IPositionalArgument> GetVerbCandidatePositionals()
+    private FlagArgument MarkAccessedAsFlag(int i, ParsedFlag f)
     {
-        var candidates = new List<IPositionalArgument>();
-        for (int i = 0; i < _rawArguments.Count; i++)
-        {
-            var arg = _rawArguments[i];
-            if (arg.Access == AccessType.Accessed || arg.Access == AccessType.AccessedAsPositional)
-                continue;
-
-            // In some cases we're going to double-convert an arg. We'll pull more positionals
-            // than we need, decide that some of them are not part of the verb, and put back
-            // the rest. It's a small price to pay to avoid the complexity of conditionally
-            // caching them.
-            if (arg.Argument is ParsedPositional pa)
-                candidates.Add(new PositionalArgument(pa.Value));
-        }
-
-        return candidates;
+        var accessor = new FlagArgument(f.Name);
+        _rawArguments[i].Access = AccessType.Accessed;
+        _accessedFlags.Add(f.Name, accessor);
+        return accessor;
     }
 
-    public void SetVerbCount(int count)
+    private FlagArgument MarkAccessedAsFlag(RawArg arg, ParsedFlagAndPositionalOrNamed fp)
     {
-        _rawArguments.RemoveRange(0, count);
+        var accessor = new FlagArgument(fp.Name);
+        _accessedFlags.Add(fp.Name, accessor);
+        arg.Access = arg.Access == AccessType.AccessedAsPositional
+            ? AccessType.Accessed
+            : AccessType.AccessedAsFlag;
+        return accessor;
     }
 }

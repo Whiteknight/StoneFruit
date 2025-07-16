@@ -89,7 +89,7 @@ public class ParsedCommandArgumentsTests
         {
             new ParsedPositional("test1"),
             new ParsedNamed("b", "512"),
-            new ParsedFlag("c"),
+            new ParsedFlag("C"),
             new ParsedNamed("e", "1024"),
             new ParsedNamed("f", "true")
         });

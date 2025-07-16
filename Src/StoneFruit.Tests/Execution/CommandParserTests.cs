@@ -41,7 +41,7 @@ public class CommandParserTests
     public void ParseArguments_ToObject_Flags()
     {
         var target = CommandParser.GetDefault();
-        var args = target.ParseCommand("-x -y");
+        var args = target.ParseCommand("-X -Y");
         var result = args.MapTo<TestArgsFlags>();
         result.X.Should().BeTrue();
         result.Y.Should().BeTrue();
