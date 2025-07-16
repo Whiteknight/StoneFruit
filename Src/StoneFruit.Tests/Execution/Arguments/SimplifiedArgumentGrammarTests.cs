@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using NUnit.Framework;
 using ParserObjects;
 using StoneFruit.Execution.Arguments;
