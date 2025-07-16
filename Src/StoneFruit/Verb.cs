@@ -11,32 +11,33 @@ namespace StoneFruit;
 /// </summary>
 public readonly struct Verb : IReadOnlyList<string>, IEquatable<Verb>
 {
+    private const string _errorNoWords = "Verb must contain at least one word";
     // Verb is just a wrapper around a List of string. The constructors assert that the
     // list is non-null, not empty, and that all the entries in the list are also non-null
     // and non-empty
 
-    private readonly IReadOnlyList<string> _verb;
+    private readonly string[] _verb;
 
     public Verb(string verb)
     {
         if (string.IsNullOrEmpty(verb))
-            throw new InvalidOperationException("Verb must contain at least one word");
+            throw new InvalidOperationException(_errorNoWords);
         _verb = verb.Contains(' ')
             ? verb.Split(Constants.SeparatedBySpace, StringSplitOptions.RemoveEmptyEntries)
-            : (IReadOnlyList<string>)[verb];
-        if (_verb.Count == 0)
-            throw new InvalidOperationException("Verb must contain at least one word");
+            : [verb];
+        if (_verb.Length == 0)
+            throw new InvalidOperationException(_errorNoWords);
     }
 
     public Verb(string[] verb)
     {
         if (verb == null || verb.Length == 0)
-            throw new InvalidOperationException("Verb must contain at least one word");
+            throw new InvalidOperationException(_errorNoWords);
         _verb = verb
             .SelectMany(w => (w ?? "").Split(Constants.SeparatedBySpace, StringSplitOptions.RemoveEmptyEntries))
             .ToArray();
-        if (_verb.Count == 0)
-            throw new InvalidOperationException("Verb must contain at least one word");
+        if (_verb.Length == 0)
+            throw new InvalidOperationException(_errorNoWords);
     }
 
     public static implicit operator Verb(string s) => new Verb(s);
@@ -45,11 +46,11 @@ public readonly struct Verb : IReadOnlyList<string>, IEquatable<Verb>
 
     public string this[int index] => _verb[index];
 
-    public int Count => _verb.Count;
+    public int Count => _verb.Length;
 
-    public IEnumerator<string> GetEnumerator() => _verb.GetEnumerator();
+    public IEnumerator<string> GetEnumerator() => ((IReadOnlyList<string>)_verb).GetEnumerator();
 
-    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)(_verb ?? Enumerable.Empty<string>())).GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => _verb.GetEnumerator();
 
     public override string ToString() => string.Join(" ", _verb);
 
