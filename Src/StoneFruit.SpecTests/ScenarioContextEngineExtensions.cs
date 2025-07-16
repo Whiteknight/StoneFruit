@@ -5,12 +5,12 @@ namespace StoneFruit.SpecTests;
 
 public static class ScenarioContextEngineExtensions
 {
-    public static EngineBuilder GetEngineBuilder(this ScenarioContext context)
+    public static StoneFruitApplicationBuilder GetEngineBuilder(this ScenarioContext context)
     {
-        if (context.TryGetValue<EngineBuilder>("engineBuilder", out var builder))
+        if (context.TryGetValue<StoneFruitApplicationBuilder>("engineBuilder", out var builder))
             return builder;
         var io = context.GetIo();
-        builder = EngineBuilder.Create();
+        builder = StoneFruitApplicationBuilder.Create();
         builder.SetupIo(o => o
             .DoNotUseConsole()
             .Add(io)
@@ -20,9 +20,9 @@ public static class ScenarioContextEngineExtensions
         return builder;
     }
 
-    public static Engine GetEngine(this ScenarioContext context)
+    public static StoneFruitApplication GetEngine(this ScenarioContext context)
     {
-        if (context.TryGetValue<Engine>("engine", out var engine))
+        if (context.TryGetValue<StoneFruitApplication>("engine", out var engine))
             return engine;
         var builder = context.GetEngineBuilder();
         engine = builder.Build();

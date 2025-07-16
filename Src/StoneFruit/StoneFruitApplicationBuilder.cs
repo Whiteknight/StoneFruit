@@ -13,7 +13,7 @@ namespace StoneFruit;
 /// <summary>
 /// Used to setup all options and dependencies of the Engine.
 /// </summary>
-public sealed class EngineBuilder : IEngineBuilder
+public sealed class StoneFruitApplicationBuilder
 {
     private readonly HandlerSetup _handlers;
     private readonly IoSetup _output;
@@ -26,7 +26,7 @@ public sealed class EngineBuilder : IEngineBuilder
 
     public IServiceCollection Services { get; }
 
-    private EngineBuilder(IServiceCollection services)
+    private StoneFruitApplicationBuilder(IServiceCollection services)
     {
         Services = NotNull(services);
         _handlers = new HandlerSetup(Services);
@@ -37,9 +37,9 @@ public sealed class EngineBuilder : IEngineBuilder
         _settings = new EngineSettings();
     }
 
-    public static EngineBuilder Create(IServiceCollection? services = null)
+    public static StoneFruitApplicationBuilder Create(IServiceCollection? services = null)
     {
-        return new EngineBuilder(services ?? new ServiceCollection());
+        return new StoneFruitApplicationBuilder(services ?? new ServiceCollection());
     }
 
     /// <summary>
@@ -47,7 +47,7 @@ public sealed class EngineBuilder : IEngineBuilder
     /// </summary>
     /// <param name="setup"></param>
     /// <returns></returns>
-    public IEngineBuilder SetupHandlers(Action<IHandlerSetup> setup)
+    public StoneFruitApplicationBuilder SetupHandlers(Action<IHandlerSetup> setup)
     {
         setup?.Invoke(_handlers);
         return this;
@@ -58,7 +58,7 @@ public sealed class EngineBuilder : IEngineBuilder
     /// </summary>
     /// <param name="setup"></param>
     /// <returns></returns>
-    public IEngineBuilder SetupEnvironments(Action<IEnvironmentSetup> setup)
+    public StoneFruitApplicationBuilder SetupEnvironments(Action<IEnvironmentSetup> setup)
     {
         setup?.Invoke(_environments);
         return this;
@@ -69,7 +69,7 @@ public sealed class EngineBuilder : IEngineBuilder
     /// </summary>
     /// <param name="setup"></param>
     /// <returns></returns>
-    public IEngineBuilder SetupArguments(Action<IParserSetup> setup)
+    public StoneFruitApplicationBuilder SetupArguments(Action<IParserSetup> setup)
     {
         setup?.Invoke(_parsers);
         return this;
@@ -80,7 +80,7 @@ public sealed class EngineBuilder : IEngineBuilder
     /// </summary>
     /// <param name="setup"></param>
     /// <returns></returns>
-    public IEngineBuilder SetupIo(Action<IIoSetup> setup)
+    public StoneFruitApplicationBuilder SetupIo(Action<IIoSetup> setup)
     {
         setup?.Invoke(_output);
         return this;
@@ -91,7 +91,7 @@ public sealed class EngineBuilder : IEngineBuilder
     /// </summary>
     /// <param name="setup"></param>
     /// <returns></returns>
-    public IEngineBuilder SetupEvents(Action<EngineEventCatalog> setup)
+    public StoneFruitApplicationBuilder SetupEvents(Action<EngineEventCatalog> setup)
     {
         setup?.Invoke(_eventCatalog);
         return this;
@@ -102,19 +102,22 @@ public sealed class EngineBuilder : IEngineBuilder
     /// </summary>
     /// <param name="setup"></param>
     /// <returns></returns>
-    public IEngineBuilder SetupSettings(Action<EngineSettings> setup)
+    public StoneFruitApplicationBuilder SetupSettings(Action<EngineSettings> setup)
     {
         setup?.Invoke(_settings);
         return this;
     }
 
-    public IEngineBuilder SetCommandLine(ICommandLine commandLine)
+    public StoneFruitApplicationBuilder SetCommandLine(ICommandLine commandLine)
     {
         _commandLine = commandLine;
         return this;
     }
 
-    public Engine Build()
+    public StoneFruitApplicationBuilder SetCommandLine(string commandLine)
+        => SetCommandLine(new StringCommandLine(commandLine));
+
+    public StoneFruitApplication Build()
     {
         SetupCoreEngineRegistrations(Services);
 
@@ -122,7 +125,7 @@ public sealed class EngineBuilder : IEngineBuilder
         // dependencies which were setup previously
         BuildUp(Services);
         var provider = Services.BuildServiceProvider();
-        return provider.GetRequiredService<Engine>();
+        return provider.GetRequiredService<StoneFruitApplication>();
     }
 
     /// <summary>
@@ -132,9 +135,9 @@ public sealed class EngineBuilder : IEngineBuilder
     /// </summary>
     /// <param name="services"></param>
     /// <param name="build"></param>
-    public static void SetupEngineRegistrations(IServiceCollection services, Action<IEngineBuilder> build)
+    public static void SetupEngineRegistrations(IServiceCollection services, Action<StoneFruitApplicationBuilder> build)
     {
-        var builder = new EngineBuilder(services);
+        var builder = new StoneFruitApplicationBuilder(services);
         build?.Invoke(builder);
         SetupCoreEngineRegistrations(services);
         builder.BuildUp(services);
@@ -168,7 +171,7 @@ public sealed class EngineBuilder : IEngineBuilder
             var engineCatalog = provider.GetRequiredService<EngineEventCatalog>();
             var engineSettings = provider.GetRequiredService<EngineSettings>();
             var commandLine = provider.GetRequiredService<ICommandLine>();
-            var e = new Engine(handlers, environments, parser, output, input, engineCatalog, engineSettings, commandLine);
+            var e = new StoneFruitApplication(handlers, environments, parser, output, input, engineCatalog, engineSettings, commandLine);
             accessor.SetEngine(e);
             return e;
         });

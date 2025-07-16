@@ -10,7 +10,7 @@ internal static class Program
 {
     private static void Main(string[] args)
     {
-        var builder = EngineBuilder.Create();
+        var builder = StoneFruitApplicationBuilder.Create();
         builder.Services.AddPerEnvironment<MyEnvironment>((p, env) => new MyEnvironment(env));
         builder.SetupHandlers(h => h
             // Scan for handlers using reflection. Looks for any public, non-abstract,

@@ -14,13 +14,13 @@ namespace StoneFruit;
 /// <summary>
 /// The execution core. Provides a run loop to receive user commands and execute them.
 /// </summary>
-public class Engine
+public class StoneFruitApplication
 {
     private readonly ICommandParser _parser;
     private readonly ICommandLine _cmdLineArgs;
     private readonly IInput _input;
 
-    public Engine(
+    public StoneFruitApplication(
         IHandlers handlers,
         IEnvironments environments,
         ICommandParser parser,
