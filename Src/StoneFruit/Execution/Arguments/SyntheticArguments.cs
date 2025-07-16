@@ -120,31 +120,36 @@ public class SyntheticArguments : IArguments, IVerbSource
         return _positionals[realIndex];
     }
 
-    public INamedArgument Get(string name)
-        => _nameds.TryGetValue(name, out var named)
-            ? named.FirstOrDefault(a => !a.Consumed) ?? MissingArgument.NoneNamed(name)
-            : MissingArgument.NoneNamed(name);
+    public INamedArgument Get(string name, bool caseSensitive = true)
+        => _nameds
+            .Where(kvp => Equals(kvp.Key, name, caseSensitive))
+            .SelectMany(kvp => kvp.Value)
+            .Where(n => !n.Consumed)
+            .FirstOrDefault(MissingArgument.NoneNamed(name));
 
     public IEnumerable<IPositionalArgument> GetAllPositionals()
         => _positionals.Skip(_verbCount).Where(a => !a.Consumed);
 
-    public IEnumerable<INamedArgument> GetAllNamed(string name)
-        => _nameds.ContainsKey(name)
-            ? _nameds[name].Where(a => !a.Consumed)
-            : [];
+    public IEnumerable<INamedArgument> GetAllNamed(string name, bool caseSensitive = true)
+        => _nameds
+            .Where(kvp => Equals(kvp.Key, name, caseSensitive))
+            .SelectMany(kvp => kvp.Value)
+            .Where(n => !n.Consumed);
 
     public IEnumerable<INamedArgument> GetAllNamed()
         => _nameds.Values
             .SelectMany(n => n)
             .Where(a => !a.Consumed);
 
-    public IFlagArgument GetFlag(string name)
-        => _flags.TryGetValue(name, out var flag) && !flag.Consumed
-            ? flag
-            : MissingArgument.FlagConsumed(name);
+    public IFlagArgument GetFlag(string name, bool caseSensitive = true)
+        => _flags
+            .Where(kvp => Equals(kvp.Key, name, caseSensitive))
+            .Select(kvp => kvp.Value)
+            .Where(f => !f.Consumed)
+            .FirstOrDefault(MissingArgument.FlagConsumed(name));
 
-    public bool HasFlag(string name, bool markConsumed = false)
-        => _flags.ContainsKey(name.ToLowerInvariant());
+    public bool HasFlag(string name, bool markConsumed = false, bool caseSensitive = true)
+        => _flags.Any(kvp => Equals(kvp.Key, name, caseSensitive));
 
     public IEnumerable<IFlagArgument> GetAllFlags() => _flags.Values.Where(a => !a.Consumed);
 
@@ -154,6 +159,9 @@ public class SyntheticArguments : IArguments, IVerbSource
     {
         _verbCount = count;
     }
+
+    private static bool Equals(string s1, string s2, bool caseSensitive)
+        => s1.Equals(s2, caseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
 }
 
 public static class SyntheticArgumentsExtensions

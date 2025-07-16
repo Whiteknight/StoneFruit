@@ -73,12 +73,12 @@ public static class CommandArgumentMapper
         var namedAttr = property.GetCustomAttribute<ArgumentNamedAttribute>(true);
         if (namedAttr != null)
         {
-            var namedArgument = args.Consume(namedAttr.Name);
+            var namedArgument = args.Consume(namedAttr.Name, false);
             if (namedArgument.Exists())
                 return new Maybe<IValuedArgument>(namedArgument);
         }
 
-        var namedArg = args.Consume(property.Name);
+        var namedArg = args.Consume(property.Name, false);
         if (namedArg.Exists())
             return new Maybe<IValuedArgument>(namedArg);
 
@@ -87,7 +87,7 @@ public static class CommandArgumentMapper
 
     private static bool IsBoolSettableFromFlag(IArguments args, PropertyInfo property)
         => (property.PropertyType == typeof(bool) || property.PropertyType == typeof(bool?))
-            && args.ConsumeFlag(property.Name).Exists();
+            && args.ConsumeFlag(property.Name, false).Exists();
 
     private static void AssignPropertyValue<T>(IValuedArgument argument, PropertyInfo property, T obj)
     {

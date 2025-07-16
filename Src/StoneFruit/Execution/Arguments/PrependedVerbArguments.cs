@@ -33,9 +33,11 @@ public class PrependedVerbArguments : IArguments, IVerbSource
 
     public IPositionalArgument Get(int index) => _inner.Get(index);
 
-    public INamedArgument Get(string name) => _inner.Get(name);
+    public INamedArgument Get(string name, bool caseSensitive = true)
+        => _inner.Get(name, caseSensitive);
 
-    public IEnumerable<INamedArgument> GetAllNamed(string name) => _inner.GetAllNamed(name);
+    public IEnumerable<INamedArgument> GetAllNamed(string name, bool caseSensitive = true)
+        => _inner.GetAllNamed(name, caseSensitive);
 
     public IEnumerable<INamedArgument> GetAllNamed() => _inner.GetAllNamed();
 
@@ -43,9 +45,11 @@ public class PrependedVerbArguments : IArguments, IVerbSource
 
     public IEnumerable<IPositionalArgument> GetAllPositionals() => _inner.GetAllPositionals();
 
-    public IFlagArgument GetFlag(string name) => _inner.GetFlag(name);
+    public IFlagArgument GetFlag(string name, bool caseSensitive = true)
+        => _inner.GetFlag(name, caseSensitive);
 
-    public bool HasFlag(string name, bool markConsumed = false) => _inner.HasFlag(name, markConsumed);
+    public bool HasFlag(string name, bool markConsumed = false, bool caseSensitive = true)
+        => _inner.HasFlag(name, markConsumed, caseSensitive);
 
     public void Reset() => _inner.Reset();
 

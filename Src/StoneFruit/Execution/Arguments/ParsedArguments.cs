@@ -81,6 +81,8 @@ public class ParsedArguments : IArguments, IVerbSource
 
     public void SetVerbCount(int count)
     {
+        // TODO: See if we can avoid removing the raw args from the beginning, so .Reset()
+        // actually returns us to the beginning state?
         _rawArguments.RemoveRange(0, count);
     }
 
@@ -145,19 +147,20 @@ public class ParsedArguments : IArguments, IVerbSource
         return index < _accessedPositionals.Count ? _accessedPositionals[index] : MissingArgument.NoPositionals();
     }
 
-    public INamedArgument Get(string name)
+    public INamedArgument Get(string name, bool caseSensitive = true)
     {
         // Check the already-accessed named args. If we have it, return it.
-        if (_accessedNameds.TryGetValue(name, out var value))
-        {
-            var firstAvailable = value.FirstOrDefault(a => !a.Consumed);
-            if (firstAvailable != null)
-                return firstAvailable;
-        }
+
+        var found = _accessedNameds
+            .Where(kvp => Equals(kvp.Key, name, caseSensitive))
+            .SelectMany(kvp => kvp.Value)
+            .FirstOrDefault(n => !n.Consumed);
+        if (found != null)
+            return found;
 
         // Loop through all unaccessed args looking for the first one with the given
         // name.
-        return AccessNamedUntil(n => n.Equals(name, StringComparison.OrdinalIgnoreCase), () => true)
+        return AccessNamedUntil(n => Equals(n, name, caseSensitive), () => true)
             .GetValueOrDefault(MissingArgument.NoneNamed(name));
     }
 
@@ -167,10 +170,10 @@ public class ParsedArguments : IArguments, IVerbSource
         return _accessedPositionals.Where(a => !a.Consumed);
     }
 
-    public IEnumerable<INamedArgument> GetAllNamed(string name)
+    public IEnumerable<INamedArgument> GetAllNamed(string name, bool caseSensitive = true)
     {
         name = name.ToLowerInvariant();
-        AccessNamedUntil(n => n == name, () => false);
+        AccessNamedUntil(n => Equals(n, name, caseSensitive), () => false);
         return _accessedNameds.TryGetValue(name, out var value)
             ? value.Where(a => !a.Consumed)
             : [];
@@ -185,20 +188,24 @@ public class ParsedArguments : IArguments, IVerbSource
             .Where(a => !a.Consumed);
     }
 
-    public IFlagArgument GetFlag(string name)
+    public IFlagArgument GetFlag(string name, bool caseSensitive = true)
     {
         // Check if we've already accessed this flag. If so, return it if unconsumed
         // or not found
-        if (_accessedFlags.ContainsKey(name))
-            return _accessedFlags[name].Consumed ? MissingArgument.FlagConsumed(name) : _accessedFlags[name];
+        var found = _accessedFlags
+            .Where(kvp => !kvp.Value.Consumed && Equals(kvp.Key, name, caseSensitive))
+            .Select(kvp => kvp.Value)
+            .FirstOrDefault();
+        if (found != null)
+            return found;
 
         // Loop through unaccessed args looking for a matching flag.
-        return AccessFlagsUntil(name, n => n == name, () => true);
+        return AccessFlagsUntil(name, n => Equals(n, name, caseSensitive), () => true);
     }
 
-    public bool HasFlag(string name, bool markConsumed = false)
+    public bool HasFlag(string name, bool markConsumed = false, bool caseSensitive = true)
         => _accessedFlags.ContainsKey(name)
-            || AccessFlagsUntil(name, n => n == name, () => true).Exists();
+            || AccessFlagsUntil(name, n => Equals(n, name, caseSensitive), () => true).Exists();
 
     public IEnumerable<IFlagArgument> GetAllFlags()
     {
@@ -230,6 +237,9 @@ public class ParsedArguments : IArguments, IVerbSource
 
         return MissingArgument.NoPositionals();
     }
+
+    private static bool Equals(string s1, string s2, bool caseSensitive)
+        => s1.Equals(s2, caseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
 
     private PositionalArgument MarkAccessedAsPositional(RawArg arg, ParsedFlagAndPositionalOrNamed fp)
     {

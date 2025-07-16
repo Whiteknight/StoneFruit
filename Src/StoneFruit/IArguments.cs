@@ -42,8 +42,9 @@ public interface IArguments
     /// Get the unconsumed named argument with the given name.
     /// </summary>
     /// <param name="name"></param>
+    /// <param name="caseSensitive"></param>
     /// <returns></returns>
-    INamedArgument Get(string name);
+    INamedArgument Get(string name, bool caseSensitive = true);
 
     /// <summary>
     /// Get all remaining unconsumed positional arguments. Arguments which are
@@ -57,8 +58,9 @@ public interface IArguments
     /// already been consumed, it will not be returned.
     /// </summary>
     /// <param name="name"></param>
+    /// <param name="caseSensitive"></param>
     /// <returns></returns>
-    IFlagArgument GetFlag(string name);
+    IFlagArgument GetFlag(string name, bool caseSensitive = true);
 
     /// <summary>
     /// Returns true if the collection contains a flag with the given name, regardless
@@ -66,8 +68,9 @@ public interface IArguments
     /// </summary>
     /// <param name="name"></param>
     /// <param name="markConsumed"></param>
+    /// <param name="caseSensitive"></param>
     /// <returns></returns>
-    bool HasFlag(string name, bool markConsumed = false);
+    bool HasFlag(string name, bool markConsumed = false, bool caseSensitive = true);
 
     /// <summary>
     /// Get all remaining unconsumed flag arguments. Arguments which are ambiguous
@@ -80,8 +83,9 @@ public interface IArguments
     /// Get all remaining unconsumed named arguments with the given name.
     /// </summary>
     /// <param name="name"></param>
+    /// <param name="caseSensitive"></param>
     /// <returns></returns>
-    IEnumerable<INamedArgument> GetAllNamed(string name);
+    IEnumerable<INamedArgument> GetAllNamed(string name, bool caseSensitive = true);
 
     /// <summary>
     /// Get all remaining unconsumed named arguments.
@@ -115,8 +119,8 @@ public static class ArgumentsExtensions
     /// <param name="args"></param>
     /// <param name="name"></param>
     /// <returns></returns>
-    public static INamedArgument Consume(this IArguments args, string name)
-        => NotNull(args).Get(name).MarkConsumed();
+    public static INamedArgument Consume(this IArguments args, string name, bool caseSensitive = true)
+        => NotNull(args).Get(name, caseSensitive).MarkConsumed();
 
     /// <summary>
     /// Get the named argument with the given name and mark it consumed.
@@ -124,8 +128,8 @@ public static class ArgumentsExtensions
     /// <param name="args"></param>
     /// <param name="name"></param>
     /// <returns></returns>
-    public static IFlagArgument ConsumeFlag(this IArguments args, string name)
-        => NotNull(args).GetFlag(name).MarkConsumed();
+    public static IFlagArgument ConsumeFlag(this IArguments args, string name, bool caseSensitive = true)
+        => NotNull(args).GetFlag(name, caseSensitive).MarkConsumed();
 
     /// <summary>
     /// Create a new instance of type T and attempt to map argument values into the
