@@ -39,42 +39,55 @@ public static class CommandArgumentMapper
 
         foreach (var property in publicProperties)
         {
-            // Try to map positional argument if the attribute is set
-            var idxAttr = property.GetCustomAttribute<ArgumentIndexAttribute>(true);
-            if (idxAttr != null)
+            var arg = FindSuitablePositionalArgument(property, args)
+                .Or(() => FindSuitableNamedArgument(property, args));
+            if (arg.IsSuccess)
             {
-                var index = idxAttr.Index;
-                var positionalArgument = args.Consume(index);
-                if (positionalArgument.Exists())
-                {
-                    AssignPropertyValue(positionalArgument, property, obj);
-                    continue;
-                }
-            }
-
-            var namedAttr = property.GetCustomAttribute<ArgumentNamedAttribute>(true);
-            if (namedAttr != null)
-            {
-                var name = namedAttr.Name;
-                var namedArgument = args.Consume(name);
-                if (namedArgument.Exists())
-                {
-                    AssignPropertyValue(namedArgument, property, obj);
-                    continue;
-                }
-            }
-
-            if ((property.PropertyType == typeof(bool) || property.PropertyType == typeof(bool?)) && args.ConsumeFlag(property.Name).Exists())
-            {
-                property.SetValue(obj, true);
+                AssignPropertyValue(arg.GetValueOrThrow(), property, obj);
                 continue;
             }
 
-            var namedArg = args.Consume(property.Name);
-            if (namedArg.Exists())
-                AssignPropertyValue(namedArg, property, obj);
+            if (IsBoolSettableFromFlag(args, property))
+            {
+                property.SetValue(obj, true);
+            }
         }
     }
+
+    private static Maybe<IValuedArgument> FindSuitablePositionalArgument(PropertyInfo property, IArguments args)
+    {
+        var idxAttr = property.GetCustomAttribute<ArgumentIndexAttribute>(true);
+        if (idxAttr != null)
+        {
+            var index = idxAttr.Index;
+            var positionalArgument = args.Consume(index);
+            if (positionalArgument.Exists())
+                return new Maybe<IValuedArgument>(positionalArgument);
+        }
+
+        return default;
+    }
+
+    private static Maybe<IValuedArgument> FindSuitableNamedArgument(PropertyInfo property, IArguments args)
+    {
+        var namedAttr = property.GetCustomAttribute<ArgumentNamedAttribute>(true);
+        if (namedAttr != null)
+        {
+            var namedArgument = args.Consume(namedAttr.Name);
+            if (namedArgument.Exists())
+                return new Maybe<IValuedArgument>(namedArgument);
+        }
+
+        var namedArg = args.Consume(property.Name);
+        if (namedArg.Exists())
+            return new Maybe<IValuedArgument>(namedArg);
+
+        return default;
+    }
+
+    private static bool IsBoolSettableFromFlag(IArguments args, PropertyInfo property)
+        => (property.PropertyType == typeof(bool) || property.PropertyType == typeof(bool?))
+            && args.ConsumeFlag(property.Name).Exists();
 
     private static void AssignPropertyValue<T>(IValuedArgument argument, PropertyInfo property, T obj)
     {
