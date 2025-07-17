@@ -14,6 +14,7 @@ public class EngineState
     private readonly IEnvironments _environments;
     private readonly IInput _input;
     private IArguments? _arguments;
+    private HandlerContext? _handlerContext;
 
     public EngineState(EngineEventCatalog eventCatalog, EngineSettings settings, IEnvironments environments, ICommandParser parser, IInput input)
     {
@@ -43,6 +44,9 @@ public class EngineState
         => _arguments
             ?? SyntheticArguments.Empty();
 
+    public HandlerContext HandlerContext
+        => _handlerContext ?? throw new InvalidOperationException("Cannot access handler context, because one has not been set.");
+
     public void SetRunMode(EngineRunMode runMode)
     {
         RunMode = runMode;
@@ -54,14 +58,16 @@ public class EngineState
         };
     }
 
-    public void SetCurrentArguments(IArguments arguments)
+    public void SetHandlerExecutionContext(IArguments arguments, HandlerContext context)
     {
         _arguments = arguments;
+        _handlerContext = context;
     }
 
-    public void ClearCurrentArguments()
+    public void ClearHandlerExecutionContext()
     {
         _arguments = null;
+        _handlerContext = null;
     }
 
     /// <summary>

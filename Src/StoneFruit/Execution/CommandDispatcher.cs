@@ -77,25 +77,33 @@ public class CommandDispatcher
     /// <param name="token"></param>
     public void Execute(IArguments arguments, CancellationToken token = default)
     {
-        _state.SetCurrentArguments(NotNull(arguments));
+        NotNull(arguments);
         var context = CreateHandlerContext(arguments);
-        var handler = _handlers.GetInstance(context)
-            .OnFailure(() => throw VerbNotFoundException.FromArguments(arguments))
-            .GetValueOrThrow();
-        if (handler is IHandler syncHandler)
-        {
-            syncHandler.Execute();
-            _state.ClearCurrentArguments();
-            return;
-        }
+        _state.SetHandlerExecutionContext(arguments, context);
 
-        if (handler is IAsyncHandler asyncHandler)
+        try
         {
-            Task.Run(async () => await asyncHandler.ExecuteAsync(token), token)
-                .ConfigureAwait(false)
-                .GetAwaiter()
-                .GetResult();
-            _state.ClearCurrentArguments();
+            var handler = _handlers.GetInstance(context)
+                .OnFailure(() => throw VerbNotFoundException.FromArguments(arguments))
+                .GetValueOrThrow();
+            if (handler is IHandler syncHandler)
+            {
+                syncHandler.Execute();
+
+                return;
+            }
+
+            if (handler is IAsyncHandler asyncHandler)
+            {
+                Task.Run(async () => await asyncHandler.ExecuteAsync(token), token)
+                    .ConfigureAwait(false)
+                    .GetAwaiter()
+                    .GetResult();
+            }
+        }
+        finally
+        {
+            _state.ClearHandlerExecutionContext();
         }
     }
 
@@ -152,17 +160,24 @@ public class CommandDispatcher
     public async Task ExecuteAsync(IArguments arguments, CancellationToken token = default)
     {
         // Set the current arguments in the State, so they can be resolved from the container
-        _state.SetCurrentArguments(NotNull(arguments));
-
-        // Get the handler. Throw if a matching one is not found
+        NotNull(arguments);
         var context = CreateHandlerContext(arguments);
-        var handler = _handlers.GetInstance(context)
-            .OnFailure(() => throw VerbNotFoundException.FromArguments(arguments))
-            .GetValueOrThrow();
+        _state.SetHandlerExecutionContext(arguments, context);
 
-        // Invoke the handler, async or otherwise.
-        await ExecuteHandler(handler, CreateHandlerContext(arguments), token);
-        _state.ClearCurrentArguments();
+        try
+        {
+            // Get the handler. Throw if a matching one is not found
+            var handler = _handlers.GetInstance(context)
+                .OnFailure(() => throw VerbNotFoundException.FromArguments(arguments))
+                .GetValueOrThrow();
+
+            // Invoke the handler, async or otherwise.
+            await ExecuteHandler(handler, context, token);
+        }
+        finally
+        {
+            _state.ClearHandlerExecutionContext();
+        }
     }
 
     private static async Task ExecuteHandler(IHandlerBase handler, HandlerContext context, CancellationToken token)

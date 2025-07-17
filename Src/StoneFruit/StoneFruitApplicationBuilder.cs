@@ -158,5 +158,6 @@ public sealed class StoneFruitApplicationBuilder
         // input command has been entered. We access it from the EngineState, which comes from
         // the Engine, and we do all this to avoid circular references in the DI.
         services.AddTransient(provider => provider.GetRequiredService<EngineState>().CurrentArguments);
+        services.AddTransient(provider => provider.GetRequiredService<EngineState>().HandlerContext);
     }
 }

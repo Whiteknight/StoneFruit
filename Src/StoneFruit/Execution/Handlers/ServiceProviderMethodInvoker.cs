@@ -22,13 +22,13 @@ public class ServiceProviderMethodInvoker : IHandlerMethodInvoker
 
     public void Invoke(object instance, MethodInfo method, HandlerContext context)
     {
-        InvokeDynamic(instance, method, context.Arguments, context, CancellationToken.None);
+        InvokeDynamic(instance, method, context.Arguments, CancellationToken.None);
     }
 
     public Task InvokeAsync(object instance, MethodInfo method, HandlerContext context, CancellationToken token)
-        => InvokeDynamic(instance, method, context.Arguments, context, token) as Task ?? Task.CompletedTask;
+        => InvokeDynamic(instance, method, context.Arguments, token) as Task ?? Task.CompletedTask;
 
-    private object? InvokeDynamic(object instance, MethodInfo method, IArguments args, HandlerContext context, CancellationToken token)
+    private object? InvokeDynamic(object instance, MethodInfo method, IArguments args, CancellationToken token)
     {
         // Iterate over the list of parameters. For each parameter, depending on it's position and
         // type, try to get a value.
@@ -42,19 +42,15 @@ public class ServiceProviderMethodInvoker : IHandlerMethodInvoker
         for (int i = 0; i < parameters.Length; i++)
         {
             var parameter = parameters[i];
-            argumentValues[i] = AssignArgumentValue(parameter, args, context, token);
+            argumentValues[i] = AssignArgumentValue(parameter, args, token);
         }
 
         return method.Invoke(instance, argumentValues);
     }
 
-    private object? AssignArgumentValue(ParameterInfo parameter, IArguments args, HandlerContext context, CancellationToken token)
+    private object? AssignArgumentValue(ParameterInfo parameter, IArguments args, CancellationToken token)
     {
         Debug.Assert(parameter.Name != null, "Parameter name should not be null");
-
-        // TODO: We should be able to set current HandlerContext in EngineState and resove through DI
-        if (parameter.ParameterType == typeof(HandlerContext))
-            return context;
 
         if ((parameter.ParameterType.IsClass || parameter.ParameterType.IsInterface) && parameter.ParameterType != typeof(string))
             return _provider.GetRequiredService(parameter.ParameterType);
