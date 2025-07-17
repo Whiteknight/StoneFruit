@@ -39,6 +39,14 @@ public sealed class StoneFruitApplicationBuilder
         return new StoneFruitApplicationBuilder(services ?? new ServiceCollection());
     }
 
+    public static StoneFruitApplication BuildDefault()
+        => Create()
+            .SetupArguments(a => a
+                .UseSimplifiedArgumentParser())
+            .SetupHandlers(h => h
+                .ScanHandlersFromEntryAssembly())
+            .Build();
+
     /// <summary>
     /// Setup verbs and their handlers.
     /// </summary>
