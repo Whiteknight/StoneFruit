@@ -24,8 +24,7 @@ public interface IArguments
     void Reset();
 
     /// <summary>
-    /// Get the next positional value in order without regard to whether the argument
-    /// has been consumed.
+    /// Get the next unconsumed positional value in order.
     /// </summary>
     /// <returns></returns>
     IPositionalArgument Shift();

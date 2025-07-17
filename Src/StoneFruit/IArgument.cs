@@ -26,6 +26,10 @@ public interface IValuedArgument : IArgument
     /// </summary>
     string Value { get; }
 
+    // TODO: Replace all these various .As*() methods with a single .As(Func<string, T>)
+    // method to map values with a callback.
+    // Then we can provide a few extensions for string, bool, int, etc parsing.
+
     /// <summary>
     /// Get the value of the argument as a string, with a default value if the argument doesn't exist.
     /// </summary>

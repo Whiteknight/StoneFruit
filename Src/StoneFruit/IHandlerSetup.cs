@@ -12,6 +12,7 @@ namespace StoneFruit;
 
 public interface IHandlerSetup
 {
+    // TODO: If we add a prefix here, we can scan an entire assembly into a prefix.
     IHandlerSetup ScanAssemblyForHandlers(Assembly assembly);
 
     /// <summary>
@@ -38,6 +39,8 @@ public interface IHandlerSetup
     /// <returns></returns>
     IHandlerSetup AddSource(Func<IServiceProvider, IHandlerSource> getSource);
 
+    // TODO: If RegisteredHandler adds some metadata for prefix and group, we can use Add<T>()
+    // and Add(Type) methods to HandlerSectionSetup as well.
     /// <summary>
     /// Register a handler type. Verbs and help information will be derived from the type.
     /// </summary>

@@ -28,6 +28,7 @@ public class ShowHandler : IHandler
         var command = _args.Get(0).Require("Must provide thing to show").AsString();
         switch (command)
         {
+            // TODO: Would like to include some kind of library version output here too.
             case "exitcodes":
                 ShowExitCodes();
                 break;

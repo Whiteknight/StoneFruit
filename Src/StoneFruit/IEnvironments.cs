@@ -7,6 +7,7 @@ namespace StoneFruit;
 public interface IEnvironment
 {
     string Name { get; }
+
     Maybe<T> GetCached<T>();
 
     void CacheInstance<T>(T value);
