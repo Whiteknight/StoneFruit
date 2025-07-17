@@ -22,13 +22,13 @@ public class ServiceProviderMethodInvoker : IHandlerMethodInvoker
 
     public void Invoke(object instance, MethodInfo method, HandlerContext context)
     {
-        InvokeDynamic(instance, method, context.Arguments, CancellationToken.None);
+        InvokeDynamic(instance, method, context.Arguments, context, CancellationToken.None);
     }
 
     public Task InvokeAsync(object instance, MethodInfo method, HandlerContext context, CancellationToken token)
-        => InvokeDynamic(instance, method, context.Arguments, token) as Task ?? Task.CompletedTask;
+        => InvokeDynamic(instance, method, context.Arguments, context, token) as Task ?? Task.CompletedTask;
 
-    private object? InvokeDynamic(object instance, MethodInfo method, IArguments args, CancellationToken token)
+    private object? InvokeDynamic(object instance, MethodInfo method, IArguments args, HandlerContext context, CancellationToken token)
     {
         // Iterate over the list of parameters. For each parameter, depending on it's position and
         // type, try to get a value.
@@ -39,50 +39,45 @@ public class ServiceProviderMethodInvoker : IHandlerMethodInvoker
         // and finally we look for the next positional argument.
         var parameters = method.GetParameters();
         var argumentValues = new object?[parameters.Length];
-        int j = 0;
         for (int i = 0; i < parameters.Length; i++)
         {
             var parameter = parameters[i];
-            (argumentValues[i], var shouldIncrement) = AssignArgumentValue(parameter, args, j, token);
-
-            // j is the current positional argument index. Only increment it if we have pulled a
-            // positional argument.
-            if (shouldIncrement)
-                j++;
+            argumentValues[i] = AssignArgumentValue(parameter, args, context, token);
         }
 
         return method.Invoke(instance, argumentValues);
     }
 
-    private (object? Value, bool IncrementPosition) AssignArgumentValue(ParameterInfo parameter, IArguments args, int i, CancellationToken token)
+    private object? AssignArgumentValue(ParameterInfo parameter, IArguments args, HandlerContext context, CancellationToken token)
     {
         Debug.Assert(parameter.Name != null, "Parameter name should not be null");
+
+        // TODO: We should be able to set current HandlerContext in EngineState and resove through DI
+        if (parameter.ParameterType == typeof(HandlerContext))
+            return context;
+
         if ((parameter.ParameterType.IsClass || parameter.ParameterType.IsInterface) && parameter.ParameterType != typeof(string))
-            return (_provider.GetRequiredService(parameter.ParameterType), false);
+            return _provider.GetRequiredService(parameter.ParameterType);
 
         if (parameter.ParameterType == typeof(CancellationToken))
-            return (token, false);
+            return token;
 
         if (parameter.ParameterType == typeof(bool))
-            return (args.HasFlag(parameter.Name!), false);
+            return args.HasFlag(parameter.Name!);
 
-        bool increment = false;
         IValuedArgument arg = args.Get(parameter.Name!);
         if (!arg.Exists())
-        {
-            arg = args.Get(i);
-            increment = true;
-        }
+            arg = args.Shift();
 
         // If we don't have a matching named or positional, just return nothing.
         if (!arg.Exists())
-            return (null, true);
+            return null;
 
         if (parameter.ParameterType == typeof(string))
-            return (arg.AsString(), increment);
+            return arg.AsString();
 
         if (parameter.ParameterType == typeof(int))
-            return (arg.AsInt(), increment);
+            return arg.AsInt();
 
         return default;
     }
