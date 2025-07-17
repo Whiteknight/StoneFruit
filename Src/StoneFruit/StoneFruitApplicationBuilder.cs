@@ -127,32 +127,28 @@ public sealed class StoneFruitApplicationBuilder
 
     private static void SetupCoreEngineRegistrations(IServiceCollection services)
     {
+        services.AddSingleton<EngineState>();
+        services.AddSingleton<CommandDispatcher>();
+
         // Register the Engine and the things that the Engine provides. These registrations
         // are required, the user is not expected to inject their own Engine, State or
         // Dispatcher
         services.AddSingleton(_ => new StoneFruitApplicationAccessor());
         services.AddSingleton(provider =>
         {
+            var e = new StoneFruitApplication(
+                provider.GetRequiredService<IEnvironments>(),
+                provider.GetRequiredService<ICommandParser>(),
+                provider.GetRequiredService<IOutput>(),
+                provider.GetRequiredService<IInput>(),
+                provider.GetRequiredService<EngineState>(),
+                provider.GetRequiredService<ICommandLine>(),
+                provider.GetRequiredService<CommandDispatcher>()
+            );
             var accessor = provider.GetRequiredService<StoneFruitApplicationAccessor>();
-            var handlers = provider.GetRequiredService<IHandlers>();
-            var environments = provider.GetRequiredService<IEnvironments>();
-            var parser = provider.GetRequiredService<ICommandParser>();
-            var output = provider.GetRequiredService<IOutput>();
-            var input = provider.GetRequiredService<IInput>();
-            var engineCatalog = provider.GetRequiredService<EngineEventCatalog>();
-            var engineSettings = provider.GetRequiredService<EngineSettings>();
-            var commandLine = provider.GetRequiredService<ICommandLine>();
-            var e = new StoneFruitApplication(handlers, environments, parser, output, input, engineCatalog, engineSettings, commandLine);
             accessor.Set(e);
             return e;
         });
-
-        // The Engine creates the EngineState and CommandDispatcher, so those things can be accessed
-        // by getting the Engine. We use EngineAccessor here, because we will have circular references
-        // with a few Engine dependencies otherwise. Circular references only need to be resolved
-        // after the Engine.Run() or variants are called.
-        services.AddSingleton(provider => provider.GetRequiredService<StoneFruitApplicationAccessor>().Instance.State);
-        services.AddSingleton(provider => provider.GetRequiredService<StoneFruitApplicationAccessor>().Instance.Dispatcher);
 
         // The CurrentArguments only exist when the Engine.Run() or a variant is called, and an
         // input command has been entered. We access it from the EngineState, which comes from

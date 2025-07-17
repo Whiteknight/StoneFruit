@@ -21,14 +21,13 @@ public class StoneFruitApplication
     private readonly IInput _input;
 
     public StoneFruitApplication(
-        IHandlers handlers,
         IEnvironments environments,
         ICommandParser parser,
         IOutput output,
         IInput input,
-        EngineEventCatalog eventCatalog,
-        EngineSettings settings,
-        ICommandLine cmdLineArgs
+        EngineState state,
+        ICommandLine cmdLineArgs,
+        CommandDispatcher dispatcher
     )
     {
         Environments = NotNull(environments);
@@ -36,8 +35,8 @@ public class StoneFruitApplication
         Output = NotNull(output);
         _input = NotNull(input);
         _cmdLineArgs = NotNull(cmdLineArgs);
-        State = new EngineState(eventCatalog, settings, Environments, _parser, _input);
-        Dispatcher = new CommandDispatcher(_parser, handlers, Environments, State, Output);
+        State = NotNull(state);
+        Dispatcher = NotNull(dispatcher);
     }
 
     public EngineState State { get; }

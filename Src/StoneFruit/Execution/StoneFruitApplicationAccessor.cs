@@ -10,7 +10,7 @@ internal class StoneFruitApplicationAccessor
 
     public StoneFruitApplication Instance
         => _instance
-        ?? throw new InvalidOperationException($"Cannot access {nameof(StoneFruitApplication).GetType().Name} because one has not been created");
+        ?? throw new InvalidOperationException($"Cannot access {typeof(StoneFruitApplication).Name} because one has not been created");
 
     public void Set(StoneFruitApplication engine)
     {

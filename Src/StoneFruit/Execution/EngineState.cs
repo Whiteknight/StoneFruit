@@ -11,18 +11,20 @@ namespace StoneFruit.Execution;
 /// </summary>
 public class EngineState
 {
-    private readonly IEnvironments _environments;
     private readonly IInput _input;
     private IArguments? _arguments;
     private HandlerContext? _handlerContext;
 
-    public EngineState(EngineEventCatalog eventCatalog, EngineSettings settings, IEnvironments environments, ICommandParser parser, IInput input)
+    public EngineState(
+        EngineEventCatalog eventCatalog,
+        EngineSettings settings,
+        ICommandParser parser,
+        IInput input)
     {
         EventCatalog = NotNull(eventCatalog);
         ShouldExit = false;
 
         Settings = NotNull(settings);
-        _environments = environments;
         _input = input;
         Commands = new EngineStateCommandQueue(parser);
         Metadata = new EngineStateMetadataCache();
@@ -98,10 +100,9 @@ public class EngineState
     /// Call when the current environment has been changed. Executes the EnvironmentChanged
     /// script.
     /// </summary>
-    public void OnEnvironmentChanged()
+    public void OnEnvironmentChanged(string env)
     {
-        var currentEnvName = _environments.GetCurrentName().GetValueOrDefault("")!;
-        var args = SyntheticArguments.From(("environment", currentEnvName));
+        var args = SyntheticArguments.From(("environment", env));
         Commands.Prepend(EventCatalog.EnvironmentChanged, args);
     }
 

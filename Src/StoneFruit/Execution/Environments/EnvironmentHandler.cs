@@ -71,7 +71,7 @@ public class EnvironmentHandler : IHandler
                 // just clear the data in the current environment.
                 if (_args.HasFlag(FlagClearData))
                     e.ClearCache();
-                _state.OnEnvironmentChanged();
+                _state.OnEnvironmentChanged(e.Name);
             })
             .OnFailure(err => EnvironmentsException.Throw(err));
     }
