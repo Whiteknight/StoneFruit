@@ -59,3 +59,36 @@ Rule: Instance Methods
             |       | methodwithonenamedarg      |
             |       | simplemethodasync          |
             |       | methodwithonenamedargasync |
+
+Rule: Instance Methods in Sections
+
+    Scenario: Instance methods sections help
+        Given I use ObjectWithHandlerMethod handlers in section "methods"
+        When I run headless with input "help"
+        Then The help output should contain these verbs:
+            | Group   | Verb                                    |
+            | methods | methods simple-method                   |
+            | methods | methods method-with-one-flag-arg        |
+            | methods | methods method-with-one-named-arg       |
+            | methods | methods simple-method-async             |
+            | methods | methods method-with-one-named-arg-async |
+
+Rule: Scripts
+
+    Scenario: Scripts help
+        Given I have a script "test-script" with lines:
+            | Line      |
+            | echo test |
+        When I run headless with input "help"
+        Then The help output should contain these verbs:
+            | Group | Verb        |
+            |       | test-script |
+
+    Scenario: Scripts in section help
+        Given I have a script "test-script" in section "section" with lines:
+            | Line      |
+            | echo test |
+        When I run headless with input "help"
+        Then The help output should contain these verbs:
+            | Group   | Verb        |
+            | section | section test-script |

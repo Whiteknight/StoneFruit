@@ -3,59 +3,75 @@
 Rule: Sync methods
 
     Scenario: Can invoke a simple handler method
-        Given I use ObjectWithHandlerMethod handlers
+        Given I use ObjectWithHandlerMethod handlers with value "test"
         When I run headless with input "simple-method"
         Then The output should contain:
-            | Line   |
-            | Simple |
+            | Line        |
+            | test Simple |
 
     Scenario: Can invoke a handler method with named argument
-        Given I use ObjectWithHandlerMethod handlers
+        Given I use ObjectWithHandlerMethod handlers with value "test"
         When I run headless with input "method-with-one-named-arg name=value"
         Then The output should contain:
-            | Line         |
-            | Named: value |
+            | Line              |
+            | test Named: value |
 
     Scenario: Can invoke a handler method with positional argument
-        Given I use ObjectWithHandlerMethod handlers
+        Given I use ObjectWithHandlerMethod handlers with value "test"
         When I run headless with input "method-with-one-named-arg value"
         Then The output should contain:
-            | Line         |
-            | Named: value |
+            | Line              |
+            | test Named: value |
 
     Scenario: Can invoke a handler method with positional argument2
-        Given I use ObjectWithHandlerMethod handlers
+        Given I use ObjectWithHandlerMethod handlers with value "test"
         When I run headless with input "method-with-one-named-arg2 value"
         Then The output should contain:
-            | Line         |
-            | Named: value |
+            | Line              |
+            | test Named: value |
 
     Scenario: Can invoke a handler method with flag argument true
-        Given I use ObjectWithHandlerMethod handlers
+        Given I use ObjectWithHandlerMethod handlers with value "test"
         When I run headless with input "method-with-one-flag-arg -flag"
         Then The output should contain:
-            | Line       |
-            | Flag: True |
+            | Line            |
+            | test Flag: True |
 
     Scenario: Can invoke a handler method with flag argument false
-        Given I use ObjectWithHandlerMethod handlers
+        Given I use ObjectWithHandlerMethod handlers with value "test"
         When I run headless with input "method-with-one-flag-arg"
         Then The output should contain:
-            | Line        |
-            | Flag: False |
+            | Line             |
+            | test Flag: False |
 
 Rule: Async methods
 
     Scenario: Can invoke a simple handler method async
-        Given I use ObjectWithHandlerMethod handlers
+        Given I use ObjectWithHandlerMethod handlers with value "test"
         When I run headless with input "simple-method-async"
         Then The output should contain:
-            | Line   |
-            | Simple |
+            | Line        |
+            | test Simple |
 
     Scenario: Can invoke a handler method with named argument async
-        Given I use ObjectWithHandlerMethod handlers
+        Given I use ObjectWithHandlerMethod handlers with value "test"
         When I run headless with input "method-with-one-named-arg-async name=value"
         Then The output should contain:
-            | Line         |
-            | Named: value |
+            | Line              |
+            | test Named: value | 
+
+Rule: Sections
+
+    Scenario: Can invoke a simple handler method in a section
+        Given I use ObjectWithHandlerMethod handlers in section "test"
+        When I run headless with input "test simple-method"
+        Then The output should contain:
+            | Line        |
+            | test Simple |
+
+    Scenario: Can invoke a simple handler method async in a section
+        Given I use ObjectWithHandlerMethod handlers in section "test"
+        When I run headless with input "test simple-method-async"
+        Then The output should contain:
+            | Line        |
+            | test Simple |
