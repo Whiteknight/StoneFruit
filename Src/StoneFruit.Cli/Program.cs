@@ -20,7 +20,11 @@ internal static class Program
             .ScanHandlersFromAssemblyContaining<MyFirstHandler>()
 
             // Create an object instance and treat each of it's public methods as handlers
-            .UsePublicInstanceMethodsAsHandlers(new MyObject())
+            // Do it two ways, so we can see the effect of a Section
+            .AddSection("grouped", s => s
+                .UsePublicInstanceMethodsAsHandlers(new MyObject("grouped"))
+            )
+            .UsePublicInstanceMethodsAsHandlers(new MyObject("ungrouped"))
 
             // Set up a verb which executes a callback delegate
             // Also set up a script as an alias of this
@@ -30,14 +34,16 @@ internal static class Program
             .Add(new[] { "test", "j" }, d => d.Output.WriteLine("J"), description: "do J things", usage: "test j")
 
             // Create a few scripts, showing usage
-            .AddScript("testg", ["echo test", "echo g"], group: "scripts")
-            .AddScript("testh", ["echo [0]", "echo ['a']"], group: "scripts")
-            .AddScript("testi", [
-                "echo 1",
-                "echo 2",
-                "echo 3",
-                "echo 4"
-            ], group: "scripts")
+            .AddSection("scripts", s => s
+                .AddScript("testg", ["echo test", "echo g"])
+                .AddScript("testh", ["echo [0]", "echo ['a']"])
+                .AddScript("testi", [
+                    "echo 1",
+                    "echo 2",
+                    "echo 3",
+                    "echo 4"
+                ])
+            )
         );
         builder.SetupEnvironments(e => e
             .SetEnvironments(new[] { "Local", "Testing", "Production" })
@@ -152,12 +158,19 @@ public class MyEnvironment
 
 public class MyObject
 {
+    private readonly string _tag;
+
+    public MyObject(string tag)
+    {
+        _tag = tag;
+    }
+
     [Group("public-methods")]
     [Description("do D things")]
     [Usage("test d <name>")]
     public void TestD(IOutput output, string name)
     {
-        output.WriteLine($"{name}: D");
+        output.WriteLine($"{_tag} {name}: D");
     }
 
     [Group("public-methods")]
@@ -165,7 +178,7 @@ public class MyObject
     [Usage("test e")]
     public Task TestE(IOutput output, CancellationToken token)
     {
-        output.WriteLine("E");
+        output.WriteLine($"{_tag} E");
         return Task.CompletedTask;
     }
 }

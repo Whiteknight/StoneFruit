@@ -35,9 +35,7 @@ public sealed class StoneFruitApplicationBuilder
     }
 
     public static StoneFruitApplicationBuilder Create(IServiceCollection? services = null)
-    {
-        return new StoneFruitApplicationBuilder(services ?? new ServiceCollection());
-    }
+        => new StoneFruitApplicationBuilder(services ?? new ServiceCollection());
 
     public static StoneFruitApplication BuildDefault()
         => Create()

@@ -39,6 +39,21 @@ public interface IHandlerSetup
     IHandlerSetup AddSource(Func<IServiceProvider, IHandlerSource> getSource);
 
     /// <summary>
+    /// Register a handler type. Verbs and help information will be derived from the type.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    IHandlerSetup Add<T>()
+        where T : class, IHandlerBase;
+
+    /// <summary>
+    /// Register a handler type. Verbs and help information will be derived from the type.
+    /// </summary>
+    /// <param name="handlerType"></param>
+    /// <returns></returns>
+    IHandlerSetup Add(Type handlerType);
+
+    /// <summary>
     /// Add a function delegate as a handler.
     /// </summary>
     /// <param name="verb"></param>
@@ -69,21 +84,6 @@ public interface IHandlerSetup
     IHandlerSetup Add(Verb verb, Func<HandlerContext, CancellationToken, Task> handleAsync, string description = "", string usage = "", string group = "");
 
     /// <summary>
-    /// Register a handler type. Verbs and help information will be derived from the type.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
-    IHandlerSetup Add<T>()
-        where T : class, IHandlerBase;
-
-    /// <summary>
-    /// Register a handler type. Verbs and help information will be derived from the type.
-    /// </summary>
-    /// <param name="handlerType"></param>
-    /// <returns></returns>
-    IHandlerSetup Add(Type handlerType);
-
-    /// <summary>
     /// Add a script with a verb and zero or more commands to execute.
     /// </summary>
     /// <param name="verb"></param>
@@ -105,6 +105,12 @@ public static class HandlerSetupExtensions
     public static IHandlerSetup ScanHandlersFromAssemblyContaining<T>(this IHandlerSetup handlers)
         => handlers.ScanAssemblyForHandlers(typeof(T).Assembly);
 
+    public static IHandlerSetup AddSection(this IHandlerSetup handlers, string name, Action<HandlerSectionSetup> setup)
+    {
+        setup?.Invoke(new HandlerSectionSetup(handlers, name));
+        return handlers;
+    }
+
     /// <summary>
     /// Add a handler source where handlers can be looked up.
     /// </summary>
@@ -123,12 +129,66 @@ public static class HandlerSetupExtensions
     /// <param name="handlers"></param>
     /// <param name="instance"></param>
     /// <returns></returns>
-    public static IHandlerSetup UsePublicInstanceMethodsAsHandlers(this IHandlerSetup handlers, object instance)
+    public static IHandlerSetup UsePublicInstanceMethodsAsHandlers(this IHandlerSetup handlers, object instance, string? group = null)
         => NotNull(handlers).AddSource(provider =>
             new InstanceMethodHandlerSource(
                 instance,
                 provider.GetRequiredService<IHandlerMethodInvoker>(),
-                provider.GetRequiredService<IVerbExtractor>()
+                provider.GetRequiredService<IVerbExtractor>(),
+                group
             )
         );
+}
+
+public readonly struct HandlerSectionSetup
+{
+    private readonly IHandlerSetup _setup;
+    private readonly string _name;
+
+    public HandlerSectionSetup(IHandlerSetup setup, string name)
+    {
+        _setup = setup;
+        _name = name;
+    }
+
+    public HandlerSectionSetup Add(Verb verb, Action<HandlerContext> handle, string description = "", string usage = "", string group = "")
+    {
+        _setup.Add(verb.AddPrefix(_name), handle, description, usage, GetGroup(group));
+        return this;
+    }
+
+    public HandlerSectionSetup Add(Verb verb, IHandlerBase handler, string description = "", string usage = "", string group = "")
+    {
+        _setup.Add(verb.AddPrefix(_name), handler, description, usage, GetGroup(group));
+        return this;
+    }
+
+    public HandlerSectionSetup Add(Verb verb, Func<HandlerContext, CancellationToken, Task> handleAsync, string description = "", string usage = "", string group = "")
+    {
+        _setup.Add(verb.AddPrefix(_name), handleAsync, description, usage, GetGroup(group));
+        return this;
+    }
+
+    public HandlerSectionSetup AddScript(Verb verb, IEnumerable<string> lines, string description = "", string usage = "", string group = "")
+    {
+        _setup.AddScript(verb.AddPrefix(_name), lines, description, usage, GetGroup(group));
+        return this;
+    }
+
+    public HandlerSectionSetup UsePublicInstanceMethodsAsHandlers(object instance)
+    {
+        var name = _name;
+        _setup.AddSource(provider =>
+            new InstanceMethodHandlerSource(
+                instance,
+                provider.GetRequiredService<IHandlerMethodInvoker>(),
+                new PrefixingVerbExtractor(name, provider.GetRequiredService<IVerbExtractor>()),
+                name
+            )
+        );
+        return this;
+    }
+
+    private string GetGroup(string group)
+        => string.IsNullOrEmpty(group) ? _name : group;
 }

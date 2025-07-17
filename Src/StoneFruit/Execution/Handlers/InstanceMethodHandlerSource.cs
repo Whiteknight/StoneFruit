@@ -19,7 +19,7 @@ public class InstanceMethodHandlerSource : IHandlerSource
     private readonly VerbTrie<IHandlerBase> _methods;
     private readonly IHandlerMethodInvoker _invoker;
 
-    public InstanceMethodHandlerSource(object instance, IHandlerMethodInvoker invoker, IVerbExtractor verbExtractor)
+    public InstanceMethodHandlerSource(object instance, IHandlerMethodInvoker invoker, IVerbExtractor verbExtractor, string? group)
     {
         _invoker = NotNull(invoker);
         _instance = NotNull(instance);
@@ -28,7 +28,7 @@ public class InstanceMethodHandlerSource : IHandlerSource
             .Where(m => m.ReturnType == typeof(void) || m.ReturnType == typeof(Task))
             .SelectMany(m => verbExtractor
                 .GetVerbs(m)
-                .Select(v => (Handler: CreateHandlerInstance(v, m), Verb: v))
+                .Select(v => (Handler: CreateHandlerInstance(v, m, group), Verb: v))
             )
             .ToVerbTrie(x => x.Verb, x => x.Handler);
     }
@@ -46,11 +46,11 @@ public class InstanceMethodHandlerSource : IHandlerSource
     public Maybe<IVerbInfo> GetByName(Verb verb)
         => _methods.Get(verb).Map(v => (IVerbInfo)v);
 
-    private IHandlerBase CreateHandlerInstance(Verb verb, MethodInfo method)
+    private IHandlerBase CreateHandlerInstance(Verb verb, MethodInfo method, string? group)
     {
         var description = method.GetDescriptionAttributeValue() ?? string.Empty;
         var usage = method.GetUsageAttributeValue() ?? description;
-        var group = method.GetGroupAttributeValue() ?? string.Empty;
+        group = (string.IsNullOrEmpty(group) ? method.GetGroupAttributeValue() : group) ?? string.Empty;
         if (method.ReturnType == typeof(void))
             return new SyncHandlerWrapper(verb, _instance, method, _invoker, description, usage, group);
         if (method.ReturnType == typeof(Task))

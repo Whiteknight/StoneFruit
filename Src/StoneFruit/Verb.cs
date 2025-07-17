@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using StoneFruit.Execution;
+using StoneFruit.Utility;
 
 namespace StoneFruit;
 
@@ -31,9 +32,8 @@ public readonly struct Verb : IReadOnlyList<string>, IEquatable<Verb>
 
     public Verb(string[] verb)
     {
-        if (verb == null || verb.Length == 0)
-            throw new InvalidOperationException(_errorNoWords);
         _verb = verb
+            .OrEmptyIfNull()
             .SelectMany(w => (w ?? "").Split(Constants.SeparatedBySpace, StringSplitOptions.RemoveEmptyEntries))
             .ToArray();
         if (_verb.Length == 0)
@@ -43,6 +43,12 @@ public readonly struct Verb : IReadOnlyList<string>, IEquatable<Verb>
     public static implicit operator Verb(string s) => new Verb(s);
 
     public static implicit operator Verb(string[] s) => new Verb(s);
+
+    public Verb AddPrefix(string[] prefix)
+        => new Verb(prefix.Concat(_verb).ToArray());
+
+    public Verb AddPrefix(string prefix)
+        => new Verb(new[] { prefix }.Concat(_verb).ToArray());
 
     public string this[int index] => _verb[index];
 
