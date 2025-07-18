@@ -1,4 +1,5 @@
-﻿using ParserObjects;
+﻿using System;
+using ParserObjects;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Scripts;
 using static StoneFruit.Utility.Assert;
@@ -8,7 +9,7 @@ namespace StoneFruit;
 /// <summary>
 /// Setup argument parsing.
 /// </summary>
-public interface IParserSetup
+public interface IArgumentsSetup
 {
     /// <summary>
     /// Specify an argument parser to use. Notice that you cannot set an Argument
@@ -17,7 +18,7 @@ public interface IParserSetup
     /// </summary>
     /// <param name="argParser"></param>
     /// <returns></returns>
-    IParserSetup UseArgumentParser(IParser<char, ArgumentToken> argParser);
+    IArgumentsSetup UseArgumentParser(IParser<char, ArgumentToken> argParser);
 
     /// <summary>
     /// Specify a parser to use for scripts. Notice that you cannot set a Script
@@ -26,17 +27,20 @@ public interface IParserSetup
     /// </summary>
     /// <param name="scriptParser"></param>
     /// <returns></returns>
-    IParserSetup UseScriptParser(IParser<char, CommandFormat> scriptParser);
+    IArgumentsSetup UseScriptParser(IParser<char, CommandFormat> scriptParser);
+
+    IArgumentsSetup UseTypeParser<T>(IValueTypeParser<T> typeParser)
+         where T : class;
 }
 
-public static class ParserSetupExtensions
+public static class ArgumentsSetupExtensions
 {
     /// <summary>
     /// Use the StoneFruit simplified argument syntax.
     /// </summary>
     /// <param name="setup"></param>
     /// <returns></returns>
-    public static IParserSetup UseSimplifiedArgumentParser(this IParserSetup setup)
+    public static IArgumentsSetup UseSimplifiedArgumentParser(this IArgumentsSetup setup)
         => NotNull(setup).UseArgumentParser(SimplifiedArgumentGrammar.GetParser());
 
     /// <summary>
@@ -44,7 +48,7 @@ public static class ParserSetupExtensions
     /// </summary>
     /// <param name="setup"></param>
     /// <returns></returns>
-    public static IParserSetup UsePosixStyleArgumentParser(this IParserSetup setup)
+    public static IArgumentsSetup UsePosixStyleArgumentParser(this IArgumentsSetup setup)
         => NotNull(setup).UseArgumentParser(PosixStyleArgumentGrammar.GetParser());
 
     /// <summary>
@@ -52,7 +56,7 @@ public static class ParserSetupExtensions
     /// </summary>
     /// <param name="setup"></param>
     /// <returns></returns>
-    public static IParserSetup UsePowershellStyleArgumentParser(this IParserSetup setup)
+    public static IArgumentsSetup UsePowershellStyleArgumentParser(this IArgumentsSetup setup)
         => NotNull(setup).UseArgumentParser(PowershellStyleArgumentGrammar.GetParser());
 
     /// <summary>
@@ -60,6 +64,10 @@ public static class ParserSetupExtensions
     /// </summary>
     /// <param name="setup"></param>
     /// <returns></returns>
-    public static IParserSetup UseWindowsCmdArgumentParser(this IParserSetup setup)
+    public static IArgumentsSetup UseWindowsCmdArgumentParser(this IArgumentsSetup setup)
         => NotNull(setup).UseArgumentParser(WindowsCmdArgumentGrammar.GetParser());
+
+    public static IArgumentsSetup UseTypeParser<T>(this IArgumentsSetup setup, Func<string, T> parse)
+        where T : class
+        => NotNull(setup).UseTypeParser<T>(new DelegateValueTypeParser<T>(NotNull(parse)));
 }

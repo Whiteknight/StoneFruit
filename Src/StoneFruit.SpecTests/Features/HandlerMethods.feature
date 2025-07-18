@@ -75,3 +75,19 @@ Rule: Sections
         Then The output should contain:
             | Line        |
             | test Simple |
+
+Rule: Value Type Parsing
+
+    Scenario: Can parse positional path as FileInfo
+        Given I use the value type parsing handlers
+        When I run headless with input "as file info 'path/to/file.txt'"
+        Then The output should contain:
+            | Line |
+            | True |
+
+    Scenario: Can parse named path as FileInfo
+        Given I use the value type parsing handlers
+        When I run headless with input "as file info file='path/to/file.txt'"
+        Then The output should contain:
+            | Line |
+            | True |

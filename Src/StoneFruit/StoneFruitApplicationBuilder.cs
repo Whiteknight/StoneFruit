@@ -18,7 +18,7 @@ public sealed class StoneFruitApplicationBuilder
     private readonly IoSetup _output;
     private readonly EngineEventCatalog _eventCatalog;
     private readonly EnvironmentSetup _environments;
-    private readonly ParserSetup _parsers;
+    private readonly ArgumentsSetup _parsers;
     private readonly EngineSettings _settings;
 
     public IServiceCollection Services { get; }
@@ -30,7 +30,7 @@ public sealed class StoneFruitApplicationBuilder
         _eventCatalog = new EngineEventCatalog();
         _output = new IoSetup();
         _environments = new EnvironmentSetup();
-        _parsers = new ParserSetup();
+        _parsers = new ArgumentsSetup();
         _settings = new EngineSettings();
     }
 
@@ -72,7 +72,7 @@ public sealed class StoneFruitApplicationBuilder
     /// </summary>
     /// <param name="setup"></param>
     /// <returns></returns>
-    public StoneFruitApplicationBuilder SetupArguments(Action<IParserSetup> setup)
+    public StoneFruitApplicationBuilder SetupArguments(Action<IArgumentsSetup> setup)
     {
         setup?.Invoke(_parsers);
         return this;

@@ -1,26 +1,37 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using ParserObjects;
 using StoneFruit.Execution.Exceptions;
 using StoneFruit.Execution.Scripts;
+using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit.Execution.Arguments;
 
 /// <summary>
 /// Sets up the parsers.
 /// </summary>
-public class ParserSetup : IParserSetup
+public class ArgumentsSetup : IArgumentsSetup
 {
+    private readonly Dictionary<Type, IValueTypeParser> _typeParsers;
     private IParser<char, ArgumentToken>? _argParser;
     private IParser<char, CommandFormat>? _scriptParser;
+
+    public ArgumentsSetup()
+    {
+        _typeParsers = [];
+    }
 
     public void BuildUp(IServiceCollection services)
     {
         services.AddSingleton<ICommandParser>(new CommandParser(
             _argParser ?? SimplifiedArgumentGrammar.GetParser(),
             _scriptParser ?? ScriptFormatGrammar.GetParser()));
+        foreach (var typeParser in _typeParsers)
+            services.AddSingleton(typeParser.Value);
     }
 
-    public IParserSetup UseArgumentParser(IParser<char, ArgumentToken> argParser)
+    public IArgumentsSetup UseArgumentParser(IParser<char, ArgumentToken> argParser)
     {
         if (argParser == null)
         {
@@ -33,7 +44,7 @@ public class ParserSetup : IParserSetup
         return this;
     }
 
-    public IParserSetup UseScriptParser(IParser<char, CommandFormat> scriptParser)
+    public IArgumentsSetup UseScriptParser(IParser<char, CommandFormat> scriptParser)
     {
         if (scriptParser == null)
         {
@@ -43,6 +54,13 @@ public class ParserSetup : IParserSetup
 
         EnsureCanSetScriptParser();
         _scriptParser = scriptParser;
+        return this;
+    }
+
+    public IArgumentsSetup UseTypeParser<T>(IValueTypeParser<T> typeParser)
+        where T : class
+    {
+        _typeParsers[typeof(T)] = NotNull(typeParser);
         return this;
     }
 
