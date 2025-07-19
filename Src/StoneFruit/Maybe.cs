@@ -16,7 +16,7 @@ public readonly struct Maybe<T>
         _hasValue = value is not null;
     }
 
-    public static implicit operator Maybe<T>(T value) => new Maybe<T>(value);
+    public static implicit operator Maybe<T>(T? value) => new Maybe<T>(value);
 
     public bool IsSuccess => _hasValue && _value is not null;
 

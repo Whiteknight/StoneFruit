@@ -29,6 +29,7 @@ public class ArgumentsSetup : IArgumentsSetup
             _scriptParser ?? ScriptFormatGrammar.GetParser()));
         foreach (var typeParser in _typeParsers)
             services.AddSingleton(typeParser.Value);
+        services.AddSingleton<ArgumentValueMapper>();
     }
 
     public IArgumentsSetup UseArgumentParser(IParser<char, ArgumentToken> argParser)

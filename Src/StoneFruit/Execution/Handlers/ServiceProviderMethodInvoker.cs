@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using StoneFruit.Utility;
+using StoneFruit.Execution.Arguments;
 
 namespace StoneFruit.Execution.Handlers;
 
@@ -16,12 +14,12 @@ namespace StoneFruit.Execution.Handlers;
 public class ServiceProviderMethodInvoker : IHandlerMethodInvoker
 {
     private readonly IServiceProvider _provider;
-    private readonly IValueTypeParser[] _typeParsers;
+    private readonly ArgumentValueMapper _mapper;
 
-    public ServiceProviderMethodInvoker(IServiceProvider provider, IEnumerable<IValueTypeParser> typeParsers)
+    public ServiceProviderMethodInvoker(IServiceProvider provider, ArgumentValueMapper mapper)
     {
         _provider = provider;
-        _typeParsers = typeParsers.OrEmptyIfNull().ToArray();
+        _mapper = mapper;
     }
 
     public void Invoke(object instance, MethodInfo method, HandlerContext context)
@@ -90,20 +88,15 @@ public class ServiceProviderMethodInvoker : IHandlerMethodInvoker
 
         if (isResolvableType)
         {
-            var rawMethod = GetType().GetMethod(nameof(TryParseValue), BindingFlags.NonPublic | BindingFlags.Static)!;
-            var tryParseMethod = rawMethod.MakeGenericMethod(parameter.ParameterType);
-
-            return tryParseMethod.Invoke(null, [arg, _typeParsers]);
+            var maybeResult = _mapper.TryParseValue(parameter.ParameterType, arg.Value);
+            var mappedValue = maybeResult.GetValueOrDefault(null!);
+            if (mappedValue != null)
+            {
+                Debug.Assert(mappedValue.GetType().IsAssignableTo(parameter.ParameterType));
+                return mappedValue;
+            }
         }
 
         return default;
-    }
-
-    private static T? TryParseValue<T>(IValuedArgument arg, IValueTypeParser[] parsers)
-        where T : class
-    {
-        return parsers
-            .OfType<IValueTypeParser<T>>().FirstOrDefault()
-            ?.TryParse(arg);
     }
 }
