@@ -15,7 +15,7 @@ public class ScriptCommandSourceTests
             "test1",
             "test2"
         );
-        var target = new ScriptCommandSource(script, CommandParser.GetDefault());
+        var target = new ScriptCommandSource(script, CommandParser.GetDefault(), SyntheticArguments.Empty());
         target.GetNextCommand().GetValueOrThrow().Arguments.Get(0).Value.Should().Be("test1");
         target.GetNextCommand().GetValueOrThrow().Arguments.Get(0).Value.Should().Be("test2");
         target.GetNextCommand().IsSuccess.Should().BeFalse();
@@ -25,7 +25,7 @@ public class ScriptCommandSourceTests
     public void GetNextCommand_Empty()
     {
         var script = new EventScript();
-        var target = new ScriptCommandSource(script, CommandParser.GetDefault());
+        var target = new ScriptCommandSource(script, CommandParser.GetDefault(), SyntheticArguments.Empty());
         target.GetNextCommand().IsSuccess.Should().BeFalse();
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using AwesomeAssertions;
 using NUnit.Framework;
@@ -17,26 +16,9 @@ public class SyntheticCommandArgumentsTests
     }
 
     [Test]
-    public void Single_Test()
-    {
-        var target = SyntheticArguments.From("test");
-        target.GetAllArguments().Count().Should().Be(1);
-        target.Shift().AsString().Should().Be("test");
-    }
-
-    [Test]
     public void Get_Index_TooHigh()
     {
         var target = SyntheticArguments.Empty();
-        target.Get(0).Should().BeOfType<MissingArgument>();
-    }
-
-    [Test]
-    public void Get_Index_AlreadyConsumed()
-    {
-        var target = SyntheticArguments.From("test");
-        target.Get(0).Should().NotBeOfType<MissingArgument>();
-        target.Get(0).MarkConsumed();
         target.Get(0).Should().BeOfType<MissingArgument>();
     }
 
@@ -79,20 +61,6 @@ public class SyntheticCommandArgumentsTests
         var target = SyntheticArguments.From(
             ("a", "1"),
             ("b", "2")
-        );
-        target.Get("a").AsString().Should().Be("1");
-        target.Get("b").AsString().Should().Be("2");
-    }
-
-    [Test]
-    public void From_Dictionary()
-    {
-        var target = SyntheticArguments.From(
-            new Dictionary<string, string>
-            {
-                { "a", "1" },
-                { "b", "2" }
-            }
         );
         target.Get("a").AsString().Should().Be("1");
         target.Get("b").AsString().Should().Be("2");

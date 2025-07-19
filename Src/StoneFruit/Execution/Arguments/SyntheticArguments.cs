@@ -69,26 +69,6 @@ public class SyntheticArguments : IArguments, IVerbSource
             .Select(t => new NamedArgument(t.Name, t.Value))
             .ToSyntheticArguments();
 
-    /// <summary>
-    /// Create named arguments from a dictionary of name/value pairs.
-    /// </summary>
-    /// <param name="args"></param>
-    /// <returns></returns>
-    public static IArguments From(IReadOnlyDictionary<string, string> args)
-        => args
-            .Select(kvp => new NamedArgument(kvp.Key, kvp.Value))
-            .ToSyntheticArguments();
-
-    /// <summary>
-    /// Create from a list of strings to be treated as positional arguments.
-    /// </summary>
-    /// <param name="args"></param>
-    /// <returns></returns>
-    public static IArguments From(params string[] args)
-        => args
-            .Select(s => new PositionalArgument(s))
-            .ToSyntheticArguments();
-
     public void Reset()
     {
         foreach (var p in _positionals.Skip(_verbCount))

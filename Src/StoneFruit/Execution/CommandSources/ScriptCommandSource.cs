@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Scripts;
 
 namespace StoneFruit.Execution.CommandSources;
@@ -12,11 +11,6 @@ public class ScriptCommandSource : ICommandSource
 {
     private readonly ArgumentsOrString[] _script;
     private int _index;
-
-    public ScriptCommandSource(EventScript script, ICommandParser parser, params IArgument[] args)
-        : this(script, parser, new SyntheticArguments(args))
-    {
-    }
 
     public ScriptCommandSource(EventScript script, ICommandParser parser, IArguments args)
     {
