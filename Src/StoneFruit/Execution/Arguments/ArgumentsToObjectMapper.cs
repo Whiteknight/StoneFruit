@@ -6,7 +6,7 @@ namespace StoneFruit.Execution.Arguments;
 /// <summary>
 /// Map argument values onto the public properties of an object by name.
 /// </summary>
-public static class CommandArgumentMapper
+public static class ArgumentsToObjectMapper
 {
     /// <summary>
     /// Construct a new object instance and map public property values from the

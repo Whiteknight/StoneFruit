@@ -9,7 +9,7 @@ namespace StoneFruit.Execution.Arguments;
 /// optimization over the ParsedArguments because we don't have to keep track of
 /// ambiguous cases.
 /// </summary>
-public class SyntheticArguments : IArguments, IVerbSource
+public class SyntheticArguments : IArgumentCollection, IVerbSource
 {
     private readonly List<IPositionalArgument> _positionals;
     private readonly IReadOnlyDictionary<string, List<INamedArgument>> _nameds;
@@ -35,6 +35,8 @@ public class SyntheticArguments : IArguments, IVerbSource
         _verbCount = 0;
     }
 
+    public static SyntheticArguments Empty { get; } = new SyntheticArguments([]);
+
     public string Raw => string.Empty;
 
     public IReadOnlyList<string> GetUnconsumed()
@@ -57,14 +59,13 @@ public class SyntheticArguments : IArguments, IVerbSource
     /// Create an empty arguments object.
     /// </summary>
     /// <returns></returns>
-    public static SyntheticArguments Empty() => new SyntheticArguments([]);
 
     /// <summary>
     /// Create named arguments from a list of name/value tuples.
     /// </summary>
     /// <param name="args"></param>
     /// <returns></returns>
-    public static IArguments From(params (string Name, string Value)[] args)
+    public static IArgumentCollection From(params (string Name, string Value)[] args)
         => args
             .Select(t => new NamedArgument(t.Name, t.Value))
             .ToSyntheticArguments();
@@ -146,7 +147,7 @@ public class SyntheticArguments : IArguments, IVerbSource
 
 public static class SyntheticArgumentsExtensions
 {
-    public static IArguments ToSyntheticArguments<T>(this IEnumerable<T> args)
+    public static IArgumentCollection ToSyntheticArguments<T>(this IEnumerable<T> args)
         where T : IArgument
         => new SyntheticArguments(args.Cast<IArgument>().ToList());
 }

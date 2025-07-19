@@ -24,9 +24,9 @@ public class ArgumentsSetup : IArgumentsSetup
 
     public void BuildUp(IServiceCollection services)
     {
-        services.AddSingleton<ICommandParser>(new CommandParser(
-            _argParser ?? SimplifiedArgumentGrammar.GetParser(),
-            _scriptParser ?? ScriptFormatGrammar.GetParser()));
+        services.AddSingleton(_argParser ?? SimplifiedArgumentGrammar.GetParser());
+        services.AddSingleton(_scriptParser ?? ScriptFormatGrammar.GetParser());
+        services.AddSingleton<ICommandParser, CommandParser>();
         foreach (var typeParser in _typeParsers)
             services.AddSingleton(typeParser.Value);
         services.AddSingleton<ArgumentValueMapper>();

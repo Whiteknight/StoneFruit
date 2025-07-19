@@ -152,11 +152,11 @@ public class StoneFruitApplication
 
         // Setup the Headless start script, an environment change command if any, the
         // user command, and the headless stop script
-        sources.AddToEnd(State.EventCatalog.EngineStartHeadless, _parser, SyntheticArguments.Empty());
+        sources.AddToEnd(State.EventCatalog.EngineStartHeadless, _parser, SyntheticArguments.Empty);
         if (startingEnvironment.Is(env => !string.IsNullOrEmpty(env)))
             sources.AddToEnd($"{EnvironmentHandler.Name} '{startingEnvironment.GetValueOrThrow()}'");
         sources.AddToEnd(commandLine);
-        sources.AddToEnd(State.EventCatalog.EngineStopHeadless, _parser, SyntheticArguments.Empty());
+        sources.AddToEnd(State.EventCatalog.EngineStopHeadless, _parser, SyntheticArguments.Empty);
 
         return await RunLoop(sources);
     }
@@ -201,7 +201,7 @@ public class StoneFruitApplication
         if (!string.IsNullOrEmpty(environment))
             source.AddToEnd($"{EnvironmentHandler.Name} '{environment}'");
 
-        source.AddToEnd(State.EventCatalog.EngineStartInteractive, _parser, SyntheticArguments.Empty());
+        source.AddToEnd(State.EventCatalog.EngineStartInteractive, _parser, SyntheticArguments.Empty);
         source.AddToEnd(new PromptCommandSource(_input, Environments, State.Metadata));
 
         return await RunLoop(source);
@@ -307,7 +307,7 @@ public class StoneFruitApplication
     }
 
     // Handle an error from the dispatcher.
-    private void HandleError(Exception currentException, EventScript script, IArguments args)
+    private void HandleError(Exception currentException, EventScript script, IArgumentCollection args)
     {
         // When we handle an error, we set the Current Error in the State. When we are done
         // handling it, we clear the error from the State. If we get into HandleError() and

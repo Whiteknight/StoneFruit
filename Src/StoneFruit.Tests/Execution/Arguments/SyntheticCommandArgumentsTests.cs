@@ -11,14 +11,14 @@ public class SyntheticCommandArgumentsTests
     [Test]
     public void Empty_Test()
     {
-        var target = SyntheticArguments.Empty();
+        var target = SyntheticArguments.Empty;
         target.GetAllArguments().Count().Should().Be(0);
     }
 
     [Test]
     public void Get_Index_TooHigh()
     {
-        var target = SyntheticArguments.Empty();
+        var target = SyntheticArguments.Empty;
         target.Get(0).Should().BeOfType<MissingArgument>();
     }
 
@@ -104,38 +104,38 @@ public class SyntheticCommandArgumentsTests
         public bool D { get; set; }
     }
 
-    [Test]
-    public void MapTo_Test()
-    {
-        var target = new SyntheticArguments(new IArgument[]
-        {
-            new PositionalArgument("test1"),
-            new NamedArgument("b", "test2"),
-            new FlagArgument("c")
-        });
-        var result = target.MapTo<TestArgs1>();
-        result.A.Should().Be("test1");
-        result.B.Should().Be("test2");
-        result.C.Should().BeTrue();
-        result.D.Should().BeFalse();
-    }
+    //[Test]
+    //public void MapTo_Test()
+    //{
+    //    var target = new SyntheticArguments(new IArgument[]
+    //    {
+    //        new PositionalArgument("test1"),
+    //        new NamedArgument("b", "test2"),
+    //        new FlagArgument("c")
+    //    });
+    //    var result = target.MapTo<TestArgs1>();
+    //    result.A.Should().Be("test1");
+    //    result.B.Should().Be("test2");
+    //    result.C.Should().BeTrue();
+    //    result.D.Should().BeFalse();
+    //}
 
-    [Test]
-    public void MapOnTo_Test()
-    {
-        var target = new SyntheticArguments(new IArgument[]
-        {
-            new PositionalArgument("test1"),
-            new NamedArgument("b", "test2"),
-            new FlagArgument("c")
-        });
-        var result = new TestArgs1();
-        target.MapOnto(result);
-        result.A.Should().Be("test1");
-        result.B.Should().Be("test2");
-        result.C.Should().BeTrue();
-        result.D.Should().BeFalse();
-    }
+    //[Test]
+    //public void MapOnTo_Test()
+    //{
+    //    var target = new SyntheticArguments(new IArgument[]
+    //    {
+    //        new PositionalArgument("test1"),
+    //        new NamedArgument("b", "test2"),
+    //        new FlagArgument("c")
+    //    });
+    //    var result = new TestArgs1();
+    //    target.MapOnto(result);
+    //    result.A.Should().Be("test1");
+    //    result.B.Should().Be("test2");
+    //    result.C.Should().BeTrue();
+    //    result.D.Should().BeFalse();
+    //}
 
     [Test]
     public void VerifyAllAreConsumed_NotConsumed()

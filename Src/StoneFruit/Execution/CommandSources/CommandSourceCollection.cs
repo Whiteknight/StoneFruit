@@ -25,7 +25,7 @@ public class CommandSourceCollection
 
     public void AddToEnd(params string[] commands) => AddToEnd(new QueueCommandSource(commands));
 
-    public void AddToEnd(EventScript script, ICommandParser parser, IArguments arguments)
+    public void AddToEnd(EventScript script, ICommandParser parser, IArgumentCollection arguments)
         => AddToEnd(new ScriptCommandSource(script, parser, arguments));
 
     public Maybe<ArgumentsOrString> GetNextCommand()

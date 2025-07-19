@@ -44,7 +44,7 @@ public class EngineState
 
     public IArguments CurrentArguments
         => _arguments
-            ?? SyntheticArguments.Empty();
+            ?? throw new InvalidOperationException("Cannot access current arguments, because one has not been set.");
 
     public HandlerContext HandlerContext
         => _handlerContext ?? throw new InvalidOperationException("Cannot access handler context, because one has not been set.");

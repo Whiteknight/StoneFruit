@@ -16,6 +16,8 @@ public class ArgumentValueMapper
         _typeParsers = typeParsers.OrEmptyIfNull().ToArray();
     }
 
+    public static ArgumentValueMapper Empty { get; } = new ArgumentValueMapper([]);
+
     public Maybe<T> TryParseValue<T>(string value)
         where T : class
     {

@@ -12,7 +12,7 @@ public class ScriptCommandSource : ICommandSource
     private readonly ArgumentsOrString[] _script;
     private int _index;
 
-    public ScriptCommandSource(EventScript script, ICommandParser parser, IArguments args)
+    public ScriptCommandSource(EventScript script, ICommandParser parser, IArgumentCollection args)
     {
         _script = script.GetCommands(parser, args).ToArray();
         _index = 0;

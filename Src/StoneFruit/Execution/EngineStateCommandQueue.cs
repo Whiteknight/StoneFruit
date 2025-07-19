@@ -30,7 +30,7 @@ public class EngineStateCommandQueue
             Append(argsOrString);
     }
 
-    public void Append(EventScript script, IArguments args)
+    public void Append(EventScript script, IArgumentCollection args)
     {
         Append(script.GetCommands(_parser, args));
     }
@@ -47,7 +47,7 @@ public class EngineStateCommandQueue
         _additionalCommands.AddFirst(argsOrString);
     }
 
-    public void Prepend(EventScript script, IArguments args)
+    public void Prepend(EventScript script, IArgumentCollection args)
     {
         Prepend(script.GetCommands(_parser, args));
     }

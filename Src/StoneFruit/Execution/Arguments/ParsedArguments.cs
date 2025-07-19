@@ -9,7 +9,7 @@ namespace StoneFruit.Execution.Arguments;
 /// from the parser are inherently ambiguous, so this collection keeps them in a raw
 /// state until intent is determined by user access.
 /// </summary>
-public class ParsedArguments : IArguments, IVerbSource
+public class ParsedArguments : IArgumentCollection, IVerbSource
 {
     private readonly List<RawArg> _rawArguments;
     private readonly List<IPositionalArgument> _accessedPositionals;

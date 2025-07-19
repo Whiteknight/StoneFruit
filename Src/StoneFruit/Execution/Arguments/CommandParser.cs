@@ -3,8 +3,8 @@ using System.Linq;
 using ParserObjects;
 using StoneFruit.Execution.Exceptions;
 using StoneFruit.Execution.Scripts;
-using static ParserObjects.Parsers<char>;
 using static ParserObjects.Parsers;
+using static ParserObjects.Parsers<char>;
 using static ParserObjects.Sequences;
 using static StoneFruit.Utility.Assert;
 
@@ -18,8 +18,9 @@ public class CommandParser : ICommandParser
 {
     private readonly IParser<char, IReadOnlyList<ArgumentToken>> _argsParser;
     private readonly IParser<char, CommandFormat> _scriptParser;
+    private readonly ArgumentValueMapper _mapper;
 
-    public CommandParser(IParser<char, ArgumentToken> argParser, IParser<char, CommandFormat> scriptParser)
+    public CommandParser(IParser<char, ArgumentToken> argParser, IParser<char, CommandFormat> scriptParser, ArgumentValueMapper mapper)
     {
         NotNull(argParser);
         _argsParser = Rule(
@@ -28,16 +29,8 @@ public class CommandParser : ICommandParser
             (args, _) => args
         );
         _scriptParser = NotNull(scriptParser);
+        _mapper = NotNull(mapper);
     }
-
-    /// <summary>
-    /// Get the default CommandParser instance with default parser objects configured.
-    /// </summary>
-    /// <returns></returns>
-    public static CommandParser GetDefault()
-        => new CommandParser(
-            SimplifiedArgumentGrammar.GetParser(),
-            ScriptFormatGrammar.GetParser());
 
     /// <summary>
     /// Parse the given line of text as an IArguments.
@@ -47,18 +40,18 @@ public class CommandParser : ICommandParser
     public IArguments ParseCommand(string command)
     {
         if (string.IsNullOrEmpty(command))
-            return SyntheticArguments.Empty();
+            return Arguments.Empty;
 
         var sequence = FromString(command);
         var argsList = _argsParser.Parse(sequence).Value;
         if (sequence.IsAtEnd)
-            return new ParsedArguments(argsList, command);
+            return new Arguments(new ParsedArguments(argsList, command), _mapper);
 
         var remainder = sequence.GetRemainder();
         throw new ParseException($"Could not parse all arguments. '{remainder}' fails at {sequence.CurrentLocation}");
     }
 
-    public Result<List<ArgumentsOrString>, ScriptsError> ParseScript(IReadOnlyList<string> lines, IArguments args)
+    public Result<List<ArgumentsOrString>, ScriptsError> ParseScript(IReadOnlyList<string> lines, IArgumentCollection args)
     {
         var results = lines
             .Where(l => !string.IsNullOrEmpty(l))
@@ -67,13 +60,13 @@ public class CommandParser : ICommandParser
         if (results.Errors.Count != 0)
             return results.Errors.Aggregate((e1, e2) => e1.Combine(e2));
 
-        return results.Arguments.ConvertAll(l => new ArgumentsOrString(l));
+        return results.Arguments.ConvertAll(l => new ArgumentsOrString(new Arguments(l, _mapper)));
     }
 
     private static ResultsLists SeparateSuccessesAndFailures(ResultsLists l, Result<IReadOnlyList<IArgument>, ScriptsError> r)
         => r.Match(l.Add, l.Add);
 
-    private Result<IReadOnlyList<IArgument>, ScriptsError> CompileLine(string script, int line, IArguments args)
+    private Result<IReadOnlyList<IArgument>, ScriptsError> CompileLine(string script, int line, IArgumentCollection args)
         => ParseScriptToCommandFormat(script, line).Bind(f => f.Format(args, line));
 
     private Result<CommandFormat, ScriptsError> ParseScriptToCommandFormat(string script, int line)
@@ -88,7 +81,7 @@ public class CommandParser : ICommandParser
     }
 
     // Keeps track of a list of successes and failures from all parse results
-    private readonly record struct ResultsLists(List<IArguments> Arguments, List<ScriptsError> Errors)
+    private readonly record struct ResultsLists(List<IArgumentCollection> Arguments, List<ScriptsError> Errors)
     {
         public static ResultsLists New() => new ResultsLists([], []);
 

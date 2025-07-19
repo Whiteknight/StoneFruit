@@ -24,6 +24,8 @@ public class PrependedVerbArguments : IArguments, IVerbSource
         // Do nothing, we don't actually care what this number is
     }
 
+    public ArgumentValueMapper Mapper => _inner.Mapper;
+
     public IReadOnlyList<IPositionalArgument> GetVerbCandidatePositionals()
         => _verb.Select(v => new PositionalArgument(v)).ToList();
 

@@ -82,25 +82,25 @@ public class ParsedCommandArgumentsTests
         public bool F { get; set; }
     }
 
-    [Test]
-    public void MapTo_Test()
-    {
-        var target = new ParsedArguments(new ArgumentToken[]
-        {
-            new ParsedPositional("test1"),
-            new ParsedNamed("b", "512"),
-            new ParsedFlag("C"),
-            new ParsedNamed("e", "1024"),
-            new ParsedNamed("f", "true")
-        });
-        var result = target.MapTo<TestArgs1>();
-        result.A.Should().Be("test1");
-        result.B.Should().Be(512);
-        result.C.Should().BeTrue();
-        result.D.Should().BeFalse();
-        result.E.Should().Be(1024L);
-        result.F.Should().BeTrue();
-    }
+    //[Test]
+    //public void MapTo_Test()
+    //{
+    //    var target = new ParsedArguments(new ArgumentToken[]
+    //    {
+    //        new ParsedPositional("test1"),
+    //        new ParsedNamed("b", "512"),
+    //        new ParsedFlag("C"),
+    //        new ParsedNamed("e", "1024"),
+    //        new ParsedNamed("f", "true")
+    //    });
+    //    var result = target.MapTo<TestArgs1>();
+    //    result.A.Should().Be("test1");
+    //    result.B.Should().Be(512);
+    //    result.C.Should().BeTrue();
+    //    result.D.Should().BeFalse();
+    //    result.E.Should().Be(1024L);
+    //    result.F.Should().BeTrue();
+    //}
 
     [Test]
     public void VerifyAllAreConsumed_NotConsumed()

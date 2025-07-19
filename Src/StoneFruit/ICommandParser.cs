@@ -17,5 +17,5 @@ public interface ICommandParser
     /// <returns></returns>
     IArguments ParseCommand(string command);
 
-    Result<List<ArgumentsOrString>, ScriptsError> ParseScript(IReadOnlyList<string> lines, IArguments args);
+    Result<List<ArgumentsOrString>, ScriptsError> ParseScript(IReadOnlyList<string> lines, IArgumentCollection args);
 }

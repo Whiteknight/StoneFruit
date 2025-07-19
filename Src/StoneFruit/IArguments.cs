@@ -6,10 +6,7 @@ using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit;
 
-/// <summary>
-/// Collection of parsed arguments. All names are case-insensitive.
-/// </summary>
-public interface IArguments
+public interface IArgumentCollection
 {
     /// <summary>
     /// Gets the raw, unparsed argument string if available. This string is usually only
@@ -101,6 +98,14 @@ public interface IArguments
     IReadOnlyList<string> GetUnconsumed();
 }
 
+/// <summary>
+/// Collection of parsed arguments. All names are case-insensitive.
+/// </summary>
+public interface IArguments : IArgumentCollection
+{
+    public ArgumentValueMapper Mapper { get; }
+}
+
 public static class ArgumentsExtensions
 {
     /// <summary>
@@ -109,7 +114,7 @@ public static class ArgumentsExtensions
     /// <param name="args"></param>
     /// <param name="index"></param>
     /// <returns></returns>
-    public static IPositionalArgument Consume(this IArguments args, int index)
+    public static IPositionalArgument Consume(this IArgumentCollection args, int index)
         => NotNull(args).Get(index).MarkConsumed();
 
     /// <summary>
@@ -118,7 +123,7 @@ public static class ArgumentsExtensions
     /// <param name="args"></param>
     /// <param name="name"></param>
     /// <returns></returns>
-    public static INamedArgument Consume(this IArguments args, string name, bool caseSensitive = true)
+    public static INamedArgument Consume(this IArgumentCollection args, string name, bool caseSensitive = true)
         => NotNull(args).Get(name, caseSensitive).MarkConsumed();
 
     /// <summary>
@@ -127,7 +132,7 @@ public static class ArgumentsExtensions
     /// <param name="args"></param>
     /// <param name="name"></param>
     /// <returns></returns>
-    public static IFlagArgument ConsumeFlag(this IArguments args, string name, bool caseSensitive = true)
+    public static IFlagArgument ConsumeFlag(this IArgumentCollection args, string name, bool caseSensitive = true)
         => NotNull(args).GetFlag(name, caseSensitive).MarkConsumed();
 
     /// <summary>
@@ -138,7 +143,7 @@ public static class ArgumentsExtensions
     /// <returns></returns>
     public static T MapTo<T>(this IArguments args)
         where T : new()
-        => CommandArgumentMapper.Map<T>(NotNull(args));
+        => ArgumentsToObjectMapper.Map<T>(NotNull(args));
 
     /// <summary>
     /// Attempt to map argument values onto the public properties of the given object
@@ -149,14 +154,14 @@ public static class ArgumentsExtensions
     /// <param name="obj"></param>
     public static void MapOnto<T>(this IArguments args, T obj)
     {
-        CommandArgumentMapper.MapOnto(NotNull(args), obj);
+        ArgumentsToObjectMapper.MapOnto(NotNull(args), obj);
     }
 
     /// <summary>
     /// Get a list of all argument objects.
     /// </summary>
     /// <returns></returns>
-    public static IEnumerable<IArgument> GetAllArguments(this IArguments args)
+    public static IEnumerable<IArgument> GetAllArguments(this IArgumentCollection args)
         => NotNull(args).GetAllPositionals().Cast<IArgument>()
             .Concat(args.GetAllNamed())
             .Concat(args.GetAllFlags())
@@ -166,7 +171,7 @@ public static class ArgumentsExtensions
     /// Throw an exception if any arguments have not been consumed. Useful to alert
     /// the user if extra/unnecessary arguments have been passed.
     /// </summary>
-    public static void VerifyAllAreConsumed(this IArguments args)
+    public static void VerifyAllAreConsumed(this IArgumentCollection args)
     {
         var unconsumed = NotNull(args).GetUnconsumed();
         if (!unconsumed.Any())

@@ -31,7 +31,7 @@ public class EventScript
         _lines.AddRange(NotNull(lines));
     }
 
-    public IEnumerable<ArgumentsOrString> GetCommands(ICommandParser parser, IArguments args)
+    public IEnumerable<ArgumentsOrString> GetCommands(ICommandParser parser, IArgumentCollection args)
         => NotNull(parser)
             .ParseScript(_lines, NotNull(args))
             .ThrowIfContainsErrors();
