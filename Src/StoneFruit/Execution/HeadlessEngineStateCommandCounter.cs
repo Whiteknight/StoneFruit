@@ -21,7 +21,7 @@ public class HeadlessEngineStateCommandCounter : IEngineStateCommandCounter
         _state = state;
     }
 
-    public bool VerifyCanExecuteNextCommand(ICommandParser parser)
+    public bool VerifyCanExecuteNextCommand()
     {
         // There's no obvious way for this to be true, but just to be safe for future scenarios...
         var isFromUser = _metadata.Get(Constants.Metadata.CurrentCommandIsUserInput)

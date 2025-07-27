@@ -256,7 +256,7 @@ public class StoneFruitApplication
             // Check the counter to make sure that we are not in a runaway loop
             // If we are in a loop, the counter will setup the command queue to handle
             // it, so we just continue.
-            var canExecute = State.CommandCounter.VerifyCanExecuteNextCommand(_parser);
+            var canExecute = State.CommandCounter.VerifyCanExecuteNextCommand();
             if (!canExecute)
                 continue;
 

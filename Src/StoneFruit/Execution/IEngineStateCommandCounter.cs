@@ -10,7 +10,6 @@ public interface IEngineStateCommandCounter
     /// Check if another command can be executed, and increments the internal count if it can
     /// be executed.
     /// </summary>
-    /// <param name="parser"></param>
     /// <returns></returns>
-    bool VerifyCanExecuteNextCommand(ICommandParser parser);
+    bool VerifyCanExecuteNextCommand();
 }

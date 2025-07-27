@@ -20,7 +20,7 @@ public class InteractiveEngineStateCommandCounter : IEngineStateCommandCounter
         _input = input;
     }
 
-    public bool VerifyCanExecuteNextCommand(ICommandParser parser)
+    public bool VerifyCanExecuteNextCommand()
     {
         var isFromUser = _metadata.Get(Constants.Metadata.CurrentCommandIsUserInput)
             .Map(o => bool.TryParse(o.ToString(), out var val) && val)

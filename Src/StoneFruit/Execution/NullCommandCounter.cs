@@ -5,5 +5,5 @@
 /// </summary>
 public class NullCommandCounter : IEngineStateCommandCounter
 {
-    public bool VerifyCanExecuteNextCommand(ICommandParser parser) => true;
+    public bool VerifyCanExecuteNextCommand() => true;
 }
