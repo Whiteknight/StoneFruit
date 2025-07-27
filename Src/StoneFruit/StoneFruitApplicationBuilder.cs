@@ -137,6 +137,7 @@ public sealed class StoneFruitApplicationBuilder
         services.AddSingleton<EngineState>();
         services.AddSingleton<CommandDispatcher>();
         services.AddSingleton<CommandSourcesBuilder>();
+        services.AddSingleton<Engine>();
 
         // Register the Engine and the things that the Engine provides. These registrations
         // are required, the user is not expected to inject their own Engine, State or
@@ -146,11 +147,10 @@ public sealed class StoneFruitApplicationBuilder
         {
             var e = new StoneFruitApplication(
                 provider.GetRequiredService<IEnvironments>(),
-                provider.GetRequiredService<IOutput>(),
                 provider.GetRequiredService<EngineState>(),
                 provider.GetRequiredService<ICommandLine>(),
-                provider.GetRequiredService<CommandDispatcher>(),
-                provider.GetRequiredService<CommandSourcesBuilder>()
+                provider.GetRequiredService<CommandSourcesBuilder>(),
+                provider.GetRequiredService<Engine>()
             );
             var accessor = provider.GetRequiredService<StoneFruitApplicationAccessor>();
             accessor.Set(e);

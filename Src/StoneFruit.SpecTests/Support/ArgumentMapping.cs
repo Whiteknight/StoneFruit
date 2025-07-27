@@ -15,7 +15,6 @@ public class SimpleMappedObject
     public string? Arg3 { get; set; }
 
     public bool Flag1 { get; set; }
-
 }
 
 public class SimpleMapToObjectHandler : IHandler

@@ -19,4 +19,8 @@
     <ProjectReference Include="..\StoneFruit\StoneFruit.csproj" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <CodeAnalysisRuleSet>../StyleCop.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+
 </Project>
