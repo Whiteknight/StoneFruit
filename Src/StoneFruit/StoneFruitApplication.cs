@@ -16,27 +16,24 @@ namespace StoneFruit;
 /// </summary>
 public class StoneFruitApplication
 {
-    private readonly ICommandParser _parser;
     private readonly ICommandLine _cmdLineArgs;
-    private readonly IInput _input;
+    private readonly CommandSourcesBuilder _sources;
 
     public StoneFruitApplication(
         IEnvironments environments,
-        ICommandParser parser,
         IOutput output,
-        IInput input,
         EngineState state,
         ICommandLine cmdLineArgs,
-        CommandDispatcher dispatcher
+        CommandDispatcher dispatcher,
+        CommandSourcesBuilder sources
     )
     {
         Environments = NotNull(environments);
-        _parser = NotNull(parser);
         Output = NotNull(output);
-        _input = NotNull(input);
         _cmdLineArgs = NotNull(cmdLineArgs);
         State = NotNull(state);
         Dispatcher = NotNull(dispatcher);
+        _sources = NotNull(sources);
     }
 
     public EngineState State { get; }
@@ -129,14 +126,13 @@ public class StoneFruitApplication
     public async Task<int> RunHeadlessAsync(string commandLine)
     {
         State.SetRunMode(EngineRunMode.Headless);
-        var sources = new CommandSourceCollection();
 
         // If we have a single argument "help", run the help script and exit. We don't
         // require a valid environment to run help
         if (commandLine == "help")
         {
             State.OnHeadlessHelp();
-            return await RunLoop(sources);
+            return await RunLoop();
         }
 
         // Now see if the first argument is the name of an environment. If so, switch
@@ -147,18 +143,19 @@ public class StoneFruitApplication
         if (string.IsNullOrWhiteSpace(commandLine))
         {
             State.OnHeadlessNoArgs();
-            return await RunLoop(sources);
+            return await RunLoop();
         }
 
         // Setup the Headless start script, an environment change command if any, the
         // user command, and the headless stop script
-        sources.AddToEnd(State.EventCatalog.EngineStartHeadless, _parser, SyntheticArguments.Empty);
+        _sources.AddToEnd(State.EventCatalog.EngineStartHeadless, SyntheticArguments.Empty);
         if (startingEnvironment.Is(env => !string.IsNullOrEmpty(env)))
-            sources.AddToEnd($"{EnvironmentHandler.Name} '{startingEnvironment.GetValueOrThrow()}'");
-        sources.AddToEnd(commandLine);
-        sources.AddToEnd(State.EventCatalog.EngineStopHeadless, _parser, SyntheticArguments.Empty);
+            _sources.AddToEnd($"{EnvironmentHandler.Name} '{startingEnvironment.GetValueOrThrow()}'");
+        _sources
+            .AddToEnd(commandLine)
+            .AddToEnd(State.EventCatalog.EngineStopHeadless, SyntheticArguments.Empty);
 
-        return await RunLoop(sources);
+        return await RunLoop();
     }
 
     public int RunHeadless(string commandLine)
@@ -194,17 +191,17 @@ public class StoneFruitApplication
     public async Task<int> RunInteractivelyAsync(string? environment)
     {
         State.SetRunMode(EngineRunMode.Interactive);
-        var source = new CommandSourceCollection();
 
         // Change the environment if necessary. Otherwise the EngineStartInteractive
         // script will probably prompt the user to do so.
         if (!string.IsNullOrEmpty(environment))
-            source.AddToEnd($"{EnvironmentHandler.Name} '{environment}'");
+            _sources.AddToEnd($"{EnvironmentHandler.Name} '{environment}'");
 
-        source.AddToEnd(State.EventCatalog.EngineStartInteractive, _parser, SyntheticArguments.Empty);
-        source.AddToEnd(new PromptCommandSource(_input, Environments, State.Metadata));
+        _sources
+            .AddToEnd(State.EventCatalog.EngineStartInteractive, SyntheticArguments.Empty)
+            .AddPromptToEnd();
 
-        return await RunLoop(source);
+        return await RunLoop();
     }
 
     // See if the given commandLine starts with a valid environment name. If so,
@@ -226,13 +223,13 @@ public class StoneFruitApplication
     // Pulls commands from the command source until the source is empty or an exit
     // signal is received. Each command is added to the command queue and the queue
     // is drained.
-    private async Task<int> RunLoop(CommandSourceCollection sources)
+    private async Task<int> RunLoop()
     {
         if (State.RunMode == EngineRunMode.Idle)
             throw new ExecutionException("Cannot run the engine in Idle mode. Must enter Headless or Interactive mode first.");
         try
         {
-            Environment.ExitCode = await RunLoopInternal(sources);
+            Environment.ExitCode = await RunLoopInternal();
             return Environment.ExitCode;
         }
         finally
@@ -241,8 +238,9 @@ public class StoneFruitApplication
         }
     }
 
-    private async Task<int> RunLoopInternal(CommandSourceCollection sources)
+    private async Task<int> RunLoopInternal()
     {
+        var sources = _sources.Build();
         while (true)
         {
             // Get a command. If we have one in the state use that. Otherwise try to
@@ -345,7 +343,7 @@ public class StoneFruitApplication
         // and inadvertantly break loop detection.
         State.Metadata.Add(Constants.Metadata.Error, currentException, false);
         State.Commands.Prepend($"{MetadataHandler.Name} remove {Constants.Metadata.Error}");
-        State.Commands.Prepend(script.GetCommands(_parser, args));
+        State.Commands.Prepend(script, args);
         // Current command queue:
         // 1. Error-handling script
         // 2. "metadata remove __CURRENT_EXCEPTION"

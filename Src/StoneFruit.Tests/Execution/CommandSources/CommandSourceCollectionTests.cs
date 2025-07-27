@@ -9,18 +9,20 @@ public class CommandSourceCollectionTests
     [Test]
     public void GetNextCommand_Empty()
     {
-        var target = new CommandSourceCollection();
+        var builder = new CommandSourcesBuilder(null!, null!, null!, null!);
+        var target = builder.Build();
         target.GetNextCommand().IsSuccess.Should().BeFalse();
     }
 
     [Test]
     public void GetNextCommand_Test()
     {
-        var target = new CommandSourceCollection();
+        var target = new CommandSourcesBuilder(null!, null!, null!, null!);
         target.AddToEnd(new QueueCommandSource("test1"));
         target.AddToEnd(new QueueCommandSource("test2"));
-        target.GetNextCommand().GetValueOrThrow().String.Should().Be("test1");
-        target.GetNextCommand().GetValueOrThrow().String.Should().Be("test2");
-        target.GetNextCommand().IsSuccess.Should().BeFalse();
+        var sources = target.Build();
+        sources.GetNextCommand().GetValueOrThrow().String.Should().Be("test1");
+        sources.GetNextCommand().GetValueOrThrow().String.Should().Be("test2");
+        sources.GetNextCommand().IsSuccess.Should().BeFalse();
     }
 }

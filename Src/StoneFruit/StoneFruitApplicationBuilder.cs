@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Execution;
 using StoneFruit.Execution.Arguments;
+using StoneFruit.Execution.CommandSources;
 using StoneFruit.Execution.Environments;
 using StoneFruit.Execution.Handlers;
 using StoneFruit.Execution.IO;
@@ -135,6 +136,7 @@ public sealed class StoneFruitApplicationBuilder
     {
         services.AddSingleton<EngineState>();
         services.AddSingleton<CommandDispatcher>();
+        services.AddSingleton<CommandSourcesBuilder>();
 
         // Register the Engine and the things that the Engine provides. These registrations
         // are required, the user is not expected to inject their own Engine, State or
@@ -144,12 +146,11 @@ public sealed class StoneFruitApplicationBuilder
         {
             var e = new StoneFruitApplication(
                 provider.GetRequiredService<IEnvironments>(),
-                provider.GetRequiredService<ICommandParser>(),
                 provider.GetRequiredService<IOutput>(),
-                provider.GetRequiredService<IInput>(),
                 provider.GetRequiredService<EngineState>(),
                 provider.GetRequiredService<ICommandLine>(),
-                provider.GetRequiredService<CommandDispatcher>()
+                provider.GetRequiredService<CommandDispatcher>(),
+                provider.GetRequiredService<CommandSourcesBuilder>()
             );
             var accessor = provider.GetRequiredService<StoneFruitApplicationAccessor>();
             accessor.Set(e);
