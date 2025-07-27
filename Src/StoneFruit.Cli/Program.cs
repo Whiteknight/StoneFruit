@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using StoneFruit.Execution;
-using StoneFruit.Execution.Arguments;
+using StoneFruit.Execution.IO;
 
 namespace StoneFruit.Cli;
 
@@ -143,6 +143,30 @@ public class TestCHandler : IAsyncHandler
     }
 }
 
+public class FormatHandler : IHandler
+{
+    private readonly IOutput _output;
+    private readonly IArguments _args;
+
+    public FormatHandler(IOutput output, IArguments args)
+    {
+        _output = output;
+        _args = args;
+    }
+
+    public void Execute()
+    {
+        _output.WriteLineFormatted(_args.Consume(0).AsString(), new
+        {
+            Value1 = "Value1",
+            Value2 = new
+            {
+                Value3 = "Value3"
+            }
+        });
+    }
+}
+
 public class MyEnvironment
 {
     public string Name { get; }
@@ -182,3 +206,4 @@ public class MyObject
         return Task.CompletedTask;
     }
 }
+

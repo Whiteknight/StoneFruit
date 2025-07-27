@@ -125,14 +125,12 @@ public sealed class StoneFruitApplicationBuilder
     {
         SetupCoreEngineRegistrations(services);
         _handlers.BuildUp(services);
-        services.AddSingleton(_eventCatalog);
-        services.AddSingleton(_settings);
         _environments.BuildUp(services);
         _parsers.BuildUp(services);
         _output.BuildUp(services);
     }
 
-    private static void SetupCoreEngineRegistrations(IServiceCollection services)
+    private void SetupCoreEngineRegistrations(IServiceCollection services)
     {
         services.AddSingleton<EngineState>();
         services.AddSingleton<CommandDispatcher>();
@@ -162,5 +160,7 @@ public sealed class StoneFruitApplicationBuilder
         // the Engine, and we do all this to avoid circular references in the DI.
         services.AddTransient(provider => provider.GetRequiredService<EngineState>().CurrentArguments);
         services.AddTransient(provider => provider.GetRequiredService<EngineState>().HandlerContext);
+        services.AddSingleton(_eventCatalog);
+        services.AddSingleton(_settings);
     }
 }
