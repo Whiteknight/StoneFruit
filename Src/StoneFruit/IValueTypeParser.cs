@@ -1,24 +1,13 @@
-﻿using static StoneFruit.Utility.Assert;
+﻿using System;
 
 namespace StoneFruit;
 
 public interface IValueTypeParser
 {
+    Type TargetType { get; }
 }
 
 public interface IValueTypeParser<out T> : IValueTypeParser
-    where T : class
 {
-    T? TryParse(string value);
-}
-
-public static class ValueTypeParserExtensions
-{
-    public static T? TryParse<T>(this IValueTypeParser<T> parser, IValuedArgument arg)
-        where T : class
-    {
-        if (!arg.Exists())
-            return default;
-        return NotNull(parser).TryParse(arg.Value);
-    }
+    T? TryParse(IValuedArgument value);
 }

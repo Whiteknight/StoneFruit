@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Microsoft.Extensions.DependencyInjection;
 using ParserObjects;
 using StoneFruit.Execution.Exceptions;
@@ -27,8 +28,14 @@ public class ArgumentsSetup : IArgumentsSetup
         services.AddSingleton(_argParser ?? SimplifiedArgumentGrammar.GetParser());
         services.AddSingleton(_scriptParser ?? ScriptFormatGrammar.GetParser());
         services.AddSingleton<ICommandParser, CommandParser>();
+
+        MaybeUseTypeParser(a => a.AsString());
+        MaybeUseTypeParser(a => Guid.Parse(a.AsString()));
+        MaybeUseTypeParser(a => new FileInfo(a.AsString()));
+        MaybeUseTypeParser(a => new DirectoryInfo(a.AsString()));
         foreach (var typeParser in _typeParsers)
             services.AddSingleton(typeParser.Value);
+
         services.AddSingleton<ArgumentValueMapper>();
     }
 
@@ -59,10 +66,14 @@ public class ArgumentsSetup : IArgumentsSetup
     }
 
     public IArgumentsSetup UseTypeParser<T>(IValueTypeParser<T> typeParser)
-        where T : class
     {
         _typeParsers[typeof(T)] = NotNull(typeParser);
         return this;
+    }
+
+    private void MaybeUseTypeParser<T>(Func<IValuedArgument, T> parser)
+    {
+        _typeParsers.TryAdd(typeof(T), new DelegateValueTypeParser<T>(parser));
     }
 
     private void EnsureCanSetArgumentParser()

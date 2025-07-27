@@ -86,15 +86,12 @@ public class ServiceProviderMethodInvoker : IHandlerMethodInvoker
         if (parameter.ParameterType == typeof(int) || parameter.ParameterType == typeof(int?))
             return arg.AsInt();
 
-        if (isResolvableType)
+        var maybeResult = _mapper.TryParseValue(parameter.ParameterType, arg);
+        var mappedValue = maybeResult.GetValueOrDefault(null!);
+        if (mappedValue is not null)
         {
-            var maybeResult = _mapper.TryParseValue(parameter.ParameterType, arg.Value);
-            var mappedValue = maybeResult.GetValueOrDefault(null!);
-            if (mappedValue != null)
-            {
-                Debug.Assert(mappedValue.GetType().IsAssignableTo(parameter.ParameterType));
-                return mappedValue;
-            }
+            Debug.Assert(mappedValue.GetType().IsAssignableTo(parameter.ParameterType));
+            return mappedValue;
         }
 
         return default;

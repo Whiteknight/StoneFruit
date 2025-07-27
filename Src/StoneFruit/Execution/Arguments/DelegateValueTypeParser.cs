@@ -3,14 +3,15 @@
 namespace StoneFruit.Execution.Arguments;
 
 public sealed class DelegateValueTypeParser<T> : IValueTypeParser<T>
-    where T : class
 {
-    private readonly Func<string, T> _parse;
+    private readonly Func<IValuedArgument, T> _parse;
 
-    public DelegateValueTypeParser(Func<string, T> parse)
+    public DelegateValueTypeParser(Func<IValuedArgument, T> parse)
     {
         _parse = parse;
     }
 
-    public T? TryParse(string value) => _parse(value);
+    public Type TargetType => typeof(T);
+
+    public T? TryParse(IValuedArgument value) => _parse(value);
 }

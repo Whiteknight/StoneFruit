@@ -143,7 +143,7 @@ public static class ArgumentsExtensions
     /// <returns></returns>
     public static T MapTo<T>(this IArguments args)
         where T : new()
-        => ArgumentsToObjectMapper.Map<T>(NotNull(args));
+        => NotNull(args).Mapper.Map<T>(args);
 
     /// <summary>
     /// Attempt to map argument values onto the public properties of the given object
@@ -153,9 +153,7 @@ public static class ArgumentsExtensions
     /// <param name="args"></param>
     /// <param name="obj"></param>
     public static void MapOnto<T>(this IArguments args, T obj)
-    {
-        ArgumentsToObjectMapper.MapOnto(NotNull(args), obj);
-    }
+        => NotNull(args).Mapper.MapOnto(args, obj);
 
     /// <summary>
     /// Get a list of all argument objects.

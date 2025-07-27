@@ -79,15 +79,29 @@ Rule: Sections
 Rule: Value Type Parsing
 
     Scenario: Can parse positional path as FileInfo
-        Given I use the value type parsing handlers
+        Given I use the value type parsing handler methods
         When I run headless with input "as file info 'path/to/file.txt'"
         Then The output should contain:
             | Line |
             | True |
 
     Scenario: Can parse named path as FileInfo
-        Given I use the value type parsing handlers
+        Given I use the value type parsing handler methods
         When I run headless with input "as file info file='path/to/file.txt'"
+        Then The output should contain:
+            | Line |
+            | True |
+
+    Scenario: Can parse positional path as Guid
+        Given I use the value type parsing handler methods
+        When I run headless with input "as guid '12345678-1234-5678-9000-123456789000'"
+        Then The output should contain:
+            | Line |
+            | True |
+
+    Scenario: Can parse named path as Guid
+        Given I use the value type parsing handler methods
+        When I run headless with input "as guid guid='12345678-1234-5678-9000-123456789000'"
         Then The output should contain:
             | Line |
             | True |

@@ -29,8 +29,7 @@ public interface IArgumentsSetup
     /// <returns></returns>
     IArgumentsSetup UseScriptParser(IParser<char, CommandFormat> scriptParser);
 
-    IArgumentsSetup UseTypeParser<T>(IValueTypeParser<T> typeParser)
-         where T : class;
+    IArgumentsSetup UseTypeParser<T>(IValueTypeParser<T> typeParser);
 }
 
 public static class ArgumentsSetupExtensions
@@ -67,7 +66,7 @@ public static class ArgumentsSetupExtensions
     public static IArgumentsSetup UseWindowsCmdArgumentParser(this IArgumentsSetup setup)
         => NotNull(setup).UseArgumentParser(WindowsCmdArgumentGrammar.GetParser());
 
-    public static IArgumentsSetup UseTypeParser<T>(this IArgumentsSetup setup, Func<string, T> parse)
+    public static IArgumentsSetup UseTypeParser<T>(this IArgumentsSetup setup, Func<IValuedArgument, T> parse)
         where T : class
         => NotNull(setup).UseTypeParser<T>(new DelegateValueTypeParser<T>(NotNull(parse)));
 }
