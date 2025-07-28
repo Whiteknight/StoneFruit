@@ -1,4 +1,5 @@
 ﻿using System;
+using StoneFruit.Execution.Templating;
 using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.IO;
@@ -8,6 +9,13 @@ namespace StoneFruit.Execution.IO;
 /// </summary>
 public class ConsoleIO : IOutput, IInput
 {
+    public ConsoleIO(ITemplateParser parser)
+    {
+        TemplateParser = parser;
+    }
+
+    public ITemplateParser TemplateParser { get; }
+
     public IOutput Color(Func<Brush, Brush> changeBrush)
     {
         Assert.NotNull(changeBrush);

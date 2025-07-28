@@ -1,4 +1,4 @@
-﻿
+﻿using StoneFruit.Execution.Templating;
 using StoneFruit.SpecTests.Support;
 
 namespace StoneFruit.SpecTests;
@@ -12,9 +12,8 @@ public static class ScenarioContextEngineExtensions
         var io = context.GetIo();
         builder = StoneFruitApplicationBuilder.Create();
         builder.SetupIo(o => o
-            .DoNotUseConsole()
-            .Add(io)
-            .Use(io)
+            .UseOutput(io)
+            .UseInput(io)
         );
         context["engineBuilder"] = builder;
         return builder;
@@ -34,7 +33,7 @@ public static class ScenarioContextEngineExtensions
     {
         if (context.TryGetValue<TestInputOutput>("io", out var output))
             return output;
-        output = new TestInputOutput();
+        output = new TestInputOutput(DefaultFormat.Parser.Create());
         context["io"] = output;
         return output;
     }

@@ -27,9 +27,9 @@ public sealed class StoneFruitApplicationBuilder
     private StoneFruitApplicationBuilder(IServiceCollection services)
     {
         Services = NotNull(services);
-        _handlers = new HandlerSetup(Services);
+        _handlers = new HandlerSetup(services);
         _eventCatalog = new EngineEventCatalog();
-        _output = new IoSetup();
+        _output = new IoSetup(services);
         _environments = new EnvironmentSetup();
         _parsers = new ArgumentsSetup();
         _settings = new EngineSettings();

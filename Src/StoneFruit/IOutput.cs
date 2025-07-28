@@ -1,5 +1,6 @@
 ﻿using System;
 using StoneFruit.Execution.IO;
+using StoneFruit.Execution.Templating;
 using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit;
@@ -36,6 +37,8 @@ public interface IOutput
     /// <param name="str"></param>
     /// <returns></returns>
     IOutput Write(string str);
+
+    ITemplateParser TemplateParser { get; }
 }
 
 public interface IInput
@@ -82,25 +85,19 @@ public static class OutputExtensions
             : output.WriteLine(obj!.ToString()!);
     }
 
-    /// <summary>
-    /// WriteLine with a format string and arguments.
-    /// </summary>
-    /// <param name="output"></param>
-    /// <param name="fmt"></param>
-    /// <param name="args"></param>
-    /// <returns></returns>
-    public static IOutput WriteLineFormat(this IOutput output, string fmt, params object[] args)
-        => NotNull(output).WriteLine(string.Format(NotNullOrEmpty(fmt), args));
+    public static IOutput WriteFormatted(this IOutput output, string format, object value)
+    {
+        NotNull(output);
+        NotNullOrEmpty(format);
+        var template = output.TemplateParser.Parse(format);
+        template.Render(output, value);
+        return output;
+    }
 
-    /// <summary>
-    /// Write with a format string and arguments.
-    /// </summary>
-    /// <param name="output"></param>
-    /// <param name="fmt"></param>
-    /// <param name="args"></param>
-    /// <returns></returns>
-    public static IOutput WriteFormat(this IOutput output, string fmt, params object[] args)
-        => NotNull(output).Write(string.Format(NotNullOrEmpty(fmt), args));
+    public static IOutput WriteLineFormatted(this IOutput output, string format, object value)
+    {
+        return output.WriteFormatted(format, value).WriteLine();
+    }
 
     /// <summary>
     /// Get a new output with the given color for text and the current background color

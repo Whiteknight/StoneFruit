@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using StoneFruit.Execution;
-using StoneFruit.Execution.IO;
+using StoneFruit.Execution.Templating;
 
 namespace StoneFruit.Cli;
 

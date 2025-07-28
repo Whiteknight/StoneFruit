@@ -1,4 +1,5 @@
 ﻿using System;
+using StoneFruit.Execution.Templating;
 
 namespace StoneFruit.Execution.IO;
 
@@ -6,6 +7,8 @@ public class ColoredOutputWrapper : IOutput
 {
     private readonly Brush _color;
     private readonly IOutput _inner;
+
+    public ITemplateParser TemplateParser => _inner.TemplateParser;
 
     public ColoredOutputWrapper(Brush color, IOutput inner)
     {

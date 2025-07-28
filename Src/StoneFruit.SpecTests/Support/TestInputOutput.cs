@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using StoneFruit.Execution.IO;
+using StoneFruit.Execution.Templating;
 
 namespace StoneFruit.SpecTests.Support;
 
@@ -8,16 +9,19 @@ public class TestInputOutput : IOutput, IInput
     private readonly Queue<string> _inputs;
     private readonly StringBuilder _output;
 
-    public TestInputOutput(params string[] inputs)
+    public TestInputOutput(ITemplateParser parser, params string[] inputs)
     {
         _output = new StringBuilder();
         _inputs = new Queue<string>(inputs);
+        TemplateParser = parser;
     }
 
     public string[] Lines => _output.ToString()
         .Split('\n', StringSplitOptions.RemoveEmptyEntries)
         .Select(l => l.Trim())
         .ToArray();
+
+    public ITemplateParser TemplateParser { get; }
 
     public void EnqueueInputLine(string line)
         => _inputs.Enqueue(line);
