@@ -30,8 +30,9 @@ public sealed class Engine
             throw new ExecutionException("Cannot run the engine in Idle mode. Must enter Headless or Interactive mode first.");
         try
         {
-            Environment.ExitCode = await RunLoopInternal(sources);
-            return Environment.ExitCode;
+            var exitCode = await RunLoopInternal(sources);
+            exitCode.Set();
+            return exitCode.Value;
         }
         finally
         {
@@ -39,7 +40,7 @@ public sealed class Engine
         }
     }
 
-    private async Task<int> RunLoopInternal(CommandSourceCollection sources)
+    private async Task<ExitCode> RunLoopInternal(CommandSourceCollection sources)
     {
         while (true)
         {
@@ -49,7 +50,7 @@ public sealed class Engine
                 .Or(() => sources.GetNextCommand())
                 .GetValueOrDefault(ArgumentsOrString.Invalid);
             if (!command.IsValid)
-                return Constants.ExitCode.Ok;
+                return ExitCode.Ok;
 
             // Check the counter to make sure that we are not in a runaway loop
             // If we are in a loop, the counter will setup the command queue to handle
@@ -132,7 +133,7 @@ public sealed class Engine
                 .WriteLine(previousException.Message)
                 .WriteLine(previousException.StackTrace ?? "")
                 ;
-            _state.SignalExit(Constants.ExitCode.CascadeError);
+            _state.SignalExit(ExitCode.CascadeError);
             return;
         }
 

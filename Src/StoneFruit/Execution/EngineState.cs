@@ -38,7 +38,7 @@ public class EngineState
     public EngineSettings Settings { get; }
 
     public bool ShouldExit { get; private set; }
-    public int ExitCode { get; private set; }
+    public ExitCode ExitCode { get; private set; }
     public EngineRunMode RunMode { get; private set; }
     public IEngineStateCommandCounter CommandCounter { get; private set; }
 
@@ -76,7 +76,7 @@ public class EngineState
     /// Signal the runloop that it should exit immediately and stop executing commands.
     /// </summary>
     /// <param name="exitCode"></param>
-    public void SignalExit(int exitCode = Constants.ExitCode.Ok)
+    public void SignalExit(ExitCode exitCode = default)
     {
         ShouldExit = true;
         ExitCode = exitCode;
@@ -108,13 +108,13 @@ public class EngineState
 
     public void OnHeadlessHelp()
     {
-        var args = SyntheticArguments.From(("exitcode", Constants.ExitCode.HeadlessHelp.ToString()));
+        var args = SyntheticArguments.From(("exitcode", ExitCode.HeadlessHelp.ToString()));
         Commands.Prepend(EventCatalog.HeadlessHelp, args);
     }
 
     public void OnHeadlessNoArgs()
     {
-        var args = SyntheticArguments.From(("exitcode", Constants.ExitCode.HeadlessNoVerb.ToString()));
+        var args = SyntheticArguments.From(("exitcode", ExitCode.HeadlessNoVerb.ToString()));
         Commands.Prepend(EventCatalog.HeadlessNoArgs, args);
     }
 
@@ -122,7 +122,7 @@ public class EngineState
     {
         var args = SyntheticArguments.From(
            ("limit", Settings.MaxInputlessCommands.ToString()),
-           ("exitcode", Constants.ExitCode.MaximumCommands.ToString())
+           ("exitcode", ExitCode.MaximumCommands.ToString())
         );
         Commands.Prepend(EventCatalog.MaximumHeadlessCommands, args);
     }

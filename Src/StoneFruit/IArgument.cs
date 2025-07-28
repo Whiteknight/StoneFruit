@@ -138,7 +138,7 @@ public static class ArgumentExtensions
     /// <param name="transform"></param>
     /// <param name="defaultValue"></param>
     /// <returns></returns>
-    public static T As<T>(this IValuedArgument argument, Func<string, T> transform, T defaultValue)
+    public static T? As<T>(this IValuedArgument argument, Func<string, T> transform, T? defaultValue = default)
     {
         if (argument is MissingArgument)
             return defaultValue;

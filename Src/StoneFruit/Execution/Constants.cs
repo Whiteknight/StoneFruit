@@ -2,35 +2,6 @@
 
 public static class Constants
 {
-    public static class ExitCode
-    {
-        /// <summary>
-        /// Exit code when everything is going well.
-        /// </summary>
-        public const int Ok = 0;
-
-        /// <summary>
-        /// Exit code for when successfully returning from headless help.
-        /// </summary>
-        public const int HeadlessHelp = 0;
-
-        /// <summary>
-        /// Exit code when we don't have a verb in headless mode.
-        /// </summary>
-        public const int HeadlessNoVerb = 1;
-
-        /// <summary>
-        /// Exit code for when a cascade error forces a premature exit.
-        /// </summary>
-        public const int CascadeError = 2;
-
-        /// <summary>
-        /// Exit code for when the maximum number of commands are executed in headless
-        /// mode.
-        /// </summary>
-        public const int MaximumCommands = 3;
-    }
-
     public static class Metadata
     {
         /// <summary>

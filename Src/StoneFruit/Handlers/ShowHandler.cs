@@ -40,7 +40,7 @@ public class ShowHandler : IHandler
 
     private void ShowExitCodes()
     {
-        var constants = typeof(Constants.ExitCode)
+        var constants = typeof(ExitCode.Constants)
             .GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
             .Where(fi => fi.IsLiteral && !fi.IsInitOnly)
             .ToList();

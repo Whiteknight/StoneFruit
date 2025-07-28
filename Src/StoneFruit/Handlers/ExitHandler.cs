@@ -23,7 +23,7 @@ public class ExitHandler : IHandler
 
     public void Execute()
     {
-        var exitCode = _args.Shift().AsInt(Constants.ExitCode.Ok);
+        var exitCode = _args.Shift().As(ExitCode.Parse);
         _state.SignalExit(exitCode);
     }
 }
