@@ -8,9 +8,9 @@ using static ParserObjects.Parsers<char>;
 
 namespace StoneFruit.Execution.Templating;
 
-public static class DefaultFormat
+public static class DefaultTemplateFormat
 {
-    public class Parser : ITemplateParser
+    public sealed class Parser : ITemplateParser
     {
         private readonly IParser<char, ITemplate> _parser;
 

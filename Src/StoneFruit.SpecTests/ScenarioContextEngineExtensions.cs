@@ -33,7 +33,7 @@ public static class ScenarioContextEngineExtensions
     {
         if (context.TryGetValue<TestInputOutput>("io", out var output))
             return output;
-        output = new TestInputOutput(DefaultFormat.Parser.Create());
+        output = new TestInputOutput(DefaultTemplateFormat.Parser.Create());
         context["io"] = output;
         return output;
     }

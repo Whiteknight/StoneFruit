@@ -45,6 +45,6 @@ public class PriorityVerbExtractor : IVerbExtractor
         => method == null
             ? []
             : _extractors
-            .Select(e => e.GetVerbs(method))
-            .FirstOrDefault(v => v?.Count > 0) ?? [];
+                .Select(e => e.GetVerbs(method))
+                .FirstOrDefault(v => v?.Count > 0) ?? [];
 }

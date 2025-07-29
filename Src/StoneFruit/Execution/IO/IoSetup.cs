@@ -59,6 +59,6 @@ public class IoSetup : IIoSetup
         services.TryAddSingleton<IOutput, ConsoleIO>();
         services.TryAddSingleton<IInput, ConsoleIO>();
         services.TryAddSingleton<ICommandLine, EnvironmentCommandLine>();
-        services.TryAddSingleton(_ => DefaultFormat.Parser.Create());
+        services.TryAddSingleton(_ => DefaultTemplateFormat.Parser.Create());
     }
 }

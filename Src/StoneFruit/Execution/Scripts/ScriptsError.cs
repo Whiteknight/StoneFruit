@@ -7,13 +7,12 @@ namespace StoneFruit.Execution.Scripts;
 public abstract record ScriptsError
 {
     public virtual ScriptsError Combine(ScriptsError other)
-    {
-        if (other is EmptyLine)
-            return this;
-        if (other is CombinedError combined2)
-            return combined2.Combine(this);
-        return new CombinedError(this, other);
-    }
+        => other switch
+        {
+            EmptyLine => this,
+            CombinedError c => c.Combine(this),
+            _ => new CombinedError(this, other)
+        };
 }
 
 public sealed record MissingRequiredPositional(int Line, int Index) : ScriptsError

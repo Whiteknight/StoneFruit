@@ -112,7 +112,7 @@ public class VerbTrie<TValue>
 
         public Node()
         {
-            _children = new Dictionary<string, Node>();
+            _children = [];
         }
 
         public TValue? Value { get; set; }
