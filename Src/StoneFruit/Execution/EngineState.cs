@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using StoneFruit.Execution.Arguments;
+using StoneFruit.Execution.CommandCounting;
 using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit.Execution;

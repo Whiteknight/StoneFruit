@@ -1,4 +1,4 @@
-﻿namespace StoneFruit.Execution;
+﻿namespace StoneFruit.Execution.CommandCounting;
 
 /// <summary>
 /// Keep track of how many commands have been executed without user input and show
@@ -22,32 +22,24 @@ public class InteractiveEngineStateCommandCounter : IEngineStateCommandCounter
 
     public bool VerifyCanExecuteNextCommand()
     {
-        var isFromUser = _metadata.Get(Constants.Metadata.CurrentCommandIsUserInput)
-            .Map(o => bool.TryParse(o.ToString(), out var val) && val)
-            .GetValueOrDefault(false);
-        if (isFromUser)
+        if (_metadata.IsCurrentCommandFromUserInput())
         {
-            _metadata.Add(Constants.Metadata.ConsecutiveCommandsWithoutUserInput, 0);
-            _metadata.Remove(Constants.Metadata.CurrentCommandIsUserInput);
+            _metadata.ResetCountsOnUserInput();
             return true;
         }
 
-        var consecutiveCommands = _metadata.Get(Constants.Metadata.ConsecutiveCommandsWithoutUserInput)
-            .Map(o => int.TryParse(o.ToString(), out var val) ? val : 0)
-            .GetValueOrDefault(0);
+        var consecutiveCommands = _metadata.GetConsecutiveCommandCountWithoutUserInput();
         var limit = _settings.MaxInputlessCommands;
         if (consecutiveCommands < limit)
         {
-            _metadata.Add(Constants.Metadata.ConsecutiveCommandsWithoutUserInput, consecutiveCommands + 1);
+            _metadata.IncrementConsecutiveCommandCount();
             return true;
         }
 
         var cont = _input.Prompt("Maximum command count reached, continue? (y/n)");
+        _metadata.ResetCountsOnUserInput();
         if (cont.GetValueOrDefault("n").Equals("y", System.StringComparison.InvariantCultureIgnoreCase))
-        {
-            _metadata.Add(Constants.Metadata.ConsecutiveCommandsWithoutUserInput, 0);
             return true;
-        }
 
         // Clear the commands in state, so we can get back to the prompt
         _commands.Clear();

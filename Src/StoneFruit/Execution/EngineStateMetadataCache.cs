@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit.Execution;
 
@@ -16,15 +18,29 @@ public class EngineStateMetadataCache : IEnumerable<KeyValuePair<string, object>
         _metadata = [];
     }
 
-    public void Add(string name, object value, bool allowOverwrite = true)
+    public EngineStateMetadataCache Add(string name, object value, bool allowOverwrite = true)
     {
-        if (_metadata.TryAdd(name, value))
-            return;
+        if (!_metadata.TryAdd(name, value) && allowOverwrite)
+            _metadata[name] = value;
+        return this;
+    }
 
-        if (!allowOverwrite)
-            return;
+    public EngineStateMetadataCache Update<T>(string name, T start, Func<T, T> update)
+    {
+        NotNull(update);
+        if (_metadata.TryGetValue(name, out var value) && value is T typed)
+        {
+            _metadata[name] = update(typed)!;
+            return this;
+        }
 
-        _metadata[name] = value;
+        return Add(name, update(start)!);
+    }
+
+    public EngineStateMetadataCache Remove(string name)
+    {
+        _metadata.Remove(name);
+        return this;
     }
 
     public Maybe<object> Get(string name)
@@ -35,9 +51,4 @@ public class EngineStateMetadataCache : IEnumerable<KeyValuePair<string, object>
     public IEnumerator<KeyValuePair<string, object>> GetEnumerator() => _metadata.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => _metadata.GetEnumerator();
-
-    public void Remove(string name)
-    {
-        _metadata.Remove(name);
-    }
 }

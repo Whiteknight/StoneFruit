@@ -1,6 +1,6 @@
 ﻿using StoneFruit.Execution.Exceptions;
 
-namespace StoneFruit.Execution;
+namespace StoneFruit.Execution.CommandCounting;
 
 /// <summary>
 /// Keeps track of how many commands have been executed and causes the headless runloop
@@ -24,44 +24,31 @@ public class HeadlessEngineStateCommandCounter : IEngineStateCommandCounter
     public bool VerifyCanExecuteNextCommand()
     {
         // There's no obvious way for this to be true, but just to be safe for future scenarios...
-        var isFromUser = _metadata.Get(Constants.Metadata.CurrentCommandIsUserInput)
-            .Map(o => bool.TryParse(o.ToString(), out var val) && val)
-            .GetValueOrDefault(false);
-        if (isFromUser)
+        if (_metadata.IsCurrentCommandFromUserInput())
         {
-            _metadata.Add(Constants.Metadata.ConsecutiveCommandsWithoutUserInput, 0);
-            _metadata.Remove(Constants.Metadata.CurrentCommandIsUserInput);
-            _metadata.Remove(Constants.Metadata.ConsecutiveCommandsReachedLimit);
+            _metadata.ResetCountsOnUserInput();
             return true;
         }
 
-        var consecutiveCommands = _metadata.Get(Constants.Metadata.ConsecutiveCommandsWithoutUserInput)
-            .Map(o => int.TryParse(o.ToString(), out var val) ? val : 0)
-            .GetValueOrDefault(0);
+        var consecutiveCommands = _metadata.GetConsecutiveCommandCountWithoutUserInput();
         var limit = _settings.MaxInputlessCommands;
         if (consecutiveCommands <= limit)
         {
-            _metadata.Add(Constants.Metadata.ConsecutiveCommandsWithoutUserInput, consecutiveCommands + 1);
+            _metadata.IncrementConsecutiveCommandCount();
             return true;
         }
 
         // If we've already reached the limit, we don't execute the script again. We just
         // bail out
         _commands.Clear();
-        var hasReachedLimit = _metadata.Get(Constants.Metadata.ConsecutiveCommandsReachedLimit)
-            .Map(o => bool.TryParse(o.ToString(), out var val) && val)
-            .GetValueOrDefault(false);
-        if (hasReachedLimit)
+        if (_metadata.IsConsecutiveCommandLimitReached())
             throw new ExecutionException("The MaximumHeadlessCommands script is too long and has been terminated");
 
         // Clear the counter so we can execute the exit script. Set the limit flag so we don't
         // recurse here again until the next user input has been received.
-        _metadata.Add(Constants.Metadata.ConsecutiveCommandsReachedLimit, true.ToString());
-        _metadata.Add(Constants.Metadata.ConsecutiveCommandsWithoutUserInput, 0);
+        _metadata.SetupForCommandLimitErrorScript();
         _commands.Clear();
-
         _state.OnMaximumHeadlessCommands();
-
         return false;
     }
 }
