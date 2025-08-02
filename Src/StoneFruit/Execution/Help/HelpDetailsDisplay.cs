@@ -1,6 +1,6 @@
 ﻿using StoneFruit.Execution.Exceptions;
 
-namespace StoneFruit.Handlers.Help;
+namespace StoneFruit.Execution.Help;
 
 public class HelpDetailsDisplay
 {

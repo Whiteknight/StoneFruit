@@ -1,7 +1,6 @@
 ﻿using System.Linq;
-using StoneFruit.Handlers.Help;
 
-namespace StoneFruit.Handlers;
+namespace StoneFruit.Execution.Help;
 
 [Verb(Name)]
 public class HelpHandler : IHandler

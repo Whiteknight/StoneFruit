@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.CommandSources;
 using StoneFruit.Execution.Exceptions;
+using StoneFruit.Execution.Metadata;
 using StoneFruit.Execution.Scripts;
-using StoneFruit.Handlers;
 
 namespace StoneFruit.Execution;
 

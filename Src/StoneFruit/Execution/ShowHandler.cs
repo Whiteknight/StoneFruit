@@ -1,8 +1,9 @@
 ﻿using System.Linq;
 using System.Reflection;
-using StoneFruit.Execution;
+using StoneFruit;
+using StoneFruit.Execution.Help;
 
-namespace StoneFruit.Handlers;
+namespace StoneFruit.Execution;
 
 [Verb(Name, Hide = true)]
 public class ShowHandler : IHandler

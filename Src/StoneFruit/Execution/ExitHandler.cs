@@ -1,6 +1,6 @@
-﻿using StoneFruit.Execution;
+﻿using StoneFruit.Execution.Help;
 
-namespace StoneFruit.Handlers;
+namespace StoneFruit.Execution;
 
 [Verb(Name)]
 [Verb("quit", Hide = true)]

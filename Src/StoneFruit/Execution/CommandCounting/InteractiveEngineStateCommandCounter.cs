@@ -1,4 +1,6 @@
-﻿namespace StoneFruit.Execution.CommandCounting;
+﻿using StoneFruit.Execution.Metadata;
+
+namespace StoneFruit.Execution.CommandCounting;
 
 /// <summary>
 /// Keep track of how many commands have been executed without user input and show

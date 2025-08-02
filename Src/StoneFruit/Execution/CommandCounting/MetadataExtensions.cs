@@ -1,4 +1,5 @@
-﻿using static StoneFruit.Execution.Constants.Metadata;
+﻿using StoneFruit.Execution.Metadata;
+using static StoneFruit.Execution.Constants.Metadata;
 using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit.Execution.CommandCounting;

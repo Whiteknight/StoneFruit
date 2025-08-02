@@ -1,4 +1,6 @@
-﻿namespace StoneFruit.Handlers;
+﻿using StoneFruit.Execution.Help;
+
+namespace StoneFruit.Execution.Arguments;
 
 [Verb(Name, Hide = true)]
 public class ArgumentDisplayHandler : IHandler

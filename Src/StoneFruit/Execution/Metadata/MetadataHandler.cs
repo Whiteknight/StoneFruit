@@ -1,8 +1,8 @@
 ﻿using System;
-using StoneFruit.Execution;
 using StoneFruit.Execution.Exceptions;
+using StoneFruit.Execution.Help;
 
-namespace StoneFruit.Handlers;
+namespace StoneFruit.Execution.Metadata;
 
 [Verb(Name, Hide = true)]
 public class MetadataHandler : IHandler

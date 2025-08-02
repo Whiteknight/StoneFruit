@@ -1,4 +1,6 @@
-﻿namespace StoneFruit.Execution.CommandSources;
+﻿using StoneFruit.Execution.Metadata;
+
+namespace StoneFruit.Execution.CommandSources;
 
 /// <summary>
 /// prompts the user to input commands and exposes them to the runloop.

@@ -1,4 +1,5 @@
 ﻿using StoneFruit.Execution.Exceptions;
+using StoneFruit.Execution.Metadata;
 
 namespace StoneFruit.Execution.CommandCounting;
 

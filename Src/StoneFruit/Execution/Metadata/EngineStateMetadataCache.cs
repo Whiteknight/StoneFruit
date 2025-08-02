@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using static StoneFruit.Utility.Assert;
 
-namespace StoneFruit.Execution;
+namespace StoneFruit.Execution.Metadata;
 
 /// <summary>
 /// Metadata storage for the EngineState. Can be used to hold temporary data items between
