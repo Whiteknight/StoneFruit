@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using AwesomeAssertions;
+﻿using AwesomeAssertions;
 using NUnit.Framework;
 using StoneFruit.Execution.Handlers;
 
@@ -15,7 +14,7 @@ public class TypeNameVerbExtractorTests
     public void GetVerbs_CamelCaseToSpinalCase()
     {
         var target = new CamelCaseVerbExtractor();
-        var result = target.GetVerbs(typeof(FirstTestHandler)).ToList();
+        var result = target.GetVerbs(typeof(FirstTestHandler)).GetValueOrThrow();
         result[0].ToString().Should().Be("first test");
     }
 }

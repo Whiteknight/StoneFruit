@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -34,17 +33,17 @@ public class PriorityVerbExtractor : IVerbExtractor
     /// </summary>
     public static IVerbExtractor DefaultInstance => _default.Value;
 
-    public IReadOnlyList<Verb> GetVerbs(Type type)
+    public Result<Verb[], Verb.Error> GetVerbs(Type type)
         => type == null || !typeof(IHandlerBase).IsAssignableFrom(type)
-            ? []
+            ? new Verb.InvalidHandler()
             : _extractors
                 .Select(e => e.GetVerbs(type))
-                .FirstOrDefault(v => v.Count > 0) ?? [];
+                .FirstOrDefault(verbs => verbs.Satisfies(v => v.Length > 0), new Verb.NoWords());
 
-    public IReadOnlyList<Verb> GetVerbs(MethodInfo method)
+    public Result<Verb[], Verb.Error> GetVerbs(MethodInfo method)
         => method == null
-            ? []
+            ? new Verb.InvalidHandler()
             : _extractors
                 .Select(e => e.GetVerbs(method))
-                .FirstOrDefault(v => v?.Count > 0) ?? [];
+                .FirstOrDefault(verbs => verbs.Satisfies(v => v.Length > 0), new Verb.NoWords());
 }

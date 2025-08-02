@@ -26,7 +26,10 @@ public class ServiceProviderHandlerSource : IHandlerSource
             .SelectMany(sd =>
                 verbExtractor
                     .GetVerbs(sd.HandlerType)
-                    .Select(verb => new VerbInfo(verb, sd.HandlerType))
+                    .Match(
+                        verbs => verbs.Select(verb => new VerbInfo(verb, sd.HandlerType)),
+                        _ => [])
+
             )
             .ToVerbTrie(vi => vi.Verb);
     }

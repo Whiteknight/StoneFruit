@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -16,15 +15,17 @@ public class PrefixingVerbExtractor : IVerbExtractor
         _inner = inner;
     }
 
-    public IReadOnlyList<Verb> GetVerbs(Type type)
+    public Result<Verb[], Verb.Error> GetVerbs(Type type)
         => _inner
             .GetVerbs(type)
-            .Select(v => v.AddPrefix(_prefix))
-            .ToArray();
+            .Map(verbs => verbs
+                .Select(v => v.AddPrefix(_prefix))
+                .ToArray());
 
-    public IReadOnlyList<Verb> GetVerbs(MethodInfo method)
+    public Result<Verb[], Verb.Error> GetVerbs(MethodInfo method)
         => _inner
             .GetVerbs(method)
-            .Select(v => v.AddPrefix(_prefix))
-            .ToArray();
+            .Map(verbs => verbs
+                .Select(v => v.AddPrefix(_prefix))
+                .ToArray());
 }

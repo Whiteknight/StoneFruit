@@ -28,7 +28,10 @@ public class InstanceMethodHandlerSource : IHandlerSource
             .Where(m => m.ReturnType == typeof(void) || m.ReturnType == typeof(Task))
             .SelectMany(m => verbExtractor
                 .GetVerbs(m)
-                .Select(v => (Handler: CreateHandlerInstance(v, m, group), Verb: v))
+                // TODO: If we have errors extracting verbs we should report them somewhere
+                .Match(
+                    verbs => verbs.Select(v => (Handler: CreateHandlerInstance(v, m, group), Verb: v)),
+                    _ => [])
             )
             .ToVerbTrie(x => x.Verb, x => x.Handler);
     }

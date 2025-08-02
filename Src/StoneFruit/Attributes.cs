@@ -57,7 +57,7 @@ public class VerbAttribute : Attribute
         Verb = verb;
     }
 
-    public Verb Verb { get; }
+    public string[] Verb { get; }
 
     public bool Hide { get; set; }
 }

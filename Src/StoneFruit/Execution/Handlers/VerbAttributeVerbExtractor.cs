@@ -10,14 +10,21 @@ namespace StoneFruit.Execution.Handlers;
 /// </summary>
 public class VerbAttributeVerbExtractor : IVerbExtractor
 {
-    public IReadOnlyList<Verb> GetVerbs(Type type)
+    public Result<Verb[], Verb.Error> GetVerbs(Type type)
         => type != null && typeof(IHandlerBase).IsAssignableFrom(type)
             ? GetVerbsInternal(type.GetCustomAttributes<VerbAttribute>())
-            : [];
+            : new Verb.InvalidHandler();
 
-    public IReadOnlyList<Verb> GetVerbs(MethodInfo method)
+    public Result<Verb[], Verb.Error> GetVerbs(MethodInfo method)
         => GetVerbsInternal(method?.GetCustomAttributes<VerbAttribute>() ?? []);
 
-    private static IReadOnlyList<Verb> GetVerbsInternal(IEnumerable<VerbAttribute> attrs)
-        => [.. attrs.Select(a => a.Verb)];
+    private static Result<Verb[], Verb.Error> GetVerbsInternal(IEnumerable<VerbAttribute> attrs)
+        => attrs
+            .Select(a => Verb.TryCreate(a.Verb))
+            .Aggregate(new List<Verb>(), (l, r) =>
+            {
+                r.OnSuccess(verb => l.Add(verb));
+                return l;
+            })
+            .ToArray();
 }

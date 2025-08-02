@@ -143,7 +143,7 @@ public static class HandlerSetupExtensions
         );
 }
 
-public readonly struct HandlerSectionSetup
+public sealed class HandlerSectionSetup
 {
     private readonly IHandlerSetup _setup;
     private readonly string _name;

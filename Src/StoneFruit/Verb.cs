@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using StoneFruit.Execution;
 using StoneFruit.Utility;
+using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit;
 
@@ -13,34 +14,42 @@ namespace StoneFruit;
 public readonly struct Verb : IReadOnlyList<string>, IEquatable<Verb>
 {
     private const string _errorNoWords = "Verb must contain at least one word";
+    private const string _errorInvalidHandler = "Object is not a valid handler type and a verb cannot be determined";
     // Verb is just a wrapper around a List of string. The constructors assert that the
     // list is non-null, not empty, and that all the entries in the list are also non-null
     // and non-empty
 
     private readonly string[] _verb;
 
-    public Verb(string verb)
+    private Verb(string[] verb)
     {
-        if (string.IsNullOrEmpty(verb))
-            throw new InvalidOperationException(_errorNoWords);
-        _verb = verb.Contains(' ')
-            ? verb.Split(Constants.SeparatedBySpace, StringSplitOptions.RemoveEmptyEntries)
-            : [verb];
-        if (_verb.Length == 0)
-            throw new InvalidOperationException(_errorNoWords);
+        _verb = NotNullOrEmpty(verb.Where(v => !string.IsNullOrEmpty(v)).ToArray());
     }
 
-    public Verb(string[] verb)
+    public static Result<Verb, Error> TryCreate(string verb)
     {
-        _verb = verb
+        if (string.IsNullOrEmpty(verb))
+            return new NoWords();
+        var words = verb.Contains(' ')
+            ? verb.Split(Constants.SeparatedBySpace, StringSplitOptions.RemoveEmptyEntries)
+            : [verb];
+        if (words.Length == 0)
+            return new NoWords();
+        return new Verb(words);
+    }
+
+    public static Result<Verb, Error> TryCreate(string[] verb)
+    {
+        var words = verb
             .OrEmptyIfNull()
             .SelectMany(w => (w ?? "").Split(Constants.SeparatedBySpace, StringSplitOptions.RemoveEmptyEntries))
             .ToArray();
-        if (_verb.Length == 0)
-            throw new InvalidOperationException(_errorNoWords);
+        if (words.Length == 0)
+            return new NoWords();
+        return new Verb(words);
     }
 
-    public static implicit operator Verb(string s) => new Verb(s);
+    public static implicit operator Verb(string s) => new Verb([s]);
 
     public static implicit operator Verb(string[] s) => new Verb(s);
 
@@ -81,4 +90,9 @@ public readonly struct Verb : IReadOnlyList<string>, IEquatable<Verb>
     public static bool operator ==(Verb a, Verb b) => a.Equals(b);
 
     public static bool operator !=(Verb a, Verb b) => !a.Equals(b);
+
+    public abstract record Error(string Message);
+    public sealed record NoWords() : Error(_errorNoWords);
+    public sealed record InvalidHandler() : Error(_errorInvalidHandler);
+    public sealed record IncorrectFormat() : Error("Input string is not in a parseable format");
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using ParserObjects;
@@ -15,32 +14,27 @@ namespace StoneFruit.Execution.Handlers;
 /// </summary>
 public class CamelCaseVerbExtractor : IVerbExtractor
 {
-    public IReadOnlyList<Verb> GetVerbs(Type type)
+    public Result<Verb[], Verb.Error> GetVerbs(Type type)
         => type.IsHandlerType()
             ? GetVerbs(type.Name)
-            : [];
+            : new Verb.InvalidHandler();
 
-    public IReadOnlyList<Verb> GetVerbs(MethodInfo method) => GetVerbs(method.Name);
+    public Result<Verb[], Verb.Error> GetVerbs(MethodInfo method) => GetVerbs(method.Name);
 
-    private static IReadOnlyList<Verb> GetVerbs(string name)
+    private static Result<Verb[], Verb.Error> GetVerbs(string name)
     {
-        if (string.IsNullOrEmpty(name))
-            return [];
-
-        name = name
-            .RemoveSuffix("verb")
-            .RemoveSuffix("command")
-            .RemoveSuffix("handler");
+        name = name.CleanVerbName();
 
         if (string.IsNullOrEmpty(name))
-            return [];
+            return new Verb.NoWords();
 
         var camelCase = CamelCase();
         var result = camelCase.Parse(name);
         if (!result.Success)
-            return [];
+            return new Verb.IncorrectFormat();
 
         var verb = result.Value.Select(s => s.ToLowerInvariant()).ToArray();
-        return [new Verb(verb)];
+        return Verb.TryCreate(verb)
+            .Map(v => new[] { v });
     }
 }

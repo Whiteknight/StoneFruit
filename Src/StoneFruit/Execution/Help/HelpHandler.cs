@@ -66,6 +66,7 @@ public class HelpHandler : IHandler
             return;
         }
 
-        new HelpDetailsDisplay(_output, _commands).ShowTestDetail(verb);
+        Verb.TryCreate(verb)
+            .OnSuccess(v => new HelpDetailsDisplay(_output, _commands).ShowTestDetail(v));
     }
 }

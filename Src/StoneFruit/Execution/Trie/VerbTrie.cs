@@ -130,7 +130,7 @@ public class VerbTrie<TValue>
         public void AppendAll(string current, List<KeyValuePair<Verb, TValue>> values)
         {
             if (Value != null)
-                values.Add(new KeyValuePair<Verb, TValue>(current, Value));
+                values.Add(new KeyValuePair<Verb, TValue>(default, Value));
             foreach (var child in _children)
             {
                 var name = current + " " + child.Key;

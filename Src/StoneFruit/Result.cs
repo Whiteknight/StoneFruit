@@ -43,6 +43,11 @@ public readonly struct Result<T, TError>
             v => new Result<TOut, TError>(onValue(v), default, true),
             e => new Result<TOut, TError>(default, e, false));
 
+    public Result<TOut, TError> Map<TOut, TData>(TData data, Func<T, TData, TOut> onValue)
+        => Match(
+            v => new Result<TOut, TError>(onValue(v, data), default, true),
+            e => new Result<TOut, TError>(default, e, false));
+
     public Result<T, TErrorOut> MapError<TErrorOut>(Func<TError, TErrorOut> onError)
         => Match(
             v => new Result<T, TErrorOut>(v, default, true),
@@ -91,6 +96,9 @@ public readonly struct Result<T, TError>
 
     public bool Satisfies(Func<T, bool> predicate)
         => Match(t => predicate(t), _ => false);
+
+    public bool SatisfiesError(Func<TError, bool> predicate)
+        => Match(_ => false, e => predicate(e));
 
     public Result<T, TError> Or(Func<Result<T, TError>> onFailure)
         => Match(v => new Result<T, TError>(v, default, true), _ => onFailure());

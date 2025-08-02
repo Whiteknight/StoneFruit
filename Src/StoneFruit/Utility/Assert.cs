@@ -12,6 +12,7 @@ public static class Assert
     /// <typeparam name="T"></typeparam>
     /// <param name="arg"></param>
     /// <param name="name"></param>
+    [return: NotNull]
     public static T NotNull<T>([NotNull] T arg, [CallerArgumentExpression(nameof(arg))] string? name = null)
         => arg ?? throw new ArgumentNullException(name);
 
@@ -20,8 +21,15 @@ public static class Assert
     /// </summary>
     /// <param name="arg"></param>
     /// <param name="name"></param>
+    [return: NotNull]
     public static string NotNullOrEmpty([NotNull] string arg, [CallerArgumentExpression(nameof(arg))] string? name = null)
         => !string.IsNullOrEmpty(arg)
             ? arg
             : throw new ArgumentNullException(name);
+
+    [return: NotNull]
+    public static T[] NotNullOrEmpty<T>([NotNull] T[] array, [CallerArgumentExpression(nameof(array))] string? name = null)
+        => array == null || array.Length == 0
+            ? throw new ArgumentException("Array may not be null or empty", name)
+            : array;
 }
