@@ -19,38 +19,38 @@ public class EngineStateCommandQueue
         _parser = parser;
     }
 
-    public void Append(ArgumentsOrString argsOrString)
+    public EngineStateCommandQueue Append(ArgumentsOrString argsOrString)
     {
         _additionalCommands.AddLast(argsOrString);
+        return this;
     }
 
-    public void Append(IEnumerable<ArgumentsOrString> argsOrStrings)
+    public EngineStateCommandQueue Append(IEnumerable<ArgumentsOrString> argsOrStrings)
     {
         foreach (var argsOrString in argsOrStrings)
             Append(argsOrString);
+        return this;
     }
 
-    public void Append(EventScript script, IArgumentCollection args)
-    {
-        Append(script.GetCommands(_parser, args));
-    }
+    public EngineStateCommandQueue Append(EventScript script, IArgumentCollection args)
+        => Append(script.GetCommands(_parser, args));
 
-    public void Prepend(IEnumerable<ArgumentsOrString> argsOrStrings)
+    public EngineStateCommandQueue Prepend(IEnumerable<ArgumentsOrString> argsOrStrings)
     {
         var list = argsOrStrings.ToList();
         for (int i = list.Count - 1; i >= 0; i--)
             _additionalCommands.AddFirst(list[i]);
+        return this;
     }
 
-    public void Prepend(ArgumentsOrString argsOrString)
+    public EngineStateCommandQueue Prepend(ArgumentsOrString argsOrString)
     {
         _additionalCommands.AddFirst(argsOrString);
+        return this;
     }
 
-    public void Prepend(EventScript script, IArgumentCollection args)
-    {
-        Prepend(script.GetCommands(_parser, args));
-    }
+    public EngineStateCommandQueue Prepend(EventScript script, IArgumentCollection args)
+        => Prepend(script.GetCommands(_parser, args));
 
     public Maybe<ArgumentsOrString> GetNext()
     {

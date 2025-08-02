@@ -8,6 +8,9 @@ namespace StoneFruit;
 /// </summary>
 public interface IHandlerBase
 {
+    static virtual string Description { get; } = string.Empty;
+    static virtual string Usage { get; } = string.Empty;
+    static virtual string Group { get; } = string.Empty;
 }
 
 /// <summary>

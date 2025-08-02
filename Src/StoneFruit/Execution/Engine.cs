@@ -47,7 +47,7 @@ public sealed class Engine
             // Get a command. If we have one in the state use that. Otherwise try to
             // get one from the sources. If null, we're all done so exit
             var command = _state.Commands.GetNext()
-                .Or(() => sources.GetNextCommand())
+                .Or(sources.GetNextCommand)
                 .GetValueOrDefault(ArgumentsOrString.Invalid);
             if (!command.IsValid)
                 return ExitCode.Ok;
@@ -143,8 +143,9 @@ public sealed class Engine
         // We can't remove metadata in the script, because users might change the script
         // and inadvertantly break loop detection.
         _state.Metadata.Add(Constants.Metadata.Error, currentException, false);
-        _state.Commands.Prepend($"{MetadataHandler.Name} remove {Constants.Metadata.Error}");
-        _state.Commands.Prepend(script, args);
+        _state.Commands
+            .Prepend($"{MetadataHandler.Name} remove {Constants.Metadata.Error}")
+            .Prepend(script, args);
         // Current command queue:
         // 1. Error-handling script
         // 2. "metadata remove __CURRENT_EXCEPTION"

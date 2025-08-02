@@ -37,8 +37,7 @@ public class ServiceProviderHandlerSource : IHandlerSource
     private Maybe<IHandlerBase> GetHandlerFromProvider(VerbInfo st)
     {
         using var scope = _provider.CreateScope();
-        var instance = scope.ServiceProvider.GetService(st.Type) as IHandlerBase;
-        return instance switch
+        return scope.ServiceProvider.GetService(st.Type) switch
         {
             IHandlerBase handler => new Maybe<IHandlerBase>(handler),
             _ => default
