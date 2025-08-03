@@ -110,16 +110,16 @@ public class HandlerSetup : IHandlerSetup
         return this;
     }
 
-    public IHandlerSetup Add<T>()
+    public IHandlerSetup Add<T>(string? prefix = null)
         where T : class, IHandlerBase
     {
-        _services.AddHandler<T>();
+        _services.AddHandler<T>(prefix);
         return this;
     }
 
-    public IHandlerSetup Add(Type handlerType)
+    public IHandlerSetup Add(Type handlerType, string? prefix = null)
     {
-        _services.AddHandler(handlerType);
+        _services.AddHandler(handlerType, prefix);
         return this;
     }
 

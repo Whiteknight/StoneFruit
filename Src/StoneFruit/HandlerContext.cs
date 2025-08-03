@@ -9,4 +9,7 @@ public sealed record HandlerContext(
     CommandDispatcher Dispatcher,
     IEnvironments Environments,
     ICommandParser Parser,
-    EngineState State);
+    EngineState State)
+{
+    public IEnvironment CurrentEnvironment => Environments.GetCurrent().GetValueOrThrow();
+}

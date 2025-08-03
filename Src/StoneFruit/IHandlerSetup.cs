@@ -57,14 +57,12 @@ public interface IHandlerSetup
         return AddSource(_ => source);
     }
 
-    // TODO: If RegisteredHandler adds some metadata for prefix and group, we can use Add<T>()
-    // and Add(Type) methods to HandlerSectionSetup as well.
     /// <summary>
     /// Register a handler type. Verbs and help information will be derived from the type.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    IHandlerSetup Add<T>()
+    IHandlerSetup Add<T>(string? prefix = null)
         where T : class, IHandlerBase;
 
     /// <summary>
@@ -72,7 +70,7 @@ public interface IHandlerSetup
     /// </summary>
     /// <param name="handlerType"></param>
     /// <returns></returns>
-    IHandlerSetup Add(Type handlerType);
+    IHandlerSetup Add(Type handlerType, string? prefix = null);
 
     /// <summary>
     /// Add a function delegate as a handler.
@@ -162,6 +160,19 @@ public sealed class HandlerSectionSetup
     public HandlerSectionSetup Add(Verb verb, Func<IArguments, HandlerContext, CancellationToken, Task> handleAsync, string description = "", string usage = "", string group = "")
     {
         _setup.Add(verb.AddPrefix(_name), handleAsync, description, usage, GetGroup(group));
+        return this;
+    }
+
+    public HandlerSectionSetup Add<T>()
+        where T : class, IHandlerBase
+    {
+        _setup.Add<T>(_name);
+        return this;
+    }
+
+    public HandlerSectionSetup Add(Type handlerType)
+    {
+        _setup.Add(handlerType, _name);
         return this;
     }
 
