@@ -21,6 +21,34 @@ public interface IArgumentsSetup
     IArgumentsSetup UseArgumentParser(IParser<char, ArgumentToken> argParser);
 
     /// <summary>
+    /// Use the StoneFruit simplified argument syntax.
+    /// </summary>
+    /// <returns></returns>
+    IArgumentsSetup UseSimplifiedArgumentParser()
+        => UseArgumentParser(SimplifiedArgumentGrammar.GetParser());
+
+    /// <summary>
+    /// Use a POSIX-style argument syntax similar to many existing POSIX utilities.
+    /// </summary>
+    /// <returns></returns>
+    IArgumentsSetup UsePosixStyleArgumentParser()
+        => UseArgumentParser(PosixStyleArgumentGrammar.GetParser());
+
+    /// <summary>
+    /// Use a Windows PowerShell syntax for arguments.
+    /// </summary>
+    /// <returns></returns>
+    IArgumentsSetup UsePowershellStyleArgumentParser()
+        => UseArgumentParser(PowershellStyleArgumentGrammar.GetParser());
+
+    /// <summary>
+    /// Use a class Windows-CMD syntax for arguments.
+    /// </summary>
+    /// <returns></returns>
+    IArgumentsSetup UseWindowsCmdArgumentParser()
+        => UseArgumentParser(WindowsCmdArgumentGrammar.GetParser());
+
+    /// <summary>
     /// Specify a parser to use for scripts. Notice that you cannot set a Script
     /// parser if you specify a Command parser. If null is passed the default script parser
     /// will be used.
@@ -30,43 +58,8 @@ public interface IArgumentsSetup
     IArgumentsSetup UseScriptParser(IParser<char, CommandFormat> scriptParser);
 
     IArgumentsSetup UseTypeParser<T>(IValueTypeParser<T> typeParser);
-}
 
-public static class ArgumentsSetupExtensions
-{
-    /// <summary>
-    /// Use the StoneFruit simplified argument syntax.
-    /// </summary>
-    /// <param name="setup"></param>
-    /// <returns></returns>
-    public static IArgumentsSetup UseSimplifiedArgumentParser(this IArgumentsSetup setup)
-        => NotNull(setup).UseArgumentParser(SimplifiedArgumentGrammar.GetParser());
-
-    /// <summary>
-    /// Use a POSIX-style argument syntax similar to many existing POSIX utilities.
-    /// </summary>
-    /// <param name="setup"></param>
-    /// <returns></returns>
-    public static IArgumentsSetup UsePosixStyleArgumentParser(this IArgumentsSetup setup)
-        => NotNull(setup).UseArgumentParser(PosixStyleArgumentGrammar.GetParser());
-
-    /// <summary>
-    /// Use a Windows PowerShell syntax for arguments.
-    /// </summary>
-    /// <param name="setup"></param>
-    /// <returns></returns>
-    public static IArgumentsSetup UsePowershellStyleArgumentParser(this IArgumentsSetup setup)
-        => NotNull(setup).UseArgumentParser(PowershellStyleArgumentGrammar.GetParser());
-
-    /// <summary>
-    /// Use a class Windows-CMD syntax for arguments.
-    /// </summary>
-    /// <param name="setup"></param>
-    /// <returns></returns>
-    public static IArgumentsSetup UseWindowsCmdArgumentParser(this IArgumentsSetup setup)
-        => NotNull(setup).UseArgumentParser(WindowsCmdArgumentGrammar.GetParser());
-
-    public static IArgumentsSetup UseTypeParser<T>(this IArgumentsSetup setup, Func<IValuedArgument, T> parse)
+    IArgumentsSetup UseTypeParser<T>(Func<IValuedArgument, T> parse)
         where T : class
-        => NotNull(setup).UseTypeParser<T>(new DelegateValueTypeParser<T>(NotNull(parse)));
+        => UseTypeParser<T>(new DelegateValueTypeParser<T>(NotNull(parse)));
 }

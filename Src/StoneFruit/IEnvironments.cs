@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using StoneFruit.Execution.Environments;
-using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit;
 
@@ -61,19 +60,4 @@ public interface IEnvironments
     /// <param name="index"></param>
     /// <returns></returns>
     Result<IEnvironment, EnvironmentError> SetCurrent(int index);
-}
-
-public static class EnvironmentsExtensions
-{
-    /// <summary>
-    /// Returns true if this is a valid environment position.
-    /// </summary>
-    /// <param name="environments"></param>
-    /// <param name="index"></param>
-    /// <returns></returns>
-    public static bool IsValid(this IEnvironments environments, int index)
-    {
-        var allEnvs = NotNull(environments).GetNames();
-        return index >= 0 && index < allEnvs.Count;
-    }
 }

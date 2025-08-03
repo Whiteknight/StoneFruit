@@ -15,6 +15,15 @@ public interface IHandlerSetup
     // TODO: If we add a prefix here, we can scan an entire assembly into a prefix.
     IHandlerSetup ScanAssemblyForHandlers(Assembly assembly);
 
+    IHandlerSetup ScanHandlersFromEntryAssembly()
+        => ScanAssemblyForHandlers(Assembly.GetExecutingAssembly());
+
+    IHandlerSetup ScanHandlersFromCurrentAssembly()
+        => ScanAssemblyForHandlers(new StackTrace(1).GetFrame(0)!.GetType().Assembly);
+
+    IHandlerSetup ScanHandlersFromAssemblyContaining<T>()
+        => ScanAssemblyForHandlers(typeof(T).Assembly);
+
     /// <summary>
     /// Set the Verb Extractor to use to get verbs from classes and methods where verbs are
     /// not explicitly supplied.
@@ -38,6 +47,17 @@ public interface IHandlerSetup
     /// <param name="getSource"></param>
     /// <returns></returns>
     IHandlerSetup AddSource(Func<IServiceProvider, IHandlerSource> getSource);
+
+    /// <summary>
+    /// Add a handler source where handlers can be looked up.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    IHandlerSetup AddSource(IHandlerSource source)
+    {
+        NotNull(source);
+        return AddSource(_ => source);
+    }
 
     // TODO: If RegisteredHandler adds some metadata for prefix and group, we can use Add<T>()
     // and Add(Type) methods to HandlerSectionSetup as well.
@@ -95,45 +115,20 @@ public interface IHandlerSetup
     /// <param name="usage"></param>
     /// <returns></returns>
     IHandlerSetup AddScript(Verb verb, IEnumerable<string> lines, string description = "", string usage = "", string group = "");
-}
 
-public static class HandlerSetupExtensions
-{
-    public static IHandlerSetup ScanHandlersFromEntryAssembly(this IHandlerSetup handlers)
-        => handlers.ScanAssemblyForHandlers(Assembly.GetExecutingAssembly());
-
-    public static IHandlerSetup ScanHandlersFromCurrentAssembly(this IHandlerSetup handlers)
-        => handlers.ScanAssemblyForHandlers(new StackTrace(1).GetFrame(0)!.GetType().Assembly);
-
-    public static IHandlerSetup ScanHandlersFromAssemblyContaining<T>(this IHandlerSetup handlers)
-        => handlers.ScanAssemblyForHandlers(typeof(T).Assembly);
-
-    public static IHandlerSetup AddSection(this IHandlerSetup handlers, string name, Action<HandlerSectionSetup> setup)
+    IHandlerSetup AddSection(string name, Action<HandlerSectionSetup> setup)
     {
-        setup?.Invoke(new HandlerSectionSetup(handlers, name));
-        return handlers;
-    }
-
-    /// <summary>
-    /// Add a handler source where handlers can be looked up.
-    /// </summary>
-    /// <param name="handlers"></param>
-    /// <param name="source"></param>
-    /// <returns></returns>
-    public static IHandlerSetup AddSource(this IHandlerSetup handlers, IHandlerSource source)
-    {
-        NotNull(source);
-        return NotNull(handlers).AddSource(_ => source);
+        setup?.Invoke(new HandlerSectionSetup(this, name));
+        return this;
     }
 
     /// <summary>
     /// Use the public methods of an instance object as handlers.
     /// </summary>
-    /// <param name="handlers"></param>
     /// <param name="instance"></param>
     /// <returns></returns>
-    public static IHandlerSetup UsePublicInstanceMethodsAsHandlers(this IHandlerSetup handlers, object instance, string? group = null)
-        => NotNull(handlers).AddSource(provider =>
+    IHandlerSetup UsePublicInstanceMethodsAsHandlers(object instance, string? group = null)
+        => AddSource(provider =>
             new InstanceMethodHandlerSource(
                 instance,
                 provider.GetRequiredService<IHandlerMethodInvoker>(),
