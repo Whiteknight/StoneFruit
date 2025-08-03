@@ -139,10 +139,8 @@ public class EnvironmentHandler : IHandler
     private Result<IEnvironment, EnvironmentError> TrySetEnvironment(string arg)
     {
         // No argument, nothing to do. Fail
-        if (string.IsNullOrEmpty(arg))
-            return new NoEnvironmentSpecified();
-
-        return GetEnvironmentNameFromUserInput(_environments.GetNames(), arg)
+        return Validate.IsNotNullOrEmpty(arg).ToResult(() => (EnvironmentError)new NoEnvironmentSpecified())
+            .Bind(a => GetEnvironmentNameFromUserInput(_environments.GetNames(), a))
             .Bind(_environments.SetCurrent);
     }
 

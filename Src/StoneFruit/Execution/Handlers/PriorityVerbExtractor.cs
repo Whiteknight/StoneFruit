@@ -35,15 +35,15 @@ public class PriorityVerbExtractor : IVerbExtractor
 
     public Result<Verb[], Verb.Error> GetVerbs(Type type)
         => type == null || !typeof(IHandlerBase).IsAssignableFrom(type)
-            ? new Verb.InvalidHandler()
+            ? Verb.InvalidHandler
             : _extractors
                 .Select(e => e.GetVerbs(type))
-                .FirstOrDefault(verbs => verbs.Satisfies(v => v.Length > 0), new Verb.NoWords());
+                .FirstOrDefault(verbs => verbs.Satisfies(v => v.Length > 0), Verb.NoWords);
 
     public Result<Verb[], Verb.Error> GetVerbs(MethodInfo method)
         => method == null
-            ? new Verb.InvalidHandler()
+            ? Verb.InvalidHandler
             : _extractors
                 .Select(e => e.GetVerbs(method))
-                .FirstOrDefault(verbs => verbs.Satisfies(v => v.Length > 0), new Verb.NoWords());
+                .FirstOrDefault(verbs => verbs.Satisfies(v => v.Length > 0), Verb.NoWords);
 }

@@ -13,10 +13,12 @@ public class VerbAttributeVerbExtractor : IVerbExtractor
     public Result<Verb[], Verb.Error> GetVerbs(Type type)
         => type != null && typeof(IHandlerBase).IsAssignableFrom(type)
             ? GetVerbsInternal(type.GetCustomAttributes<VerbAttribute>())
-            : new Verb.InvalidHandler();
+            : Verb.InvalidHandler;
 
     public Result<Verb[], Verb.Error> GetVerbs(MethodInfo method)
-        => GetVerbsInternal(method?.GetCustomAttributes<VerbAttribute>() ?? []);
+        => method == null
+            ? Verb.InvalidHandler
+            : GetVerbsInternal(method?.GetCustomAttributes<VerbAttribute>() ?? []);
 
     private static Result<Verb[], Verb.Error> GetVerbsInternal(IEnumerable<VerbAttribute> attrs)
         => attrs

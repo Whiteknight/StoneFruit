@@ -14,7 +14,7 @@ public class CamelCaseToSpinalCaseVerbExtractor : IVerbExtractor
     public Result<Verb[], Verb.Error> GetVerbs(Type type)
         => type != null && typeof(IHandlerBase).IsAssignableFrom(type)
             ? GetVerbs(type.Name)
-            : new Verb.InvalidHandler();
+            : Verb.InvalidHandler;
 
     public Result<Verb[], Verb.Error> GetVerbs(MethodInfo method)
         => GetVerbs(method.Name);
@@ -24,12 +24,12 @@ public class CamelCaseToSpinalCaseVerbExtractor : IVerbExtractor
         name = name.CleanVerbName();
 
         if (string.IsNullOrEmpty(name))
-            return new Verb.NoWords();
+            return Verb.NoWords;
 
         var camelCase = CamelCase();
         var result = camelCase.Parse(name);
         if (!result.Success)
-            return new Verb.IncorrectFormat();
+            return Verb.IncorrectFormat;
 
         var spinal = string.Join("-", result.Value).ToLowerInvariant();
         return Verb.TryCreate(spinal)

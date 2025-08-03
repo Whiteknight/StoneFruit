@@ -28,25 +28,22 @@ public readonly struct Verb : IReadOnlyList<string>, IEquatable<Verb>
 
     public static Result<Verb, Error> TryCreate(string verb)
     {
-        if (string.IsNullOrEmpty(verb))
-            return new NoWords();
-        var words = verb.Contains(' ')
-            ? verb.Split(Constants.SeparatedBySpace, StringSplitOptions.RemoveEmptyEntries)
-            : [verb];
-        if (words.Length == 0)
-            return new NoWords();
-        return new Verb(words);
+        return Validate.IsNotNullOrEmpty(verb)
+            .ToResult(() => NoWords)
+            .Map(SplitOnSpaces)
+            .Bind(TryCreate);
     }
 
     public static Result<Verb, Error> TryCreate(string[] verb)
     {
         var words = verb
             .OrEmptyIfNull()
-            .SelectMany(w => (w ?? "").Split(Constants.SeparatedBySpace, StringSplitOptions.RemoveEmptyEntries))
+            .SelectMany(SplitOnSpaces)
+            .Where(w => !string.IsNullOrEmpty(w))
             .ToArray();
-        if (words.Length == 0)
-            return new NoWords();
-        return new Verb(words);
+        return words.Length == 0
+            ? NoWords
+            : new Verb(words);
     }
 
     public static implicit operator Verb(string s) => new Verb([s]);
@@ -54,10 +51,14 @@ public readonly struct Verb : IReadOnlyList<string>, IEquatable<Verb>
     public static implicit operator Verb(string[] s) => new Verb(s);
 
     public Verb AddPrefix(string[] prefix)
-        => new Verb(prefix.Concat(_verb).ToArray());
+        => prefix == null || prefix.Length == 0 || prefix.All(string.IsNullOrWhiteSpace)
+            ? this
+            : new Verb(prefix.Concat(_verb).ToArray());
 
     public Verb AddPrefix(string prefix)
-        => new Verb(new[] { prefix }.Concat(_verb).ToArray());
+        => string.IsNullOrEmpty(prefix)
+            ? this
+            : new Verb(new[] { prefix }.Concat(_verb).ToArray());
 
     public string this[int index] => _verb[index];
 
@@ -91,8 +92,21 @@ public readonly struct Verb : IReadOnlyList<string>, IEquatable<Verb>
 
     public static bool operator !=(Verb a, Verb b) => !a.Equals(b);
 
+    private static string[] SplitOnSpaces(string v)
+    {
+        if (v == null)
+            return [];
+        return v.Contains(' ')
+            ? v.Split(Constants.SeparatedBySpace, StringSplitOptions.RemoveEmptyEntries)
+            : [v];
+    }
+
+    public static Error NoWords { get; } = new NoWordsError();
+    public static Error InvalidHandler { get; } = new InvalidHandlerError();
+    public static Error IncorrectFormat { get; } = new IncorrectFormatError();
+
     public abstract record Error(string Message);
-    public sealed record NoWords() : Error(_errorNoWords);
-    public sealed record InvalidHandler() : Error(_errorInvalidHandler);
-    public sealed record IncorrectFormat() : Error("Input string is not in a parseable format");
+    public sealed record NoWordsError() : Error(_errorNoWords);
+    public sealed record InvalidHandlerError() : Error(_errorInvalidHandler);
+    public sealed record IncorrectFormatError() : Error("Input string is not in a parseable format");
 }

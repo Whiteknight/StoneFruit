@@ -17,7 +17,7 @@ public class CamelCaseVerbExtractor : IVerbExtractor
     public Result<Verb[], Verb.Error> GetVerbs(Type type)
         => type.IsHandlerType()
             ? GetVerbs(type.Name)
-            : new Verb.InvalidHandler();
+            : Verb.InvalidHandler;
 
     public Result<Verb[], Verb.Error> GetVerbs(MethodInfo method) => GetVerbs(method.Name);
 
@@ -26,12 +26,12 @@ public class CamelCaseVerbExtractor : IVerbExtractor
         name = name.CleanVerbName();
 
         if (string.IsNullOrEmpty(name))
-            return new Verb.NoWords();
+            return Verb.NoWords;
 
         var camelCase = CamelCase();
         var result = camelCase.Parse(name);
         if (!result.Success)
-            return new Verb.IncorrectFormat();
+            return Verb.IncorrectFormat;
 
         var verb = result.Value.Select(s => s.ToLowerInvariant()).ToArray();
         return Verb.TryCreate(verb)
