@@ -19,14 +19,16 @@ public class CommandDispatcher
     private readonly IEnvironments _environments;
     private readonly EngineState _state;
     private readonly IOutput _output;
+    private readonly IInput _input;
 
-    public CommandDispatcher(ICommandParser parser, IHandlers handlers, IEnvironments environments, EngineState state, IOutput output)
+    public CommandDispatcher(ICommandParser parser, IHandlers handlers, IEnvironments environments, EngineState state, IOutput output, IInput input)
     {
         _parser = NotNull(parser);
         _handlers = NotNull(handlers);
         _environments = NotNull(environments);
         _output = NotNull(output);
         _state = NotNull(state);
+        _input = NotNull(input);
     }
 
     /// <summary>
@@ -88,14 +90,14 @@ public class CommandDispatcher
                 .GetValueOrThrow();
             if (handler is IHandler syncHandler)
             {
-                syncHandler.Execute();
+                syncHandler.Execute(arguments, context);
 
                 return;
             }
 
             if (handler is IAsyncHandler asyncHandler)
             {
-                Task.Run(async () => await asyncHandler.ExecuteAsync(token), token)
+                Task.Run(async () => await asyncHandler.ExecuteAsync(arguments, context, token), token)
                     .ConfigureAwait(false)
                     .GetAwaiter()
                     .GetResult();
@@ -184,25 +186,13 @@ public class CommandDispatcher
     {
         if (handler is IHandler syncHandler)
         {
-            syncHandler.Execute();
-            return;
-        }
-
-        if (handler is IHandlerWithContext syncWithContext)
-        {
-            syncWithContext.Execute(context);
+            syncHandler.Execute(context.Arguments, context);
             return;
         }
 
         if (handler is IAsyncHandler asyncHandler)
         {
-            await asyncHandler.ExecuteAsync(token);
-            return;
-        }
-
-        if (handler is IAsyncHandlerWithContext asyncWithContext)
-        {
-            await asyncWithContext.ExecuteAsync(context, token);
+            await asyncHandler.ExecuteAsync(context.Arguments, context, token);
             return;
         }
 
@@ -210,5 +200,5 @@ public class CommandDispatcher
     }
 
     private HandlerContext CreateHandlerContext(IArguments args)
-        => new HandlerContext(args, _output, this, _environments, _parser, _state);
+        => new HandlerContext(args, _output, _input, this, _environments, _parser, _state);
 }

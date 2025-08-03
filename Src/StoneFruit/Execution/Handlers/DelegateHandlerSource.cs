@@ -32,31 +32,31 @@ public class DelegateHandlerSource : IHandlerSource
     public Maybe<IVerbInfo> GetByName(Verb verb)
         => _handlers.Get(verb).Map(i => (IVerbInfo)i);
 
-    public void Add(Verb verb, Action<HandlerContext> act, string description, string usage, string group)
+    public void Add(Verb verb, Action<IArguments, HandlerContext> act, string description, string usage, string group)
     {
         _handlers.Insert(verb, new SyncHandler(act, verb, description, usage, group));
     }
 
-    public void Add(Verb verb, Func<HandlerContext, CancellationToken, Task> func, string description, string usage, string group)
+    public void Add(Verb verb, Func<IArguments, HandlerContext, CancellationToken, Task> func, string description, string usage, string group)
     {
         _handlers.Insert(verb, new AsyncHandler(func, verb, description, usage, group));
     }
 
-    private sealed record SyncHandler(Action<HandlerContext> Act, Verb Verb, string Description, string Usage, string Group)
-        : IHandlerWithContext, IVerbInfo
+    private sealed record SyncHandler(Action<IArguments, HandlerContext> Act, Verb Verb, string Description, string Usage, string Group)
+        : IHandler, IVerbInfo
     {
         public bool ShouldShowInHelp => true;
 
-        public void Execute(HandlerContext context)
-            => Act(context);
+        public void Execute(IArguments arguments, HandlerContext context)
+            => Act(arguments, context);
     }
 
-    private sealed record AsyncHandler(Func<HandlerContext, CancellationToken, Task> Func, Verb Verb, string Description, string Usage, string Group)
-        : IAsyncHandlerWithContext, IVerbInfo
+    private sealed record AsyncHandler(Func<IArguments, HandlerContext, CancellationToken, Task> Func, Verb Verb, string Description, string Usage, string Group)
+        : IAsyncHandler, IVerbInfo
     {
         public bool ShouldShowInHelp => true;
 
-        public Task ExecuteAsync(HandlerContext context, CancellationToken cancellation)
-            => Func(context, cancellation);
+        public Task ExecuteAsync(IArguments arguments, HandlerContext context, CancellationToken cancellation)
+            => Func(arguments, context, cancellation);
     }
 }

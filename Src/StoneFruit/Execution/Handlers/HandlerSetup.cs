@@ -86,7 +86,7 @@ public class HandlerSetup : IHandlerSetup
         return this;
     }
 
-    public IHandlerSetup Add(Verb verb, Action<HandlerContext> handle, string description = "", string usage = "", string group = "")
+    public IHandlerSetup Add(Verb verb, Action<IArguments, HandlerContext> handle, string description = "", string usage = "", string group = "")
     {
         NotNull(verb);
         NotNull(handle);
@@ -102,7 +102,7 @@ public class HandlerSetup : IHandlerSetup
         return this;
     }
 
-    public IHandlerSetup Add(Verb verb, Func<HandlerContext, CancellationToken, Task> handleAsync, string description = "", string usage = "", string group = "")
+    public IHandlerSetup Add(Verb verb, Func<IArguments, HandlerContext, CancellationToken, Task> handleAsync, string description = "", string usage = "", string group = "")
     {
         NotNull(verb);
         NotNull(handleAsync);

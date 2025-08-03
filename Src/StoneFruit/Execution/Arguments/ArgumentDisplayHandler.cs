@@ -6,14 +6,6 @@ namespace StoneFruit.Execution.Arguments;
 public class ArgumentDisplayHandler : IHandler
 {
     public const string Name = "_args";
-    private readonly IArguments _args;
-    private readonly IOutput _output;
-
-    public ArgumentDisplayHandler(IArguments args, IOutput output)
-    {
-        _args = args;
-        _output = output;
-    }
 
     public static string Group => HelpHandler.BuiltinsGroup;
     public static string Description => "Diagnostic handler to display arguments passed";
@@ -24,19 +16,20 @@ public class ArgumentDisplayHandler : IHandler
             Used for unit-testing and diagnosing issues with argument-parsing and scripts
         """;
 
-    public void Execute()
+    public void Execute(IArguments arguments, HandlerContext context)
     {
+        var output = context.Output;
         int index = 0;
-        foreach (var p in _args.GetAllPositionals())
+        foreach (var p in arguments.GetAllPositionals())
         {
-            _output.WriteLine($"{index}: {p.Value}");
+            output.WriteLine($"{index}: {p.Value}");
             index++;
         }
 
-        foreach (var n in _args.GetAllNamed())
-            _output.WriteLine($"'{n.Name}': {n.Value}");
+        foreach (var n in arguments.GetAllNamed())
+            output.WriteLine($"'{n.Name}': {n.Value}");
 
-        foreach (var f in _args.GetAllFlags())
-            _output.WriteLine($"flag: {f.Name}");
+        foreach (var f in arguments.GetAllFlags())
+            output.WriteLine($"flag: {f.Name}");
     }
 }

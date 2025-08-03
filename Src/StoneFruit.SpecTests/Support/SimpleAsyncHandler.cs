@@ -2,16 +2,9 @@
 
 public class SimpleAsyncHandler : IAsyncHandler
 {
-    private readonly IOutput _output;
-
-    public SimpleAsyncHandler(IOutput output)
+    public Task ExecuteAsync(IArguments arguments, HandlerContext context, CancellationToken cancellation)
     {
-        _output = output;
-    }
-
-    public Task ExecuteAsync(CancellationToken cancellation)
-    {
-        _output.WriteLine("Simple async invoked");
+        context.Output.WriteLine("Simple async invoked");
         return Task.CompletedTask;
     }
 }

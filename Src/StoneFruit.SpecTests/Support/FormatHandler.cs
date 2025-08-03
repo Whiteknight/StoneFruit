@@ -2,16 +2,7 @@
 
 public class FormatHandler : IHandler
 {
-    private readonly IOutput _output;
-    private readonly IArguments _args;
-
-    public FormatHandler(IOutput output, IArguments args)
-    {
-        _output = output;
-        _args = args;
-    }
-
-    public void Execute()
+    public void Execute(IArguments arguments, HandlerContext context)
     {
         var value = new
         {
@@ -22,7 +13,7 @@ public class FormatHandler : IHandler
                 Prop2_2 = "prop2_2"
             }
         };
-        var format = _args.Consume(0).AsString();
-        _output.WriteLineFormatted(format, value);
+        var format = arguments.Consume(0).AsString();
+        context.Output.WriteLineFormatted(format, value);
     }
 }

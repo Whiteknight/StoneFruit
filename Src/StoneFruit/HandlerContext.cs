@@ -5,6 +5,7 @@ namespace StoneFruit;
 public sealed record HandlerContext(
     IArguments Arguments,
     IOutput Output,
+    IInput Input,
     CommandDispatcher Dispatcher,
     IEnvironments Environments,
     ICommandParser Parser,

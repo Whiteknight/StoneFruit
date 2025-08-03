@@ -14,17 +14,6 @@ public class EchoHandler : IHandler
     public const string FlagIgnoreEmpty = "ignoreempty";
     public const string ArgColor = "color";
 
-    private readonly EngineState _state;
-    private readonly IOutput _output;
-    private readonly IArguments _args;
-
-    public EchoHandler(EngineState state, IOutput output, IArguments args)
-    {
-        _state = state;
-        _output = output;
-        _args = args;
-    }
-
     public static string Group => HelpHandler.BuiltinsGroup;
     public static string Description => "Writes a string of output to the console";
 
@@ -38,35 +27,35 @@ public class EchoHandler : IHandler
             -{FlagIgnoreEmpty} do nothing if there are no non-empty arguments
         """;
 
-    public void Execute()
+    public void Execute(IArguments arguments, HandlerContext context)
     {
+        var state = context.State;
         // Some messages, especially internal ones, don't want to display in headless
-        if (_args.HasFlag(FlagNoHeadless) && _state.RunMode == EngineRunMode.Headless)
+        if (arguments.HasFlag(FlagNoHeadless) && state.RunMode == EngineRunMode.Headless)
             return;
 
-        var output = GetOutput();
+        var output = GetOutput(arguments, context.Output);
 
-        var strings = _args.GetAllPositionals().Where(p => p.Exists()).Select(p => p.AsString());
+        var strings = arguments.GetAllPositionals().Where(p => p.Exists()).Select(p => p.AsString());
         var line = string.Join(" ", strings);
 
-        if (string.IsNullOrWhiteSpace(line) && _args.HasFlag(FlagIgnoreEmpty))
+        if (string.IsNullOrWhiteSpace(line) && arguments.HasFlag(FlagIgnoreEmpty))
             return;
 
-        WriteToOutput(output, line);
+        WriteToOutput(arguments, output, line);
     }
 
-    private void WriteToOutput(IOutput output, string line)
+    private static void WriteToOutput(IArguments arguments, IOutput output, string line)
     {
-        if (_args.HasFlag(FlagNoNewline))
+        if (arguments.HasFlag(FlagNoNewline))
             output.Write(line);
         else
             output.WriteLine(line);
     }
 
-    private IOutput GetOutput()
+    private static IOutput GetOutput(IArguments arguments, IOutput output)
     {
-        var output = _output;
-        var colorName = _args.Get(ArgColor).AsString();
+        var colorName = arguments.Get(ArgColor).AsString();
         if (string.IsNullOrEmpty(colorName))
             return output;
 

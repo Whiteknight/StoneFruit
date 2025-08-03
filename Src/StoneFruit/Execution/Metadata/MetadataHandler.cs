@@ -11,17 +11,6 @@ public class MetadataHandler : IHandler
     public const string RemoveSubverb = "remove";
     public const string ListSubverb = "list";
 
-    private readonly EngineState _state;
-    private readonly IArguments _args;
-    private readonly IOutput _output;
-
-    public MetadataHandler(EngineState state, IArguments args, IOutput output)
-    {
-        _state = state;
-        _args = args;
-        _output = output;
-    }
-
     public static string Group => HelpHandler.BuiltinsGroup;
     public static string Description => "Work with internal metadata";
 
@@ -35,16 +24,18 @@ public class MetadataHandler : IHandler
             List all available metadata entries
         """;
 
-    public void Execute()
+    public void Execute(IArguments arguments, HandlerContext context)
     {
-        var subverb = _args.Shift().Require("Must provide an action").AsString();
+        var output = context.Output;
+        var state = context.State;
+        var subverb = arguments.Shift().Require("Must provide an action").AsString();
         if (subverb == ListSubverb)
         {
-            foreach (var kvp in _state.Metadata)
+            foreach (var kvp in state.Metadata)
             {
-                _output.Color(ConsoleColor.Green).Write(kvp.Key);
-                _output.Write(": ");
-                _output.WriteLine(kvp.Value.ToString() ?? string.Empty);
+                output.Color(ConsoleColor.Green).Write(kvp.Key);
+                output.Write(": ");
+                output.WriteLine(kvp.Value.ToString() ?? string.Empty);
             }
 
             return;
@@ -52,8 +43,8 @@ public class MetadataHandler : IHandler
 
         if (subverb == RemoveSubverb)
         {
-            foreach (var name in _args.GetAllPositionals())
-                _state.Metadata.Remove(name.AsString());
+            foreach (var name in arguments.GetAllPositionals())
+                state.Metadata.Remove(name.AsString());
             return;
         }
 

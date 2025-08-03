@@ -5,17 +5,15 @@ namespace TestUtilities;
 [Verb("test-environment")]
 public class EnvironmentInjectionTestHandler : IHandler
 {
-    private readonly IOutput _output;
     public TestEnvironment Environment { get; }
 
-    public EnvironmentInjectionTestHandler(TestEnvironment environment, IOutput output)
+    public EnvironmentInjectionTestHandler(TestEnvironment environment)
     {
-        _output = output;
         Environment = environment;
     }
 
-    public void Execute()
+    public void Execute(IArguments arguments, HandlerContext context)
     {
-        _output.WriteLine(Environment.Value ?? "");
+        context.Output.WriteLine(Environment.Value ?? "");
     }
 }

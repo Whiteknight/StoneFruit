@@ -23,12 +23,9 @@ public interface IHandler : IHandlerBase
     /// <summary>
     /// Execute the handler and perform any work.
     /// </summary>
-    void Execute();
-}
-
-public interface IHandlerWithContext : IHandlerBase
-{
-    void Execute(HandlerContext context);
+    /// <param name="arguments"></param>
+    /// <param name="context"></param>
+    void Execute(IArguments arguments, HandlerContext context);
 }
 
 /// <summary>
@@ -41,12 +38,9 @@ public interface IAsyncHandler : IHandlerBase
     /// <summary>
     /// Execute the handler asynchronously and perform any work.
     /// </summary>
+    /// <param name="arguments"></param>
+    /// <param name="context"></param>
     /// <param name="cancellation"></param>
     /// <returns></returns>
-    Task ExecuteAsync(CancellationToken cancellation);
-}
-
-public interface IAsyncHandlerWithContext : IHandlerBase
-{
-    Task ExecuteAsync(HandlerContext context, CancellationToken cancellation);
+    Task ExecuteAsync(IArguments arguments, HandlerContext context, CancellationToken cancellation);
 }

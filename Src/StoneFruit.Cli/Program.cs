@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using StoneFruit.Execution;
 
 namespace StoneFruit.Cli;
 
@@ -28,9 +27,9 @@ internal static class Program
             // Set up a verb which executes a callback delegate
             // Also set up a script as an alias of this
             // Also setup a multi-word verb using a callback delegate.
-            .Add("testf", d => d.Output.WriteLine("F"), description: "do F things", usage: "testf ...", group: "delegates")
+            .Add("testf", (a, hc) => hc.Output.WriteLine("F"), description: "do F things", usage: "testf ...", group: "delegates")
             .AddScript("testf-alias", ["testf"], group: "delegates")
-            .Add(new[] { "test", "j" }, d => d.Output.WriteLine("J"), description: "do J things", usage: "test j")
+            .Add(new[] { "test", "j" }, (args, hc) => hc.Output.WriteLine("J"), description: "do J things", usage: "test j")
 
             // Create a few scripts, showing usage
             .AddSection("scripts", s => s
@@ -66,21 +65,12 @@ internal static class Program
 
 public class MyFirstHandler : IHandler
 {
-    private readonly IOutput _output;
-    private readonly EngineState _state;
-
-    public MyFirstHandler(IOutput output, EngineState state)
+    public void Execute(IArguments arguments, HandlerContext context)
     {
-        _output = output;
-        _state = state;
-    }
-
-    public void Execute()
-    {
-        _state.Metadata.Add("test", this);
-        _output.WriteLine("Starting the job...");
+        context.State.Metadata.Add("test", this);
+        context.Output.WriteLine("Starting the job...");
         // .. Do work here ..
-        _output.WriteLine("Done.");
+        context.Output.WriteLine("Done.");
     }
 }
 
@@ -98,19 +88,17 @@ public class TestArgsA
 
 public class TestAHandler : IHandler
 {
-    private readonly IOutput _output;
     private readonly MyEnvironment _environment;
 
-    public TestAHandler(IOutput output, MyEnvironment environment)
+    public TestAHandler(MyEnvironment environment)
     {
-        _output = output;
         _environment = environment;
     }
 
-    public void Execute()
+    public void Execute(IArguments arguments, HandlerContext context)
     {
         _environment.InvokedTimes++;
-        _output.WriteLine($"TESTA: {_environment.Name} invoked {_environment.InvokedTimes} times");
+        context.Output.WriteLine($"TESTA: {_environment.Name} invoked {_environment.InvokedTimes} times");
     }
 }
 
@@ -119,7 +107,7 @@ public class TestBHandler : IHandler
 {
     public static string Description => "Throw an exception";
 
-    public void Execute()
+    public void Execute(IArguments arguments, HandlerContext context)
     {
         throw new Exception("TESTB");
     }
@@ -127,7 +115,7 @@ public class TestBHandler : IHandler
 
 public class TestCHandler : IAsyncHandler
 {
-    public async Task ExecuteAsync(CancellationToken cancellation)
+    public async Task ExecuteAsync(IArguments arguments, HandlerContext context, CancellationToken cancellation)
     {
         await Task.Run(() =>
         {
@@ -144,18 +132,9 @@ public class TestCHandler : IAsyncHandler
 
 public class FormatHandler : IHandler
 {
-    private readonly IOutput _output;
-    private readonly IArguments _args;
-
-    public FormatHandler(IOutput output, IArguments args)
+    public void Execute(IArguments arguments, HandlerContext context)
     {
-        _output = output;
-        _args = args;
-    }
-
-    public void Execute()
-    {
-        _output.WriteLineFormatted(_args.Consume(0).AsString(), new
+        context.Output.WriteLineFormatted(arguments.Consume(0).AsString(), new
         {
             Value1 = "Value1",
             Value2 = new

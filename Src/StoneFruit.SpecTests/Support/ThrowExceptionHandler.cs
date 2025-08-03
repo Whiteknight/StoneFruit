@@ -2,7 +2,7 @@
 
 public class ThrowExceptionHandler : IHandler
 {
-    public void Execute()
+    public void Execute(IArguments arguments, HandlerContext context)
     {
         throw new Exception("Exception thrown");
     }

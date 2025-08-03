@@ -3,20 +3,13 @@
 [Verb("async-timeout")]
 public class AsyncTimeoutHandler : IAsyncHandler
 {
-    private readonly IOutput _output;
-
-    public AsyncTimeoutHandler(IOutput output)
+    public async Task ExecuteAsync(IArguments arguments, HandlerContext context, CancellationToken token)
     {
-        _output = output;
-    }
-
-    public async Task ExecuteAsync(CancellationToken token)
-    {
-        _output.WriteLine("started");
+        context.Output.WriteLine("started");
         while (!token.IsCancellationRequested)
         {
             await Task.Delay(100);
         }
-        _output.WriteLine("stopped");
+        context.Output.WriteLine("stopped");
     }
 }

@@ -62,20 +62,20 @@ public class InstanceMethodHandlerSource : IHandlerSource
     }
 
     private sealed record SyncHandlerWrapper(Verb Verb, object Instance, MethodInfo Method, IHandlerMethodInvoker Invoker, string Description, string Usage, string Group)
-        : IHandlerWithContext, IVerbInfo
+        : IHandler, IVerbInfo
     {
         public bool ShouldShowInHelp => true;
 
-        public void Execute(HandlerContext context)
+        public void Execute(IArguments arguments, HandlerContext context)
             => Invoker.Invoke(Instance, Method, context);
     }
 
     private sealed record AsyncHandlerWrapper(Verb Verb, object Instance, MethodInfo Method, IHandlerMethodInvoker Invoker, string Description, string Usage, string Group)
-        : IAsyncHandlerWithContext, IVerbInfo
+        : IAsyncHandler, IVerbInfo
     {
         public bool ShouldShowInHelp => true;
 
-        public Task ExecuteAsync(HandlerContext context, CancellationToken cancellation)
+        public Task ExecuteAsync(IArguments arguments, HandlerContext context, CancellationToken cancellation)
             => Invoker.InvokeAsync(Instance, Method, context, cancellation);
     }
 }

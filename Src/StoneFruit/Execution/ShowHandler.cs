@@ -9,14 +9,10 @@ namespace StoneFruit.Execution;
 public class ShowHandler : IHandler
 {
     public const string Name = "_show";
-    private readonly IArguments _args;
-    private readonly IOutput _output;
     private readonly EngineSettings _settings;
 
-    public ShowHandler(IArguments args, IOutput output, EngineSettings settings)
+    public ShowHandler(EngineSettings settings)
     {
-        _args = args;
-        _output = output;
         _settings = settings;
     }
 
@@ -24,37 +20,37 @@ public class ShowHandler : IHandler
 
     public static string Group => HelpHandler.BuiltinsGroup;
 
-    public void Execute()
+    public void Execute(IArguments arguments, HandlerContext context)
     {
-        var command = _args.Get(0).Require("Must provide thing to show").AsString();
+        var command = arguments.Get(0).Require("Must provide thing to show").AsString();
         switch (command)
         {
             // TODO: Would like to include some kind of library version output here too.
             case "exitcodes":
-                ShowExitCodes();
+                ShowExitCodes(context.Output);
                 break;
             case "settings":
-                ShowSettings();
+                ShowSettings(context.Output, _settings);
                 break;
         }
     }
 
-    private void ShowExitCodes()
+    private static void ShowExitCodes(IOutput output)
     {
         var constants = typeof(ExitCode.Constants)
             .GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
             .Where(fi => fi.IsLiteral && !fi.IsInitOnly)
             .ToList();
         foreach (var c in constants)
-            _output.WriteLine($"{c.Name} : {c.GetValue(null)}");
+            output.WriteLine($"{c.Name} : {c.GetValue(null)}");
     }
 
-    private void ShowSettings()
+    private static void ShowSettings(IOutput output, EngineSettings settings)
     {
         var props = typeof(EngineSettings)
             .GetProperties(BindingFlags.Public | BindingFlags.Instance)
             .ToList();
         foreach (var p in props)
-            _output.WriteLine($"{p.Name} : {p.GetValue(_settings)}");
+            output.WriteLine($"{p.Name} : {p.GetValue(settings)}");
     }
 }

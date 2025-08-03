@@ -19,21 +19,13 @@ public class SimpleMappedObject
 
 public class SimpleMapToObjectHandler : IHandler
 {
-    private readonly IOutput _output;
-    private readonly SimpleMappedObject _args;
-
-    public SimpleMapToObjectHandler(IArguments args, IOutput output)
+    public void Execute(IArguments arguments, HandlerContext context)
     {
-        _output = output;
-        _args = args.MapTo<SimpleMappedObject>();
-    }
-
-    public void Execute()
-    {
-        _output.WriteLine(_args.Arg1 ?? string.Empty);
-        _output.WriteLine(_args.Arg2);
-        _output.WriteLine(_args.Arg3 ?? string.Empty);
-        _output.WriteLine(_args.Flag1);
+        var args = arguments.MapTo<SimpleMappedObject>();
+        context.Output.WriteLine(args.Arg1 ?? string.Empty);
+        context.Output.WriteLine(args.Arg2);
+        context.Output.WriteLine(args.Arg3 ?? string.Empty);
+        context.Output.WriteLine(args.Flag1);
     }
 }
 
@@ -54,19 +46,11 @@ public class ComplexMappedObject
 
 public class ComplexMapToObjectHandler : IHandler
 {
-    private readonly IOutput _output;
-    private readonly ComplexMappedObject _args;
-
-    public ComplexMapToObjectHandler(IArguments args, IOutput output)
+    public void Execute(IArguments arguments, HandlerContext context)
     {
-        _output = output;
-        _args = args.MapTo<ComplexMappedObject>();
-    }
-
-    public void Execute()
-    {
-        _output.Write("As FileInfo: ").WriteLine(_args.AsFileInfo != null);
-        _output.Write("As DirectoryInfo: ").WriteLine(_args.AsDirectoryInfo != null);
-        _output.Write("As Guid: ").WriteLine(_args.AsGuid != Guid.Empty);
+        var args = arguments.MapTo<ComplexMappedObject>();
+        context.Output.Write("As FileInfo: ").WriteLine(args.AsFileInfo != null);
+        context.Output.Write("As DirectoryInfo: ").WriteLine(args.AsDirectoryInfo != null);
+        context.Output.Write("As Guid: ").WriteLine(args.AsGuid != Guid.Empty);
     }
 }

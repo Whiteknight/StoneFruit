@@ -6,7 +6,7 @@ public class NamedInstanceSourceTests
 {
     private class TestCommandHandler : IHandler
     {
-        public void Execute()
+        public void Execute(IArguments arguments, HandlerContext context)
         {
             throw new NotImplementedException();
         }

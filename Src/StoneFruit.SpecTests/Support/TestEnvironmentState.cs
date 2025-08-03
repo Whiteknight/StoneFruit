@@ -22,17 +22,15 @@ public class TestEnvironmentState
 public class IncrementEnvStateCount : IHandler
 {
     private readonly TestEnvironmentState _state;
-    private readonly IOutput _output;
 
-    public IncrementEnvStateCount(TestEnvironmentState state, IOutput output)
+    public IncrementEnvStateCount(TestEnvironmentState state)
     {
         _state = state;
-        _output = output;
     }
 
-    public void Execute()
+    public void Execute(IArguments arguments, HandlerContext context)
     {
         _state.Increment();
-        _output.WriteLine($"{_state.Name}: {_state.IncrementCount}");
+        context.Output.WriteLine($"{_state.Name}: {_state.IncrementCount}");
     }
 }

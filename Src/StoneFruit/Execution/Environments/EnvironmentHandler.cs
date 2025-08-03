@@ -14,21 +14,6 @@ public class EnvironmentHandler : IHandler
     public const string FlagNotSet = "notset";
     public const string FlagClearData = "cleardata";
 
-    private readonly IOutput _output;
-    private readonly IInput _input;
-    private readonly IArguments _args;
-    private readonly EngineState _state;
-    private readonly IEnvironments _environments;
-
-    public EnvironmentHandler(IOutput output, IInput input, IArguments args, EngineState state, IEnvironments environments)
-    {
-        _output = output;
-        _input = input;
-        _args = args;
-        _state = state;
-        _environments = environments;
-    }
-
     public static string Group => HelpHandler.BuiltinsGroup;
 
     public static string Description => "List or change environments";
@@ -55,38 +40,38 @@ public class EnvironmentHandler : IHandler
             Clear the data for the current environment.
         """;
 
-    public void Execute()
+    public void Execute(IArguments arguments, HandlerContext context)
     {
         // If --list, list all environments and return
-        if (_args.HasFlag(FlagList))
+        if (arguments.HasFlag(FlagList))
         {
-            ListEnvironments();
+            ListEnvironments(context.Environments, context.Output);
             return;
         }
 
-        MaybeChangeEnvironment()
+        MaybeChangeEnvironment(arguments, context)
             .OnSuccess(e =>
             {
                 // If -cleardata and we are in an environment and we are not setting an environment
                 // just clear the data in the current environment.
-                if (_args.HasFlag(FlagClearData))
+                if (arguments.HasFlag(FlagClearData))
                     e.ClearCache();
-                _state.OnEnvironmentChanged(e.Name);
+                context.State.OnEnvironmentChanged(e.Name);
             })
             .OnFailure(err => EnvironmentsException.Throw(err));
     }
 
-    private void ListEnvironments()
+    private static void ListEnvironments(IEnvironments environments, IOutput output)
     {
         var color = new Brush(ConsoleColor.Cyan);
-        var envList = _environments.GetNames();
-        var currentEnv = _environments.GetCurrentName();
+        var envList = environments.GetNames();
+        var currentEnv = environments.GetCurrentName();
         for (int i = 0; i < envList.Count; i++)
         {
             var index = i + 1;
             var env = envList[i];
 
-            _output
+            output
                 .Color(ConsoleColor.White).Write(index.ToString())
                 .Color(ConsoleColor.DarkGray).Write(") ")
                 .Color(currentEnv.Satisfies(ce => ce == env) ? color.Swap() : color).Write(env)
@@ -94,54 +79,57 @@ public class EnvironmentHandler : IHandler
         }
     }
 
-    private Result<IEnvironment, EnvironmentError> MaybeChangeEnvironment()
+    private static Result<IEnvironment, EnvironmentError> MaybeChangeEnvironment(IArguments arguments, HandlerContext context)
     {
+        var environments = context.Environments;
         // If -notset and we have a current env, bail out
         // It's an error, but not one that turns into an exception.
-        if (_args.HasFlag(FlagNotSet) && _environments.GetCurrentName().IsSuccess)
+        if (arguments.HasFlag(FlagNotSet) && environments.GetCurrentName().IsSuccess)
             return new EnvironmentNotChanged();
 
         // We don't have an arg. If there is exactly 1 option, jump to that. Otherwise prompt
         // the user (if we're in interactive mode)
-        var target = _args.Shift();
+        var target = arguments.Shift();
         if (target.Exists())
-            return TrySetEnvironment(target.AsString());
+            return TrySetEnvironment(target.AsString(), environments);
 
         // If we only have a single environment, switch directly to it with no input from the user
         // We can skip some checks because this name is from a known list of valid environment names
-        var environments = _environments.GetNames();
-        if (environments.Count == 1)
-            return _environments.SetCurrent(environments[0]);
+        var envList = environments.GetNames();
+        if (envList.Count == 1)
+            return environments.SetCurrent(envList[0]);
 
-        return PromptUserForEnvironment();
+        return PromptUserForEnvironment(context);
     }
 
-    private Result<IEnvironment, EnvironmentError> PromptUserForEnvironment()
+    private static Result<IEnvironment, EnvironmentError> PromptUserForEnvironment(HandlerContext context)
     {
+        var state = context.State;
+        var output = context.Output;
         // In headless mode we can't prompt, so at this point we just throw an exception
-        if (_state.RunMode == EngineRunMode.Headless)
+        if (state.RunMode == EngineRunMode.Headless)
             return new NoEnvironmentSpecifiedHeadless();
 
         // Use the env-list verb to show the list, then prompt the user to make a selection. Loop until
         // a valid selection is made.
         while (true)
         {
-            _output.Color(ConsoleColor.DarkCyan).WriteLine("Please select an environment:");
-            ListEnvironments();
+            output.Color(ConsoleColor.DarkCyan).WriteLine("Please select an environment:");
+            ListEnvironments(context.Environments, context.Output);
 
-            var envIndex = _input.Prompt("", true, false).GetValueOrThrow();
-            var result = TrySetEnvironment(envIndex);
+            var envIndex = context.Input.Prompt("", true, false).GetValueOrThrow();
+            var result = TrySetEnvironment(envIndex, context.Environments);
             if (result.IsSuccess)
                 return result;
         }
     }
 
-    private Result<IEnvironment, EnvironmentError> TrySetEnvironment(string arg)
+    private static Result<IEnvironment, EnvironmentError> TrySetEnvironment(string arg, IEnvironments environments)
     {
         // No argument, nothing to do. Fail
         return Validate.IsNotNullOrEmpty(arg).ToResult(() => (EnvironmentError)new NoEnvironmentSpecified())
-            .Bind(a => GetEnvironmentNameFromUserInput(_environments.GetNames(), a))
-            .Bind(_environments.SetCurrent);
+            .Bind(a => GetEnvironmentNameFromUserInput(environments.GetNames(), a))
+            .Bind(environments.SetCurrent);
     }
 
     private static Result<string, EnvironmentError> GetEnvironmentNameFromUserInput(IReadOnlyList<string> environments, string envNameOrNumber)

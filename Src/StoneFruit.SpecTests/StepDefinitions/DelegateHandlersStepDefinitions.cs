@@ -7,13 +7,13 @@ public record DelegateHandlersStepDefinitions(ScenarioContext Context)
     public void GivenIRegisterASimpleDelegateHandler(string name)
     {
         Context.GetEngineBuilder().SetupHandlers(h => h
-            .Add(name, c => c.Output.WriteLine($"Invoked: {name}")));
+            .Add(name, (args, c) => c.Output.WriteLine($"Invoked: {name}")));
     }
 
     [Given("I register a simple async delegate handler {string}")]
     public void GivenIRegisterASimpleAsyncDelegateHandler(string name)
     {
-        Task handle(HandlerContext context, CancellationToken token)
+        Task handle(IArguments args, HandlerContext context, CancellationToken token)
         {
             context.Output.WriteLine($"Invoked: {name}");
             return Task.CompletedTask;

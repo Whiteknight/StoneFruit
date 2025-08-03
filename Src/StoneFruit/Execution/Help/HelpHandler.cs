@@ -10,15 +10,11 @@ public class HelpHandler : IHandler
     public const string FlagStartsWith = "startswith";
     public const string BuiltinsGroup = "__STONEFRUIT_BUILTIN";
 
-    private readonly IOutput _output;
     private readonly IHandlers _commands;
-    private readonly IArguments _args;
 
-    public HelpHandler(IOutput output, IHandlers commands, IArguments args)
+    public HelpHandler(IHandlers commands)
     {
-        _output = output;
         _commands = commands;
-        _args = args;
     }
 
     public static string Group => BuiltinsGroup;
@@ -50,23 +46,23 @@ public class HelpHandler : IHandler
             Command class should provide a description using the mechanisms mentioned above.
         """;
 
-    public void Execute()
+    public void Execute(IArguments arguments, HandlerContext context)
     {
-        var verb = _args.GetAllPositionals().Select(p => p.AsString()).ToArray();
-        var showAll = _args.HasFlag(FlagShowAll);
+        var verb = arguments.GetAllPositionals().Select(p => p.AsString()).ToArray();
+        var showAll = arguments.HasFlag(FlagShowAll);
         if (verb.Length == 0)
         {
-            new HelpOverviewDisplay(_output, _commands).DisplayOverview(showAll);
+            new HelpOverviewDisplay(context.Output, _commands).DisplayOverview(showAll);
             return;
         }
 
-        if (_args.HasFlag(FlagStartsWith))
+        if (arguments.HasFlag(FlagStartsWith))
         {
-            new HelpOverviewDisplay(_output, _commands).DisplayOverviewStartingWith(verb[0], showAll);
+            new HelpOverviewDisplay(context.Output, _commands).DisplayOverviewStartingWith(verb[0], showAll);
             return;
         }
 
         Verb.TryCreate(verb)
-            .OnSuccess(v => new HelpDetailsDisplay(_output, _commands).ShowTestDetail(v));
+            .OnSuccess(v => new HelpDetailsDisplay(context.Output, _commands).ShowTestDetail(v));
     }
 }

@@ -21,7 +21,7 @@ public class ScriptHandlerSource : IHandlerSource
 
     public Maybe<IHandlerBase> GetInstance(HandlerContext context)
         => _scripts.Get(context.Arguments)
-            .Map(script => (IHandlerBase)new ScriptHandler(context, script));
+            .Map(script => (IHandlerBase)new ScriptHandler(script));
 
     public IEnumerable<IVerbInfo> GetAll() => _scripts.GetAll().Select(kvp => kvp.Value);
 
@@ -64,15 +64,15 @@ public class ScriptHandlerSource : IHandlerSource
 
     // We need to keep ScriptHandler private child class, so it doesn't get scooped up
     // during DI container scan
-    private sealed record ScriptHandler(HandlerContext Context, Script Script) : IHandler
+    private sealed record ScriptHandler(Script Script) : IHandler
     {
-        public void Execute()
+        public void Execute(IArguments arguments, HandlerContext context)
         {
-            var lines = Context.Parser
-                .ParseScript(Script.Lines, Context.Arguments)
+            var lines = context.Parser
+                .ParseScript(Script.Lines, context.Arguments)
                 .ThrowIfContainsErrors();
-            Context.Arguments.Reset();
-            Context.State.Commands.Append(lines);
+            context.Arguments.Reset();
+            context.State.Commands.Append(lines);
         }
     }
 }

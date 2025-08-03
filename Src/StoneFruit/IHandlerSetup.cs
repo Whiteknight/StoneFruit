@@ -82,7 +82,7 @@ public interface IHandlerSetup
     /// <param name="description"></param>
     /// <param name="usage"></param>
     /// <returns></returns>
-    IHandlerSetup Add(Verb verb, Action<HandlerContext> handle, string description = "", string usage = "", string group = "");
+    IHandlerSetup Add(Verb verb, Action<IArguments, HandlerContext> handle, string description = "", string usage = "", string group = "");
 
     /// <summary>
     /// Add a pre-existing handler instance with the given verb.
@@ -102,7 +102,7 @@ public interface IHandlerSetup
     /// <param name="description"></param>
     /// <param name="usage"></param>
     /// <returns></returns>
-    IHandlerSetup Add(Verb verb, Func<HandlerContext, CancellationToken, Task> handleAsync, string description = "", string usage = "", string group = "");
+    IHandlerSetup Add(Verb verb, Func<IArguments, HandlerContext, CancellationToken, Task> handleAsync, string description = "", string usage = "", string group = "");
 
     /// <summary>
     /// Add a script with a verb and zero or more commands to execute.
@@ -147,7 +147,7 @@ public sealed class HandlerSectionSetup
         _name = name;
     }
 
-    public HandlerSectionSetup Add(Verb verb, Action<HandlerContext> handle, string description = "", string usage = "", string group = "")
+    public HandlerSectionSetup Add(Verb verb, Action<IArguments, HandlerContext> handle, string description = "", string usage = "", string group = "")
     {
         _setup.Add(verb.AddPrefix(_name), handle, description, usage, GetGroup(group));
         return this;
@@ -159,7 +159,7 @@ public sealed class HandlerSectionSetup
         return this;
     }
 
-    public HandlerSectionSetup Add(Verb verb, Func<HandlerContext, CancellationToken, Task> handleAsync, string description = "", string usage = "", string group = "")
+    public HandlerSectionSetup Add(Verb verb, Func<IArguments, HandlerContext, CancellationToken, Task> handleAsync, string description = "", string usage = "", string group = "")
     {
         _setup.Add(verb.AddPrefix(_name), handleAsync, description, usage, GetGroup(group));
         return this;
