@@ -20,7 +20,6 @@ public class PromptCommandSource : ICommandSource
 
     public Maybe<ArgumentsOrString> GetNextCommand()
         => _environments.GetCurrentName().Or(() => Constants.EnvironmentNameDefault)
-            // TODO: Need to figure out the correct error result here
             .Map(env => _input.Prompt(env).GetValueOrDefault(string.Empty))
             .OnSuccess(_ => _metadata.Add(Constants.Metadata.CurrentCommandIsUserInput, true.ToString()))
             .Match(

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,17 +11,16 @@ namespace StoneFruit;
 
 public interface IHandlerSetup
 {
-    // TODO: If we add a prefix here, we can scan an entire assembly into a prefix.
-    IHandlerSetup ScanAssemblyForHandlers(Assembly assembly);
+    IHandlerSetup ScanAssemblyForHandlers(Assembly? assembly, string? prefix = null);
 
-    IHandlerSetup ScanHandlersFromEntryAssembly()
-        => ScanAssemblyForHandlers(Assembly.GetExecutingAssembly());
+    IHandlerSetup ScanHandlersFromEntryAssembly(string? prefix = null)
+        => ScanAssemblyForHandlers(Assembly.GetEntryAssembly(), prefix);
 
-    IHandlerSetup ScanHandlersFromCurrentAssembly()
-        => ScanAssemblyForHandlers(new StackTrace(1).GetFrame(0)!.GetType().Assembly);
+    IHandlerSetup ScanHandlersFromCurrentAssembly(string? prefix = null)
+        => ScanAssemblyForHandlers(Assembly.GetCallingAssembly(), prefix);
 
-    IHandlerSetup ScanHandlersFromAssemblyContaining<T>()
-        => ScanAssemblyForHandlers(typeof(T).Assembly);
+    IHandlerSetup ScanHandlersFromAssemblyContaining<T>(string? prefix = null)
+        => ScanAssemblyForHandlers(typeof(T).Assembly, prefix);
 
     /// <summary>
     /// Set the Verb Extractor to use to get verbs from classes and methods where verbs are

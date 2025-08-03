@@ -55,10 +55,10 @@ public readonly struct Verb : IReadOnlyList<string>, IEquatable<Verb>
             ? this
             : new Verb(prefix.Concat(_verb).ToArray());
 
-    public Verb AddPrefix(string prefix)
+    public Verb AddPrefix(string? prefix)
         => string.IsNullOrEmpty(prefix)
             ? this
-            : new Verb(new[] { prefix }.Concat(_verb).ToArray());
+            : new Verb(SplitOnSpaces(prefix).Concat(_verb).ToArray());
 
     public string this[int index] => _verb[index];
 

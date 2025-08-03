@@ -131,9 +131,9 @@ public class HandlerSetup : IHandlerSetup
         return this;
     }
 
-    public IHandlerSetup ScanAssemblyForHandlers(Assembly assembly)
+    public IHandlerSetup ScanAssemblyForHandlers(Assembly? assembly, string? prefix = null)
     {
-        if (_scannedAssemblies.Contains(assembly))
+        if (assembly == null || _scannedAssemblies.Contains(assembly))
             return this;
 
         var handlerTypes = NotNull(assembly).GetTypes()
@@ -143,7 +143,7 @@ public class HandlerSetup : IHandlerSetup
         // 1) the type itself, as itself, so we can resolve the handler instance later, and
         // 2) a RegisteredHandler, which holds the handler type, so we can set up verb->handler mappings
         foreach (var type in handlerTypes)
-            _services.AddHandler(type);
+            _services.AddHandler(type, prefix);
 
         _scannedAssemblies.Add(assembly);
         return this;

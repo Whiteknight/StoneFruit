@@ -27,19 +27,19 @@ public static class ServiceCollectionExtensions
         });
     }
 
-    public static IServiceCollection AddHandler<T>(this IServiceCollection services)
+    public static IServiceCollection AddHandler<T>(this IServiceCollection services, string? prefix = null)
         where T : class, IHandlerBase
         => NotNull(services)
             .AddScoped<T>()
-            .AddSingleton(RegisteredHandler.Create<T>());
+            .AddSingleton(RegisteredHandler.Create<T>(prefix));
 
-    public static IServiceCollection AddHandler(this IServiceCollection services, Type handlerType)
+    public static IServiceCollection AddHandler(this IServiceCollection services, Type handlerType, string? prefix = null)
     {
         NotNull(services);
         NotNull(handlerType);
         if (!handlerType.IsHandlerType())
             throw new EngineBuildException($"Cannot register handler type {handlerType.Name}. It is not derived from IHandlerBase.");
         return services.AddScoped(handlerType)
-            .AddSingleton(new RegisteredHandler(handlerType));
+            .AddSingleton(new RegisteredHandler(handlerType, prefix));
     }
 }

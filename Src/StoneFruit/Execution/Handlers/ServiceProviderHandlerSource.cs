@@ -20,22 +20,18 @@ public class ServiceProviderHandlerSource : IHandlerSource
     public ServiceProviderHandlerSource(IServiceProvider provider, IVerbExtractor verbExtractor, IEnumerable<RegisteredHandler> handlerTypes)
     {
         _provider = provider;
-
         _verbs = handlerTypes
             .Where(sd => typeof(IHandlerBase).IsAssignableFrom(sd.HandlerType))
-            .SelectMany(sd =>
-                verbExtractor
-                    .GetVerbs(sd.HandlerType)
-                    .Match(
-                        verbs => verbs.Select(verb => new VerbInfo(verb, sd.HandlerType)),
-                        _ => [])
-
-            )
+            .SelectMany(sd => GetVerbsForHandler(verbExtractor, sd))
             .ToVerbTrie(vi => vi.Verb);
     }
 
     public Maybe<IHandlerBase> GetInstance(HandlerContext context)
         => _verbs.Get(context.Arguments).Bind(GetHandlerFromProvider);
+
+    public IEnumerable<IVerbInfo> GetAll() => _verbs.GetAll().Select(kvp => kvp.Value);
+
+    public Maybe<IVerbInfo> GetByName(Verb verb) => _verbs.Get(verb).Map(i => (IVerbInfo)i);
 
     private Maybe<IHandlerBase> GetHandlerFromProvider(VerbInfo st)
     {
@@ -47,9 +43,14 @@ public class ServiceProviderHandlerSource : IHandlerSource
         };
     }
 
-    public IEnumerable<IVerbInfo> GetAll() => _verbs.GetAll().Select(kvp => kvp.Value);
-
-    public Maybe<IVerbInfo> GetByName(Verb verb) => _verbs.Get(verb).Map(i => (IVerbInfo)i);
+    private static IEnumerable<VerbInfo> GetVerbsForHandler(IVerbExtractor verbExtractor, RegisteredHandler sd)
+        => verbExtractor
+            .GetVerbs(sd.HandlerType)
+            .Map(verbs => verbs.Select(verb => verb.AddPrefix(sd.Prefix)))
+            .Map(verbs => verbs.Select(verb => new VerbInfo(verb, sd.HandlerType)))
+            .Match(
+                vis => vis,
+                _ => []);
 
     private sealed record VerbInfo(Verb Verb, Type Type) : IVerbInfo
     {

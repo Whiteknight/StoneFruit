@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using StoneFruit.Execution;
-using StoneFruit.Execution.Templating;
 
 namespace StoneFruit.Cli;
 
@@ -15,9 +14,9 @@ internal static class Program
         builder.SetupHandlers(h => h
             // Scan for handlers using reflection. Looks for any public, non-abstract,
             // implementations of IHandlerBase in the specified assemblies
-            .ScanHandlersFromEntryAssembly()
-            .ScanHandlersFromCurrentAssembly()
-            .ScanHandlersFromAssemblyContaining<MyFirstHandler>()
+            //.ScanHandlersFromEntryAssembly()
+            .ScanHandlersFromCurrentAssembly("entry")
+            //.ScanHandlersFromAssemblyContaining<MyFirstHandler>()
 
             // Create an object instance and treat each of it's public methods as handlers
             // Do it two ways, so we can see the effect of a Section
