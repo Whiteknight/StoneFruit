@@ -64,7 +64,12 @@ public class CommandParser : ICommandParser
     }
 
     private static ResultsLists SeparateSuccessesAndFailures(ResultsLists l, Result<IReadOnlyList<IArgument>, ScriptsError> r)
-        => r.Match(l.Add, l.Add);
+        => r.Match(l.Add, e =>
+        {
+            if (e is not EmptyLine)
+                l.Add(e);
+            return l;
+        });
 
     private Result<IReadOnlyList<IArgument>, ScriptsError> CompileLine(string script, int line, IArgumentCollection args)
         => ParseScriptToCommandFormat(script, line).Bind(f => f.Format(args, line));

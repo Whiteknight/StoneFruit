@@ -18,6 +18,10 @@ public static class ScriptFormatGrammar
 
     private static IParser<char, CommandFormat> GetParserInternal()
     {
+        var comment = First(
+            PrefixedLine("#"),
+            PrefixedLine("//")
+        ).Transform(c => (IArgumentAccessor)new NullArgumentAccessor());
         var doubleQuotedString = StrippedDoubleQuotedString();
 
         var singleQuotedString = StrippedSingleQuotedString();
@@ -204,6 +208,8 @@ public static class ScriptFormatGrammar
         // All possible args
         // <flag> | <named> | <positional>
         var args = First<IArgumentAccessor>(
+            comment,
+
             literalNameFetchNamedArg,
             literalNameFetchPositionalArg,
             literalNamedArg,
@@ -223,7 +229,7 @@ public static class ScriptFormatGrammar
         // The command with verb and all arguments
         // command := <verb> <argAndWhitespace>* <end>
         return Rule(
-            args.List(Whitespace(), true),
+            args.List(Whitespace(), false),
             If(End(), Produce(() => true)),
 
             (a, _) => new CommandFormat(a)
@@ -232,6 +238,14 @@ public static class ScriptFormatGrammar
 
     private static Result<IReadOnlyList<IArgument>, ScriptsError> Empty()
         => Result<IReadOnlyList<IArgument>, ScriptsError>.Create([]);
+
+    private sealed class NullArgumentAccessor : IArgumentAccessor
+    {
+        public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArgumentCollection args, int line)
+        {
+            return Array.Empty<IArgument>();
+        }
+    }
 
     private sealed class FetchAllFlagsArgumentAccessor : IArgumentAccessor
     {

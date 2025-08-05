@@ -44,4 +44,42 @@ Rule: Scripts can call other scripts
             | Line    |
             | 0: a    |
 
+Rule: Scripts can have comments
 
+    Scenario: Full line comment bash style
+        Given I have a script "test" with lines:
+            | Line      |
+            | # comment |
+            | echo test |
+        When I run headless with input "test"
+        Then The output should contain: 
+            | Line |
+            | test |
+
+    Scenario: Full line comment CPP style
+        Given I have a script "test" with lines:
+            | Line       |
+            | // comment |
+            | echo test  |
+        When I run headless with input "test"
+        Then The output should contain: 
+            | Line |
+            | test |
+
+    Scenario: Part line comment bash style
+        Given I have a script "test" with lines:
+            | Line                |
+            | echo test # comment |
+        When I run headless with input "test"
+        Then The output should contain: 
+            | Line |
+            | test |
+
+    Scenario: Part line comment CPP style
+        Given I have a script "test" with lines:
+            | Line                 |
+            | echo test // comment |
+        When I run headless with input "test"
+        Then The output should contain: 
+            | Line |
+            | test |
