@@ -22,6 +22,16 @@ Rule: Can map simple string and int property values by name and position
             | c    |
             | True |
 
+    Scenario: I can map positional arguments to object properties with named as bool
+        Given I use the ArgumentMapping handlers
+        When I run headless with input "simple map to object a 2 c Flag1=true"
+        Then The output should contain:
+            | Line |
+            | a    |
+            | 2    |
+            | c    |
+            | True |
+
     Scenario: I can map named arguments to object properties
         Given I use the ArgumentMapping handlers
         When I run headless with input "simple map to object first=a second=2 third=c"
