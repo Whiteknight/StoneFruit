@@ -1,6 +1,6 @@
 ﻿Feature: Help
 
-Rule: Built-In Verbs
+Rule: List Built-In Verbs
 
     Scenario: Basic help
         When I run headless with input "help"
@@ -23,7 +23,7 @@ Rule: Built-In Verbs
             | Built-In Verbs | _metadata |
             | Built-In Verbs | _show     |
 
-Rule: Instance Methods
+Rule: List Instance Methods
 
     Scenario: Instance methods help
         Given I use ObjectWithHandlerMethod handlers
@@ -60,7 +60,7 @@ Rule: Instance Methods
             |       | simplemethodasync          |
             |       | methodwithonenamedargasync |
 
-Rule: Instance Methods in Sections
+Rule: List Instance Methods in Sections
 
     Scenario: Instance methods sections help
         Given I use ObjectWithHandlerMethod handlers in section "methods"
@@ -73,9 +73,9 @@ Rule: Instance Methods in Sections
             | methods | methods simple-method-async             |
             | methods | methods method-with-one-named-arg-async |
 
-Rule: Scripts
+Rule: List Scripts
 
-    Scenario: Scripts help
+    Scenario: Scripts help list
         Given I have a script "test-script" with lines:
             | Line      |
             | echo test |
@@ -84,11 +84,25 @@ Rule: Scripts
             | Group | Verb        |
             |       | test-script |
 
-    Scenario: Scripts in section help
+    Scenario: Scripts in section help list
         Given I have a script "test-script" in section "section" with lines:
             | Line      |
             | echo test |
         When I run headless with input "help"
         Then The help output should contain these verbs:
-            | Group   | Verb        |
+            | Group   | Verb                |
             | section | section test-script |
+
+Rule: Details
+
+    Scenario: Script help details
+        Given I have a script "test-script" with:
+            | Field       | Value                   |
+            | Line        | echo test               |
+            | Description | test script description |
+            | Usage       | test script usage       |
+            | Group       |                         |
+        When I run headless with input "help test-script"
+        Then The output should contain:
+            | Line              |
+            | test script usage |
