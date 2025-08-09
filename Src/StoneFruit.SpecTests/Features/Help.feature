@@ -112,6 +112,36 @@ Rule: List Scripts
             | Group   | Verb                |
             | section | section test-script |
 
+Rule: List Delegates
+
+    Scenario: Delegate handler
+        Given I register a simple delegate handler "test"
+        When I run headless with input "help"
+        Then The help output should contain these verbs:
+            | Group | Verb |
+            |       | test |
+
+    Scenario: Delegate handler in section
+        Given I register a simple delegate handler "test" in section "delegate"
+        When I run headless with input "help"
+        Then The help output should contain these verbs:
+            | Group    | Verb          |
+            | delegate | delegate test |
+
+    Scenario: Async delegate handler
+        Given I register a simple async delegate handler "test"
+        When I run headless with input "help"
+        Then The help output should contain these verbs:
+            | Group | Verb |
+            |       | test |
+
+    Scenario: Async delegate handler in section
+        Given I register a simple async delegate handler "test" in section "delegate"
+        When I run headless with input "help"
+        Then The help output should contain these verbs:
+            | Group    | Verb          |
+            | delegate | delegate test |
+
 Rule: Details
 
     Scenario: Script help details
@@ -125,3 +155,10 @@ Rule: Details
         Then The output should contain:
             | Line              |
             | test script usage |
+
+    Scenario: Help help
+        When I run headless with input "help help"
+        Then The output should contain at least:
+            | Line                                              |
+            | help [ -showall ]                                 |
+            | Get overview information for all available verbs. |
