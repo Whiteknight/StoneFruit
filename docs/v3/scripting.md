@@ -4,7 +4,7 @@ There are several methods of scripting in StoneFruit. These allow you to transla
 
 ## Scripts
 
-A script is a collection of zero or more commands which are executed in response to a single input command. These are setup in the `IEngineBuilder` and employ a sophisticated mechanism for translating arguments. Here is a simple example:
+A script is a collection of zero or more commands which are executed in response to a single input command. These are setup in the `StoneFruitApplicationBuilder` and employ a sophisticated mechanism for translating arguments. Here is a simple example:
 
 ```csharp
 builder.SetupHandlers(handlers => handlers
@@ -21,7 +21,7 @@ Arguments in a script use the Simplified argument syntax (see the [Arguments])(a
 
 #### Positional Arguments
 
-Positional arguments can be fetched from the input using the `[]` syntax. An integer index will fetch and consume the argument with that index, while a `[*]` will fetch all remaining unconsumed positional arguments. Positional arguments can also be gotten from the values of named input arguments using the `[]` syntax with a string integer of an integer argument. Literal positional values will be passed as-is:
+Positional arguments can be fetched from the command using the `[]` syntax. An integer index will fetch and consume the argument with that index, while a `[*]` will fetch all remaining unconsumed positional arguments. Positional arguments can also be gotten from the values of named command arguments using the `[]` syntax with a string integer of an integer argument. Literal positional values will be passed as-is:
 
 **Script**: `test [1] [*] [x] z`
 
@@ -31,7 +31,7 @@ Positional arguments can be fetched from the input using the `[]` syntax. An int
 
 #### Flag Arguments
 
-Flag arguments can be fetched and consumed from the input by name using the `?` syntax, or passed as literal flags with `-`
+Flag arguments can be fetched and consumed from the command by name using the `?` syntax, or passed as literal flags with `-`
 
 **Script**: `test ?a ?b -c`
 
@@ -41,7 +41,7 @@ Flag arguments can be fetched and consumed from the input by name using the `?` 
 
 #### Named Arguments
 
-Named arguments can be fetched from the input in a few ways. They can be fetched and consumed with name and value using `{name}` syntax, all remaining named arguments can be fetched and consumed with `{*}` syntax, and arguments can be given names using the  `name=[]` syntax. Literal named values can be passed like normal.
+Named arguments can be fetched from the command in a few ways. They can be fetched and consumed with name and value using `{name}` syntax, all remaining named arguments can be fetched and consumed with `{*}` syntax, and arguments can be given names using the  `name=[]` syntax. Literal named values can be passed like normal.
 
 **Script**: `test {a} b=['x'] c=[0] d=4 {*}`
 
@@ -88,7 +88,7 @@ Event scripts use the same argument formatting syntax as normal scripts (describ
 
 ### A Note on Errors
 
-When the runloop catches an unhandled exception, it will execute the `EngineError` script which usually will show the exception message and stack trace to the user. However, if the `EngineError` script also causes an error to be thrown, an error circle could  occur that would hang the application.
+When the runloop receives an error or catches an unhandled exception, it will execute the `EngineError` script which usually will show the exception message and stack trace to the user. However, if the `EngineError` script also causes an error to be thrown, an error circle could occur that would hang the application.
 
 To prevent this, StoneFruit keeps track of the current error during the `EngineError` script. If another error is thrown in the middle of the script the runloop will panic, display *a very stern message* and will terminate immediately. This behavior is not scripted and cannot be overridden.
 

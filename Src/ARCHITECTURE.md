@@ -9,10 +9,10 @@ This document describes the overall, high-level architecture of the StoneFruit l
 
 # High Level Flow
 
-1. The user builds an `Engine`, using `EngineBuilder` and (preferrably) the DI container of their choice.
+1. The user builds an `StoneFruitApplication`, using `StoneFruitApplicationBuilder`.
 2. The end-user starts the application, possibly in headless or interactive mode
-3. The `Engine` starts a runloop.
-   1. The runloop invokes `ICommandSource` to get the next command to execute
+3. The `StoneFruitApplication` starts a runloop.
+   1. The runloop pulls the next available command from the current list of `ICommandSource` objects.
    2. The command is parsed into an `IArguments`, if necessary, using the `ICommandParser`
    3. The `IArguments` is passed to the `CommandDispatcher`
      1. The `CommandDispatcher` calls the `IHandlerSource` to find a matching handler
@@ -29,13 +29,19 @@ StoneFruit should:
 * Provide sane and powerful defaults so the advanced user will not be required to replace components for most use-cases.
 * Provide a small interface for most setup operations, so the user can easily explore options and settings.
 
+StoneFruit catches and handles Exceptions, but most internal errors should be communicated with structured error objects instead. This gives us more control over where, when and how errors are handled and reported to the user.
+
+## Style
+
+StoneFruit is written in a heavily Functional style, leaning significantly on LINQ and `Result<,>` and `Maybe<>` classes (implementations of the *Either Monad* and *Option* monad, respectively). Errors, where possible, should be communicated as part of the `Result<,>` return value of a method instead of thrown as exceptions.
+
 # Code Map
 
 This section will talk about some of the basic organizational ideas and tell where some important subsystems are located. Each sub-heading here is a folder/namespace in the `StoneFruit` solution.
 
 ## StoneFruit/
 
-At the root of the `StoneFruit` project are the `Engine`, `EngineBuilder` and important abstractions. In general, the user should be able to build a complete StoneFruit application without any more preparation than `using StoneFruit;`.
+At the root of the `StoneFruit` project are the `StoneFruitApplication`, `StoneFruitApplicationBuilder` and important abstractions. In general, the user should be able to build a complete StoneFruit application without any more preparation than `using StoneFruit;`.
 
 ## StoneFruit/Utility
 
@@ -43,65 +49,61 @@ This directory contains utility and cross-cutting code which is not specifically
 
 **Note**: There is a tendency for this folder to become a dumping ground for all sorts of unrelated code. When possible, code from this folder should be moved to someplace more specific/appropriate.
 
-## StoneFruit/Trie
-
-This directory contains code related to the `VerbTrie` and related classes.
-
-## StoneFruit/Handlers
-
-The built-in handler types live here. This list should be kept very small and simple, to avoid unnecessary collisions with user-defined verbs. These built-in handlers are the only ones which are guaranteed to exist, and the only ones which built-in scripts may make use of.
-
 ## StoneFruit/Execution
 
-This folder and subfolders contains all the operational code for making StoneFruit run. This root directory contains several important objects used by the `EngineBuilder` and `Engine`, a few abstractions which are used internally, and several data objects for communicating state.
+The Execution directory contains all the internal implementation code for the library. This is stuff that the User typically does not need to interact with, directly. Almost all functionality in StoneFruit is implemented inside the Execution directory.
 
-**Invariant**: `Engine` contains a runloop but should delegate quickly to other objects to implement most logic, because so much of the system is pluggable. `Engine` should only contain the most fundamental code which cannot be meaningfully overridden.
+**Invariant**: `StoneFruitApplication` and `Engine` contain a runloop but should delegate quickly to other objects to implement most logic, because so much of the system is pluggable. These types should only contain the most fundamental code which cannot be meaningfully overridden.
 
-## StoneFruit/Execution/Arguments
+### StoneFruit/Execution/Arguments
 
-This folder contains argument parsers/grammars, objects to represent parsed arguments, and setup code for configuring parsers. `ParserSetup` is used by `EngineBuilder` to configure parsers. The `CommandParser` uses the configured grammar to turn a command string into an `IArguments`.
+This folder contains argument parsers/grammars, objects to represent parsed arguments, and setup code for configuring parsers. `ParserSetup` is used by `StoneFruitApplicationBuilder` to configure parsers. The `CommandParser` uses the configured grammar to turn a command string into an `IArguments`.
 
 **Invariant**: StoneFruit supports multiple syntaxes for specifying arguments. The system cannot make assumptions about which parser has been configured, or assume that the default parser will always be used. Certain syntaxes contain ambiguities in their grammar. It may not be possible in some parsers to determine the exact nature of arguments until they are accessed by the handler. The parser returns a raw, ambiguous format which may contain extra details, and these will be converted to definite argument values when they are accessed by the handler.
 
-## StoneFruit/Execution/CommandSource
+### StoneFruit/Execution/CommandCounting
+
+StoneFruit uses `ICommandCounter` implementations to count the number of commands executed without receiving user input. This count allows the application to detect and break out from runaway loops. This directory contains implementations for that.
+
+### StoneFruit/Execution/CommandSources
 
 This folder contains implementations of `ICommandSource` and related code for getting a stream of commands for consumption by the `Engine`.
 
-## StoneFruit/Execution/Environments
+### StoneFruit/Execution/Environments
 
-This folder contains classes for working with environments. An environment is an arbitrary user-defined object which serves as an execution context for a set of commands. Environments are configured during setup, may be constructed by a factory, and are held in an environment collection object.
+This folder contains classes for working with environments. An environment is an arbitrary user-defined name which serves as an execution context for a set of commands. Environment names are configured during setup. Once configured, each environment maintains it's own cache of values and state information.
 
-## StoneFruit/Execution/Handlers
+### StoneFruit/Execution/Exceptions
+
+Contains some of the common exception types used by the system.
+
+### StoneFruit/Execution/Handlers
 
 This folder contains code for working with handlers: extractors to get a verb from the handler class name and `IHandlerSource` implementations to hold lists of handlers and be able to return them by name.
 
-## StoneFruit/Execution/Output
+### StoneFruit/Execution/Help
 
-This folder contains logic for working with output vectors, including implementations of `IOutput`. For most cases, `IOutput` uses the console to display text. `OutputSetup` is used by the `EngineBuilder` to configure output vectors.
+Contains the `help` handler implementation and supporting code for extracting and displaying help information for registered handlers.
 
-## StoneFruit/Execution/Scripts
+### StoneFruit/Execution/IO
+
+This folder contains logic for working with input and output, including implementations of `IOutput` and `IInput`. For most cases, `IOutput` uses the console to display text. `IoSetup` is used by the `StoneFruitApplicationBuilder` to configure input and output.
+
+### StoneFruit/Execution/Metadata
+
+Contains code for working with metadata: cached values which are held in the current environment.
+
+### StoneFruit/Execution/Scripts
 
 This folder contains logic for working with scripts. The Script parser parses a format string into an accessor. An accessor turns an input `IArguments` into one or more output `IArguments`.
 
-## StoneFruit.Containers.Autofac
+### StoneFruit/Execution/Templating
 
-The Autofac bindings
+This folder contains grammars and formatters for templating output.
 
-## StoneFruit.Containers.Lamar
+### StoneFruit/Execution/Trie
 
-The Lamar bindings
-
-## StoneFruit.Containers.Microsoft
-
-The Microsoft.Extensions.DependencyInjection bindings
-
-## StoneFruit.Containers.StructureMap
-
-The StructureMap bindings
-
-## StoneFruit.Containers.Unity
-
-The Unity bindings
+This directory contains code related to the `VerbTrie` and related classes.
 
 # Scripts and Handlers
 
@@ -115,7 +117,7 @@ Being completely modular, care must be taken to make sure error conditions are h
 
 # Testing
 
-Because StoneFruit is designed to be completely modular, and because it can be hard to construct some of the core pieces without also instantating several dependencies, end-to-end functional tests are generally preferred over simple unit tests. The individual classes and methods are free to change so long as the user experience remains stable.
+Because StoneFruit is designed to be completely modular, and because it can be hard to construct some of the core pieces without also instantiating several dependencies, end-to-end functional tests and high-level spec tests are generally preferred over simple unit tests. The individual classes and methods are free to change so long as the user experience remains stable.
 
 Extensive integration testing makes sure that all the defaults and invariants are sane, and also that add-ons work together with the system as a whole.
 
@@ -125,7 +127,7 @@ StoneFruit supports arguments in multiple formats so that a familiar and intuiti
 
 Because of the ambiguity, argument parsing is done in two phases. First, arguments are parsed into a raw form which preserves ambiguities if they exist. Second, arguments are identified unambiguously when a handler attempts to access them. From the example above, if we have the ambiguous sequence `--foo bar`, the user can either request the named argument `foo` or it can search for a flag `--foo` (which marks `bar` as a positional) or it can search for the next positional argument (which returns `bar` and marks `--foo` unambiguously as a flag).
 
-When a user send an input command to the engine, the following steps happen:
+When a user sends an input command to the engine, the following steps happen:
 
 1. The string is parsed into an `IArguments` which maintains any ambiguities
 2. A list of leading positionals (unambiguous positionals which are not preceeded by a named or flag argument) are pulled out as Verb Candidates

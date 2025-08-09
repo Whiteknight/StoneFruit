@@ -5,37 +5,30 @@ First let's create a handler to do some basic work:
 ```csharp
 public class MyFirstHandler : IHandler
 {
-    private readonly IOutput _output;
-
-    public MyFirstHandler(IOutput output) 
+    public void Execute(IArguments arguments, HandlerContext context)
     {
-        _output = output;
-    }
-
-    public void Execute()
-    {
-        _output.WriteLine("Starting the job...");
+        var output = context.Output;
+        output.WriteLine("Starting the job...");
         // .. Do work here ..
-        _output.WriteLine("Done.");
+        output.WriteLine("Done.");
     }
 }
 ```
 
-Now in our entry point, we can setup and run the engine. For the sake of argument we're going to use the Lamar handler source from the `StoneFruit.Containers.Lamar` package, though you can choose another supported DI container with only minor changes:
+Now in our entry point, we can setup and run the application.
+
+```csharp
+
+```
+
 
 ```csharp
 using StoneFruit;
-using StoneFruit.Containers.Ninject;
 
 public static void Main(string[] args)
 {
-    var services = new ServiceRegistry();
-    services.SetupEngine<MyEnvironment>(engineBuilder => {
-
-    });
-    var container = new Container(services);
-    var engine = container.GetService<Engine>();
-    engine.RunInteractive();
+    var stonefruit = StoneFruitApplicationBuilder.BuildDefault();
+    stonefruit.RunWithCommandLineArguments();
 }
 ```
 
@@ -136,43 +129,23 @@ public class MyEnvironment
     public string DatabaseConnectionString => _config.GetSections("ConnectionStrings")["MyDatabase"];
 }
 
-// The environment factory which creates environment objects on demand
-public class MyEnvironmentFactory : IEnvironmentFactory
-{
-    private readonly IReadOnlyList<string> _environments;
-
-    public MyEnvironmentFactory()
-    {
-        var baseDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-        // Get a list of config files in the directory.
-        // Each file corresponds to a separate environment
-        _environments = Directory.EnumerateFiles($"{baseDir}\\Configs\\")
-            .Where(s => s.EndsWith(".json"))
-            .Select(Path.GetFileName)
-            .Select(s => s.Substring(0, s.Length - ".json".Length))
-            .ToArray();
-    }
-
-    public object Create(string arg) => new MyEnvironment(arg);
-
-    public IReadOnlyCollection<string> ValidEnvironments => _environments;
-}
-```
-
-We upgrade our EngineBuilder to account for environments:
-
-```csharp
 public static void Main(string[] args)
 {
-    var services = new ServiceRegistry();
-    services.SetupEngine<MyEnvironment>(engineBuilder => engineBuilder
-        .SetupEnvironments(e => e
-            .UseFactory(new MyEnvironmentFactory())
-        )
-    );
-    var container = new Container(services);
-    var engine = container.GetService<Engine>();
-    engine.RunInteractive();
+    // Get a list of config files. These are our environments.
+    var environments = Directory.EnumerateFiles($"{baseDir}\\Configs\\")
+        .Where(s => s.EndsWith(".json"))
+        .Select(Path.GetFileName)
+        .Select(s => s.Substring(0, s.Length - ".json".Length))
+        .ToArray()
+
+    var builder = StoneFruitApplicationBuilder.Create();
+    builder.SetupEnvironments(e => e
+        .SetEnvironments(environments));
+
+    // Register the MyEnvironment object for each individual environment.
+    builder.Services.AddPerEnvironment((provider, name) => new MyEnvironment(name));
+    var stonefruit = builder.Build();
+    stonefruit.RunWithCommandLineArguments();
 }
 ```
 
@@ -196,27 +169,26 @@ Now, we can update our handler to take the environment object in the constructor
 ```csharp
 public class MyFirstHandler : IHandler
 {
-    private readonly IOutput _output;
     private readonly MyEnvironment _env;
 
-    public MyFirstHandler(IOutput output, MyEnvironment environment) 
+    public MyFirstHandler(MyEnvironment environment) 
     {
-        _output = output;
         _env = environment
     }
 
-    public void Execute()
+    public void Execute(IArguments arguments, HandlerContext context)
     {
-        _output.WriteLine("Starting the job...");
+        var output = context.Output;
+        output.WriteLine("Starting the job...");
         var connectionString = _env.DatabaseConnectionString;
         // .. Connect to the DB and do work here ..
-        _output.WriteLine("Done.");
+        output.WriteLine("Done.");
     }
 }
 ```
 
 ## Tips To Keep Going
 
-1. Create your EntityFramework `DbContext` or other DB access objects inside your environment object, so it's always available when you need it
+1. Create your EntityFramework `DbContext` or other DB access objects per environment, so they always use the current connection string
 1. Or better yet, inject your current environment object into your `DbContext` to get the connection string directly, and inject the `DbContext` into your handler
 1. Add your program to your `%PATH%` (or `$PATH` on Linux) so you can easily access it from your terminal of choice

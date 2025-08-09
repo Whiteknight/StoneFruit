@@ -4,9 +4,9 @@ Handlers are the central mechanism for encapsulation of responsibility and funct
 
 ## Basic Control Flow
 
-Control flow in StoneFruit starts with an Engine:
+Control flow in StoneFruit starts with an StoneFruitApplication:
 
-1. The `Engine` runloop gets an input string of text from the user
+1. The `StoneFruitApplication` runloop gets an input string of text from the user
 1. The string of text is parsed into an `IArguments` object
 1. The `IArguments` object is passed to the `CommandDispatcher`
 1. The `CommandDispatcher` looks up the appropriate Handler for the command
@@ -32,8 +32,8 @@ Handlers can take several forms:
 
 1. Classes which implement one of the interfaces `IHandler` or `IAsyncHandler`
 1. The public named methods on an object instance 
-1. Anonymous `Action<HandlerContext>` or asynchronous `Func<HandlerContext, CancellationToken, Task>` delegates
-1. Scripted combinations of other handlers
+1. Anonymous `Action<IArguments, HandlerContext>` or asynchronous `Func<IArguments, HandlerContext, CancellationToken, Task>` delegates
+1. [Scripted](scripting.md) combinations of other handlers
 
 StoneFruit comes with a few built-in handlers for basic operations, but most of the interesting handlers will be developed by you. The built-in `help` verb will list all the verbs currently registered with the StoneFruit engine.
 
@@ -45,19 +45,10 @@ Here is an example of a synchronous handler class:
 [Verb("example")]
 public class MyExampleHandler : IHandler
 {
-    private readonly IArguments _args;
-    private readonly IOutput _output;
-
-    public MyExampleHandler(IArguments args, IOutput output)
-    {
-        _args = args;
-        _output = output;
-    }
-
     public static string Description => "...";
     public static string Usage => "...";
 
-    public void Execute()
+    public void Execute(IArguments arguments, HandlerContext context)
     {
         ...
     }
@@ -72,19 +63,10 @@ Here is an example of an asynchronous handler class, identical in function to th
 [Verb("example")]
 public class MyExampleHandler : IAsyncHandler
 {
-    private readonly IArguments _args;
-    private readonly IOutput _output;
-
-    public MyExampleHandler(IArguments args, IOutput output)
-    {
-        _args = args;
-        _output = output;
-    }
-
     public static string Description => "";
     public static string Usage => "";
 
-    public async Task ExecuteAsync(CancellationToken token)
+    public async Task ExecuteAsync(IArguments arguments, HandlerContext context, CancellationToken token)
     {
         ...
     }
@@ -174,11 +156,11 @@ You can use lambdas and function delegates as handlers:
 ```csharp
 services.SetupEngine(b => b
     // synchronous
-    .SetupHandlers(h => h.Add("example", c => { ... }))
+    .SetupHandlers(h => h.Add("example", (args, context) => { ... }))
 
     // asynchronous
-    .SetupHandlers(h => h.Add("example", async (c, token) => { ... }))
+    .SetupHandlers(h => h.Add("example", async (args, context, token) => { ... }))
 );
 ```
 
-The delegate should be assignable to `Action<HandlerContext>` for synchronous or `Func<HandlerContext, CancellationToken, Task>` for asynchronous. The `HandlerContext` object includes several important internal objects which can provide basic functionality.
+The delegate should be assignable to `Action<IArguments, HandlerContext>` for synchronous or `Func<IArguments, HandlerContext, CancellationToken, Task>` for asynchronous. The `HandlerContext` object includes several important internal objects which can provide basic functionality.

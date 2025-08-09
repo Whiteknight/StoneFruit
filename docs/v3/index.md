@@ -29,7 +29,6 @@ stonefruit.RunWithCommandLineArguments();
 
 To have more control over your setup and access advanced features:
 
-
 ```csharp
 var builder = StoneFruitApplicationBuilder.Create();
 ... configure builder here ...
