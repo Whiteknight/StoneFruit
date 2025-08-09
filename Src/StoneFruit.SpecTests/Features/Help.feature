@@ -73,6 +73,25 @@ Rule: List Instance Methods in Sections
             | methods | methods simple-method-async             |
             | methods | methods method-with-one-named-arg-async |
 
+    Scenario: Instance methods sections help starts with 1
+        Given I use ObjectWithHandlerMethod handlers in section "methods"
+        When I run headless with input "help -startswith methods"
+        Then The help output should contain these verbs:
+            | Group   | Verb                                    |
+            | methods | methods simple-method                   |
+            | methods | methods method-with-one-flag-arg        |
+            | methods | methods method-with-one-named-arg       |
+            | methods | methods simple-method-async             |
+            | methods | methods method-with-one-named-arg-async |
+
+    Scenario: Instance methods sections help starts with 2
+        Given I use ObjectWithHandlerMethod handlers in section "methods"
+        When I run headless with input "help -startswith methods simple"
+        Then The help output should contain these verbs:
+            | Group   | Verb                                    |
+            | methods | methods simple-method                   |
+            | methods | methods simple-method-async             |
+
 Rule: List Scripts
 
     Scenario: Scripts help list
