@@ -50,6 +50,8 @@ public readonly struct Verb : IReadOnlyList<string>, IEquatable<Verb>
 
     public static implicit operator Verb(string[] s) => new Verb(s);
 
+    public bool IsValid => _verb != null && _verb.Length > 0;
+
     public Verb AddPrefix(string[] prefix)
         => prefix == null || prefix.Length == 0 || prefix.All(string.IsNullOrWhiteSpace)
             ? this

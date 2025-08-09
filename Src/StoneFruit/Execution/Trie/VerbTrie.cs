@@ -75,7 +75,7 @@ public class VerbTrie<TValue>
         for (int index = 0; index < keys.Count; index++)
         {
             var arg = keys[index];
-            var key = arg.AsString().ToLowerInvariant();
+            var key = arg.AsString();
             var node = current.GetChild(key);
             if (node == null)
                 break;

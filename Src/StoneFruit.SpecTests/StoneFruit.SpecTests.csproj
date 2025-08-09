@@ -19,6 +19,12 @@
     <ProjectReference Include="..\StoneFruit\StoneFruit.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="ScriptFile.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <PropertyGroup>
     <CodeAnalysisRuleSet>../StyleCop.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
