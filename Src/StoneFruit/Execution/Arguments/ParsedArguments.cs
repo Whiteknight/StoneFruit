@@ -81,8 +81,6 @@ public class ParsedArguments : IArgumentCollection, IVerbSource
 
     public void SetVerbCount(int count)
     {
-        // TODO: See if we can avoid removing the raw args from the beginning, so .Reset()
-        // actually returns us to the beginning state?
         _rawArguments.RemoveRange(0, count);
     }
 

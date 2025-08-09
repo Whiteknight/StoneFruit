@@ -68,10 +68,6 @@ public class ServiceProviderMethodInvoker : IHandlerMethodInvoker
         if (parameter.ParameterType == typeof(bool))
             return args.HasFlag(parameter.Name!);
 
-        // TODO: If we have an array or collection type, we should be able to fill that in with
-        // the list of all matching named arguments with that name, or the value of all remaining
-        // positionals, etc.
-
         IValuedArgument arg = args.Get(parameter.Name!);
         if (!arg.Exists())
             arg = args.Shift();
