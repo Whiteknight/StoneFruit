@@ -33,4 +33,11 @@ public record OutputStepDefinitions(ScenarioContext Context)
         foreach (var line in dataTable.CreateSet<LineOfText>())
             output.EnqueueInputLine(line.Line);
     }
+
+    [Then("The output should be empty")]
+    public void ThenTheOutputShouldBeEmpty()
+    {
+        var output = Context.GetIo();
+        output.Lines.Length.Should().Be(0);
+    }
 }
