@@ -54,7 +54,7 @@ public class IoSetup : IIoSetup
         return this;
     }
 
-    public void BuildUp(IServiceCollection services)
+    public static void BuildUp(IServiceCollection services)
     {
         services.TryAddSingleton<IOutput, ConsoleIO>();
         services.TryAddSingleton<IInput, ConsoleIO>();

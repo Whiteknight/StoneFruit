@@ -3,8 +3,8 @@ using System.Linq;
 using ParserObjects;
 using StoneFruit.Execution.Exceptions;
 using StoneFruit.Execution.Scripts;
-using static ParserObjects.Parsers;
 using static ParserObjects.Parsers<char>;
+using static ParserObjects.Parsers;
 using static ParserObjects.Sequences;
 using static StoneFruit.Utility.Assert;
 
@@ -98,10 +98,9 @@ public class CommandParser : ICommandParser
             return this;
         }
 
-        public ResultsLists Add(ScriptsError error)
+        public void Add(ScriptsError error)
         {
             Errors.Add(error);
-            return this;
         }
     }
 }

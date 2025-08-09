@@ -127,7 +127,7 @@ public sealed class StoneFruitApplicationBuilder
         _handlers.BuildUp(services);
         _environments.BuildUp(services);
         _parsers.BuildUp(services);
-        _output.BuildUp(services);
+        IoSetup.BuildUp(services);
     }
 
     private void SetupCoreEngineRegistrations(IServiceCollection services)
