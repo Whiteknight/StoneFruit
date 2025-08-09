@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using StoneFruit.Execution.Templating;
 using StoneFruit.Utility;
 
@@ -7,6 +8,7 @@ namespace StoneFruit.Execution.IO;
 /// <summary>
 /// An ITerminalOutput adaptor for System.Console and ReadLine.
 /// </summary>
+[ExcludeFromCodeCoverage(Justification = "Hard to test System.Console without capturing IO streams")]
 public class ConsoleIO : IOutput, IInput
 {
     public ConsoleIO(ITemplateParser parser)
