@@ -1,8 +1,7 @@
 #!/bin/bash
 
-# Path to the OpenCover.Console.exe executable
-# TODO: see if we can find a way to make this a relative path for a more repeatable process
-OPENCOVER_EXE=$HOMEPATH/.nuget/packages/opencover/4.7.922/tools/OpenCover.Console.exe
+# PREREQUISITE: Install Coverlet 
+#   dotnet tool install --global coverlet.console
 
 # URL to Sonarqube. If nginx is working we can use the first. "if"
 SONARQUBE_URL=http://localhost:9000
@@ -11,16 +10,12 @@ dotnet sonarscanner begin \
     -d:sonar.token="$SQ_STONEFRUIT_KEY" \
     -d:sonar.host.url="$SONARQUBE_URL" \
     -k:StoneFruit \
-    -d:"sonar.cs.opencover.reportsPaths=coverage.xml"
+    -d:"sonar.cs.opencover.reportsPaths=**/coverage.opencover.xml"
 
-dotnet build Src/StoneFruit.sln
+dotnet build --no-incremental Src/StoneFruit.sln
 
-$OPENCOVER_EXE \
-    -target:"c:\Program Files\dotnet\dotnet.exe" \
-    -targetargs:"test Src/StoneFruit.sln" \
-    -output:"coverage.xml" \
-    -oldstyle \
-    -register:user
+#dotnet test --collect:"XPlat Code Coverage;Format=opencover"  Src/StoneFruit.sln
+dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover Src/StoneFruit.sln
 
 dotnet sonarscanner end -d:sonar.token="$SQ_STONEFRUIT_KEY"
-rm coverage.xml
+#rm coverage.xml
