@@ -25,14 +25,21 @@ public class ShowHandler : IHandler
         var command = arguments.Get(0).Require("Must provide thing to show").AsString();
         switch (command)
         {
-            // TODO: Would like to include some kind of library version output here too.
             case "exitcodes":
                 ShowExitCodes(context.Output);
                 break;
             case "settings":
                 ShowSettings(context.Output, _settings);
                 break;
+            case "version":
+                ShowStonefruitVersion(context.Output);
+                break;
         }
+    }
+
+    private static void ShowStonefruitVersion(IOutput output)
+    {
+        output.WriteLine($"StoneFruit Version={typeof(Engine).Assembly.GetName().Version}");
     }
 
     private static void ShowExitCodes(IOutput output)
