@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using StoneFruit.Execution.Templating;
 
 namespace StoneFruit.Execution.IO;
@@ -60,5 +61,6 @@ public class IoSetup : IIoSetup
         services.TryAddSingleton<IInput, ConsoleIO>();
         services.TryAddSingleton<ICommandLine, EnvironmentCommandLine>();
         services.TryAddSingleton(_ => DefaultTemplateFormat.Parser.Create());
+        services.TryAddSingleton(typeof(ILogger<>), typeof(OutputLogger<>));
     }
 }
