@@ -99,7 +99,8 @@ public sealed class Engine
             // and hope for the best
             var args = SyntheticArguments.From(
                 ("message", e.Message),
-                ("stacktrace", e.StackTrace ?? "")
+                ("stacktrace", e.StackTrace ?? ""),
+                ("exitcode", ExitCode.Constants.UnhandledException.ToString())
             );
             HandleError(e, _state.EventCatalog.EngineError, args);
         }
@@ -143,12 +144,16 @@ public sealed class Engine
         // We can't remove metadata in the script, because users might change the script
         // and inadvertantly break loop detection.
         _state.Metadata.Add(Constants.Metadata.Error, currentException, false);
+        if (_state.RunMode == EngineRunMode.Headless)
+            _state.Commands.Prepend($"{ExitHandler.Name} {ExitCode.Constants.UnhandledException}");
         _state.Commands
             .Prepend($"{MetadataHandler.Name} remove {Constants.Metadata.Error}")
             .Prepend(script, args);
+
         // Current command queue:
         // 1. Error-handling script
         // 2. "metadata remove __CURRENT_EXCEPTION"
-        // 3. previous contents of command queue, if any
+        // 3. "exit <exitcode>" (headless mode only)
+        // 4. previous contents of command queue, if any
     }
 }

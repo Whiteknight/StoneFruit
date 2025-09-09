@@ -5,6 +5,7 @@ Scenario: Can run with input
     Then The output should contain:
         | Line |
         | test |
+    And The exit code is 0
 
 Scenario: Can run async with input
     When I run async with input "echo 'test'"

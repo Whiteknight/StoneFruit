@@ -20,26 +20,33 @@ public readonly record struct ExitCode(int Value)
         public const int HeadlessHelp = 0;
 
         /// <summary>
+        /// Exit code when we have an unhandled exception in headless mode whic
+        /// causes us to abort early.
+        /// </summary>
+        public const int UnhandledException = 1;
+
+        /// <summary>
         /// Exit code when we don't have a verb in headless mode.
         /// </summary>
-        public const int HeadlessNoVerb = 1;
+        public const int HeadlessNoVerb = 2;
 
         /// <summary>
         /// Exit code for when a cascade error forces a premature exit.
         /// </summary>
-        public const int CascadeError = 2;
+        public const int CascadeError = 3;
 
         /// <summary>
         /// Exit code for when the maximum number of commands are executed in headless
         /// mode.
         /// </summary>
-        public const int MaximumCommands = 3;
+        public const int MaximumCommands = 4;
 
         public const int Unknown = 100;
     }
 
     public static ExitCode Ok => new ExitCode(Constants.Ok);
     public static ExitCode HeadlessHelp => new ExitCode(Constants.HeadlessHelp);
+    public static ExitCode UnhandledException => new ExitCode(Constants.UnhandledException);
     public static ExitCode HeadlessNoVerb => new ExitCode(Constants.HeadlessNoVerb);
     public static ExitCode CascadeError => new ExitCode(Constants.CascadeError);
     public static ExitCode MaximumCommands => new ExitCode(Constants.MaximumCommands);

@@ -26,3 +26,18 @@ Rule: Headless help
         Then The output should contain:
             | Line          |
             | headless help |
+        And The exit code is 0
+
+Rule: Headless unhandled exception
+
+   Scenario: Headless unhandled exception event runs
+        Given I use the ThrowExceptionHandler
+        When I run headless with input "throw exception"
+        Then The exit code is 1
+
+Rule: Headless unhandled exception
+
+   Scenario: Headless no verb
+        Given I use the ThrowExceptionHandler
+        When I run headless with input ""
+        Then The exit code is 2
