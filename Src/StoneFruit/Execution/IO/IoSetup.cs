@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using StoneFruit.Execution.Templating;
@@ -8,10 +9,13 @@ namespace StoneFruit.Execution.IO;
 public class IoSetup : IIoSetup
 {
     private readonly IServiceCollection _services;
+    private readonly Dictionary<LogLevel, Brush> _logColors;
+    private LogLevel _logLevel = LogLevel.Information;
 
     public IoSetup(IServiceCollection services)
     {
         _services = services;
+        _logColors = LoggingConfiguration.GetColorsLookup();
     }
 
     public IIoSetup UseOutput<T>()
@@ -55,12 +59,25 @@ public class IoSetup : IIoSetup
         return this;
     }
 
-    public static void BuildUp(IServiceCollection services)
+    public IIoSetup UseLogLevel(LogLevel logLevel)
+    {
+        _logLevel = logLevel;
+        return this;
+    }
+
+    public IIoSetup SetLogColor(LogLevel logLevel, Brush brush)
+    {
+        _logColors[logLevel] = brush;
+        return this;
+    }
+
+    public void BuildUp(IServiceCollection services)
     {
         services.TryAddSingleton<IOutput, ConsoleIO>();
         services.TryAddSingleton<IInput, ConsoleIO>();
         services.TryAddSingleton<ICommandLine, EnvironmentCommandLine>();
         services.TryAddSingleton(_ => DefaultTemplateFormat.Parser.Create());
         services.TryAddSingleton(typeof(ILogger<>), typeof(OutputLogger<>));
+        services.TryAddSingleton(new LoggingConfiguration(_logLevel, _logColors));
     }
 }

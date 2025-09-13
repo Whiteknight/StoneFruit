@@ -16,7 +16,7 @@ namespace StoneFruit;
 public sealed class StoneFruitApplicationBuilder
 {
     private readonly HandlerSetup _handlers;
-    private readonly IoSetup _output;
+    private readonly IoSetup _io;
     private readonly EngineEventCatalog _eventCatalog;
     private readonly EnvironmentSetup _environments;
     private readonly ArgumentsSetup _parsers;
@@ -29,7 +29,7 @@ public sealed class StoneFruitApplicationBuilder
         Services = NotNull(services);
         _handlers = new HandlerSetup(services);
         _eventCatalog = new EngineEventCatalog();
-        _output = new IoSetup(services);
+        _io = new IoSetup(services);
         _environments = new EnvironmentSetup();
         _parsers = new ArgumentsSetup();
         _settings = new EngineSettings();
@@ -86,7 +86,7 @@ public sealed class StoneFruitApplicationBuilder
     /// <returns></returns>
     public StoneFruitApplicationBuilder SetupIo(Action<IIoSetup> setup)
     {
-        setup?.Invoke(_output);
+        setup?.Invoke(_io);
         return this;
     }
 
@@ -127,7 +127,7 @@ public sealed class StoneFruitApplicationBuilder
         _handlers.BuildUp(services);
         _environments.BuildUp(services);
         _parsers.BuildUp(services);
-        IoSetup.BuildUp(services);
+        _io.BuildUp(services);
     }
 
     private void SetupCoreEngineRegistrations(IServiceCollection services)
