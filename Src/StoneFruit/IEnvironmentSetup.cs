@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace StoneFruit;
 
@@ -20,4 +21,12 @@ public interface IEnvironmentSetup
     /// <param name="name"></param>
     /// <returns></returns>
     IEnvironmentSetup AddEnvironment(string name);
+
+    /// <summary>
+    /// Register an observer to be notified when the environment has been changed. Useful for
+    /// loading configurations or preparing services.
+    /// </summary>
+    /// <param name="onChanged"></param>
+    /// <returns></returns>
+    IEnvironmentSetup OnEnvironmentChanged(Action<string> onChanged);
 }

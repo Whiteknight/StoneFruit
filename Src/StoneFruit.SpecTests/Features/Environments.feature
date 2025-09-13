@@ -200,3 +200,28 @@ Rule: PerEnvironment objects maintain state until env changed
             | Environment changed to B           |
             | Environment changed to A           |
             | A: 1                               |
+
+Rule: Change observers
+    
+    Background: 
+        Given I clear the EngineStartInteractive script
+        And I use an environment changed observer
+        And I use the environments:
+            | Environment |
+            | A           |
+            | B           |
+
+    Scenario: I can observe a changed environment
+        Given I input the following lines:
+            | Line  |
+            | env B |
+            | env A |
+        When I run interactively in environment "A"
+        Then The output should contain:
+            | Line                     |
+            | OBSERVED A               |
+            | Environment changed to A |
+            | OBSERVED B               |
+            | Environment changed to B |
+            | OBSERVED A               |
+            | Environment changed to A |

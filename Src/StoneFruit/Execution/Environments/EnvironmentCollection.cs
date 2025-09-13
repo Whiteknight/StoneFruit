@@ -1,27 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Environments;
 
+public sealed record EnvironmentChangedObserver(Action<string> Action);
+
 /// <summary>
-/// An IEnvironmentCollection implementation which uses an IEnvironmentFactory to create environments
-/// on demand.
+/// Keeps track of the list of available environments including which one is the current
+/// environment.
 /// </summary>
 public class EnvironmentCollection : IEnvironments
 {
     public static IReadOnlyList<string> DefaultNamesList => [Constants.EnvironmentNameDefault];
+
     private readonly IReadOnlyDictionary<string, IEnvironment> _environments;
     private readonly EnvironmentObjectCache _cache;
+    private readonly IReadOnlyList<EnvironmentChangedObserver> _observers;
 
     private Maybe<string> _currentName;
 
-    public EnvironmentCollection(IReadOnlyList<string>? names)
+    public EnvironmentCollection(IReadOnlyList<string>? names, IEnumerable<EnvironmentChangedObserver> changeObservers)
     {
         var validNames = names == null || names.Count == 0 ? DefaultNamesList : names;
         _cache = [];
         _environments = validNames.ToDictionary(n => n, n => (IEnvironment)new Environment(n, _cache), StringComparer.OrdinalIgnoreCase);
         _currentName = default;
+        _observers = changeObservers.OrEmptyIfNull().ToArray();
     }
 
     public Result<string, EnvironmentError> GetCurrentName()
@@ -41,7 +47,12 @@ public class EnvironmentCollection : IEnvironments
             return GetCurrent();
         if (!_environments.ContainsKey(name))
             return new InvalidEnvironment(name);
-        _currentName = name;
+        if (!_currentName.Is(name))
+        {
+            _currentName = name;
+            NotifyChange(_currentName.GetValueOrThrow());
+        }
+
         return GetCurrent();
     }
 
@@ -52,6 +63,12 @@ public class EnvironmentCollection : IEnvironments
             return new InvalidEnvironment(index.ToString());
         SetCurrent(allEnvs[index]);
         return GetCurrent();
+    }
+
+    private void NotifyChange(string name)
+    {
+        foreach (var observer in _observers)
+            observer.Action(name);
     }
 
     private sealed class Environment : IEnvironment

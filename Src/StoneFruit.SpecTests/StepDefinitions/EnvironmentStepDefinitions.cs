@@ -1,5 +1,4 @@
-﻿
-using StoneFruit.SpecTests.Support;
+﻿using StoneFruit.SpecTests.Support;
 
 namespace StoneFruit.SpecTests.StepDefinitions;
 
@@ -11,6 +10,13 @@ public record EnvironmentStepDefinitions(ScenarioContext Context)
     {
         var builder = Context.GetEngineBuilder();
         builder.SetupEnvironments(e => e.SetEnvironments(dataTable.CreateSet<EnvironmentName>().Select(e => e.Environment).ToList()));
+    }
 
+    [Given("I use an environment changed observer")]
+    public void GivenIUseAnEnvironmentChangedObserver()
+    {
+        var io = Context.GetIo();
+        var builder = Context.GetEngineBuilder();
+        builder.SetupEnvironments(e => e.OnEnvironmentChanged(name => io.WriteLine($"OBSERVED {name}")));
     }
 }

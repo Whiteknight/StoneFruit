@@ -45,6 +45,7 @@ internal static class Program
         );
         builder.SetupEnvironments(e => e
             .SetEnvironments(new[] { "Local", "Testing", "Production" })
+            .OnEnvironmentChanged(name => Console.WriteLine($"OBSERVER Environment changed to {name}"))
         );
         builder.SetupEvents(e =>
         {

@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using StoneFruit.Execution.Exceptions;
+using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Environments;
 
@@ -11,14 +13,17 @@ namespace StoneFruit.Execution.Environments;
 /// </summary>
 public class EnvironmentSetup : IEnvironmentSetup
 {
+    private List<Action<string>>? _observers;
     private List<string>? _names;
 
     public void BuildUp(IServiceCollection services)
     {
-        services.TryAddSingleton<IEnvironments>(p => new EnvironmentCollection(_names));
+        services.TryAddSingleton<IEnvironments>(p => new EnvironmentCollection(_names, p.GetServices<EnvironmentChangedObserver>()));
         services.AddScoped(p => p.GetRequiredService<IEnvironments>()
             .GetCurrent()
             .Match(e => e, err => throw EnvironmentNotSetException.Create(err)));
+        foreach (var observer in _observers.OrEmptyIfNull())
+            services.AddSingleton(new EnvironmentChangedObserver(observer));
     }
 
     public IEnvironmentSetup SetEnvironments(IReadOnlyList<string> names)
@@ -38,6 +43,17 @@ public class EnvironmentSetup : IEnvironmentSetup
         _names ??= [];
         if (!_names.Contains(name))
             _names.Add(name);
+        return this;
+    }
+
+    public IEnvironmentSetup OnEnvironmentChanged(Action<string> onChanged)
+    {
+        if (onChanged is not null)
+        {
+            _observers ??= [];
+            _observers.Add(onChanged);
+        }
+
         return this;
     }
 }

@@ -12,7 +12,7 @@ public static class EnumerableExtensions
     /// <typeparam name="T"></typeparam>
     /// <param name="source"></param>
     /// <returns></returns>
-    public static IEnumerable<T> OrEmptyIfNull<T>(this IEnumerable<T> source)
+    public static IEnumerable<T> OrEmptyIfNull<T>(this IEnumerable<T>? source)
         => source ?? [];
 
     /// <summary>
