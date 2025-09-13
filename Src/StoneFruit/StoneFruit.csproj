@@ -8,7 +8,7 @@
     <AssemblyName>StoneFruit</AssemblyName>
     <RootNamespace>StoneFruit</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>3.0.1</Version>
+    <Version>3.1.0</Version>
       
     <Authors>Andrew F. Whitworth</Authors>
     <Company />

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using ParserObjects;
 using StoneFruit.Execution.IO;
-using static ParserObjects.Parsers;
 using static ParserObjects.Parsers<char>;
+using static ParserObjects.Parsers;
 using static ParserObjects.Parsers.C;
 
 namespace StoneFruit.Execution.Templating;
@@ -51,13 +51,31 @@ public static class DefaultTemplateFormat
 
             var pipelineTag = Rule(
                 Match("{{"),
+                ows,
                 pipeline,
+                ows,
                 Match("}}"),
-                (_, p, _) => TemplatePart.Pipeline(p));
+                (_, _, p, _, _) => TemplatePart.Pipeline(p));
 
             var color = First(
                 Drawing.Color(),
                 Drawing.ConsoleColor().Transform(Brush.ToColor));
+
+            var brush = First(
+                MatchChars("default", true).Transform(_ => Brush.Default),
+                Rule(
+                    color,
+                    Optional(
+                        Rule(
+                            MatchChar(','),
+                            color,
+                            (_, bg) => bg
+                        ),
+                        () => Brush.Default.GetColors().Background
+                    ),
+                    (fg, bg) => new Brush(fg, bg)
+                )
+            );
 
             var colorTag = Rule(
                 Match("{{"),
@@ -66,19 +84,14 @@ public static class DefaultTemplateFormat
                 Optional(
                     Rule(
                         ws,
-                        color,
-                        Optional(
-                            Rule(
-                                MatchChar(','),
-                                color,
-                                (_, bg) => bg),
-                            () => Brush.Default.GetColors().Background),
-                        (_, fg, bg) => new Brush(fg, bg)
+                        brush,
+                        (_, b) => b
                     ),
                     () => Brush.Default
                 ),
+                ows,
                 Match("}}"),
-                (_, _, _, brush, _) => TemplatePart.Color(brush));
+                (_, _, _, b, _, _) => TemplatePart.Color(b));
 
             var ifStartTag = Rule(
                 Match("{{"),

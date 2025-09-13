@@ -135,16 +135,20 @@ public class FormatHandler : IHandler
 {
     public void Execute(IArguments arguments, HandlerContext context)
     {
-        context.Output.WriteLineFormatted("{{color red}}test{{color darkyellow}}test{{color yellow}}test{{color green}}test{{color cyan}}test{{color blue}}test{{color magenta}}test");
-        context.Output.WriteLineFormatted("{{color white,red}}test{{color white,darkyellow}}test{{color white,yellow}}test{{color white,green}}test{{color white,cyan}}test{{color white,blue}}test{{color white,magenta}}test");
-        context.Output.WriteLineFormatted(arguments.Consume(0).AsString(), new
+        context.Output.WriteLineFormatted("{{color red}}test{{color darkyellow}}test{{color yellow}}test{{color green}}test{{color cyan}}test{{color blue}}test{{color magenta}}test{{color default}}test");
+        context.Output.WriteLineFormatted("{{color white,red}}test{{color white,darkyellow}}test{{color white,yellow}}test{{color white,green}}test{{color white,cyan}}test{{color white,blue}}test{{color white,magenta}}test{{color}}test");
+        var fmt = arguments.Consume(0).AsString();
+        if (!string.IsNullOrEmpty(fmt))
         {
-            Value1 = "Value1",
-            Value2 = new
+            context.Output.WriteLineFormatted(fmt, new
             {
-                Value3 = "Value3"
-            }
-        });
+                Value1 = "Value1",
+                Value2 = new
+                {
+                    Value3 = "Value3"
+                }
+            });
+        }
     }
 }
 
