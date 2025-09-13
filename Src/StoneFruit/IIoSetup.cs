@@ -79,4 +79,11 @@ public interface IIoSetup
     /// <param name="brush"></param>
     /// <returns></returns>
     IIoSetup SetLogColor(LogLevel logLevel, Brush brush);
+
+    /// <summary>
+    /// Specify a custom factory to use for creating new colored output instances.
+    /// </summary>
+    /// <param name="factory"></param>
+    /// <returns></returns>
+    IIoSetup UseColorOutputFactory(IColorOutputFactory factory);
 }

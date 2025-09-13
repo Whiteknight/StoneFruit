@@ -1,5 +1,5 @@
 ﻿using System;
-using StoneFruit.Utility;
+using System.Drawing;
 
 namespace StoneFruit.Execution.IO;
 
@@ -10,18 +10,25 @@ namespace StoneFruit.Execution.IO;
 public readonly struct Brush
     : IEquatable<Brush>
 {
-    public Brush(byte byteValue)
+    private readonly Color _foreground;
+    private readonly Color _background;
+    private readonly ConsoleColor _ccForeground;
+    private readonly ConsoleColor _ccBackground;
+
+    public Brush(Color foreground, Color background)
     {
-        ByteValue = byteValue;
-        Foreground = GetForeground(byteValue);
-        Background = GetBackground(byteValue);
+        _foreground = foreground;
+        _background = background;
+        _ccForeground = ToConsoleColor(_foreground);
+        _ccBackground = ToConsoleColor(_background);
     }
 
     public Brush(ConsoleColor foreground, ConsoleColor background)
     {
-        Background = background;
-        Foreground = foreground;
-        ByteValue = ColorsToByte(foreground, background);
+        _ccForeground = foreground;
+        _ccBackground = background;
+        _background = ToColor(background);
+        _foreground = ToColor(foreground);
     }
 
     public Brush(ConsoleColor foreground)
@@ -35,44 +42,57 @@ public readonly struct Brush
 
     public static implicit operator Brush(ConsoleColor color) => new Brush(color, Console.BackgroundColor);
 
-    public readonly void Set()
-    {
-        Console.ForegroundColor = Foreground;
-        Console.BackgroundColor = Background;
-    }
+    public readonly Brush Swap() => new Brush(_background, _foreground);
 
-    public byte ByteValue { get; }
+    public (ConsoleColor Foreground, ConsoleColor Background) GetConsoleColors()
+        => (_ccForeground, _ccBackground);
 
-    public ConsoleColor Foreground { get; }
-
-    public ConsoleColor Background { get; }
-
-    public readonly Brush Swap() => new Brush(Background, Foreground);
-
-    public readonly Brush Invert() => new Brush(Foreground.Invert(), Background.Invert());
+    public (Color Foreground, Color Background) GetColors()
+        => (_foreground, _background);
 
     public override bool Equals(object? obj)
         => obj is Brush other && Equals(other);
 
     public readonly bool Equals(Brush other)
-        => Foreground == other.Foreground && Background == other.Background;
+        => _foreground == other._foreground && _background == other._background;
 
-    public override int GetHashCode()
-    {
-        unchecked
-        {
-            return (int)Foreground * 397 ^ (int)Background;
-        }
-    }
+    public override int GetHashCode() => HashCode.Combine(_foreground, _background);
 
     public static bool operator ==(Brush a, Brush b) => a.Equals(b);
 
     public static bool operator !=(Brush a, Brush b) => !a.Equals(b);
 
-    private static byte ColorsToByte(ConsoleColor foreground, ConsoleColor background)
-        => (byte)(((byte)foreground << 4) | (byte)background);
+    public static ConsoleColor ToConsoleColor(Color c)
+    {
+        int index = (c.R > 150 || c.G > 150 || c.B > 150) ? 8 : 0; // Bright bit
+        index |= (c.R > 64) ? 4 : 0; // Red bit
+        index |= (c.G > 64) ? 2 : 0; // Green bit
+        index |= (c.B > 64) ? 1 : 0; // Blue bit
+        return (ConsoleColor)index;
+    }
 
-    private static ConsoleColor GetForeground(byte b) => (ConsoleColor)((b & 0xF0) >> 4);
-
-    private static ConsoleColor GetBackground(byte b) => (ConsoleColor)(b & 0x0F);
+    public static Color ToColor(ConsoleColor c)
+    {
+        var colorInt = c switch
+        {
+            ConsoleColor.Black => 0x000000,
+            ConsoleColor.DarkBlue => 0x000080,
+            ConsoleColor.DarkGreen => 0x008000,
+            ConsoleColor.DarkCyan => 0x008080,
+            ConsoleColor.DarkRed => 0x800000,
+            ConsoleColor.DarkMagenta => 0x800080,
+            ConsoleColor.DarkYellow => 0x808000,
+            ConsoleColor.Gray => 0xC0C0C0,
+            ConsoleColor.DarkGray => 0x808080,
+            ConsoleColor.Blue => 0x0000FF,
+            ConsoleColor.Green => 0x00FF00,
+            ConsoleColor.Cyan => 0x00FFFF,
+            ConsoleColor.Red => 0xFF0000,
+            ConsoleColor.Magenta => 0xFF00FF,
+            ConsoleColor.Yellow => 0xFFFF00,
+            ConsoleColor.White => 0xFFFFFF,
+            _ => 0xC0C0C0
+        };
+        return Color.FromArgb(colorInt);
+    }
 }

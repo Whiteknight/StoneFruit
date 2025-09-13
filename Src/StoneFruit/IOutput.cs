@@ -1,5 +1,4 @@
-﻿using System;
-using StoneFruit.Execution.IO;
+﻿using StoneFruit.Execution.IO;
 using StoneFruit.Execution.Templating;
 using static StoneFruit.Utility.Assert;
 
@@ -10,31 +9,15 @@ namespace StoneFruit;
 /// </summary>
 public interface IOutput
 {
+    /// <summary>
+    /// Gets a reference to the base IOutput implementation. If this is the base output
+    /// implementation, it will return itself.
+    /// </summary>
+    IOutput Inner { get; }
+
+    IColorOutputFactory ColorOutputFactory { get; }
+
     ITemplateParser TemplateParser { get; }
-
-    /// <summary>
-    /// Get a new output using the given color palette. If the output does not support
-    /// color this will be a no-op.
-    /// </summary>
-    /// <param name="changeBrush"></param>
-    /// <returns></returns>
-    IOutput Color(Func<Brush, Brush> changeBrush);
-
-    /// <summary>
-    /// Get a new output with the given color for text and the current background color
-    /// unchanged. If the implementation does not support color this will be a no-op.
-    /// </summary>
-    /// <param name="color"></param>
-    /// <returns></returns>
-    IOutput Color(ConsoleColor color) => Color(_ => color);
-
-    /// <summary>
-    /// Get a new output with the given brush for text and background color. If the
-    /// implementation does not support color this will be a no-op.
-    /// </summary>
-    /// <param name="brush"></param>
-    /// <returns></returns>
-    IOutput Color(Brush brush) => Color(_ => brush);
 
     /// <summary>
     /// Write a linebreak to the output.
@@ -77,16 +60,24 @@ public interface IOutput
             ? this
             : Write(obj!.ToString()!);
 
-    IOutput WriteFormatted(string format, object value)
+    IOutput WriteFormatted(string format, object? value = null)
     {
         NotNullOrEmpty(format);
         var template = TemplateParser.Parse(format);
-        template.Render(this, value);
+        template.Render(this, value ?? new object());
         return this;
     }
 
-    IOutput WriteLineFormatted(string format, object value)
+    IOutput WriteLineFormatted(string format, object? value = null)
         => WriteFormatted(format, value).WriteLine();
+
+    /// <summary>
+    /// Get a new output with the given brush for text and background color. If the
+    /// implementation does not support color this will be a no-op.
+    /// </summary>
+    /// <param name="brush"></param>
+    /// <returns></returns>
+    IOutput Color(Brush brush) => ColorOutputFactory.Create(Inner, brush);
 }
 
 public interface IInput

@@ -4,7 +4,7 @@ using StoneFruit.Execution.Templating;
 
 namespace StoneFruit.SpecTests.Support;
 
-public class TestInputOutput : IOutput, IInput
+public class TestInputOutput : IOutput, IInput, IColorOutputFactory
 {
     private readonly Queue<string> _inputs;
     private readonly StringBuilder _output;
@@ -22,6 +22,10 @@ public class TestInputOutput : IOutput, IInput
         .ToArray();
 
     public ITemplateParser TemplateParser { get; }
+
+    public IOutput Inner => this;
+
+    public IColorOutputFactory ColorOutputFactory => this;
 
     public void EnqueueInputLine(string line)
         => _inputs.Enqueue(line);
@@ -50,4 +54,6 @@ public class TestInputOutput : IOutput, IInput
     {
         return _inputs.Any() ? new Maybe<string>(_inputs.Dequeue()) : default;
     }
+
+    public IOutput Create(IOutput inner, Brush brush) => this;
 }

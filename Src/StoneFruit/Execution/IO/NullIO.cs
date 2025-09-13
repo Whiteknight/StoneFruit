@@ -1,13 +1,14 @@
-﻿using System;
-using StoneFruit.Execution.Templating;
+﻿using StoneFruit.Execution.Templating;
 
 namespace StoneFruit.Execution.IO;
 
-public class NullIO : IOutput, IInput, ITemplateParser, ITemplate
+public class NullIO : IOutput, IInput, ITemplateParser, ITemplate, IColorOutputFactory
 {
     public ITemplateParser TemplateParser => this;
 
-    public IOutput Color(Func<Brush, Brush> changeBrush) => this;
+    public IOutput Inner => this;
+
+    public IColorOutputFactory ColorOutputFactory => this;
 
     public IOutput WriteLine() => this;
 
@@ -17,9 +18,12 @@ public class NullIO : IOutput, IInput, ITemplateParser, ITemplate
 
     public Maybe<string> Prompt(string prompt, bool mustProvide = true, bool keepHistory = true)
         => default;
+
     public ITemplate Parse(string format) => this;
 
     public void Render(IOutput output, object? value)
     {
     }
+
+    public IOutput Create(IOutput inner, Brush brush) => this;
 }

@@ -134,6 +134,8 @@ public class FormatHandler : IHandler
 {
     public void Execute(IArguments arguments, HandlerContext context)
     {
+        context.Output.WriteLineFormatted("{{color red}}test{{color darkyellow}}test{{color yellow}}test{{color green}}test{{color cyan}}test{{color blue}}test{{color magenta}}test");
+        context.Output.WriteLineFormatted("{{color white,red}}test{{color white,darkyellow}}test{{color white,yellow}}test{{color white,green}}test{{color white,cyan}}test{{color white,blue}}test{{color white,magenta}}test");
         context.Output.WriteLineFormatted(arguments.Consume(0).AsString(), new
         {
             Value1 = "Value1",
@@ -184,4 +186,3 @@ public class MyObject
         return Task.CompletedTask;
     }
 }
-

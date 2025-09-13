@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using ParserObjects;
 using StoneFruit.Execution.IO;
 using static ParserObjects.Parsers;
-using static ParserObjects.Parsers.C;
 using static ParserObjects.Parsers<char>;
+using static ParserObjects.Parsers.C;
 
 namespace StoneFruit.Execution.Templating;
 
@@ -56,6 +55,10 @@ public static class DefaultTemplateFormat
                 Match("}}"),
                 (_, p, _) => TemplatePart.Pipeline(p));
 
+            var color = First(
+                Drawing.Color(),
+                Drawing.ConsoleColor().Transform(Brush.ToColor));
+
             var colorTag = Rule(
                 Match("{{"),
                 ows,
@@ -63,13 +66,13 @@ public static class DefaultTemplateFormat
                 Optional(
                     Rule(
                         ws,
-                        CSharp.Enum<ConsoleColor>(),
+                        color,
                         Optional(
                             Rule(
                                 MatchChar(','),
-                                CSharp.Enum<ConsoleColor>(),
+                                color,
                                 (_, bg) => bg),
-                            () => Brush.Default.Background),
+                            () => Brush.Default.GetColors().Background),
                         (_, fg, bg) => new Brush(fg, bg)
                     ),
                     () => Brush.Default

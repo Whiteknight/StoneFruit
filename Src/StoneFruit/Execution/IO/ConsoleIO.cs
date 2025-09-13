@@ -11,19 +11,17 @@ namespace StoneFruit.Execution.IO;
 [ExcludeFromCodeCoverage(Justification = "Hard to test System.Console without capturing IO streams")]
 public class ConsoleIO : IOutput, IInput
 {
-    public ConsoleIO(ITemplateParser parser)
+    public ConsoleIO(ITemplateParser parser, IColorOutputFactory colorFactory)
     {
         TemplateParser = parser;
+        ColorOutputFactory = colorFactory;
     }
 
     public ITemplateParser TemplateParser { get; }
 
-    public IOutput Color(Func<Brush, Brush> changeBrush)
-    {
-        Assert.NotNull(changeBrush);
-        var brush = changeBrush(Brush.Current);
-        return brush.Equals(Brush.Current) ? this : new ColoredOutputWrapper(brush, this);
-    }
+    public IColorOutputFactory ColorOutputFactory { get; }
+
+    public IOutput Inner => this;
 
     public IOutput WriteLine()
     {
