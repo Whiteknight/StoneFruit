@@ -18,7 +18,7 @@ public interface IArgumentsSetup
     /// </summary>
     /// <param name="argParser"></param>
     /// <returns></returns>
-    IArgumentsSetup UseArgumentParser(IParser<char, ArgumentToken> argParser);
+    IArgumentsSetup UseArgumentParser(IParser<char, IArgumentToken> argParser);
 
     /// <summary>
     /// Use the StoneFruit simplified argument syntax.

@@ -41,12 +41,4 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
-  <!-- StyleCop Analyzers configuration -->
-  <PropertyGroup>
-    <CodeAnalysisRuleSet>../StyleCop.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <ItemGroup>
-    <AdditionalFiles Include="../stylecop.json" Link="stylecop.json" />
-  </ItemGroup>
 </Project>

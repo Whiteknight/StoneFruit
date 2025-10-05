@@ -16,11 +16,11 @@ namespace StoneFruit.Execution.Arguments;
 /// </summary>
 public class CommandParser : ICommandParser
 {
-    private readonly IParser<char, IReadOnlyList<ArgumentToken>> _argsParser;
+    private readonly IParser<char, IReadOnlyList<IArgumentToken>> _argsParser;
     private readonly IParser<char, CommandFormat> _scriptParser;
     private readonly ArgumentValueMapper _mapper;
 
-    public CommandParser(IParser<char, ArgumentToken> argParser, IParser<char, CommandFormat> scriptParser, ArgumentValueMapper mapper)
+    public CommandParser(IParser<char, IArgumentToken> argParser, IParser<char, CommandFormat> scriptParser, ArgumentValueMapper mapper)
     {
         NotNull(argParser);
         _argsParser = Rule(

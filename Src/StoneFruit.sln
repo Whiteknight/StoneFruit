@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.32002.185
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11018.127 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoneFruit", "StoneFruit\StoneFruit.csproj", "{FEFFBA16-C605-4801-8E59-27CDC0AB73DD}"
 EndProject
@@ -17,10 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		ARCHITECTURE.md = ARCHITECTURE.md
-		Directory.Build.props = Directory.Build.props
 		..\README.md = ..\README.md
-		stylecop.json = stylecop.json
-		StyleCop.ruleset = StyleCop.ruleset
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Containers", "Containers", "{39E3A1BC-3612-4C49-ACD5-53B876B896BB}"

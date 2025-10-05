@@ -78,7 +78,6 @@ public static class ScriptFormatGrammar
         var literalFlagArg = Rule(
             Match('-'),
             names,
-
             (_, name) => (IArgumentAccessor)new LiteralFlagArgumentAccessor(name)
         );
 
@@ -93,7 +92,6 @@ public static class ScriptFormatGrammar
                 names,
                 (_, newName) => newName
             ).Optional(),
-
             (_, name, newName) => (IArgumentAccessor)new FetchFlagArgumentAccessor(name, newName)
         );
 
@@ -103,7 +101,6 @@ public static class ScriptFormatGrammar
             names,
             Match('='),
             values,
-
             (name, _, value) => (IArgumentAccessor)new LiteralNamedArgumentAccessor(name, value)
         );
 
@@ -117,7 +114,6 @@ public static class ScriptFormatGrammar
             optionalDefaultValue,
             Match(']'),
             maybeRequired,
-
             (n, _, _, s, defaultValue, _, required) => (IArgumentAccessor)new NamedFetchNamedArgumentAccessor(n, s, required, defaultValue)
         );
 
@@ -131,7 +127,6 @@ public static class ScriptFormatGrammar
             optionalDefaultValue,
             Match(']'),
             maybeRequired,
-
             (n, _, _, i, defaultValue, _, required) => (IArgumentAccessor)new NamedFetchPositionalArgumentAccessor(n, i, required, defaultValue)
         );
 
@@ -144,7 +139,6 @@ public static class ScriptFormatGrammar
             optionalDefaultValue,
             Match('}'),
             maybeRequired,
-
             (_, s, defaultValue, _, required) => (IArgumentAccessor)new FetchNamedArgumentAccessor(s, required, defaultValue)
         );
 
@@ -154,7 +148,6 @@ public static class ScriptFormatGrammar
             Match('{'),
             Match('*'),
             Match('}'),
-
             (_, _, _) => (IArgumentAccessor)new FetchAllNamedArgumentAccessor()
         );
 
@@ -170,7 +163,6 @@ public static class ScriptFormatGrammar
             optionalDefaultValue,
             Match(']'),
             maybeRequired,
-
             (_, i, defaultValue, _, required) => (IArgumentAccessor)new FetchPositionalArgumentAccessor(i, required, defaultValue)
         );
 
@@ -180,7 +172,6 @@ public static class ScriptFormatGrammar
             Match('['),
             Match('*'),
             Match(']'),
-
             (_, _, _) => (IArgumentAccessor)new FetchAllPositionalArgumentAccessor()
         );
 
@@ -189,7 +180,6 @@ public static class ScriptFormatGrammar
         var fetchAllFlagsArg = Rule(
             Match('-'),
             Match('*'),
-
             (_, _) => (IArgumentAccessor)new FetchAllFlagsArgumentAccessor()
         );
 
@@ -201,7 +191,6 @@ public static class ScriptFormatGrammar
             optionalDefaultValue,
             Match(']'),
             maybeRequired,
-
             (_, s, defaultValue, _, required) => (IArgumentAccessor)new FetchNamedToPositionalArgumentAccessor(s, required, defaultValue)
         );
 

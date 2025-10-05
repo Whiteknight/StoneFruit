@@ -2,7 +2,9 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-      <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
+    <!-- Exclude the project from analysis -->
+    <SonarQubeExclude>true</SonarQubeExclude>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,8 +21,4 @@
     <Folder Include="Properties\" />
   </ItemGroup>
 
-  <PropertyGroup>
-    <!-- Exclude the project from analysis -->
-    <SonarQubeExclude>true</SonarQubeExclude>
-  </PropertyGroup>
 </Project>

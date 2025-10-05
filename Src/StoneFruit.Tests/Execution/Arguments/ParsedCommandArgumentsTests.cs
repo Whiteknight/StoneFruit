@@ -105,7 +105,7 @@ public class ParsedCommandArgumentsTests
     [Test]
     public void VerifyAllAreConsumed_NotConsumed()
     {
-        var target = new ParsedArguments(new ArgumentToken[]
+        var target = new ParsedArguments(new IArgumentToken[]
         {
             new ParsedPositional("test1"),
             new ParsedNamed("b", "test2"),
@@ -118,7 +118,7 @@ public class ParsedCommandArgumentsTests
     [Test]
     public void VerifyAllAreConsumed_NotConsumed_Accessed()
     {
-        var target = new ParsedArguments(new ArgumentToken[]
+        var target = new ParsedArguments(new IArgumentToken[]
         {
             new ParsedPositional("test1"),
             new ParsedNamed("b", "test2"),
@@ -134,7 +134,7 @@ public class ParsedCommandArgumentsTests
     [Test]
     public void VerifyAllAreConsumed_Consumed()
     {
-        var target = new ParsedArguments(new ArgumentToken[]
+        var target = new ParsedArguments(new IArgumentToken[]
         {
             new ParsedPositional("test1"),
             new ParsedNamed("b", "test2"),

@@ -15,7 +15,7 @@ namespace StoneFruit.Execution.Arguments;
 public class ArgumentsSetup : IArgumentsSetup
 {
     private readonly Dictionary<Type, IValueTypeParser> _typeParsers;
-    private IParser<char, ArgumentToken>? _argParser;
+    private IParser<char, IArgumentToken>? _argParser;
     private IParser<char, CommandFormat>? _scriptParser;
 
     public ArgumentsSetup()
@@ -39,7 +39,7 @@ public class ArgumentsSetup : IArgumentsSetup
         services.AddSingleton<ArgumentValueMapper>();
     }
 
-    public IArgumentsSetup UseArgumentParser(IParser<char, ArgumentToken> argParser)
+    public IArgumentsSetup UseArgumentParser(IParser<char, IArgumentToken> argParser)
     {
         if (argParser == null)
         {
