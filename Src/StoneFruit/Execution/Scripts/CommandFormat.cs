@@ -15,13 +15,11 @@ public readonly record struct CommandFormat(IReadOnlyList<IArgumentAccessor> Arg
     public Result<IReadOnlyList<IArgument>, ScriptsError> Format(IArgumentCollection args, int line)
         => Arguments
             .Select(a => a.Access(args, line))
-            .Aggregate((f, s) => f.Combine(s, (x, y) => [.. x, .. y], (e1, e2) => e1.Combine(e2)))
+            .Aggregate(static (f, s) => f.Combine(s, (x, y) => [.. x, .. y], static (e1, e2) => e1.Combine(e2)))
             .Bind(FilterEmptyLines);
 
     private static Result<IReadOnlyList<IArgument>, ScriptsError> FilterEmptyLines(IReadOnlyList<IArgument> args)
-    {
-        if (args.Count == 0)
-            return new EmptyLine();
-        return Result<IReadOnlyList<IArgument>, ScriptsError>.Create(args);
-    }
+        => args.Count == 0
+            ? new EmptyLine()
+            : Result<IReadOnlyList<IArgument>, ScriptsError>.Create(args);
 }

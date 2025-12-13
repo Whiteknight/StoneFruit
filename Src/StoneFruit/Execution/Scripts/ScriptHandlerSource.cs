@@ -42,7 +42,7 @@ public class ScriptHandlerSource : IHandlerSource
     public int Count => _scripts.Count;
 
     private static string GetDescription(Verb verb, string description)
-            => string.IsNullOrEmpty(description) ? verb.ToString() : description;
+        => string.IsNullOrEmpty(description) ? verb.ToString() : description;
 
     private static string GetUsage(Verb verb, string usage, IReadOnlyList<string> lines)
     {

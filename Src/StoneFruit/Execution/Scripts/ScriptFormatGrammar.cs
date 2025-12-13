@@ -21,7 +21,7 @@ public static class ScriptFormatGrammar
         var comment = First(
             PrefixedLine("#"),
             PrefixedLine("//")
-        ).Transform(c => (IArgumentAccessor)new NullArgumentAccessor());
+        ).Transform(_ => (IArgumentAccessor)new NullArgumentAccessor());
         var doubleQuotedString = StrippedDoubleQuotedString();
 
         var singleQuotedString = StrippedSingleQuotedString();
@@ -231,9 +231,7 @@ public static class ScriptFormatGrammar
     private sealed class NullArgumentAccessor : IArgumentAccessor
     {
         public Result<IReadOnlyList<IArgument>, ScriptsError> Access(IArgumentCollection args, int line)
-        {
-            return Array.Empty<IArgument>();
-        }
+            => Array.Empty<IArgument>();
     }
 
     private sealed class FetchAllFlagsArgumentAccessor : IArgumentAccessor

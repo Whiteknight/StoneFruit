@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using StoneFruit.Execution.Templating;
-using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.IO;
 

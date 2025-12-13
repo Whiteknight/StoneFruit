@@ -1,29 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ParserObjects;
 using StoneFruit.Execution.IO;
-using static ParserObjects.Parsers<char>;
 using static ParserObjects.Parsers;
+using static ParserObjects.Parsers<char>;
 using static ParserObjects.Parsers.C;
 
 namespace StoneFruit.Execution.Templating;
 
 public static class DefaultTemplateFormat
 {
-    public sealed class Parser : ITemplateParser
+    public static class Grammar
     {
-        private readonly IParser<char, ITemplate> _parser;
+        private static readonly Lazy<IParser<char, ITemplate>> _parser = new(CreateParserInternal);
 
-        private Parser(IParser<char, ITemplate> parser)
-        {
-            _parser = parser;
-        }
-
-        public static ITemplateParser Create() => new Parser(CreateParserInternal());
-
-        public ITemplate Parse(string format)
-        {
-            return _parser.Parse(format).Value;
-        }
+        public static IParser<char, ITemplate> CreateParser() => _parser.Value;
 
         private static IParser<char, ITemplate> CreateParserInternal()
         {
@@ -142,23 +133,33 @@ public static class DefaultTemplateFormat
                 (_, _, _, _, _) => name);
     }
 
+    public sealed record Parser(IParser<char, ITemplate> TemplateParser) : ITemplateParser
+    {
+        public static ITemplateParser Create()
+            => new Parser(Grammar.CreateParser());
+
+        public ITemplate Parse(string format)
+            => TemplateParser.Parse(format).Value;
+    }
+
     public readonly record struct Template(IReadOnlyList<TemplatePart> Parts) : ITemplate
     {
         public void Render(IOutput output, object? value)
         {
             var currentOutput = output;
             foreach (var part in Parts)
-            {
                 currentOutput = part.Render(currentOutput, value);
-            }
         }
     }
 
     public abstract record TemplatePart()
     {
         public static TemplatePart Literal(string text) => new LiteralPart(text);
+
         public static TemplatePart Color(Brush color) => new ColorPart(color);
+
         public static TemplatePart Pipeline(Pipeline filters) => new PipelinePart(filters);
+
         public static TemplatePart If(Pipeline predicate, IReadOnlyList<TemplatePart> thenBlock, IReadOnlyList<TemplatePart> elseBlock)
             => new IfPart(predicate, thenBlock, elseBlock);
 
@@ -177,9 +178,7 @@ public static class DefaultTemplateFormat
     public sealed record ColorPart(Brush Brush) : TemplatePart
     {
         public override IOutput Render(IOutput output, object? value)
-        {
-            return output.Color(Brush);
-        }
+            => output.Color(Brush);
     }
 
     public readonly record struct Pipeline(IReadOnlyList<PipelineFilter> Filters)
@@ -189,6 +188,7 @@ public static class DefaultTemplateFormat
             var current = value;
             if (current is null)
                 return string.Empty;
+
             foreach (var filter in Filters)
             {
                 current = filter.Access(current);
@@ -223,15 +223,14 @@ public static class DefaultTemplateFormat
         {
             var currentOutput = output;
             foreach (var part in parts)
-            {
                 currentOutput = part.Render(currentOutput, value);
-            }
         }
     }
 
     public abstract record PipelineFilter()
     {
         public static PipelineFilter DotIdentifier(string id) => new DotIdentifier(id);
+
         public abstract object? Access(object value);
     }
 
