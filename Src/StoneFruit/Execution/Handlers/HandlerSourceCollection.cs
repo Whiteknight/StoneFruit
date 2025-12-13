@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using StoneFruit.Utility;
 using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit.Execution.Handlers;
@@ -13,7 +14,8 @@ public class HandlerSourceCollection : IHandlers
 
     public HandlerSourceCollection(IEnumerable<IHandlerSource> sources)
     {
-        _sources = NotNull(sources)
+        _sources = sources
+            .OrEmptyIfNull()
             .Where(s => s != null)
             .ToList();
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using ParserObjects;
@@ -19,22 +20,22 @@ public class CamelCaseVerbExtractor : IVerbExtractor
             ? GetVerbs(type.Name)
             : Verb.InvalidHandler;
 
-    public Result<Verb[], Verb.Error> GetVerbs(MethodInfo method) => GetVerbs(method.Name);
+    public Result<Verb[], Verb.Error> GetVerbs(MethodInfo method)
+        => GetVerbs(method.Name);
 
     private static Result<Verb[], Verb.Error> GetVerbs(string name)
-    {
-        name = name.CleanVerbName();
+        => GetVerbsClean(name.CleanVerbName());
 
-        if (string.IsNullOrEmpty(name))
-            return Verb.NoWords;
+    private static Result<Verb[], Verb.Error> GetVerbsClean(string name)
+        => string.IsNullOrEmpty(name)
+            ? Verb.NoWords
+            : CamelCase()
+                .Parse(name)
+                .Match(
+                    MakeVerbs,
+                    () => Verb.IncorrectFormat);
 
-        var camelCase = CamelCase();
-        var result = camelCase.Parse(name);
-        if (!result.Success)
-            return Verb.IncorrectFormat;
-
-        var verb = result.Value.Select(s => s.ToLowerInvariant()).ToArray();
-        return Verb.TryCreate(verb)
+    private static Result<Verb[], Verb.Error> MakeVerbs(IEnumerable<string> value)
+        => Verb.TryCreate(value.Select(s => s.ToLowerInvariant()).ToArray())
             .Map(v => new[] { v });
-    }
 }

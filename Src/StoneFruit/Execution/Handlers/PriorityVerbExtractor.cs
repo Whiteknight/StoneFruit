@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Handlers;
 
@@ -34,11 +35,11 @@ public class PriorityVerbExtractor : IVerbExtractor
     public static IVerbExtractor DefaultInstance => _default.Value;
 
     public Result<Verb[], Verb.Error> GetVerbs(Type type)
-        => type == null || !typeof(IHandlerBase).IsAssignableFrom(type)
-            ? Verb.InvalidHandler
-            : _extractors
+        => type.IsHandlerType()
+            ? _extractors
                 .Select(e => e.GetVerbs(type))
-                .FirstOrDefault(verbs => verbs.Satisfies(v => v.Length > 0), Verb.NoWords);
+                .FirstOrDefault(verbs => verbs.Satisfies(v => v.Length > 0), Verb.NoWords)
+            : Verb.InvalidHandler;
 
     public Result<Verb[], Verb.Error> GetVerbs(MethodInfo method)
         => method == null

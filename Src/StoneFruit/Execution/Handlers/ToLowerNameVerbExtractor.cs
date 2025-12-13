@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Handlers;
 
@@ -10,7 +11,7 @@ namespace StoneFruit.Execution.Handlers;
 public class ToLowerNameVerbExtractor : IVerbExtractor
 {
     public Result<Verb[], Verb.Error> GetVerbs(Type type)
-        => type != null && typeof(IHandlerBase).IsAssignableFrom(type)
+        => type.IsHandlerType()
             ? GetVerbs(type.Name)
             : Verb.InvalidHandler;
 
@@ -20,13 +21,12 @@ public class ToLowerNameVerbExtractor : IVerbExtractor
             : Verb.InvalidHandler;
 
     private static Result<Verb[], Verb.Error> GetVerbs(string name)
-    {
-        return Validate.IsNotNullOrEmpty(
-            name
-                .CleanVerbName()
-                .ToLowerInvariant())
+        => Validate
+            .IsNotNullOrEmpty(
+                name
+                    .CleanVerbName()
+                    .ToLowerInvariant())
             .ToResult(() => Verb.NoWords)
             .Bind(Verb.TryCreate)
             .Map(v => new[] { v });
-    }
 }

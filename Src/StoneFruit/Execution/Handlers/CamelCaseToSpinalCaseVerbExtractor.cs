@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using ParserObjects;
+using StoneFruit.Utility;
 using static ParserObjects.Parsers;
 
 namespace StoneFruit.Execution.Handlers;
@@ -12,7 +14,7 @@ namespace StoneFruit.Execution.Handlers;
 public class CamelCaseToSpinalCaseVerbExtractor : IVerbExtractor
 {
     public Result<Verb[], Verb.Error> GetVerbs(Type type)
-        => type != null && typeof(IHandlerBase).IsAssignableFrom(type)
+        => type.IsHandlerType()
             ? GetVerbs(type.Name)
             : Verb.InvalidHandler;
 
@@ -20,18 +22,20 @@ public class CamelCaseToSpinalCaseVerbExtractor : IVerbExtractor
         => GetVerbs(method.Name);
 
     private static Result<Verb[], Verb.Error> GetVerbs(string name)
+        => GetVerbsClean(name.CleanVerbName());
+
+    private static Result<Verb[], Verb.Error> GetVerbsClean(string name)
+        => string.IsNullOrEmpty(name)
+            ? (Result<Verb[], Verb.Error>)Verb.NoWords
+            : CamelCase()
+                .Parse(name)
+                .Match(
+                    MakeVerbs,
+                    () => Verb.IncorrectFormat);
+
+    private static Result<Verb[], Verb.Error> MakeVerbs(IEnumerable<string> value)
     {
-        name = name.CleanVerbName();
-
-        if (string.IsNullOrEmpty(name))
-            return Verb.NoWords;
-
-        var camelCase = CamelCase();
-        var result = camelCase.Parse(name);
-        if (!result.Success)
-            return Verb.IncorrectFormat;
-
-        var spinal = string.Join("-", result.Value).ToLowerInvariant();
+        var spinal = string.Join("-", value).ToLowerInvariant();
         return Verb.TryCreate(spinal)
             .Map(v => new[] { v });
     }

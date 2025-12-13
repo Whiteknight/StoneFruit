@@ -21,7 +21,7 @@ public class ServiceProviderHandlerSource : IHandlerSource
     {
         _provider = provider;
         _verbs = handlerTypes
-            .Where(sd => typeof(IHandlerBase).IsAssignableFrom(sd.HandlerType))
+            .Where(sd => sd.HandlerType.IsHandlerType())
             .SelectMany(sd => GetVerbsForHandler(verbExtractor, sd))
             .ToVerbTrie(vi => vi.Verb);
     }
