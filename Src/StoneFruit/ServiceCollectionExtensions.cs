@@ -20,12 +20,17 @@ public static class ServiceCollectionExtensions
             var existing = currentEnvironment.GetCached<TInterface>();
             if (existing.IsSuccess)
                 return existing.GetValueOrThrow();
+
             var value = factory(p, currentEnvironment.Name)
-                ?? throw new ExecutionException($"Cannot resolve object of type {typeof(TInterface).Name}. Factory method returned null.");
+                ?? ThrowOnFactoryReturnsNull<TInterface>();
             currentEnvironment.CacheInstance(value);
             return value;
         });
     }
+
+    private static TInterface ThrowOnFactoryReturnsNull<TInterface>()
+        where TInterface : class
+        => throw new ExecutionException($"Cannot resolve object of type {typeof(TInterface).Name}. Factory method returned null.");
 
     public static IServiceCollection AddHandler<T>(this IServiceCollection services, string? prefix = null)
         where T : class, IHandlerBase
@@ -34,12 +39,9 @@ public static class ServiceCollectionExtensions
             .AddSingleton(RegisteredHandler.Create<T>(prefix));
 
     public static IServiceCollection AddHandler(this IServiceCollection services, Type handlerType, string? prefix = null)
-    {
-        NotNull(services);
-        NotNull(handlerType);
-        if (!handlerType.IsHandlerType())
-            throw new EngineBuildException($"Cannot register handler type {handlerType.Name}. It is not derived from IHandlerBase.");
-        return services.AddScoped(handlerType)
-            .AddSingleton(new RegisteredHandler(handlerType, prefix));
-    }
+        => NotNull(handlerType).IsHandlerType()
+            ? NotNull(services)
+                .AddScoped(handlerType)
+                .AddSingleton(new RegisteredHandler(handlerType, prefix))
+            : throw new EngineBuildException($"Cannot register handler type {handlerType.Name}. It is not derived from {nameof(IHandlerBase)}.");
 }

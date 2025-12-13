@@ -41,19 +41,14 @@ public class StoneFruitApplication
     /// </summary>
     /// <returns></returns>
     public Task<int> RunWithCommandLineArgumentsAsync()
-    {
-        var commandLine = _cmdLineArgs.GetRawArguments();
-        return RunAsync(commandLine);
-    }
+        => RunAsync(_cmdLineArgs.GetRawArguments());
 
     public int RunWithCommandLineArguments()
-    {
-        return Task.Run(async () =>
+        => Task.Run(async () =>
         {
             var commandLine = _cmdLineArgs.GetRawArguments();
             return await RunAsync(commandLine);
         }).GetAwaiter().GetResult();
-    }
 
     /// <summary>
     /// Selects the appropriate run mode and executes it. If a command is provided, the
@@ -87,19 +82,14 @@ public class StoneFruitApplication
     /// </summary>
     /// <returns></returns>
     public Task<int> RunHeadlessWithCommandLineArgsAsync()
-    {
-        var commandLine = _cmdLineArgs.GetRawArguments();
-        return RunHeadlessAsync(commandLine);
-    }
+        => RunHeadlessAsync(_cmdLineArgs.GetRawArguments());
 
     public int RunHeadlessWithCommandLineArgs()
-    {
-        return Task.Run(async () =>
+        => Task.Run(async () =>
         {
             var commandLine = _cmdLineArgs.GetRawArguments();
             return await RunHeadlessAsync(commandLine);
         }).GetAwaiter().GetResult();
-    }
 
     /// <summary>
     /// Run the application in headless mode with the provided commandline string.

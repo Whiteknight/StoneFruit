@@ -11,7 +11,6 @@ public readonly record struct ExitCode(int Value)
         /// <summary>
         /// Exit code when everything is going well.
         /// </summary>
-
         public const int Ok = 0;
 
         /// <summary>
@@ -45,10 +44,15 @@ public readonly record struct ExitCode(int Value)
     }
 
     public static ExitCode Ok => new ExitCode(Constants.Ok);
+
     public static ExitCode HeadlessHelp => new ExitCode(Constants.HeadlessHelp);
+
     public static ExitCode UnhandledException => new ExitCode(Constants.UnhandledException);
+
     public static ExitCode HeadlessNoVerb => new ExitCode(Constants.HeadlessNoVerb);
+
     public static ExitCode CascadeError => new ExitCode(Constants.CascadeError);
+
     public static ExitCode MaximumCommands => new ExitCode(Constants.MaximumCommands);
 
     public static ExitCode Parse(string input)

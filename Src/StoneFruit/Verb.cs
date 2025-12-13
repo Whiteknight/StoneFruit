@@ -27,12 +27,10 @@ public readonly struct Verb : IReadOnlyList<string>, IEquatable<Verb>
     }
 
     public static Result<Verb, Error> TryCreate(string verb)
-    {
-        return Validate.IsNotNullOrEmpty(verb)
+        => Validate.IsNotNullOrEmpty(verb)
             .ToResult(() => NoWords)
             .Map(SplitOnSpaces)
             .Bind(TryCreate);
-    }
 
     public static Result<Verb, Error> TryCreate(string[] verb)
     {
@@ -50,7 +48,7 @@ public readonly struct Verb : IReadOnlyList<string>, IEquatable<Verb>
 
     public static implicit operator Verb(string[] s) => new Verb(s);
 
-    public bool IsValid => _verb != null && _verb.Length > 0;
+    public bool IsValid => _verb?.Length > 0;
 
     public Verb AddPrefix(string[] prefix)
         => prefix == null || prefix.Length == 0 || prefix.All(string.IsNullOrWhiteSpace)
@@ -104,11 +102,16 @@ public readonly struct Verb : IReadOnlyList<string>, IEquatable<Verb>
     }
 
     public static Error NoWords { get; } = new NoWordsError();
+
     public static Error InvalidHandler { get; } = new InvalidHandlerError();
+
     public static Error IncorrectFormat { get; } = new IncorrectFormatError();
 
     public abstract record Error(string Message);
+
     public sealed record NoWordsError() : Error(_errorNoWords);
+
     public sealed record InvalidHandlerError() : Error(_errorInvalidHandler);
+
     public sealed record IncorrectFormatError() : Error("Input string is not in a parseable format");
 }

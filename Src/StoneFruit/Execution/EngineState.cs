@@ -35,13 +35,19 @@ public class EngineState
     }
 
     public EngineEventCatalog EventCatalog { get; }
+
     public EngineStateCommandQueue Commands { get; }
+
     public EngineStateMetadataCache Metadata { get; }
+
     public EngineSettings Settings { get; }
 
     public bool ShouldExit { get; private set; }
+
     public ExitCode ExitCode { get; private set; }
+
     public EngineRunMode RunMode { get; private set; }
+
     public IEngineStateCommandCounter CommandCounter { get; private set; }
 
     public IArguments CurrentArguments

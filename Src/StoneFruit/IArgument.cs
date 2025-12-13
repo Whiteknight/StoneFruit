@@ -1,6 +1,6 @@
 ﻿using System;
 using StoneFruit.Execution.Arguments;
-using StoneFruit.Utility;
+using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit;
 
@@ -101,7 +101,7 @@ public static class ArgumentExtensions
     public static T Require<T>(this T argument, string errorMessage = "")
         where T : IArgument
     {
-        Assert.NotNull(argument);
+        NotNull(argument);
         (argument as MissingArgument)?.Throw(errorMessage);
         return argument;
     }
@@ -116,7 +116,7 @@ public static class ArgumentExtensions
     public static T MarkConsumed<T>(this T argument, bool consumed = true)
         where T : IArgument
     {
-        Assert.NotNull(argument);
+        NotNull(argument);
         argument.Consumed = consumed;
         return argument;
     }
