@@ -9,7 +9,6 @@ namespace StoneFruit;
 
 public static class ServiceCollectionExtensions
 {
-    // TODO: Want a transient version of this method with no caching.
     public static IServiceCollection AddPerEnvironment<TInterface>(this IServiceCollection services, Func<IServiceProvider, string, TInterface> factory)
         where TInterface : class
     {
