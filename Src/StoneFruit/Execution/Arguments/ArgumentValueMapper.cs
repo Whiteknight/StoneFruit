@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using StoneFruit.Utility;
+using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit.Execution.Arguments;
 
@@ -69,6 +70,7 @@ public class ArgumentValueMapper
     /// <param name="obj"></param>
     public void MapOnto<T>(IArguments args, T obj)
     {
+        NotNull(obj);
         var targetType = typeof(T);
         var publicProperties = targetType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
             .Where(p => p.CanWrite && p.SetMethod != null)
@@ -94,10 +96,17 @@ public class ArgumentValueMapper
                 property.SetValue(obj, true);
         }
 
-        if (requiredProperties.Count > 0)
+        var errors = new List<ValidationResult>();
+        Validator.TryValidateObject(obj!, new ValidationContext(obj), errors);
+        if (errors.Count == 1)
+            throw new ArgumentParseException($"Failed to map arguments to type {targetType.Name}: {errors[0].ErrorMessage}");
+        if (errors.Count > 1)
         {
-            var missingProps = string.Join(", ", requiredProperties.Select(p => p.Name));
-            throw new ArgumentParseException($"Missing required argument values for properties: {missingProps}");
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine($"Failed to map arguments to type {targetType.Name}:");
+            foreach (var error in errors)
+                sb.AppendLine($"\t{error.ErrorMessage}");
+            throw new ArgumentParseException(sb.ToString());
         }
     }
 

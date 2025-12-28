@@ -88,5 +88,5 @@ Rule: I can use AddHandlerArgumentType to map custom argument types
         Given I use the ArgumentMapping handlers
         When I run headless with input "type mapped object"
         Then The output should contain:
-            | Line                                                  |
-            | Missing required argument values for properties: Arg1 |
+            | Line                                                                        |
+            | Failed to map arguments to type TypeMappedArgs: The Arg1 field is required. |
