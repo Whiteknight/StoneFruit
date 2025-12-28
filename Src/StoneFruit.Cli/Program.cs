@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,6 +11,7 @@ internal static class Program
     {
         var builder = StoneFruitApplicationBuilder.Create();
         builder.Services.AddPerEnvironment<MyEnvironment>((p, env) => new MyEnvironment(env));
+        builder.Services.AddHandlerArgumentType<TestArgsK>();
         builder.SetupHandlers(h => h
             // Scan for handlers using reflection. Looks for any public, non-abstract,
             // implementations of IHandlerBase in the specified assemblies
@@ -44,7 +46,7 @@ internal static class Program
             )
         );
         builder.SetupEnvironments(e => e
-            .SetEnvironments(new[] { "Local", "Testing", "Production" })
+            .SetEnvironments(["Local", "Testing", "Production"])
             .OnEnvironmentChanged(name => Console.WriteLine($"OBSERVER Environment changed to {name}"))
         );
         builder.SetupEvents(e =>
@@ -73,18 +75,6 @@ public class MyFirstHandler : IHandler
         // .. Do work here ..
         context.Output.WriteLine("Done.");
     }
-}
-
-public class TestArgsA
-{
-    [ArgumentIndex(0)]
-    public string Arg1 { get; set; }
-
-    [ArgumentIndex(1)]
-    public string Arg2 { get; set; }
-
-    [ArgumentIndex(2)]
-    public string Arg3 { get; set; }
 }
 
 public class TestAHandler : IHandler
@@ -189,5 +179,35 @@ public class MyObject
     {
         output.WriteLine($"{_tag} E");
         return Task.CompletedTask;
+    }
+}
+
+public class TestArgsK
+{
+    [ArgumentIndex(0)]
+    [Required]
+    public string Arg1 { get; set; }
+
+    [ArgumentIndex(1)]
+    public string Arg2 { get; set; }
+
+    [ArgumentIndex(2)]
+    public string Arg3 { get; set; }
+}
+
+public class TestKHandler : IHandler
+{
+    private readonly TestArgsK _args;
+
+    public TestKHandler(TestArgsK args)
+    {
+        _args = args;
+    }
+
+    public void Execute(IArguments arguments, HandlerContext context)
+    {
+        context.Output.WriteLine($"Arg1: {_args.Arg1}");
+        context.Output.WriteLine($"Arg2: {_args.Arg2}");
+        context.Output.WriteLine($"Arg3: {_args.Arg3}");
     }
 }

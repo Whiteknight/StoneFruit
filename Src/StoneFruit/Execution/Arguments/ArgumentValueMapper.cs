@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -73,18 +74,30 @@ public class ArgumentValueMapper
             .Where(p => p.CanWrite && p.SetMethod != null)
             .ToList();
 
+        var requiredProperties = publicProperties
+            .Where(p => p.GetCustomAttribute<RequiredAttribute>(true) != null)
+            .ToHashSet();
+
         foreach (var property in publicProperties)
         {
             var arg = FindSuitablePositionalArgument(property, args)
                 .Or(() => FindSuitableNamedArgument(property, args));
             if (arg.IsSuccess)
             {
-                AssignPropertyFromValuedArgument(arg.GetValueOrThrow(), property, obj);
+                var assigned = AssignPropertyFromValuedArgument(arg.GetValueOrThrow(), property, obj);
+                if (assigned)
+                    requiredProperties.Remove(property);
                 continue;
             }
 
             if (IsBoolSettableFromFlag(args, property))
                 property.SetValue(obj, true);
+        }
+
+        if (requiredProperties.Count > 0)
+        {
+            var missingProps = string.Join(", ", requiredProperties.Select(p => p.Name));
+            throw new ArgumentParseException($"Missing required argument values for properties: {missingProps}");
         }
     }
 
@@ -123,30 +136,31 @@ public class ArgumentValueMapper
         => (property.PropertyType == typeof(bool) || property.PropertyType == typeof(bool?))
             && args.ConsumeFlag(property.Name, false).Exists();
 
-    private void AssignPropertyFromValuedArgument<T>(IValuedArgument argument, PropertyInfo property, T obj)
+    private bool AssignPropertyFromValuedArgument<T>(IValuedArgument argument, PropertyInfo property, T obj)
     {
         if (!argument.Exists())
-            return;
+            return true;
 
         if (property.PropertyType == typeof(int) || property.PropertyType == typeof(int?))
         {
             property.SetValue(obj, argument.AsInt());
-            return;
+            return true;
         }
 
         if (property.PropertyType == typeof(long) || property.PropertyType == typeof(long?))
         {
             property.SetValue(obj, argument.AsLong());
-            return;
+            return true;
         }
 
         if (property.PropertyType == typeof(bool) || property.PropertyType == typeof(bool?))
         {
             property.SetValue(obj, argument.AsBool());
-            return;
+            return true;
         }
 
         var value = TryParseValue(property.PropertyType, argument);
         value.OnSuccess(v => property.SetValue(obj, v));
+        return value.IsSuccess;
     }
 }

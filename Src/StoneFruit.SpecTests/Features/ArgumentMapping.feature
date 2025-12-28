@@ -71,3 +71,22 @@ Rule: Can use IValueTypeParser to map complex objects
             | As FileInfo: True      |
             | As DirectoryInfo: True |
             | As Guid: True          |
+
+Rule: I can use AddHandlerArgumentType to map custom argument types
+
+    Scenario: I can map custom argument type
+        Given I use the ArgumentMapping handlers
+        When I run headless with input "type mapped object 'a' 1 'c'"
+        Then The output should contain:
+            | Line  |
+            | a     |
+            | 1     |
+            | c     |
+            | False |
+
+    Scenario: Required properties must be provided
+        Given I use the ArgumentMapping handlers
+        When I run headless with input "type mapped object"
+        Then The output should contain:
+            | Line                                                  |
+            | Missing required argument values for properties: Arg1 |

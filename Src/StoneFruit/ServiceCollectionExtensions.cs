@@ -43,4 +43,8 @@ public static class ServiceCollectionExtensions
                 .AddScoped(handlerType)
                 .AddSingleton(new RegisteredHandler(handlerType, prefix))
             : throw new EngineBuildException($"Cannot register handler type {handlerType.Name}. It is not derived from {nameof(IHandlerBase)}.");
+
+    public static IServiceCollection AddHandlerArgumentType<TArg>(this IServiceCollection services)
+        where TArg : class, new()
+        => NotNull(services).AddScoped(p => p.GetRequiredService<IArguments>().MapTo<TArg>());
 }
