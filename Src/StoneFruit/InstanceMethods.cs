@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using StoneFruit.Execution.Handlers;
 
 namespace StoneFruit;
@@ -8,6 +9,7 @@ public static class InstanceMethodsExtensions
     /// <summary>
     /// Use the public methods of an instance object as handlers.
     /// </summary>
+    /// <typeparam name="T"></typeparam>
     /// <param name="setup"></param>
     /// <param name="instance"></param>
     /// <param name="group"></param>
@@ -25,7 +27,7 @@ public static class InstanceMethodsExtensions
     public static IHandlerSetup UsePublicInstanceMethodsAsHandlers<T>(this IHandlerSetup setup, string? group = null)
         where T : class
     {
-        setup.Services.AddScoped<T>();
+        setup.Services.TryAddScoped<T>();
         setup.AddSource(provider =>
             new InstanceMethodHandlerSource<T>(
                 () => provider.GetRequiredService<T>(),
@@ -54,7 +56,7 @@ public static class InstanceMethodsExtensions
     public static HandlerSectionSetup UsePublicInstanceMethodsAsHandlers<T>(this HandlerSectionSetup section)
         where T : class
     {
-        section.Services.AddScoped<T>();
+        section.Services.TryAddScoped<T>();
         section.Handlers.AddSource(provider =>
             new InstanceMethodHandlerSource<T>(
                 () => provider.GetRequiredService<T>(),
