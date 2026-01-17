@@ -3,7 +3,7 @@ using StoneFruit.Execution.Handlers;
 
 namespace StoneFruit;
 
-public static class IHandlerSetupInstanceMethodExtensions
+public static class InstanceMethodsExtensions
 {
     /// <summary>
     /// Use the public methods of an instance object as handlers.
@@ -35,5 +35,34 @@ public static class IHandlerSetupInstanceMethodExtensions
             )
         );
         return setup;
+    }
+
+    public static HandlerSectionSetup UsePublicInstanceMethodsAsHandlers<T>(this HandlerSectionSetup section, T instance)
+        where T : class
+    {
+        section.Handlers.AddSource(provider =>
+            new InstanceMethodHandlerSource<T>(
+                () => instance,
+                provider.GetRequiredService<IHandlerMethodInvoker>(),
+                new PrefixingVerbExtractor(section.Name, provider.GetRequiredService<IVerbExtractor>()),
+                section.Name
+            )
+        );
+        return section;
+    }
+
+    public static HandlerSectionSetup UsePublicInstanceMethodsAsHandlers<T>(this HandlerSectionSetup section)
+        where T : class
+    {
+        section.Services.AddScoped<T>();
+        section.Handlers.AddSource(provider =>
+            new InstanceMethodHandlerSource<T>(
+                () => provider.GetRequiredService<T>(),
+                provider.GetRequiredService<IHandlerMethodInvoker>(),
+                new PrefixingVerbExtractor(section.Name, provider.GetRequiredService<IVerbExtractor>()),
+                section.Name
+            )
+        );
+        return section;
     }
 }

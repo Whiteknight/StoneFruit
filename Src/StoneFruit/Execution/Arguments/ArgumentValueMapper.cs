@@ -15,12 +15,17 @@ public class ArgumentValueMapper
      * 1) Map an IValuedArgument to an arbitrary data type, depending on registered IValueTypeParsers
      * 2) Map an IArgumentsCollection to a custom DTO object using property setters, using value mapping from #1
      */
-    private static readonly MethodInfo _tryParseValueRawMethod = typeof(ArgumentValueMapper).GetMethod(nameof(TryParseValueRaw), BindingFlags.Public | BindingFlags.Static)!;
+
+    private static readonly MethodInfo _tryParseValueRawMethod = typeof(ArgumentValueMapper)
+        .GetMethod(nameof(TryParseValueRaw), BindingFlags.Public | BindingFlags.Static)!;
+
     private readonly Dictionary<Type, IValueTypeParser> _typeParsers;
 
     public ArgumentValueMapper(IEnumerable<IValueTypeParser> typeParsers)
     {
-        _typeParsers = typeParsers.OrEmptyIfNull().ToDictionary(v => v.TargetType);
+        _typeParsers = typeParsers
+            .OrEmptyIfNull()
+            .ToDictionary(v => v.TargetType);
     }
 
     public static ArgumentValueMapper Empty { get; } = new ArgumentValueMapper([]);
