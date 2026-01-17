@@ -11,7 +11,5 @@ public record HandlerInstanceStepDefinitions(ScenarioContext Context)
         Context.GetEngineBuilder().SetupHandlers(h => h
             .Add("predefined", new PredefinedInstanceHandler())
             .Add("predefinedasync", new PredefinedInstanceAsyncHandler()));
-
     }
-
 }

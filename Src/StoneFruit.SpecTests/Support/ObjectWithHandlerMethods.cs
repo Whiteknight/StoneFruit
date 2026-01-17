@@ -57,3 +57,46 @@ public class ObjectWithAsyncHandlerMethods
         return Task.CompletedTask;
     }
 }
+
+public record ExampleBusinessService(string Value)
+{
+    public string GetData() => Value;
+}
+
+public class ObjectWithDependenciesAndHandlerMethods
+{
+    private readonly ExampleBusinessService _service;
+
+    public ObjectWithDependenciesAndHandlerMethods(ExampleBusinessService service)
+    {
+        _service = service;
+    }
+
+    [Verb("injected-method")]
+    public void InjectedMethod(IOutput output)
+    {
+        var value = _service.GetData();
+        output.WriteLine($"{value} Injected");
+    }
+
+    [Verb("injected-method-with-one-named-arg")]
+    public void MethodWithOneNamedArg(string name, IOutput output)
+    {
+        var value = _service.GetData();
+        output.WriteLine($"{value} Named: {name}");
+    }
+
+    [Verb("injected-method-with-one-named-arg2")]
+    public void MethodWithOneNamedArg2(IOutput output, string name)
+    {
+        var value = _service.GetData();
+        output.WriteLine($"{value} Named: {name}");
+    }
+
+    [Verb("injected-method-with-one-flag-arg")]
+    public void MethodWithOneFlagArg(IOutput output, bool flag)
+    {
+        var value = _service.GetData();
+        output.WriteLine($"{value} Flag: {flag}");
+    }
+}
