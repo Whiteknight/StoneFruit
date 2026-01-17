@@ -25,16 +25,17 @@ public class InstanceMethodHandlerSource<T> : IHandlerSource
 
     public InstanceMethodHandlerSource(Func<T> getInstance, IHandlerMethodInvoker invoker, IVerbExtractor verbExtractor, IObjectOutputWriter writer, string? group)
     {
+        var classGroup = typeof(T).GetGroup();
         _invoker = NotNull(invoker);
         _methods = typeof(T)
             .GetMethods(BindingFlags.Instance | BindingFlags.Public)
             .SelectMany(m => verbExtractor
                 .GetVerbs(m)
                 .Match(
-                    verbs => verbs.Select(v => (Handler: WrapMethodMetadata(v, m, group), Verb: v)),
+                    verbs => verbs.Select(v => (Method: WrapMethodMetadata(v, m, group, classGroup), Verb: v)),
                     _ => [])
             )
-            .ToVerbTrie(x => x.Verb, x => x.Handler);
+            .ToVerbTrie(x => x.Verb, x => x.Method);
         _getInstance = NotNull(getInstance);
         _writer = writer;
     }
@@ -55,12 +56,28 @@ public class InstanceMethodHandlerSource<T> : IHandlerSource
     public Maybe<IVerbInfo> GetByName(Verb verb)
         => _methods.Get(verb).Map(mm => (IVerbInfo)mm);
 
-    private static MethodMetadata WrapMethodMetadata(Verb verb, MethodInfo method, string? group)
+    private static MethodMetadata WrapMethodMetadata(Verb verb, MethodInfo method, string? group, string classGroup)
     {
         var description = method.GetDescriptionAttributeValue() ?? string.Empty;
         var usage = method.GetUsageAttributeValue() ?? description;
-        group = (string.IsNullOrEmpty(group) ? method.GetGroupAttributeValue() : group) ?? string.Empty;
-        return new MethodMetadata(verb, method, description, usage, group);
+        var realGroup = GetGroup(method, group, classGroup);
+        return new MethodMetadata(verb, method, description, usage, realGroup);
+    }
+
+    private static string GetGroup(MethodInfo method, string? group, string classGroup)
+    {
+        // For groups we have a complicated search hierarchy:
+        // 1. If a group was provided to the handler source, use that ("group" parameter)
+        // 2. If the method has Group information ([Group] attribute, etc) use that.
+        // 3. If the type T has Group information ([Group] attribute or static Group property) use that.
+        if (!string.IsNullOrEmpty(group))
+            return group;
+        var methodGroup = method.GetGroupAttributeValue();
+        if (!string.IsNullOrEmpty(methodGroup))
+            return methodGroup;
+        if (!string.IsNullOrEmpty(classGroup))
+            return classGroup;
+        return string.Empty;
     }
 
     private sealed record MethodMetadata(Verb Verb, MethodInfo Method, string Description, string Usage, string Group)

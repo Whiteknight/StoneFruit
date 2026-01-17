@@ -9,7 +9,7 @@ public record ArgumentMappingStepDefinitions(ScenarioContext Context)
     public void GivenIUseTheArgumentMappingHandler()
     {
         var builder = Context.GetEngineBuilder();
-        builder.Services.AddHandlerArgumentType<TypeMappedArgs>();
+        builder.Services.AddArgumentType<TypeMappedArgs>();
         builder.SetupHandlers(h => h
             .Add<SimpleMapToObjectHandler>()
             .Add<ComplexMapToObjectHandler>()

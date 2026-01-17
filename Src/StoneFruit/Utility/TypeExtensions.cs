@@ -106,7 +106,9 @@ public static class TypeExtensions
     }
 
     public static bool IsHandlerType(this Type type)
-        => type != null && !type.IsAbstract && !type.IsInterface && type.IsAssignableTo(typeof(IHandlerBase));
+        => type?.IsAbstract == false
+        && !type.IsInterface
+        && (type.IsAssignableTo(typeof(IHandler)) || type.IsAssignableTo(typeof(IAsyncHandler)));
 
     public static bool IsTaskType(this Type type)
         => type == typeof(Task) || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Task<>));

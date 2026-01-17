@@ -12,7 +12,7 @@ internal static class Program
     {
         var builder = StoneFruitApplicationBuilder.Create();
         builder.Services.AddPerEnvironment<MyEnvironment>((p, env) => new MyEnvironment(env));
-        builder.Services.AddHandlerArgumentType<TestArgsK>();
+        builder.Services.AddArgumentType<TestArgsK>();
         builder.SetupHandlers(h => h
             // Scan for handlers using reflection. Looks for any public, non-abstract,
             // implementations of IHandlerBase in the specified assemblies
