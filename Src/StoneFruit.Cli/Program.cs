@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
+using StoneFruit.Execution.IO;
 
 namespace StoneFruit.Cli;
 
@@ -45,6 +46,7 @@ internal static class Program
                 ])
             )
         );
+        builder.SetupIo(io => io.UseJsonObjectWriter());
         builder.SetupEnvironments(e => e
             .SetEnvironments(["Local", "Testing", "Production"])
             .OnEnvironmentChanged(name => Console.WriteLine($"OBSERVER Environment changed to {name}"))
@@ -59,6 +61,7 @@ internal static class Program
         builder.SetupSettings(s =>
         {
             //s.MaxInputlessCommands = 3;
+            // Used by TestC to cancel the command after a timeout
             s.MaxExecuteTimeout = TimeSpan.FromSeconds(5);
         });
         var engine = builder.Build();
@@ -179,6 +182,18 @@ public class MyObject
     {
         output.WriteLine($"{_tag} E");
         return Task.CompletedTask;
+    }
+
+    [Group("public-methods")]
+    public object Testm()
+    {
+        return new { Value = "Return Value" };
+    }
+
+    [Group("public-methods")]
+    public async Task<object> TestL()
+    {
+        return new { Value = "Return Value" };
     }
 }
 

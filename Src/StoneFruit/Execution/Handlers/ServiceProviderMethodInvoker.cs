@@ -13,6 +13,9 @@ namespace StoneFruit.Execution.Handlers;
 /// </summary>
 public class ServiceProviderMethodInvoker : IHandlerMethodInvoker
 {
+    private static readonly MethodInfo _getTaskMethod = typeof(ServiceProviderMethodInvoker)
+        .GetMethod(nameof(GetObjectTask), BindingFlags.NonPublic | BindingFlags.Static)!;
+
     private readonly IServiceProvider _provider;
     private readonly ArgumentValueMapper _mapper;
 
@@ -22,13 +25,26 @@ public class ServiceProviderMethodInvoker : IHandlerMethodInvoker
         _mapper = mapper;
     }
 
-    public void Invoke(object instance, MethodInfo method, HandlerContext context)
-    {
-        InvokeDynamic(instance, method, context.Arguments, CancellationToken.None);
-    }
+    public object? Invoke(object instance, MethodInfo method, HandlerContext context)
+        => InvokeDynamic(instance, method, context.Arguments, CancellationToken.None);
 
-    public Task InvokeAsync(object instance, MethodInfo method, HandlerContext context, CancellationToken token)
-        => InvokeDynamic(instance, method, context.Arguments, token) as Task ?? Task.CompletedTask;
+    public Task<object?> InvokeAsync(object instance, MethodInfo method, HandlerContext context, CancellationToken token)
+    {
+        var result = InvokeDynamic(instance, method, context.Arguments, token);
+        if (result == null)
+            return Task.FromResult<object?>(null);
+        var resultType = result.GetType();
+        if (resultType.IsGenericType && resultType.GetGenericTypeDefinition() == typeof(Task<>))
+        {
+            Debug.Assert(_getTaskMethod != null);
+            var valueMethod = _getTaskMethod.MakeGenericMethod(resultType.GetGenericArguments()[0]);
+            return valueMethod.Invoke(null, [result]) as Task<object?> ?? Task.FromResult<object?>(null);
+        }
+
+        if (result is Task task)
+            return task.ContinueWith(v => (object?)null, token);
+        return Task.FromResult<object?>(null);
+    }
 
     private object? InvokeDynamic(object instance, MethodInfo method, IArguments args, CancellationToken token)
     {
@@ -48,6 +64,11 @@ public class ServiceProviderMethodInvoker : IHandlerMethodInvoker
         }
 
         return method.Invoke(instance, argumentValues);
+    }
+
+    private static Task<object?> GetObjectTask<T>(Task<T> task)
+    {
+        return task.ContinueWith(t => (object?)t.Result);
     }
 
     private object? GetArgumentValue(ParameterInfo parameter, IArguments args, CancellationToken token)

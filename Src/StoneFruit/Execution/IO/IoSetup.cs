@@ -77,8 +77,16 @@ public class IoSetup : IIoSetup
         return this;
     }
 
+    public IIoSetup UseObjectWriter<T>()
+        where T : class, IObjectOutputWriter
+    {
+        _services.TryAddSingleton<IObjectOutputWriter, T>();
+        return this;
+    }
+
     public void BuildUp(IServiceCollection services)
     {
+        // Fill in some default values in case they haven't been specified elsewhere.
         services.TryAddSingleton<IOutput, ConsoleIO>();
         services.TryAddSingleton<IInput, ConsoleIO>();
         services.TryAddSingleton<ICommandLine, EnvironmentCommandLine>();
@@ -86,5 +94,6 @@ public class IoSetup : IIoSetup
         services.TryAddSingleton(typeof(ILogger<>), typeof(OutputLogger<>));
         services.TryAddSingleton(new LoggingConfiguration(_logLevel, _logColors));
         services.TryAddSingleton<IColorOutputFactory, ConsoleColorOutputFactory>();
+        services.TryAddSingleton<IObjectOutputWriter, NullObjectOutputWriter>();
     }
 }

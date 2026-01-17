@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using StoneFruit.Execution.Exceptions;
+using StoneFruit.Execution.IO;
 using StoneFruit.Execution.Trie;
 using StoneFruit.Utility;
 using static StoneFruit.Utility.Assert;
@@ -20,13 +21,13 @@ public class InstanceMethodHandlerSource<T> : IHandlerSource
     private readonly VerbTrie<MethodMetadata> _methods;
     private readonly IHandlerMethodInvoker _invoker;
     private readonly Func<T> _getInstance;
+    private readonly IObjectOutputWriter _writer;
 
-    public InstanceMethodHandlerSource(Func<T> getInstance, IHandlerMethodInvoker invoker, IVerbExtractor verbExtractor, string? group)
+    public InstanceMethodHandlerSource(Func<T> getInstance, IHandlerMethodInvoker invoker, IVerbExtractor verbExtractor, IObjectOutputWriter writer, string? group)
     {
         _invoker = NotNull(invoker);
         _methods = typeof(T)
             .GetMethods(BindingFlags.Instance | BindingFlags.Public)
-            .Where(m => m.ReturnType == typeof(void) || m.ReturnType == typeof(Task))
             .SelectMany(m => verbExtractor
                 .GetVerbs(m)
                 .Match(
@@ -35,17 +36,15 @@ public class InstanceMethodHandlerSource<T> : IHandlerSource
             )
             .ToVerbTrie(x => x.Verb, x => x.Handler);
         _getInstance = NotNull(getInstance);
+        _writer = writer;
     }
 
     public Maybe<IHandlerBase> GetInstance(HandlerContext context)
-        => _methods.Get(context.Arguments).Map<IHandlerBase>(mm =>
-        {
-            if (mm.Method.ReturnType == typeof(void))
-                return new SyncHandler(mm, _getInstance, _invoker);
-            if (mm.Method.ReturnType == typeof(Task))
-                return new AsyncHandler(mm, _getInstance, _invoker);
-            throw new ExecutionException("Method does not have a valid return type");
-        });
+        => _methods
+            .Get(context.Arguments)
+            .Map<IHandlerBase>(mm => mm.Method.IsAsync()
+                ? new AsyncHandler(mm, _getInstance, _invoker, _writer)
+                : new SyncHandler(mm, _getInstance, _invoker, _writer));
 
     public IEnumerable<IVerbInfo> GetAll()
         => _methods.GetAll()
@@ -70,23 +69,25 @@ public class InstanceMethodHandlerSource<T> : IHandlerSource
         public bool ShouldShowInHelp => true;
     }
 
-    private sealed record SyncHandler(MethodMetadata Method, Func<T> GetInstance, IHandlerMethodInvoker Invoker)
+    private sealed record SyncHandler(MethodMetadata Method, Func<T> GetInstance, IHandlerMethodInvoker Invoker, IObjectOutputWriter Writer)
         : IHandler
     {
         public void Execute(IArguments arguments, HandlerContext context)
         {
             var instance = GetInstance() ?? throw new ExecutionException("Instance could not be resolved");
-            Invoker.Invoke(instance, Method.Method, context);
+            var result = Invoker.Invoke(instance, Method.Method, context);
+            Writer.MaybeWriteObject(result);
         }
     }
 
-    private sealed record AsyncHandler(MethodMetadata Method, Func<T> GetInstance, IHandlerMethodInvoker Invoker)
+    private sealed record AsyncHandler(MethodMetadata Method, Func<T> GetInstance, IHandlerMethodInvoker Invoker, IObjectOutputWriter Writer)
         : IAsyncHandler
     {
-        public Task ExecuteAsync(IArguments arguments, HandlerContext context, CancellationToken cancellation)
+        public async Task ExecuteAsync(IArguments arguments, HandlerContext context, CancellationToken cancellation)
         {
             var instance = GetInstance() ?? throw new ExecutionException("Instance could not be resolved");
-            return Invoker.InvokeAsync(instance, Method.Method, context, cancellation);
+            var result = await Invoker.InvokeAsync(instance, Method.Method, context, cancellation);
+            Writer.MaybeWriteObject(result);
         }
     }
 }

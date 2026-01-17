@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace StoneFruit.Utility;
 
@@ -106,4 +107,10 @@ public static class TypeExtensions
 
     public static bool IsHandlerType(this Type type)
         => type != null && !type.IsAbstract && !type.IsInterface && type.IsAssignableTo(typeof(IHandlerBase));
+
+    public static bool IsTaskType(this Type type)
+        => type == typeof(Task) || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Task<>));
+
+    public static bool IsAsync(this MethodInfo method)
+        => method.ReturnType.IsTaskType();
 }

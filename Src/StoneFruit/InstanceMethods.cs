@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using StoneFruit.Execution.Handlers;
+using StoneFruit.Execution.IO;
 
 namespace StoneFruit;
 
@@ -20,6 +21,7 @@ public static class InstanceMethodsExtensions
                 () => instance,
                 provider.GetRequiredService<IHandlerMethodInvoker>(),
                 provider.GetRequiredService<IVerbExtractor>(),
+                provider.GetRequiredService<IObjectOutputWriter>(),
                 group
             )
         );
@@ -33,6 +35,7 @@ public static class InstanceMethodsExtensions
                 () => provider.GetRequiredService<T>(),
                 provider.GetRequiredService<IHandlerMethodInvoker>(),
                 provider.GetRequiredService<IVerbExtractor>(),
+                provider.GetRequiredService<IObjectOutputWriter>(),
                 group
             )
         );
@@ -47,6 +50,7 @@ public static class InstanceMethodsExtensions
                 () => instance,
                 provider.GetRequiredService<IHandlerMethodInvoker>(),
                 new PrefixingVerbExtractor(section.Name, provider.GetRequiredService<IVerbExtractor>()),
+                provider.GetRequiredService<IObjectOutputWriter>(),
                 section.Name
             )
         );
@@ -62,6 +66,7 @@ public static class InstanceMethodsExtensions
                 () => provider.GetRequiredService<T>(),
                 provider.GetRequiredService<IHandlerMethodInvoker>(),
                 new PrefixingVerbExtractor(section.Name, provider.GetRequiredService<IVerbExtractor>()),
+                provider.GetRequiredService<IObjectOutputWriter>(),
                 section.Name
             )
         );

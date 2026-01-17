@@ -86,4 +86,13 @@ public interface IIoSetup
     /// <param name="factory"></param>
     /// <returns></returns>
     IIoSetup UseColorOutputFactory(IColorOutputFactory factory);
+
+    /// <summary>
+    /// For handlers which return a value, specify a custom object writer to handle writing those
+    /// objects the output.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    IIoSetup UseObjectWriter<T>()
+        where T : class, IObjectOutputWriter;
 }
