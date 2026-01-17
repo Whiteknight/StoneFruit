@@ -24,15 +24,16 @@ public class HandlerSetup : IHandlerSetup
     private readonly DelegateHandlerSource _delegates;
     private readonly ScriptHandlerSource _scripts;
     private readonly NamedInstanceHandlerSource _instances;
-    private readonly IServiceCollection _services;
     private readonly HashSet<Assembly> _scannedAssemblies;
+
+    public IServiceCollection Services { get; }
 
     public HandlerSetup(IServiceCollection services)
     {
         _delegates = new DelegateHandlerSource();
         _scripts = new ScriptHandlerSource();
         _instances = new NamedInstanceHandlerSource();
-        _services = services;
+        Services = services;
         _scannedAssemblies = [];
     }
 
@@ -68,21 +69,21 @@ public class HandlerSetup : IHandlerSetup
     public IHandlerSetup UseVerbExtractor(IVerbExtractor verbExtractor)
     {
         NotNull(verbExtractor);
-        _services.AddSingleton(verbExtractor);
+        Services.AddSingleton(verbExtractor);
         return this;
     }
 
     public IHandlerSetup UseMethodInvoker(IHandlerMethodInvoker invoker)
     {
         NotNull(invoker);
-        _services.AddSingleton(invoker);
+        Services.AddSingleton(invoker);
         return this;
     }
 
     public IHandlerSetup AddSource(Func<IServiceProvider, IHandlerSource> getSource)
     {
         NotNull(getSource);
-        _services.AddSingleton(getSource);
+        Services.AddSingleton(getSource);
         return this;
     }
 
@@ -113,13 +114,13 @@ public class HandlerSetup : IHandlerSetup
     public IHandlerSetup Add<T>(string? prefix = null)
         where T : class, IHandlerBase
     {
-        _services.AddHandler<T>(prefix);
+        Services.AddHandler<T>(prefix);
         return this;
     }
 
     public IHandlerSetup Add(Type handlerType, string? prefix = null)
     {
-        _services.AddHandler(handlerType, prefix);
+        Services.AddHandler(handlerType, prefix);
         return this;
     }
 
@@ -143,7 +144,7 @@ public class HandlerSetup : IHandlerSetup
         // 1) the type itself, as itself, so we can resolve the handler instance later, and
         // 2) a RegisteredHandler, which holds the handler type, so we can set up verb->handler mappings
         foreach (var type in handlerTypes)
-            _services.AddHandler(type, prefix);
+            Services.AddHandler(type, prefix);
 
         _scannedAssemblies.Add(assembly);
         return this;

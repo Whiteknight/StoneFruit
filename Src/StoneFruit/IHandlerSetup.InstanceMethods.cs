@@ -12,13 +12,28 @@ public static class IHandlerSetupInstanceMethodExtensions
     /// <param name="instance"></param>
     /// <param name="group"></param>
     /// <returns></returns>
-    public static IHandlerSetup UsePublicInstanceMethodsAsHandlers(this IHandlerSetup setup, object instance, string? group = null)
+    public static IHandlerSetup UsePublicInstanceMethodsAsHandlers<T>(this IHandlerSetup setup, T instance, string? group = null)
         => setup.AddSource(provider =>
-            new InstanceMethodHandlerSource(
-                instance,
+            new InstanceMethodHandlerSource<T>(
+                () => instance,
                 provider.GetRequiredService<IHandlerMethodInvoker>(),
                 provider.GetRequiredService<IVerbExtractor>(),
                 group
             )
         );
+
+    public static IHandlerSetup UsePublicInstanceMethodsAsHandlers<T>(this IHandlerSetup setup, string? group = null)
+        where T : class
+    {
+        setup.Services.AddScoped<T>();
+        setup.AddSource(provider =>
+            new InstanceMethodHandlerSource<T>(
+                () => provider.GetRequiredService<T>(),
+                provider.GetRequiredService<IHandlerMethodInvoker>(),
+                provider.GetRequiredService<IVerbExtractor>(),
+                group
+            )
+        );
+        return setup;
+    }
 }

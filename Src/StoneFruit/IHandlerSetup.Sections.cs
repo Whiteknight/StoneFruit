@@ -27,6 +27,8 @@ public sealed class HandlerSectionSetup
         _name = name;
     }
 
+    public IServiceCollection Services => _setup.Services;
+
     public HandlerSectionSetup Add(Verb verb, Action<IArguments, HandlerContext> handle, string description = "", string usage = "", string group = "")
     {
         _setup.Add(verb.AddPrefix(_name), handle, description, usage, GetGroup(group));
@@ -64,12 +66,29 @@ public sealed class HandlerSectionSetup
         return this;
     }
 
-    public HandlerSectionSetup UsePublicInstanceMethodsAsHandlers(object instance)
+    public HandlerSectionSetup UsePublicInstanceMethodsAsHandlers<T>(T instance)
+        where T : class
     {
         var name = _name;
         _setup.AddSource(provider =>
-            new InstanceMethodHandlerSource(
-                instance,
+            new InstanceMethodHandlerSource<T>(
+                () => instance,
+                provider.GetRequiredService<IHandlerMethodInvoker>(),
+                new PrefixingVerbExtractor(name, provider.GetRequiredService<IVerbExtractor>()),
+                name
+            )
+        );
+        return this;
+    }
+
+    public HandlerSectionSetup UsePublicInstanceMethodsAsHandlers<T>()
+        where T : class
+    {
+        var name = _name;
+        _setup.Services.AddScoped<T>();
+        _setup.UsePublicInstanceMethodsAsHandlers<T>(name).AddSource(provider =>
+            new InstanceMethodHandlerSource<T>(
+                () => provider.GetRequiredService<T>(),
                 provider.GetRequiredService<IHandlerMethodInvoker>(),
                 new PrefixingVerbExtractor(name, provider.GetRequiredService<IVerbExtractor>()),
                 name

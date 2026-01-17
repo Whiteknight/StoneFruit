@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Execution.Handlers;
 using static StoneFruit.Utility.Assert;
 
@@ -10,6 +11,8 @@ namespace StoneFruit;
 
 public interface IHandlerSetup
 {
+    IServiceCollection Services { get; }
+
     IHandlerSetup ScanAssemblyForHandlers(Assembly? assembly, string? prefix = null);
 
     /// <summary>
