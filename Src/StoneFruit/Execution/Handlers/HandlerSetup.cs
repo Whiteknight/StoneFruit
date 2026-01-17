@@ -137,14 +137,19 @@ public class HandlerSetup : IHandlerSetup
         if (assembly == null || _scannedAssemblies.Contains(assembly))
             return this;
 
-        var handlerTypes = NotNull(assembly).GetTypes()
-            .Where(t => t.IsPublic && t.IsHandlerType());
-
+        // Scan for IHandler and IAsyncHandler implementations
         // Each handler type creates two DI registrations:
         // 1) the type itself, as itself, so we can resolve the handler instance later, and
         // 2) a RegisteredHandler, which holds the handler type, so we can set up verb->handler mappings
+        var handlerTypes = NotNull(assembly).GetTypes()
+            .Where(t => t.IsPublic && t.IsHandlerType());
         foreach (var type in handlerTypes)
             Services.AddHandler(type, prefix);
+
+        var instanceMethodTypes = assembly.GetTypes()
+            .Where(t => t.IsPublic && t.IsInstanceMethodHandlersType());
+        foreach (var type in instanceMethodTypes)
+            InstanceMethods.UsePublicInstanceMethodsAsHandlers(this, type, prefix);
 
         _scannedAssemblies.Add(assembly);
         return this;

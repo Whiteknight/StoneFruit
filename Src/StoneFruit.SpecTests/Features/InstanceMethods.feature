@@ -1,4 +1,4 @@
-﻿Feature: HandlerMethods
+﻿Feature: InstanceMethods
 
 Rule: Sync methods
 
@@ -116,3 +116,17 @@ Rule: Value Type Parsing
         Then The output should contain:
             | Line |
             | True |
+
+Rule: Method return values
+
+    Background: 
+        Given I use ObjectWithHandlerMethod handlers with value "test"
+        And I use JsonObjectWriter for output
+
+    Scenario: Can return value from a handler method to print as json
+        When I run headless with input "method-with-return-value"
+        Then The output should contain:
+            | Line            |
+            | {               |
+            | "Value": "test" |
+            | }               |

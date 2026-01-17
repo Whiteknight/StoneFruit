@@ -40,9 +40,3 @@ public sealed class JsonObjectOutputWriter : IObjectOutputWriter
         _output.WriteLine(json);
     }
 }
-
-public static class ObjectWriterExtensions
-{
-    public static IIoSetup UseJsonObjectWriter(this IIoSetup setup)
-        => setup.UseObjectWriter<JsonObjectOutputWriter>();
-}

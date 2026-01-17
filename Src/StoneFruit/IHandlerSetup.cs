@@ -13,6 +13,12 @@ public interface IHandlerSetup
 {
     IServiceCollection Services { get; }
 
+    /// <summary>
+    /// Scan the given Assembly for handler types marked with IHandler or IAsyncHandler.
+    /// </summary>
+    /// <param name="assembly"></param>
+    /// <param name="prefix"></param>
+    /// <returns></returns>
     IHandlerSetup ScanAssemblyForHandlers(Assembly? assembly, string? prefix = null);
 
     /// <summary>

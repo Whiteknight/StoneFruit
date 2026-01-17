@@ -1,12 +1,23 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using StoneFruit.Execution.Handlers;
 using StoneFruit.Execution.IO;
 
 namespace StoneFruit;
 
-public static class InstanceMethodsExtensions
+/// <summary>
+/// Tag type for classes which provide instance methods as handlers. Used for auto-wireup/scanning.
+/// </summary>
+public interface IInstanceMethodHandlers
 {
+}
+
+public static class InstanceMethods
+{
+    public static bool IsInstanceMethodHandlersType(this Type type)
+        => type?.IsPublic == true && !type.IsAbstract && typeof(IInstanceMethodHandlers).IsAssignableFrom(type);
+
     /// <summary>
     /// Use the public methods of an instance object as handlers.
     /// </summary>
@@ -39,6 +50,15 @@ public static class InstanceMethodsExtensions
                 group
             )
         );
+        return setup;
+    }
+
+    public static IHandlerSetup UsePublicInstanceMethodsAsHandlers(this IHandlerSetup setup, Type type, string? group = null)
+    {
+        var method = typeof(InstanceMethods)
+            .GetMethod(nameof(UsePublicInstanceMethodsAsHandlers), [typeof(IHandlerSetup), typeof(string)])!
+            .MakeGenericMethod(type);
+        method.Invoke(null, [setup, group]);
         return setup;
     }
 

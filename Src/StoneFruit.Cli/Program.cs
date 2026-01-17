@@ -17,7 +17,7 @@ internal static class Program
             // Scan for handlers using reflection. Looks for any public, non-abstract,
             // implementations of IHandlerBase in the specified assemblies
             //.ScanHandlersFromEntryAssembly()
-            .ScanHandlersFromCurrentAssembly("entry")
+            //.ScanHandlersFromCurrentAssembly("entry")
             //.ScanHandlersFromAssemblyContaining<MyFirstHandler>()
 
             // Create an object instance and treat each of it's public methods as handlers
@@ -158,13 +158,18 @@ public class MyEnvironment
     }
 }
 
-public class MyObject
+public class MyObject : IInstanceMethodHandlers
 {
     private readonly string _tag;
 
     public MyObject(string tag)
     {
         _tag = tag;
+    }
+
+    public MyObject()
+    {
+        _tag = "nothing";
     }
 
     [Group("public-methods")]

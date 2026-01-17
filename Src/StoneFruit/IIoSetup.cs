@@ -95,4 +95,11 @@ public interface IIoSetup
     /// <returns></returns>
     IIoSetup UseObjectWriter<T>()
         where T : class, IObjectOutputWriter;
+
+    /// <summary>
+    /// For handlers which return a value, write them to the output as formatted json.
+    /// </summary>
+    /// <returns></returns>
+    public IIoSetup UseJsonObjectWriter()
+        => UseObjectWriter<JsonObjectOutputWriter>();
 }

@@ -32,6 +32,12 @@ public class ObjectWithHandlerMethods
     {
         output.WriteLine($"{_value} Flag: {flag}");
     }
+
+    [Verb("method-with-return-value")]
+    public object MethodWithReturnValue()
+    {
+        return new { Value = _value };
+    }
 }
 
 public class ObjectWithAsyncHandlerMethods

@@ -4,7 +4,7 @@ using StoneFruit.SpecTests.Support;
 namespace StoneFruit.SpecTests.StepDefinitions;
 
 [Binding]
-public record ObjectHandlerMethodsStepDefinitions(ScenarioContext Context)
+public record InstanceMethodsStepDefinitions(ScenarioContext Context)
 {
     [Given("I use ObjectWithHandlerMethod handlers")]
     public void GivenIUseObjectWithHandlerMethodHandlers()

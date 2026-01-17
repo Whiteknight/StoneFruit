@@ -29,6 +29,7 @@ public class InstanceMethodHandlerSource<T> : IHandlerSource
         _invoker = NotNull(invoker);
         _methods = typeof(T)
             .GetMethods(BindingFlags.Instance | BindingFlags.Public)
+            .Where(m => m.DeclaringType != typeof(object))
             .SelectMany(m => verbExtractor
                 .GetVerbs(m)
                 .Match(
