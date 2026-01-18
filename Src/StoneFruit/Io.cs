@@ -92,3 +92,15 @@ public interface IInput
     /// <returns></returns>
     Maybe<string> Prompt(string prompt, bool mustProvide = true, bool keepHistory = true);
 }
+
+public interface IObjectOutputWriter
+{
+    void WriteObject<T>(T obj);
+
+    void MaybeWriteObject<T>(T? obj)
+        where T : class
+    {
+        if (obj != null)
+            WriteObject(obj);
+    }
+}
