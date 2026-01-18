@@ -95,3 +95,11 @@ public static class MaybeExtensions
         where TKey : notnull
         => NotNull(dict).TryGetValue(key, out var value) && value is not null ? value : default(Maybe<TValue>);
 }
+
+public static class Validate
+{
+    public static Maybe<string> IsNotNullOrEmpty(string value)
+        => string.IsNullOrEmpty(value)
+            ? default
+            : value;
+}

@@ -1,10 +1,152 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ParserObjects;
 using StoneFruit.Execution.Arguments;
+using StoneFruit.Execution.Scripts;
 using static StoneFruit.Utility.Assert;
 
 namespace StoneFruit;
+
+/// <summary>
+/// Setup argument parsing.
+/// </summary>
+public interface IArgumentsSetup
+{
+    /// <summary>
+    /// Specify an argument parser to use. Notice that you cannot set an Argument
+    /// parser if you specify a Command parser. If null is passed the default argument
+    /// parser will be used.
+    /// </summary>
+    /// <param name="argParser"></param>
+    /// <returns></returns>
+    IArgumentsSetup UseArgumentParser(IParser<char, IArgumentToken> argParser);
+
+    /// <summary>
+    /// Use the StoneFruit simplified argument syntax.
+    /// </summary>
+    /// <returns></returns>
+    IArgumentsSetup UseSimplifiedArgumentParser()
+        => UseArgumentParser(SimplifiedArgumentGrammar.GetParser());
+
+    /// <summary>
+    /// Use a POSIX-style argument syntax similar to many existing POSIX utilities.
+    /// </summary>
+    /// <returns></returns>
+    IArgumentsSetup UsePosixStyleArgumentParser()
+        => UseArgumentParser(PosixStyleArgumentGrammar.GetParser());
+
+    /// <summary>
+    /// Use a Windows PowerShell syntax for arguments.
+    /// </summary>
+    /// <returns></returns>
+    IArgumentsSetup UsePowershellStyleArgumentParser()
+        => UseArgumentParser(PowershellStyleArgumentGrammar.GetParser());
+
+    /// <summary>
+    /// Use a class Windows-CMD syntax for arguments.
+    /// </summary>
+    /// <returns></returns>
+    IArgumentsSetup UseWindowsCmdArgumentParser()
+        => UseArgumentParser(WindowsCmdArgumentGrammar.GetParser());
+
+    /// <summary>
+    /// Specify a parser to use for scripts. Notice that you cannot set a Script
+    /// parser if you specify a Command parser. If null is passed the default script parser
+    /// will be used.
+    /// </summary>
+    /// <param name="scriptParser"></param>
+    /// <returns></returns>
+    IArgumentsSetup UseScriptParser(IParser<char, CommandFormat> scriptParser);
+
+    IArgumentsSetup UseTypeParser<T>(IValueTypeParser<T> typeParser);
+
+    IArgumentsSetup UseTypeParser<T>(Func<IValuedArgument, T> parse)
+        where T : class
+        => UseTypeParser<T>(new DelegateValueTypeParser<T>(NotNull(parse)));
+}
+
+/// <summary>
+/// Represents a single argument, either positional, named, or otherwise.
+/// </summary>
+public interface IArgument
+{
+    /// <summary>
+    /// Gets or sets a value indicating whether this value has already been
+    /// consumed. A consumed argument cannot be retrieved again.
+    /// </summary>
+    bool Consumed { get; set; }
+}
+
+/// <summary>
+/// Represents an argument with a value.
+/// </summary>
+public interface IValuedArgument : IArgument
+{
+    /// <summary>
+    /// Gets the raw string value of the argument.
+    /// </summary>
+    string Value { get; }
+
+    /// <summary>
+    /// Get the value of the argument as a string, with a default value if the argument doesn't exist.
+    /// </summary>
+    /// <param name="defaultValue"></param>
+    /// <returns></returns>
+    string AsString(string defaultValue = "");
+
+    /// <summary>
+    /// Get the value of the argument as a boolean, with a default value if the argument doesn't exist
+    /// or can't be converted.
+    /// </summary>
+    /// <param name="defaultValue"></param>
+    /// <returns></returns>
+    bool AsBool(bool defaultValue = false);
+
+    /// <summary>
+    /// Get the value of the argument as an integer, with a default value if the argument doesn't exist
+    /// or can't be converted.
+    /// </summary>
+    /// <param name="defaultValue"></param>
+    /// <returns></returns>
+    int AsInt(int defaultValue = 0);
+
+    /// <summary>
+    /// Get the value of the argument as a long, with a default value if the argument doesn't exist or
+    /// can't be converted.
+    /// </summary>
+    /// <param name="defaultValue"></param>
+    /// <returns></returns>
+    long AsLong(long defaultValue = 0L);
+}
+
+/// <summary>
+/// A positional argument is a value argument with no name.
+/// </summary>
+public interface IPositionalArgument : IValuedArgument;
+
+/// <summary>
+/// A named argument is a value argument with a name.
+/// </summary>
+public interface INamedArgument : IValuedArgument
+{
+    /// <summary>
+    /// Gets the name of the argument.
+    /// </summary>
+    string Name { get; }
+}
+
+/// <summary>
+/// A flag argument is an argument with a name but no value.
+/// </summary>
+public interface IFlagArgument : IArgument
+{
+    /// <summary>
+    /// Gets the flag name.
+    /// </summary>
+    string Name { get; }
+}
 
 public interface IArgumentCollection
 {
@@ -181,5 +323,66 @@ public static class ArgumentsExtensions
         foreach (var line in unconsumed)
             sb.AppendLine(line);
         throw new ArgumentParseException(sb.ToString());
+    }
+
+    /// <summary>
+    /// Throw an exception if the argument does not exist.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="argument"></param>
+    /// <param name="errorMessage"></param>
+    /// <returns></returns>
+    public static T Require<T>(this T argument, string errorMessage = "")
+        where T : IArgument
+    {
+        NotNull(argument);
+        (argument as MissingArgument)?.Throw(errorMessage);
+        return argument;
+    }
+
+    /// <summary>
+    /// Mark the value as being consumed.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="argument"></param>
+    /// <param name="consumed"></param>
+    /// <returns></returns>
+    public static T MarkConsumed<T>(this T argument, bool consumed = true)
+        where T : IArgument
+    {
+        NotNull(argument);
+        argument.Consumed = consumed;
+        return argument;
+    }
+
+    /// <summary>
+    /// Returns true if the argument exists, false otherwise.
+    /// </summary>
+    /// <param name="argument"></param>
+    /// <returns></returns>
+    public static bool Exists(this IArgument argument)
+        => argument is not null and not MissingArgument;
+
+    /// <summary>
+    /// Helper method to convert the value of the argument to a different format, using a default
+    /// value if the conversion fails.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="argument"></param>
+    /// <param name="transform"></param>
+    /// <param name="defaultValue"></param>
+    /// <returns></returns>
+    public static T? As<T>(this IValuedArgument argument, Func<string, T> transform, T? defaultValue = default)
+    {
+        if (argument is MissingArgument)
+            return defaultValue;
+        try
+        {
+            return transform(argument.Value);
+        }
+        catch
+        {
+            return defaultValue;
+        }
     }
 }

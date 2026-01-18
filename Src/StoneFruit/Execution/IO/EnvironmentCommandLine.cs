@@ -1,11 +1,6 @@
 ﻿using System;
 
-namespace StoneFruit;
-
-public interface ICommandLine
-{
-    string GetRawArguments();
-}
+namespace StoneFruit.Execution.IO;
 
 public class EnvironmentCommandLine : ICommandLine
 {
@@ -20,9 +15,4 @@ public class EnvironmentCommandLine : ICommandLine
         var exeName = Environment.GetCommandLineArgs()[0];
         return Environment.CommandLine.Substring(exeName.Length).Trim();
     }
-}
-
-public sealed record StringCommandLine(string CommandLine) : ICommandLine
-{
-    public string GetRawArguments() => CommandLine;
 }
