@@ -136,6 +136,9 @@ public interface IOutput
             ? this
             : Write(obj!.ToString()!, brush);
 
+    IOutput WriteError(string str)
+        => WriteMessage(new OutputMessage(str ?? string.Empty, IncludeNewline: true, IsError: true));
+
     IOutput WriteFormatted(string format, object? value = null)
         => WriteMessage(new OutputMessage(NotNullOrEmpty(format), value, IsTemplate: true));
 
