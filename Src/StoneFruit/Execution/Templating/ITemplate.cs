@@ -1,6 +1,8 @@
-﻿namespace StoneFruit.Execution.Templating;
+﻿using System.Collections.Generic;
+
+namespace StoneFruit.Execution.Templating;
 
 public interface ITemplate
 {
-    void Render(IOutput output, object? value);
+    IEnumerable<OutputMessage> Render(object? value);
 }

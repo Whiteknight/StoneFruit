@@ -98,18 +98,21 @@ public interface IIoSetup
         => UseObjectWriter<JsonObjectOutputWriter>();
 }
 
+public record struct OutputMessage(string Text, Maybe<object> Object = default, Brush Brush = default, bool IncludeNewline = false, bool IsError = false, bool IsTemplate = false);
+
 /// <summary>
 /// Abstraction for output.
 /// </summary>
 public interface IOutput
 {
-    ITemplateParser TemplateParser { get; }
+    IOutput WriteMessage(OutputMessage message);
 
     /// <summary>
     /// Write a linebreak to the output.
     /// </summary>
     /// <returns></returns>
-    IOutput WriteLine(string line = "", Brush brush = default);
+    IOutput WriteLine(string line = "", Brush brush = default)
+        => WriteMessage(new OutputMessage(line ?? string.Empty, Brush: brush, IncludeNewline: true));
 
     /// <summary>
     /// Write the string representation of the object to the output, with trailing
@@ -118,11 +121,10 @@ public interface IOutput
     /// <param name="obj"></param>
     /// <returns></returns>
     IOutput WriteLine(object obj, Brush brush = default)
-        => obj == null
-            ? this
-            : WriteLine(obj!.ToString()!, brush);
+        => WriteLine(obj?.ToString() ?? string.Empty, brush);
 
-    IOutput Write(string str, Brush brush = default);
+    IOutput Write(string str, Brush brush = default)
+        => WriteMessage(new OutputMessage(str ?? string.Empty, Brush: brush));
 
     /// <summary>
     /// Write the string representation of the object to the output.
@@ -135,12 +137,7 @@ public interface IOutput
             : Write(obj!.ToString()!, brush);
 
     IOutput WriteFormatted(string format, object? value = null)
-    {
-        NotNullOrEmpty(format);
-        var template = TemplateParser.Parse(format);
-        template.Render(this, value ?? new object());
-        return this;
-    }
+        => WriteMessage(new OutputMessage(NotNullOrEmpty(format), value, IsTemplate: true));
 
     IOutput WriteLineFormatted(string format, object? value = null)
         => WriteFormatted(format, value).WriteLine();

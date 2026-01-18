@@ -15,7 +15,7 @@ public record EnvironmentStepDefinitions(ScenarioContext Context)
     [Given("I use an environment changed observer")]
     public void GivenIUseAnEnvironmentChangedObserver()
     {
-        var io = Context.GetIo();
+        IOutput io = Context.GetIo();
         var builder = Context.GetEngineBuilder();
         builder.SetupEnvironments(e => e.OnEnvironmentChanged(name => io.WriteLine($"OBSERVED {name}")));
     }

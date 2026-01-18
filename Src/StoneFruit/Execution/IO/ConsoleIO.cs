@@ -10,22 +10,34 @@ namespace StoneFruit.Execution.IO;
 [ExcludeFromCodeCoverage(Justification = "Hard to test System.Console without capturing IO streams")]
 public class ConsoleIO : IOutput, IInput
 {
+    private readonly ITemplateParser _templateParser;
+
     public ConsoleIO(ITemplateParser parser)
     {
-        TemplateParser = parser;
+        _templateParser = parser;
     }
 
-    public ITemplateParser TemplateParser { get; }
-
-    public IOutput WriteLine(string? line = "", Brush brush = default)
+    public IOutput WriteMessage(OutputMessage message)
     {
-        WithBrush(brush, line ?? string.Empty, Console.WriteLine);
-        return this;
-    }
+        if (message.IsTemplate)
+        {
+            var template = _templateParser.Parse(message.Text ?? string.Empty);
+            var messages = template.Render(message.Object.GetValueOrDefault(new object()));
+            foreach (var msg in messages)
+                WriteMessage(msg with { IsError = message.IsError });
+            if (message.IncludeNewline)
+                Console.WriteLine();
+            return this;
+        }
 
-    public IOutput Write(string str, Brush brush = default)
-    {
-        WithBrush(brush, str, Console.Write);
+        if (message.IsError)
+            WriteError(message.Text ?? string.Empty, message.Brush);
+        else
+            ToStandardOutWithBrush(Either(message.Brush, Brush.Default), message.Text ?? string.Empty);
+
+        if (message.IncludeNewline)
+            Console.WriteLine();
+
         return this;
     }
 
@@ -44,11 +56,27 @@ public class ConsoleIO : IOutput, IInput
         }
     }
 
-    private static void WithBrush(Brush brush, string text, Action<string> act)
+    private static void WriteError(string text, Brush brush)
+    {
+        // If Error is redirected, we just write it to the error stream
+        // Otherwise, if brush is default, we should write it out to standard out with red foreground
+        if (Console.IsErrorRedirected)
+        {
+            Console.Error.Write(text);
+            return;
+        }
+
+        ToStandardOutWithBrush(Either(brush, ConsoleColor.Red), text);
+    }
+
+    private static Brush Either(Brush brush, Brush defaultBrush)
+        => brush == default ? defaultBrush : brush;
+
+    private static void ToStandardOutWithBrush(Brush brush, string text)
     {
         if (brush == default || Console.IsOutputRedirected)
         {
-            act(text);
+            Console.Write(text);
             return;
         }
 
@@ -58,7 +86,7 @@ public class ConsoleIO : IOutput, IInput
         Console.BackgroundColor = background;
         try
         {
-            act(text);
+            Console.Write(text);
         }
         finally
         {

@@ -144,11 +144,19 @@ public static class DefaultTemplateFormat
 
     public readonly record struct Template(IReadOnlyList<TemplatePart> Parts) : ITemplate
     {
-        public void Render(IOutput output, object? value)
+        public IEnumerable<OutputMessage> Render(object? value)
         {
+            if (Parts == null || Parts.Count == 0)
+                return [];
             var currentBrush = Brush.Default;
+            var messages = new List<OutputMessage>();
             foreach (var part in Parts)
-                currentBrush = part.Render(output, value, currentBrush);
+            {
+                (var msgs, currentBrush) = part.Render(value, currentBrush);
+                messages.AddRange(msgs);
+            }
+
+            return messages;
         }
     }
 
@@ -163,22 +171,21 @@ public static class DefaultTemplateFormat
         public static TemplatePart If(Pipeline predicate, IReadOnlyList<TemplatePart> thenBlock, IReadOnlyList<TemplatePart> elseBlock)
             => new IfPart(predicate, thenBlock, elseBlock);
 
-        public abstract Brush Render(IOutput output, object? value, Brush brush);
+        public abstract (IEnumerable<OutputMessage> Messages, Brush Brush) Render(object? value, Brush brush);
     }
 
     public sealed record LiteralPart(string Text) : TemplatePart
     {
-        public override Brush Render(IOutput output, object? value, Brush brush)
+        public override (IEnumerable<OutputMessage> Messages, Brush Brush) Render(object? value, Brush brush)
         {
-            output.Write(Text, brush);
-            return brush;
+            return ([new OutputMessage(Text, Brush: brush)], brush);
         }
     }
 
     public sealed record ColorPart(Brush Brush) : TemplatePart
     {
-        public override Brush Render(IOutput output, object? value, Brush brush)
-            => Brush;
+        public override (IEnumerable<OutputMessage> Messages, Brush Brush) Render(object? value, Brush brush)
+            => ([], Brush);
     }
 
     public readonly record struct Pipeline(IReadOnlyList<PipelineFilter> Filters)
@@ -202,29 +209,33 @@ public static class DefaultTemplateFormat
 
     public sealed record PipelinePart(Pipeline Filters) : TemplatePart
     {
-        public override Brush Render(IOutput output, object? value, Brush brush)
+        public override (IEnumerable<OutputMessage> Messages, Brush Brush) Render(object? value, Brush brush)
         {
             if (value is null)
-                return brush;
+                return ([], default);
             var accessed = Filters.GetStringValue(value);
-            output.Write(accessed?.ToString() ?? string.Empty);
-            return brush;
+            return ([new OutputMessage(accessed ?? string.Empty, Brush: brush)], brush);
         }
     }
 
     public sealed record IfPart(Pipeline Predicate, IReadOnlyList<TemplatePart> ThenBlock, IReadOnlyList<TemplatePart> ElseBlock) : TemplatePart
     {
-        public override Brush Render(IOutput output, object? value, Brush brush)
+        public override (IEnumerable<OutputMessage> Messages, Brush Brush) Render(object? value, Brush brush)
         {
-            return Render(output, value, string.IsNullOrEmpty(Predicate.GetStringValue(value)) ? ElseBlock : ThenBlock, brush);
+            return Render(value, string.IsNullOrEmpty(Predicate.GetStringValue(value)) ? ElseBlock : ThenBlock, brush);
         }
 
-        private static Brush Render(IOutput output, object? value, IReadOnlyList<TemplatePart> parts, Brush brush)
+        private static (IEnumerable<OutputMessage> Messages, Brush Brush) Render(object? value, IReadOnlyList<TemplatePart> parts, Brush brush)
         {
             var currentBrush = brush;
+            var output = new List<OutputMessage>();
             foreach (var part in parts)
-                currentBrush = part.Render(output, value, currentBrush);
-            return currentBrush;
+            {
+                (var msgs, currentBrush) = part.Render(value, currentBrush);
+                output.AddRange(msgs);
+            }
+
+            return (output, currentBrush);
         }
     }
 
