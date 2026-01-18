@@ -29,10 +29,10 @@ public class ArgumentsSetup : IArgumentsSetup
         services.AddSingleton(_scriptParser ?? ScriptFormatGrammar.GetParser());
         services.AddSingleton<ICommandParser, CommandParser>();
 
-        MaybeUseTypeParser(a => a.AsString());
-        MaybeUseTypeParser(a => Guid.Parse(a.AsString()));
-        MaybeUseTypeParser(a => new FileInfo(a.AsString()));
-        MaybeUseTypeParser(a => new DirectoryInfo(a.AsString()));
+        MaybeUseTypeParser(a => a);
+        MaybeUseTypeParser(a => Guid.Parse(a));
+        MaybeUseTypeParser(a => new FileInfo(a));
+        MaybeUseTypeParser(a => new DirectoryInfo(a));
         foreach (var typeParser in _typeParsers)
             services.AddSingleton(typeParser.Value);
 
@@ -71,7 +71,7 @@ public class ArgumentsSetup : IArgumentsSetup
         return this;
     }
 
-    private void MaybeUseTypeParser<T>(Func<IValuedArgument, T> parser)
+    private void MaybeUseTypeParser<T>(Func<string, T> parser)
     {
         _typeParsers.TryAdd(typeof(T), new DelegateValueTypeParser<T>(parser));
     }

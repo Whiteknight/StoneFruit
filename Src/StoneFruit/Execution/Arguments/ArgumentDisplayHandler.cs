@@ -8,7 +8,9 @@ public class ArgumentDisplayHandler : IHandler
     public const string Name = "_args";
 
     public static string Group => HelpHandler.BuiltinsGroup;
+
     public static string Description => "Diagnostic handler to display arguments passed";
+
     public static string Usage => $$"""
         {{Name}} ...
 

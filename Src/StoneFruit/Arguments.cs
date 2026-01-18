@@ -60,9 +60,21 @@ public interface IArgumentsSetup
     /// <returns></returns>
     IArgumentsSetup UseScriptParser(IParser<char, CommandFormat> scriptParser);
 
+    /// <summary>
+    /// Register a parser for the given type T to convert string arguments into T.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="typeParser"></param>
+    /// <returns></returns>
     IArgumentsSetup UseTypeParser<T>(IValueTypeParser<T> typeParser);
 
-    IArgumentsSetup UseTypeParser<T>(Func<IValuedArgument, T> parse)
+    /// <summary>
+    /// Register a parser delegate for the given type T to convert string arguments into T.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="parse"></param>
+    /// <returns></returns>
+    IArgumentsSetup UseTypeParser<T>(Func<string, T> parse)
         where T : class
         => UseTypeParser<T>(new DelegateValueTypeParser<T>(NotNull(parse)));
 }
