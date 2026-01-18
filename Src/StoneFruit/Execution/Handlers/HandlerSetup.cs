@@ -8,6 +8,7 @@ using StoneFruit.Execution.Arguments;
 using StoneFruit.Execution.Environments;
 using StoneFruit.Execution.Exceptions;
 using StoneFruit.Execution.Help;
+using StoneFruit.Execution.IO;
 using StoneFruit.Execution.Metadata;
 using StoneFruit.Execution.Scripts;
 using StoneFruit.Utility;

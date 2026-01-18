@@ -1,5 +1,6 @@
 ﻿using StoneFruit.Execution.Environments;
 using StoneFruit.Execution.Help;
+using StoneFruit.Execution.IO;
 using StoneFruit.Execution.Scripts;
 
 // For purposes of this file, readability increases if we allow space between lines of scripts
@@ -22,7 +23,7 @@ public class EngineEventCatalog
     /// </summary>
     public EventScript HeadlessNoArgs { get; } = new EventScript(
         // Has argument 'exitcode' with the intended exit code
-        $"{EchoHandler.Name} No command provided",
+        $"{EchoHandler.Name} -error No command provided",
 
         // Call 'exit' so we can set an explicit error exit code
         $"{ExitHandler.Name} ['exitcode']"
@@ -59,7 +60,7 @@ public class EngineEventCatalog
     /// </summary>
     public EventScript VerbNotFound { get; } = new EventScript(
         // Has argument 'verb' with the name of the verb
-        $"{EchoHandler.Name} Verb ['verb'] not found. Please check your spelling or help output and try again.",
+        $"{EchoHandler.Name} -error Verb ['verb'] not found. Please check your spelling or help output and try again.",
         $"{HelpHandler.Name} -startswith ['verb']"
     );
 
@@ -77,7 +78,7 @@ public class EngineEventCatalog
     /// environment set.
     /// </summary>
     public EventScript HeadlessHelp { get; } = new EventScript(
-        $"{HelpHandler.Name}",
+        HelpHandler.Name,
 
         // Call 'exit' explicitly so we can set the exit code
         // Has argument 'exitcode' with the intended exit code
@@ -90,7 +91,7 @@ public class EngineEventCatalog
     /// </summary>
     public EventScript EngineError { get; } = new EventScript(
         // Contains the exception message and exception stack trace as arguments
-        $"{EchoHandler.Name} color=Red ['message']",
+        $"{EchoHandler.Name} -error ['message']",
         $"{EchoHandler.Name} -ignoreempty ['stacktrace']"
     );
 
@@ -102,7 +103,7 @@ public class EngineEventCatalog
         // 'exitcode' with the intended exit code value
         // Notice that the command counter is reset before executing this script, but it
         // is not disabled. This script cannot contain more than limit entries
-        $"{EchoHandler.Name} Maximum ['limit'] commands executed without user input. Terminating runloop.",
+        $"{EchoHandler.Name} -error Maximum ['limit'] commands executed without user input. Terminating runloop.",
         $"{ExitHandler.Name} ['exitcode']"
     );
 }
