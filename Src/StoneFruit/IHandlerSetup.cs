@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using StoneFruit.Execution.Handlers;
 using static StoneFruit.Utility.Assert;
@@ -66,6 +64,8 @@ public interface IHandlerSetup
 
     /// <summary>
     /// Register a handler type. Verbs and help information will be derived from the type.
+    /// If the type is an IHandler or IAsyncHandler it will be registered.
+    /// If the type is IInstanceMethodHandlers each method on the object will be registered as a handler.
     /// </summary>
     /// <param name="handlerType"></param>
     /// <returns></returns>
@@ -75,11 +75,11 @@ public interface IHandlerSetup
     /// Add a function delegate as a handler.
     /// </summary>
     /// <param name="verb"></param>
-    /// <param name="handle"></param>
+    /// <param name="handler"></param>
     /// <param name="description"></param>
     /// <param name="usage"></param>
     /// <returns></returns>
-    IHandlerSetup Add(Verb verb, Action<IArguments, HandlerContext> handle, string description = "", string usage = "", string group = "");
+    IHandlerSetup Add(Verb verb, Delegate handler, string description = "", string usage = "", string group = "");
 
     /// <summary>
     /// Add a pre-existing handler instance with the given verb.
@@ -90,16 +90,6 @@ public interface IHandlerSetup
     /// <param name="usage"></param>
     /// <returns></returns>
     IHandlerSetup Add(Verb verb, IHandlerBase handler, string description = "", string usage = "", string group = "");
-
-    /// <summary>
-    /// Add a function delegate as a handler for asynchronous invocation.
-    /// </summary>
-    /// <param name="verb"></param>
-    /// <param name="handleAsync"></param>
-    /// <param name="description"></param>
-    /// <param name="usage"></param>
-    /// <returns></returns>
-    IHandlerSetup Add(Verb verb, Func<IArguments, HandlerContext, CancellationToken, Task> handleAsync, string description = "", string usage = "", string group = "");
 
     /// <summary>
     /// Add a script with a verb and zero or more commands to execute.

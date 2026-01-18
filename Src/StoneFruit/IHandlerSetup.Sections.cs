@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace StoneFruit;
@@ -29,21 +27,15 @@ public sealed class HandlerSectionSetup
 
     public string Name { get; }
 
-    public HandlerSectionSetup Add(Verb verb, Action<IArguments, HandlerContext> handle, string description = "", string usage = "", string group = "")
+    public HandlerSectionSetup Add(Verb verb, Delegate handler, string description = "", string usage = "", string group = "")
     {
-        Handlers.Add(verb.AddPrefix(Name), handle, description, usage, GetGroup(group));
+        Handlers.Add(verb.AddPrefix(Name), handler, description, usage, GetGroup(group));
         return this;
     }
 
     public HandlerSectionSetup Add(Verb verb, IHandlerBase handler, string description = "", string usage = "", string group = "")
     {
         Handlers.Add(verb.AddPrefix(Name), handler, description, usage, GetGroup(group));
-        return this;
-    }
-
-    public HandlerSectionSetup Add(Verb verb, Func<IArguments, HandlerContext, CancellationToken, Task> handleAsync, string description = "", string usage = "", string group = "")
-    {
-        Handlers.Add(verb.AddPrefix(Name), handleAsync, description, usage, GetGroup(group));
         return this;
     }
 

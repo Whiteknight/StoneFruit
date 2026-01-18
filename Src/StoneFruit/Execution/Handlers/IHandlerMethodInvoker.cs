@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,5 +12,9 @@ public interface IHandlerMethodInvoker
 {
     object? Invoke(object instance, MethodInfo method, HandlerContext context);
 
+    object? Invoke(Delegate func, HandlerContext context);
+
     Task<object?> InvokeAsync(object instance, MethodInfo method, HandlerContext context, CancellationToken token);
+
+    Task<object?> InvokeAsync(Delegate func, HandlerContext context, CancellationToken token);
 }

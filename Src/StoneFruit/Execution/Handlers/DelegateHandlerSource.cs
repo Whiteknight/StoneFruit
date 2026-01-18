@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using StoneFruit.Execution.IO;
 using StoneFruit.Execution.Trie;
+using StoneFruit.Utility;
 
 namespace StoneFruit.Execution.Handlers;
+
+public sealed record DelegateHandlerRegistration(Delegate Func, Verb Verb, string Description, string Usage, string Group);
 
 /// <summary>
 /// Handler source for function delegates.
@@ -14,9 +18,11 @@ public class DelegateHandlerSource : IHandlerSource
 {
     private readonly VerbTrie<IHandlerBase> _handlers;
 
-    public DelegateHandlerSource()
+    public DelegateHandlerSource(IHandlerMethodInvoker invoker, IObjectOutputWriter writer, IEnumerable<DelegateHandlerRegistration> handlers)
     {
-        _handlers = new VerbTrie<IHandlerBase>();
+        _handlers = handlers
+            .Select(h => (Handler: CreateHandler(invoker, writer, h.Verb, h.Func, h.Description, h.Usage, h.Group), Verb: h.Verb))
+            .ToVerbTrie(h => h.Verb, h => h.Handler);
     }
 
     public int Count => _handlers.Count;
@@ -32,31 +38,34 @@ public class DelegateHandlerSource : IHandlerSource
     public Maybe<IVerbInfo> GetByName(Verb verb)
         => _handlers.Get(verb).Map(i => (IVerbInfo)i);
 
-    public void Add(Verb verb, Action<IArguments, HandlerContext> act, string description, string usage, string group)
+    private static IHandlerBase CreateHandler(IHandlerMethodInvoker invoker, IObjectOutputWriter writer, Verb verb, Delegate func, string description, string usage, string group)
     {
-        _handlers.Insert(verb, new SyncHandler(act, verb, description, usage, group));
+        return func.Method.IsAsync()
+            ? new AsyncHandler(invoker, writer, func, verb, description, usage, group)
+            : new Handler(invoker, writer, func, verb, description, usage, group);
     }
 
-    public void Add(Verb verb, Func<IArguments, HandlerContext, CancellationToken, Task> func, string description, string usage, string group)
-    {
-        _handlers.Insert(verb, new AsyncHandler(func, verb, description, usage, group));
-    }
-
-    private sealed record SyncHandler(Action<IArguments, HandlerContext> Act, Verb Verb, string Description, string Usage, string Group)
+    private sealed record Handler(IHandlerMethodInvoker Invoker, IObjectOutputWriter Writer, Delegate Func, Verb Verb, string Description, string Usage, string Group)
         : IHandler, IVerbInfo
     {
         public bool ShouldShowInHelp => true;
 
         public void Execute(IArguments arguments, HandlerContext context)
-            => Act(arguments, context);
+        {
+            var result = Invoker.Invoke(Func, context);
+            Writer.MaybeWriteObject(result);
+        }
     }
 
-    private sealed record AsyncHandler(Func<IArguments, HandlerContext, CancellationToken, Task> Func, Verb Verb, string Description, string Usage, string Group)
+    private sealed record AsyncHandler(IHandlerMethodInvoker Invoker, IObjectOutputWriter Writer, Delegate Func, Verb Verb, string Description, string Usage, string Group)
         : IAsyncHandler, IVerbInfo
     {
         public bool ShouldShowInHelp => true;
 
-        public Task ExecuteAsync(IArguments arguments, HandlerContext context, CancellationToken cancellation)
-            => Func(arguments, context, cancellation);
+        public async Task ExecuteAsync(IArguments arguments, HandlerContext context, CancellationToken cancellation)
+        {
+            var result = await Invoker.InvokeAsync(Func, context, cancellation);
+            Writer.MaybeWriteObject(result);
+        }
     }
 }

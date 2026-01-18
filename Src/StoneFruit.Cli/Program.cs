@@ -2,7 +2,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
-using StoneFruit.Execution.IO;
 
 namespace StoneFruit.Cli;
 
@@ -30,9 +29,9 @@ internal static class Program
             // Set up a verb which executes a callback delegate
             // Also set up a script as an alias of this
             // Also setup a multi-word verb using a callback delegate.
-            .Add("testf", (a, hc) => hc.Output.WriteLine("F"), description: "do F things", usage: "testf ...", group: "delegates")
+            .Add("testf", async (HandlerContext hc) => hc.Output.WriteLine("F"), description: "do F things", usage: "testf ...", group: "delegates")
             .AddScript("testf-alias", ["testf"], group: "delegates")
-            .Add(new[] { "test", "j" }, (args, hc) => hc.Output.WriteLine("J"), description: "do J things", usage: "test j")
+            .Add(new[] { "test", "j" }, (HandlerContext hc) => "J", description: "do J things", usage: "test j")
 
             // Create a few scripts, showing usage
             .AddSection("scripts", s => s

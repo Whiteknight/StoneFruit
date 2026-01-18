@@ -6,8 +6,10 @@ namespace StoneFruit.Tests.Utility;
 
 public class TypeNameVerbExtractorTests
 {
-    private class FirstTestHandler : IHandlerBase
+    private class FirstTestHandler : IHandler
     {
+        public void Execute(IArguments arguments, HandlerContext context)
+            => throw new System.NotImplementedException();
     }
 
     [Test]
