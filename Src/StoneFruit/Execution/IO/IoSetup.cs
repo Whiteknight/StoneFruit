@@ -71,12 +71,6 @@ public class IoSetup : IIoSetup
         return this;
     }
 
-    public IIoSetup UseColorOutputFactory(IColorOutputFactory factory)
-    {
-        _services.AddSingleton(factory);
-        return this;
-    }
-
     public IIoSetup UseObjectWriter<T>()
         where T : class, IObjectOutputWriter
     {
@@ -93,7 +87,6 @@ public class IoSetup : IIoSetup
         services.TryAddSingleton(_ => DefaultTemplateFormat.Parser.Create());
         services.TryAddSingleton(typeof(ILogger<>), typeof(OutputLogger<>));
         services.TryAddSingleton(new LoggingConfiguration(_logLevel, _logColors));
-        services.TryAddSingleton<IColorOutputFactory, ConsoleColorOutputFactory>();
         services.TryAddSingleton<IObjectOutputWriter, NullObjectOutputWriter>();
     }
 }

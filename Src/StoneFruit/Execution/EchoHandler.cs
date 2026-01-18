@@ -1,7 +1,7 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using StoneFruit;
 using StoneFruit.Execution.Help;
+using StoneFruit.Execution.IO;
 
 namespace StoneFruit.Execution;
 
@@ -34,7 +34,10 @@ public class EchoHandler : IHandler
         if (arguments.HasFlag(FlagNoHeadless) && state.RunMode == EngineRunMode.Headless)
             return;
 
-        var output = GetOutput(arguments, context.Output);
+        var colorName = arguments.Get(ArgColor).AsString();
+        var brush = string.IsNullOrEmpty(colorName)
+            ? Brush.Default
+            : Brush.Parse(colorName);
 
         var strings = arguments.GetAllPositionals().Where(p => p.Exists()).Select(p => p.AsString());
         var line = string.Join(" ", strings);
@@ -42,24 +45,14 @@ public class EchoHandler : IHandler
         if (string.IsNullOrWhiteSpace(line) && arguments.HasFlag(FlagIgnoreEmpty))
             return;
 
-        WriteToOutput(arguments, output, line);
+        WriteToOutput(arguments, context.Output, line, brush);
     }
 
-    private static void WriteToOutput(IArguments arguments, IOutput output, string line)
+    private static void WriteToOutput(IArguments arguments, IOutput output, string line, Brush brush)
     {
         if (arguments.HasFlag(FlagNoNewline))
-            output.Write(line);
+            output.Write(line, brush);
         else
-            output.WriteLine(line);
-    }
-
-    private static IOutput GetOutput(IArguments arguments, IOutput output)
-    {
-        var colorName = arguments.Get(ArgColor).AsString();
-        if (string.IsNullOrEmpty(colorName))
-            return output;
-
-        var color = (ConsoleColor)Enum.Parse(typeof(ConsoleColor), colorName);
-        return output.Color(color);
+            output.WriteLine(line, brush);
     }
 }

@@ -33,7 +33,7 @@ public class MetadataHandler : IHandler
         {
             foreach (var kvp in state.Metadata)
             {
-                output.Color(ConsoleColor.Green).Write(kvp.Key);
+                output.Write(kvp.Key, ConsoleColor.Green);
                 output.Write(": ");
                 output.WriteLine(kvp.Value.ToString() ?? string.Empty);
             }

@@ -146,9 +146,9 @@ public static class DefaultTemplateFormat
     {
         public void Render(IOutput output, object? value)
         {
-            var currentOutput = output;
+            var currentBrush = Brush.Default;
             foreach (var part in Parts)
-                currentOutput = part.Render(currentOutput, value);
+                currentBrush = part.Render(output, value, currentBrush);
         }
     }
 
@@ -163,22 +163,22 @@ public static class DefaultTemplateFormat
         public static TemplatePart If(Pipeline predicate, IReadOnlyList<TemplatePart> thenBlock, IReadOnlyList<TemplatePart> elseBlock)
             => new IfPart(predicate, thenBlock, elseBlock);
 
-        public abstract IOutput Render(IOutput output, object? value);
+        public abstract Brush Render(IOutput output, object? value, Brush brush);
     }
 
     public sealed record LiteralPart(string Text) : TemplatePart
     {
-        public override IOutput Render(IOutput output, object? value)
+        public override Brush Render(IOutput output, object? value, Brush brush)
         {
-            output.Write(Text);
-            return output;
+            output.Write(Text, brush);
+            return brush;
         }
     }
 
     public sealed record ColorPart(Brush Brush) : TemplatePart
     {
-        public override IOutput Render(IOutput output, object? value)
-            => output.Color(Brush);
+        public override Brush Render(IOutput output, object? value, Brush brush)
+            => Brush;
     }
 
     public readonly record struct Pipeline(IReadOnlyList<PipelineFilter> Filters)
@@ -202,28 +202,29 @@ public static class DefaultTemplateFormat
 
     public sealed record PipelinePart(Pipeline Filters) : TemplatePart
     {
-        public override IOutput Render(IOutput output, object? value)
+        public override Brush Render(IOutput output, object? value, Brush brush)
         {
             if (value is null)
-                return output;
+                return brush;
             var accessed = Filters.GetStringValue(value);
-            return output.Write(accessed?.ToString() ?? string.Empty);
+            output.Write(accessed?.ToString() ?? string.Empty);
+            return brush;
         }
     }
 
     public sealed record IfPart(Pipeline Predicate, IReadOnlyList<TemplatePart> ThenBlock, IReadOnlyList<TemplatePart> ElseBlock) : TemplatePart
     {
-        public override IOutput Render(IOutput output, object? value)
+        public override Brush Render(IOutput output, object? value, Brush brush)
         {
-            Render(output, value, string.IsNullOrEmpty(Predicate.GetStringValue(value)) ? ElseBlock : ThenBlock);
-            return output;
+            return Render(output, value, string.IsNullOrEmpty(Predicate.GetStringValue(value)) ? ElseBlock : ThenBlock, brush);
         }
 
-        private static void Render(IOutput output, object? value, IReadOnlyList<TemplatePart> parts)
+        private static Brush Render(IOutput output, object? value, IReadOnlyList<TemplatePart> parts, Brush brush)
         {
-            var currentOutput = output;
+            var currentBrush = brush;
             foreach (var part in parts)
-                currentOutput = part.Render(currentOutput, value);
+                currentBrush = part.Render(output, value, currentBrush);
+            return currentBrush;
         }
     }
 

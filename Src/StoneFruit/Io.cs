@@ -82,13 +82,6 @@ public interface IIoSetup
     IIoSetup SetLogColor(LogLevel logLevel, Brush brush);
 
     /// <summary>
-    /// Specify a custom factory to use for creating new colored output instances.
-    /// </summary>
-    /// <param name="factory"></param>
-    /// <returns></returns>
-    IIoSetup UseColorOutputFactory(IColorOutputFactory factory);
-
-    /// <summary>
     /// For handlers which return a value, specify a custom object writer to handle writing those
     /// objects the output.
     /// </summary>
@@ -110,21 +103,13 @@ public interface IIoSetup
 /// </summary>
 public interface IOutput
 {
-    /// <summary>
-    /// Gets a reference to the base IOutput implementation. If this is the base output
-    /// implementation, it will return itself.
-    /// </summary>
-    IOutput Inner { get; }
-
-    IColorOutputFactory ColorOutputFactory { get; }
-
     ITemplateParser TemplateParser { get; }
 
     /// <summary>
     /// Write a linebreak to the output.
     /// </summary>
     /// <returns></returns>
-    IOutput WriteLine();
+    IOutput WriteLine(string line = "", Brush brush = default);
 
     /// <summary>
     /// Write the string representation of the object to the output, with trailing
@@ -132,34 +117,22 @@ public interface IOutput
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
-    IOutput WriteLine(object obj)
+    IOutput WriteLine(object obj, Brush brush = default)
         => obj == null
             ? this
-            : WriteLine(obj!.ToString()!);
+            : WriteLine(obj!.ToString()!, brush);
 
-    /// <summary>
-    /// Write the given text followed by a line break to the output.
-    /// </summary>
-    /// <param name="line"></param>
-    /// <returns></returns>
-    IOutput WriteLine(string line);
-
-    /// <summary>
-    /// Write the given text to the output.
-    /// </summary>
-    /// <param name="str"></param>
-    /// <returns></returns>
-    IOutput Write(string str);
+    IOutput Write(string str, Brush brush = default);
 
     /// <summary>
     /// Write the string representation of the object to the output.
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
-    IOutput Write(object obj)
+    IOutput Write(object obj, Brush brush = default)
         => obj == null
             ? this
-            : Write(obj!.ToString()!);
+            : Write(obj!.ToString()!, brush);
 
     IOutput WriteFormatted(string format, object? value = null)
     {
@@ -171,14 +144,6 @@ public interface IOutput
 
     IOutput WriteLineFormatted(string format, object? value = null)
         => WriteFormatted(format, value).WriteLine();
-
-    /// <summary>
-    /// Get a new output with the given brush for text and background color. If the
-    /// implementation does not support color this will be a no-op.
-    /// </summary>
-    /// <param name="brush"></param>
-    /// <returns></returns>
-    IOutput Color(Brush brush) => ColorOutputFactory.Create(Inner, brush);
 }
 
 public interface IInput

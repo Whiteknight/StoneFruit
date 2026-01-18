@@ -72,10 +72,10 @@ public class EnvironmentHandler : IHandler
             var env = envList[i];
 
             output
-                .Color(ConsoleColor.White).Write(index.ToString())
-                .Color(ConsoleColor.DarkGray).Write(") ")
-                .Color(currentEnv.Satisfies(ce => ce == env) ? color.Swap() : color).Write(env)
-                .Color(Brush.Default).WriteLine();
+                .Write(index.ToString(), ConsoleColor.White)
+                .Write(") ", ConsoleColor.DarkGray)
+                .Write(env, currentEnv.Satisfies(ce => ce == env) ? color.Swap() : color)
+                .WriteLine();
         }
     }
 
@@ -114,7 +114,7 @@ public class EnvironmentHandler : IHandler
         // a valid selection is made.
         while (true)
         {
-            output.Color(ConsoleColor.DarkCyan).WriteLine("Please select an environment:");
+            output.WriteLine("Please select an environment:", ConsoleColor.DarkCyan);
             ListEnvironments(context.Environments, context.Output);
 
             var envIndex = context.Input.Prompt("", true, false).GetValueOrThrow();

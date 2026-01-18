@@ -15,7 +15,7 @@ internal static class Program
         builder.SetupHandlers(h => h
             // Scan for handlers using reflection. Looks for any public, non-abstract,
             // implementations of IHandlerBase in the specified assemblies
-            //.ScanHandlersFromEntryAssembly()
+            .ScanHandlersFromEntryAssembly()
             //.ScanHandlersFromCurrentAssembly("entry")
             //.ScanHandlersFromAssemblyContaining<MyFirstHandler>()
 

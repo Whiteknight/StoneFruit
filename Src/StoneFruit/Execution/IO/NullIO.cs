@@ -2,19 +2,13 @@
 
 namespace StoneFruit.Execution.IO;
 
-public class NullIO : IOutput, IInput, ITemplateParser, ITemplate, IColorOutputFactory
+public class NullIO : IOutput, IInput, ITemplateParser, ITemplate
 {
     public ITemplateParser TemplateParser => this;
 
-    public IOutput Inner => this;
+    public IOutput WriteLine(string? line = "", Brush brush = default) => this;
 
-    public IColorOutputFactory ColorOutputFactory => this;
-
-    public IOutput WriteLine() => this;
-
-    public IOutput WriteLine(string line) => this;
-
-    public IOutput Write(string str) => this;
+    public IOutput Write(string str, Brush brush = default) => this;
 
     public Maybe<string> Prompt(string prompt, bool mustProvide = true, bool keepHistory = true)
         => default;
@@ -24,6 +18,4 @@ public class NullIO : IOutput, IInput, ITemplateParser, ITemplate, IColorOutputF
     public void Render(IOutput output, object? value)
     {
     }
-
-    public IOutput Create(IOutput inner, Brush brush) => this;
 }

@@ -10,33 +10,22 @@ namespace StoneFruit.Execution.IO;
 [ExcludeFromCodeCoverage(Justification = "Hard to test System.Console without capturing IO streams")]
 public class ConsoleIO : IOutput, IInput
 {
-    public ConsoleIO(ITemplateParser parser, IColorOutputFactory colorFactory)
+    public ConsoleIO(ITemplateParser parser)
     {
         TemplateParser = parser;
-        ColorOutputFactory = colorFactory;
     }
 
     public ITemplateParser TemplateParser { get; }
 
-    public IColorOutputFactory ColorOutputFactory { get; }
-
-    public IOutput Inner => this;
-
-    public IOutput WriteLine()
+    public IOutput WriteLine(string? line = "", Brush brush = default)
     {
-        Console.WriteLine();
+        WithBrush(brush, line ?? string.Empty, Console.WriteLine);
         return this;
     }
 
-    public IOutput WriteLine(string line)
+    public IOutput Write(string str, Brush brush = default)
     {
-        Console.WriteLine(line);
-        return this;
-    }
-
-    public IOutput Write(string str)
-    {
-        Console.Write(str);
+        WithBrush(brush, str, Console.Write);
         return this;
     }
 
@@ -52,6 +41,30 @@ public class ConsoleIO : IOutput, IInput
             if (keepHistory)
                 ReadLine.AddHistory(value);
             return value;
+        }
+    }
+
+    private static void WithBrush(Brush brush, string text, Action<string> act)
+    {
+        if (brush == default || Console.IsOutputRedirected)
+        {
+            act(text);
+            return;
+        }
+
+        var current = Brush.Current;
+        var (foreground, background) = brush.GetConsoleColors();
+        Console.ForegroundColor = foreground;
+        Console.BackgroundColor = background;
+        try
+        {
+            act(text);
+        }
+        finally
+        {
+            (foreground, background) = current.GetConsoleColors();
+            Console.ForegroundColor = foreground;
+            Console.BackgroundColor = background;
         }
     }
 }

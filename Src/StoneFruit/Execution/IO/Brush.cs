@@ -42,6 +42,20 @@ public readonly struct Brush
 
     public static implicit operator Brush(ConsoleColor color) => new Brush(color, Console.BackgroundColor);
 
+    public static Brush Parse(string name)
+    {
+        var parts = name.Split(',');
+        if (parts.Length == 2)
+        {
+            var fg = (ConsoleColor)Enum.Parse(typeof(ConsoleColor), parts[0], true);
+            var bg = (ConsoleColor)Enum.Parse(typeof(ConsoleColor), parts[1], true);
+            return new Brush(fg, bg);
+        }
+
+        var foreground = (ConsoleColor)Enum.Parse(typeof(ConsoleColor), name, true);
+        return new Brush(foreground, Console.BackgroundColor);
+    }
+
     public readonly Brush Swap() => new Brush(_background, _foreground);
 
     public (ConsoleColor Foreground, ConsoleColor Background) GetConsoleColors()

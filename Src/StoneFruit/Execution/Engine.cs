@@ -122,18 +122,17 @@ public sealed class Engine
             // An exception was thrown while attempting to handle a previous error.
             // This isn't scripted because it's critical error-handling code and we cannot
             // allow yet another exception to be thrown at this point.
-            _output
-                .Color(ConsoleColor.Red)
-                .WriteLine("Received an exception while attempting to handle a previous exception")
-                .WriteLine("This is a fatal condition and the engine will exit")
-                .WriteLine("Make sure you clear the current exception when you are done handling it to avoid these situations")
-                .WriteLine("Current Exception:")
-                .WriteLine(currentException.Message)
-                .WriteLine(currentException.StackTrace ?? "")
-                .WriteLine("Previous Exception:")
-                .WriteLine(previousException.Message)
-                .WriteLine(previousException.StackTrace ?? "")
-                ;
+            _output.WriteLine($"""
+                Received an exception while attempting to handle a previous exception
+                This is a fatal condition and the engine will exit
+                Make sure you clear the current exception when you are done handling it to avoid these situations
+                Current Exception:
+                {currentException.Message}
+                {currentException.StackTrace ?? ""}
+                Previous Exception:
+                {previousException.Message}
+                {previousException.StackTrace ?? ""}
+                """, ConsoleColor.Red);
             _state.SignalExit(ExitCode.CascadeError);
             return;
         }

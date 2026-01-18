@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using StoneFruit;
-using StoneFruit.Execution.IO;
 
 namespace StoneFruit.Execution.Help;
 
@@ -85,9 +84,8 @@ public class HelpOverviewDisplay
         foreach (var info in verbInfos)
         {
             _output
-                .Color(ConsoleColor.Green)
                 .Write(padLeft)
-                .Write(info.Verb)
+                .Write(info.Verb, ConsoleColor.Green)
                 .Write(new string(' ', descStartColumn - (info.Verb.ToString() + padLeft).Length));
             OutputDescriptionLines(maxDescLineLength, blankPrefix, info.Description);
         }
@@ -146,9 +144,7 @@ public class HelpOverviewDisplay
         // use to indent all items in this group
         _output
             .Write("== ")
-            .Color(ConsoleColor.Blue)
-            .Write(groupName)
-            .Color(Brush.Default)
+            .Write(groupName, ConsoleColor.Blue)
             .WriteLine(" ==");
         return "  ";
     }

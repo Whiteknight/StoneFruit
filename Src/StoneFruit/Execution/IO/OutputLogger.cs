@@ -40,7 +40,7 @@ public sealed class OutputLogger<T> : ILogger<T>
             return;
         var color = _configuration.GetColor(logLevel);
         var formatted = formatter(state, exception);
-        _output.Color(color).WriteLine(formatted);
+        _output.WriteLine(formatted, color);
     }
 
     private sealed record StateToken(Dictionary<int, object> State, int Index) : IDisposable
