@@ -140,7 +140,7 @@ public interface IOutput
         => WriteMessage(new OutputMessage(str ?? string.Empty, IncludeNewline: true, IsError: true));
 
     IOutput WriteFormatted(string format, object? value = null)
-        => WriteMessage(new OutputMessage(NotNullOrEmpty(format), value, IsTemplate: true));
+        => WriteMessage(new OutputMessage(NotNull(format), value, IsTemplate: true));
 
     IOutput WriteLineFormatted(string format, object? value = null)
         => WriteFormatted(format, value).WriteLine();

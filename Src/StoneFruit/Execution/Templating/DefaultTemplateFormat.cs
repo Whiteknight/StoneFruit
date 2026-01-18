@@ -142,8 +142,10 @@ public static class DefaultTemplateFormat
             => TemplateParser.Parse(format).Value;
     }
 
-    public readonly record struct Template(IReadOnlyList<TemplatePart> Parts) : ITemplate
+    public sealed record Template(IReadOnlyList<TemplatePart> Parts) : ITemplate
     {
+        public static ITemplate Empty() => new Template([]);
+
         public IEnumerable<OutputMessage> Render(object? value)
         {
             if (Parts == null || Parts.Count == 0)

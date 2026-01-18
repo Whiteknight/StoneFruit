@@ -93,6 +93,18 @@ public sealed class Engine
             );
             HandleError(ie, _state.EventCatalog.EngineError, args);
         }
+        catch (WrappedException we)
+        {
+            var e = we.InnerException!;
+            // We've received some other error. Execute the EngineError script
+            // and hope for the best
+            var args = SyntheticArguments.From(
+                ("message", e.Message),
+                ("stacktrace", e.StackTrace ?? ""),
+                ("exitcode", ExitCode.Constants.UnhandledException.ToString())
+            );
+            HandleError(e, _state.EventCatalog.EngineError, args);
+        }
         catch (Exception e)
         {
             // We've received some other error. Execute the EngineError script

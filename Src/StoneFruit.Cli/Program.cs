@@ -25,6 +25,7 @@ internal static class Program
                 .UsePublicInstanceMethodsAsHandlers(new MyObject("grouped"))
             )
             .UsePublicInstanceMethodsAsHandlers(new MyObject("ungrouped"))
+            .UsePublicInstanceMethodsAsHandlers(new FormattingMethods())
 
             // Set up a verb which executes a callback delegate
             // Also set up a script as an alias of this
@@ -123,24 +124,25 @@ public class TestCHandler : IAsyncHandler
     }
 }
 
-public class FormatHandler : IHandler
+[Group("formatting")]
+public class FormattingMethods
 {
-    public void Execute(IArguments arguments, HandlerContext context)
+    public void ColorTest(IOutput output)
     {
-        context.Output.WriteLineFormatted("{{color red}}test{{color darkyellow}}test{{color yellow}}test{{color green}}test{{color cyan}}test{{color blue}}test{{color magenta}}test{{color default}}test");
-        context.Output.WriteLineFormatted("{{color white,red}}test{{color white,darkyellow}}test{{color white,yellow}}test{{color white,green}}test{{color white,cyan}}test{{color white,blue}}test{{color white,magenta}}test{{color}}test");
-        var fmt = arguments.Consume(0).AsString();
-        if (!string.IsNullOrEmpty(fmt))
+        output.WriteLineFormatted("{{color red}}test{{color darkyellow}}test{{color yellow}}test{{color green}}test{{color cyan}}test{{color blue}}test{{color magenta}}test{{color default}}test");
+        output.WriteLineFormatted("{{color white,red}}test{{color white,darkyellow}}test{{color white,yellow}}test{{color white,green}}test{{color white,cyan}}test{{color white,blue}}test{{color white,magenta}}test{{color}}test");
+    }
+
+    public void WriteWithTemplate(string? format, IOutput output)
+    {
+        output.WriteLineFormatted(format ?? string.Empty, new
         {
-            context.Output.WriteLineFormatted(fmt, new
+            Value1 = "Value1",
+            Value2 = new
             {
-                Value1 = "Value1",
-                Value2 = new
-                {
-                    Value3 = "Value3"
-                }
-            });
-        }
+                Value3 = "Value3"
+            }
+        });
     }
 }
 

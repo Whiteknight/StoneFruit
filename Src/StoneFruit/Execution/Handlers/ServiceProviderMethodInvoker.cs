@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using StoneFruit.Execution.Arguments;
+using StoneFruit.Execution.Exceptions;
 
 namespace StoneFruit.Execution.Handlers;
 
@@ -68,7 +69,14 @@ public class ServiceProviderMethodInvoker : IHandlerMethodInvoker
             argumentValues[i] = GetArgumentValue(parameter, context, token);
         }
 
-        return method.Invoke(instance, argumentValues);
+        try
+        {
+            return method.Invoke(instance, argumentValues);
+        }
+        catch (TargetInvocationException ex)
+        {
+            throw new WrappedException(ex.InnerException ?? ex);
+        }
     }
 
     private static Task<object?> ResolveResultToTaskOfObject(object? result, CancellationToken token)
