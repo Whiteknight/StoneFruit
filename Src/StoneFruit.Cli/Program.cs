@@ -47,10 +47,10 @@ internal static class Program
             )
         );
         builder.SetupIo(io => io.UseJsonObjectWriter());
-        builder.SetupEnvironments(e => e
-            .SetEnvironments(["Local", "Testing", "Production"])
-            .OnEnvironmentChanged(name => Console.WriteLine($"OBSERVER Environment changed to {name}"))
-        );
+        //builder.SetupEnvironments(e => e
+        //    .SetEnvironments(["Local", "Testing", "Production"])
+        //    .OnEnvironmentChanged(name => Console.WriteLine($"OBSERVER Environment changed to {name}"))
+        //);
         builder.SetupEvents(e =>
         {
             //e.EngineStartInteractive.Clear();

@@ -97,7 +97,11 @@ public class EnvironmentHandler : IHandler
         // We can skip some checks because this name is from a known list of valid environment names
         var envList = environments.GetNames();
         if (envList.Count == 1)
+        {
+            if (envList[0] == string.Empty)
+                return new EnvironmentNotChanged();
             return environments.SetCurrent(envList[0]);
+        }
 
         return PromptUserForEnvironment(context);
     }
