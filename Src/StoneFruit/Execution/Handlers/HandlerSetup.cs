@@ -14,6 +14,8 @@ using StoneFruit.Execution.Scripts;
 using StoneFruit.Utility;
 using static StoneFruit.Utility.Assert;
 
+#pragma warning disable S1200 // Too many dependencies.
+
 namespace StoneFruit.Execution.Handlers;
 
 /// <summary>
