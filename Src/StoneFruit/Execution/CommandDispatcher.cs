@@ -196,7 +196,7 @@ public class CommandDispatcher
             return;
         }
 
-        throw new InvalidOperationException($"Unknown handler type ${handler.GetType().Name}");
+        throw new InvalidOperationException($"{handler.GetType().Name} must be one of {typeof(IHandler).Name} or {typeof(IAsyncHandler).Name}.");
     }
 
     private HandlerContext CreateHandlerContext(IArguments args)

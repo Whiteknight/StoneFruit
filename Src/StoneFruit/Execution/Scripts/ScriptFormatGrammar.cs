@@ -8,6 +8,9 @@ using static ParserObjects.Parsers;
 using static ParserObjects.Parsers.C;
 using static ParserObjects.Parsers<char>;
 
+// This CreateParserInternal is just going to be large. No obvious way to break it up further.
+#pragma warning disable S138
+
 namespace StoneFruit.Execution.Scripts;
 
 public static class ScriptFormatGrammar

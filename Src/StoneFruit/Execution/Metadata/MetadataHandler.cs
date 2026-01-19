@@ -48,6 +48,6 @@ public class MetadataHandler : IHandler
             return;
         }
 
-        throw new ExecutionException("Unknown arguments");
+        throw new ExecutionException($"Unknown command: {subverb}");
     }
 }

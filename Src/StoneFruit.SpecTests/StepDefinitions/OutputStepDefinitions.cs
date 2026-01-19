@@ -40,4 +40,11 @@ public record OutputStepDefinitions(ScenarioContext Context)
         var output = Context.GetIo();
         output.Lines.Length.Should().Be(0);
     }
+
+    [Then("The output should not be empty")]
+    public void ThenTheOutputShouldNotBeEmpty()
+    {
+        var output = Context.GetIo();
+        output.Lines.Length.Should().NotBe(0);
+    }
 }
