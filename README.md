@@ -32,7 +32,21 @@ public void Main(string[] args)
 
 A **verb** is the name of an action, a word that you type in to get behavior. A **command** is a combination of a verb and an optional list of arguments. A **handler** is the class or method which is invoked in response to the verb.
 
-Handlers are implemented in code with the `IHandler` or `IAsyncHandler` interfaces which expose a `.Execute()` or `.ExecuteAsync()` method, respectively. 
+Handlers are implemented in a variety of ways:
+
+**Easy**: public instance methods on any object can become handlers. Inject dependencies either into the object constructor or the method parameter list:
+
+```csharp
+public class MyDomainService
+{
+    public void HandlerMethod(...)
+    {
+        ... your logic here ...
+    }
+}
+```
+
+**Low-Level**: The `IHandler` or `IAsyncHandler` interfaces which expose a `.Execute()` or `.ExecuteAsync()` method, respectively. Inject dependencies into the object constructor.
 
 ```csharp
 public class MyHandler : IHandler
@@ -43,9 +57,10 @@ public class MyHandler : IHandler
     }
 }
 ```
-Any dependencies required by the handler should be injected into the constructor and will be satisfied by your DI container. There are several built-in objects from StoneFruit which can be injected by default to provide helpful functionality. These are some of the highlights
 
-* `IOutput` and `IInput` abstractions allow controlled access to the Console, with basic color and formatting features.
+There are several built-in objects from StoneFruit which can be injected by default to provide helpful functionality. These are some of the highlights
+
+* `IOutput` and `IInput` abstractions allow controlled, overridable access to the `System.Console`, with basic color and formatting features.
 * `IEnvironmentCollection` Provides access to the current environment and the list of possible environments. If you inject `IEnvironment` you will get the current environment.
 * `IArguments` Provides access to the arguments of the command
 * `EngineState` Provides access to the internal state of the execution engine, allowing you to control program execution and store metadata.

@@ -1,0 +1,60 @@
+# StoneFruit Execution 
+
+## Modes of Execution
+
+The app provides several methods to begin execution. You can select either interactive mode or headless mode explicitly, or you can let the app decide based on the presence or absence of command-line arguments.
+
+### Interactive Mode
+
+If you call `app.RunInteractively()` the app will be started in interactive mode and will ignore any commands on the command-line. If you support environments and call `app.RunInteractively(envName)` the app will start interactive mode with the specified environment active. If your application supports multiple environments and you enter interactive mode without an environment set, the app will prompt you to select an environment before showing you the prompt.
+
+If you `.Run()` your app without command-line arguments, or if you support environments and specify only the name of an environment on the command-line, the app will be started in interactive mode. You can enter commands at the prompt, and can type "exit" or "quit" to exit the loop. 
+
+#### Scripting
+
+In interactive mode, the Engine will first execute the `EngineStartInteractive` script, then it will prompt the user for input until the user exits the application. See the page on [Scripting](scripting.md) for more details. 
+
+### Headless Mode
+
+If you call `app.RunHeadlessWithCommandLineArgs()` it will always run in headless mode using the commandline arguments as the only input. If a valid command is not present, an error will be shown.
+
+If you call `app.RunHeadless(cmd)` it will always run in headless mode using the given string as the only command input. If the string is null or empty, or contains an invalid verb, an error will be shown.
+
+If you call `app.Run()` with commandline arguments your application will start in headless mode. If you support environments, the first argument must be the name of the environment to use, followed by the verb and arguments. If you do not support environments, the first argument should be the verb followed by the arguments. If there is no valid command on the commandline, `app.Run()` will choose interactive mode instead.
+
+```bash
+mystonefruitapp Production echo 'test'
+mystonefruitapp echo 'test'
+```
+
+#### Scripting
+
+In headless mode, the Engine will first execute the `EngineStartHeadless` script, then it will execute the command from the commandline, and then it will execute the `EngineStopHeadless` script. See the page on [Scripting](scripting.md) for more details.
+
+#### Headless Help
+
+If you call `app.RunHeadless("help")` or `app.RunHeadlessWithCommandLineArgs()` where `help` is the only commandline argument, StoneFruit will enter "headless help" mode. It will execute the `HeadlessHelp` script (see [Scripting](scripting.md) for more details) and will exit immediately. You can configure this behavior by modifying the contents of the `HeadlessHelp` script in the EngineBuilder.
+
+### Built-In Verbs
+
+StoneFruit provides a handful of built-in verbs that you can invoke for various purposes or use as part of scripts.
+
+#### `help`
+
+The `help` verb can show you a list of all verbs registered with the system or it can show detailed usage information about a specific handler:
+
+```bash
+help 
+
+help my-verb
+```
+
+#### `echo`
+
+The `echo` verb writes all positional arguments to the output. You can specify a Color as one of the 16 DOS colors (See `System.ConsoleColor` enum). 
+
+`-nonewline` does not print a newline at the end.
+
+#### `exit`
+
+The `exit` verb exits the application. It can take an optional integer value which is the desired exit code.
