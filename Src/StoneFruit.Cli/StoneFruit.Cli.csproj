@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <!-- Exclude the project from analysis -->
+    <Nullable>enable</Nullable>
     <SonarQubeExclude>true</SonarQubeExclude>
   </PropertyGroup>
 

@@ -18,27 +18,14 @@ public static class DefaultTemplateFormat
 
         private static IParser<char, ITemplate> CreateParserInternal()
         {
-            var openCurly = MatchChar('{');
             var ws = Whitespace();
             var ows = OptionalWhitespace();
+
             IParser<char, TemplatePart>? itemRaw = null;
             var item = Deferred(() => itemRaw!);
 
-            var basicChar = First(
-                openCurly.NotFollowedBy(openCurly),
-                Match(c => c != '{' && c != '\0')
-            );
-            var literal = basicChar.ListCharToString().Map(s => TemplatePart.Literal(s));
-
-            var dotIdentifier = Rule(
-                MatchChar('.'),
-                Identifier(),
-                (_, id) => PipelineFilter.DotIdentifier(id));
-
-            var pipelineFilter = First(
-                dotIdentifier);
-
-            var pipeline = pipelineFilter.List(true).Map(l => new Pipeline(l));
+            IParser<char, TemplatePart> literal = CreateLiteralParser();
+            var pipeline = CreatePipelineParser();
 
             var pipelineTag = Rule(
                 Match("{{"),
@@ -48,25 +35,7 @@ public static class DefaultTemplateFormat
                 Match("}}"),
                 (_, _, p, _, _) => TemplatePart.Pipeline(p));
 
-            var color = First(
-                Drawing.Color(),
-                Drawing.ConsoleColor().Transform(Brush.ToColor));
-
-            var brush = First(
-                MatchChars("default", true).Transform(_ => Brush.Default),
-                Rule(
-                    color,
-                    Optional(
-                        Rule(
-                            MatchChar(','),
-                            color,
-                            (_, bg) => bg
-                        ),
-                        () => Brush.Default.GetColors().Background
-                    ),
-                    (fg, bg) => new Brush(fg, bg)
-                )
-            );
+            var brush = CreateBrushParser();
 
             var colorTag = Rule(
                 Match("{{"),
@@ -108,19 +77,62 @@ public static class DefaultTemplateFormat
                 Tag("end"),
                 (p, thens, elses, _) => TemplatePart.If(p, thens, elses));
 
-            var tag = First(
+            itemRaw = First(
                 pipelineTag,
                 colorTag,
-                ifTag);
-
-            itemRaw = First(
-                tag,
+                ifTag,
                 literal);
 
             return Rule(
                 item.List(),
                 End(),
                 (items, _) => (ITemplate)new Template(items));
+        }
+
+        private static IParser<char, TemplatePart> CreateLiteralParser()
+        {
+            var openCurly = MatchChar('{');
+            var basicChar = First(
+                openCurly.NotFollowedBy(openCurly),
+                Match(c => c != '{' && c != '\0')
+            );
+            return basicChar.ListCharToString().Map(s => TemplatePart.Literal(s));
+        }
+
+        private static IParser<char, Brush> CreateBrushParser()
+        {
+            var color = First(
+                Drawing.Color(),
+                Drawing.ConsoleColor().Transform(Brush.ToColor));
+
+            return First(
+                MatchChars("default", true).Transform(_ => Brush.Default),
+                Rule(
+                    color,
+                    Optional(
+                        Rule(
+                            MatchChar(','),
+                            color,
+                            (_, bg) => bg
+                        ),
+                        () => Brush.Default.GetColors().Background
+                    ),
+                    (fg, bg) => new Brush(fg, bg)
+                )
+            );
+        }
+
+        private static IParser<char, Pipeline> CreatePipelineParser()
+        {
+            var dotIdentifier = Rule(
+                MatchChar('.'),
+                Identifier(),
+                (_, id) => PipelineFilter.DotIdentifier(id));
+
+            var pipelineFilter = First(
+                dotIdentifier);
+
+            return pipelineFilter.List(true).Map(l => new Pipeline(l));
         }
 
         private static IParser<char, string> Tag(string name)
