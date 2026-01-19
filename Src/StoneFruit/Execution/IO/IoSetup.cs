@@ -87,6 +87,7 @@ public class IoSetup : IIoSetup
         services.TryAddSingleton(_ => DefaultTemplateFormat.Parser.Create());
         services.TryAddSingleton(typeof(ILogger<>), typeof(OutputLogger<>));
         services.TryAddSingleton(new LoggingConfiguration(_logLevel, _logColors));
+        services.TryAddSingleton<ILoggerFactory, OutputLoggerFactory>();
         services.TryAddSingleton<IObjectOutputWriter, NullObjectOutputWriter>();
     }
 }

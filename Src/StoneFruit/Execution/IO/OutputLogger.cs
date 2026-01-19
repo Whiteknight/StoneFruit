@@ -12,13 +12,15 @@ public sealed class OutputLogger<T> : ILogger<T>
 {
     private readonly IOutput _output;
     private readonly LoggingConfiguration _configuration;
+    private readonly string _name;
     private int _stateIndex;
     private Dictionary<int, object>? _state;
 
-    public OutputLogger(IOutput output, LoggingConfiguration configuration)
+    public OutputLogger(IOutput output, LoggingConfiguration configuration, string name)
     {
         _output = output;
         _configuration = configuration;
+        _name = name;
         _stateIndex = 1;
     }
 
@@ -46,5 +48,30 @@ public sealed class OutputLogger<T> : ILogger<T>
     private sealed record StateToken(Dictionary<int, object> State, int Index) : IDisposable
     {
         public void Dispose() => State.Remove(Index);
+    }
+}
+
+public sealed class OutputLoggerFactory : ILoggerFactory
+{
+    private readonly IOutput _output;
+    private readonly LoggingConfiguration _configuration;
+
+    public OutputLoggerFactory(IOutput output, LoggingConfiguration configuration)
+    {
+        _output = output;
+        _configuration = configuration;
+    }
+
+    public ILogger CreateLogger(string categoryName)
+        => new OutputLogger<object>(_output, _configuration, categoryName);
+
+    public void AddProvider(ILoggerProvider provider)
+    {
+        // No-op
+    }
+
+    public void Dispose()
+    {
+        // No-op
     }
 }
